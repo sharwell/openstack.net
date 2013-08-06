@@ -107,6 +107,10 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public bool CreateVolume(int size, string displayDescription = null, string displayName = null, string snapshotId = null, string volumeType = null, string region = null, CloudIdentity identity = null)
         {
+            if (size < 0)
+                throw new ArgumentOutOfRangeException("size");
+            CheckIdentity(identity);
+
             _cloudBlockStorageValidator.ValidateVolumeSize(size);
 
             var urlPath = new Uri(string.Format("{0}/volumes", GetServiceEndpoint(identity, region)));
@@ -119,6 +123,8 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public IEnumerable<Volume> ListVolumes(string region = null, CloudIdentity identity = null)
         {
+            CheckIdentity(identity);
+
             var urlPath = new Uri(string.Format("{0}/volumes", GetServiceEndpoint(identity, region)));
             var response = ExecuteRESTRequest<ListVolumeResponse>(identity, urlPath, HttpMethod.GET);
 
@@ -131,6 +137,12 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public Volume ShowVolume(string volumeId, string region = null, CloudIdentity identity = null)
         {
+            if (volumeId == null)
+                throw new ArgumentNullException("volumeId");
+            if (string.IsNullOrEmpty(volumeId))
+                throw new ArgumentException("volumeId cannot be empty");
+            CheckIdentity(identity);
+
             var urlPath = new Uri(string.Format("{0}/volumes/{1}", GetServiceEndpoint(identity, region), volumeId));
             var response = ExecuteRESTRequest<GetCloudBlockStorageVolumeResponse>(identity, urlPath, HttpMethod.GET);
 
@@ -143,6 +155,12 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public bool DeleteVolume(string volumeId, string region = null, CloudIdentity identity = null)
         {
+            if (volumeId == null)
+                throw new ArgumentNullException("volumeId");
+            if (string.IsNullOrEmpty(volumeId))
+                throw new ArgumentException("volumeId cannot be empty");
+            CheckIdentity(identity);
+
             var urlPath = new Uri(string.Format("{0}/volumes/{1}", GetServiceEndpoint(identity, region), volumeId));
             var response = ExecuteRESTRequest(identity, urlPath, HttpMethod.DELETE);
 
@@ -152,6 +170,8 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public IEnumerable<VolumeType> ListVolumeTypes(string region = null, CloudIdentity identity = null)
         {
+            CheckIdentity(identity);
+
             var urlPath = new Uri(string.Format("{0}/types", GetServiceEndpoint(identity, region)));
             var response = ExecuteRESTRequest<ListVolumeTypeResponse>(identity, urlPath, HttpMethod.GET);
 
@@ -164,6 +184,8 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public VolumeType DescribeVolumeType(int volumeTypeId, string region = null, CloudIdentity identity = null)
         {
+            CheckIdentity(identity);
+
             var urlPath = new Uri(string.Format("{0}/types/{1}", GetServiceEndpoint(identity, region), volumeTypeId));
             var response = ExecuteRESTRequest<GetCloudBlockStorageVolumeTypeResponse>(identity, urlPath, HttpMethod.GET);
 
@@ -176,18 +198,54 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public Volume WaitForVolumeAvailable(string volumeId, int refreshCount = 600, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null)
         {
+            if (volumeId == null)
+                throw new ArgumentNullException("volumeId");
+            if (string.IsNullOrEmpty(volumeId))
+                throw new ArgumentException("volumeId cannot be empty");
+            if (refreshCount < 0)
+                throw new ArgumentOutOfRangeException("refreshCount");
+            if (refreshDelay < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException("refreshDelay");
+            CheckIdentity(identity);
+
             return WaitForVolumeState(volumeId, VolumeState.AVAILABLE, new[] { VolumeState.ERROR, VolumeState.ERROR_DELETING }, refreshCount, refreshDelay ?? TimeSpan.FromMilliseconds(2400), region, identity);
         }
 
         /// <inheritdoc />
         public bool WaitForVolumeDeleted(string volumeId, int refreshCount = 360, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null)
         {
+            if (volumeId == null)
+                throw new ArgumentNullException("volumeId");
+            if (string.IsNullOrEmpty(volumeId))
+                throw new ArgumentException("volumeId cannot be empty");
+            if (refreshCount < 0)
+                throw new ArgumentOutOfRangeException("refreshCount");
+            if (refreshDelay < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException("refreshDelay");
+            CheckIdentity(identity);
+
             return WaitForItemToBeDeleted(ShowVolume, volumeId, refreshCount, refreshDelay ?? TimeSpan.FromSeconds(10), region, identity);
         }
 
         /// <inheritdoc />
         public Volume WaitForVolumeState(string volumeId, string expectedState, string[] errorStates, int refreshCount = 600, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null)
         {
+            if (volumeId == null)
+                throw new ArgumentNullException("volumeId");
+            if (expectedState == null)
+                throw new ArgumentNullException("expectedState");
+            if (errorStates == null)
+                throw new ArgumentNullException("errorStates");
+            if (string.IsNullOrEmpty(volumeId))
+                throw new ArgumentException("volumeId cannot be empty");
+            if (string.IsNullOrEmpty(expectedState))
+                throw new ArgumentException("expectedState cannot be empty");
+            if (refreshCount < 0)
+                throw new ArgumentOutOfRangeException("refreshCount");
+            if (refreshDelay < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException("refreshDelay");
+            CheckIdentity(identity);
+
             var volumeInfo = ShowVolume(volumeId, region, identity);
 
             var count = 0;
