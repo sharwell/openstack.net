@@ -279,18 +279,28 @@ namespace net.openstack.Providers.Rackspace
         #region Snapshots
 
         /// <inheritdoc />
-        public bool CreateSnapshot(string volumeId, bool force = false, string displayName = "None", string displayDescription = "None", string region = null, CloudIdentity identity = null)
+        public Snapshot CreateSnapshot(string volumeId, bool force = false, string displayName = "None", string displayDescription = "None", string region = null, CloudIdentity identity = null)
         {
+            if (volumeId == null)
+                throw new ArgumentNullException("volumeId");
+            if (string.IsNullOrEmpty(volumeId))
+                throw new ArgumentException("volumeId cannot be empty");
+            CheckIdentity(identity);
+
             var urlPath = new Uri(string.Format("{0}/snapshots", GetServiceEndpoint(identity, region)));
             var requestBody = new CreateCloudBlockStorageSnapshotRequest { CreateCloudBlockStorageSnapshotDetails = new CreateCloudBlockStorageSnapshotDetails { VolumeId = volumeId, Force = force, DisplayName = displayName, DisplayDescription = displayDescription } };
-            var response = ExecuteRESTRequest(identity, urlPath, HttpMethod.POST, requestBody);
+            var response = ExecuteRESTRequest<GetCloudBlockStorageSnapshotResponse>(identity, urlPath, HttpMethod.POST, requestBody);
+            if (response == null || response.Data == null)
+                return null;
 
-            return response != null && _validResponseCode.Contains(response.StatusCode);
+            return response.Data.Snapshot;
         }
 
         /// <inheritdoc />
         public IEnumerable<Snapshot> ListSnapshots(string region = null, CloudIdentity identity = null)
         {
+            CheckIdentity(identity);
+
             var urlPath = new Uri(string.Format("{0}/snapshots", GetServiceEndpoint(identity, region)));
             var response = ExecuteRESTRequest<ListSnapshotResponse>(identity, urlPath, HttpMethod.GET);
 
@@ -303,6 +313,12 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public Snapshot ShowSnapshot(string snapshotId, string region = null, CloudIdentity identity = null)
         {
+            if (snapshotId == null)
+                throw new ArgumentNullException("snapshotId");
+            if (string.IsNullOrEmpty(snapshotId))
+                throw new ArgumentException("snapshotId cannot be empty");
+            CheckIdentity(identity);
+
             var urlPath = new Uri(string.Format("{0}/snapshots/{1}", GetServiceEndpoint(identity, region), snapshotId));
             var response = ExecuteRESTRequest<GetCloudBlockStorageSnapshotResponse>(identity, urlPath, HttpMethod.GET);
 
@@ -315,6 +331,12 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public bool DeleteSnapshot(string snapshotId, string region = null, CloudIdentity identity = null)
         {
+            if (snapshotId == null)
+                throw new ArgumentNullException("snapshotId");
+            if (string.IsNullOrEmpty(snapshotId))
+                throw new ArgumentException("snapshotId cannot be empty");
+            CheckIdentity(identity);
+
             var urlPath = new Uri(string.Format("{0}/snapshots/{1}", GetServiceEndpoint(identity, region), snapshotId));
             var response = ExecuteRESTRequest(identity, urlPath, HttpMethod.DELETE);
 
@@ -324,18 +346,54 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public Snapshot WaitForSnapshotAvailable(string snapshotId, int refreshCount = 360, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null)
         {
+            if (snapshotId == null)
+                throw new ArgumentNullException("snapshotId");
+            if (string.IsNullOrEmpty(snapshotId))
+                throw new ArgumentException("snapshotId cannot be empty");
+            if (refreshCount < 0)
+                throw new ArgumentOutOfRangeException("refreshCount");
+            if (refreshDelay < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException("refreshDelay");
+            CheckIdentity(identity);
+
             return WaitForSnapshotState(snapshotId, SnapshotState.AVAILABLE, new[] { SnapshotState.ERROR, SnapshotState.ERROR_DELETING }, refreshCount, refreshDelay ?? TimeSpan.FromSeconds(10), region, identity);
         }
 
         /// <inheritdoc />
         public bool WaitForSnapshotDeleted(string snapshotId, int refreshCount = 180, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null)
         {
+            if (snapshotId == null)
+                throw new ArgumentNullException("snapshotId");
+            if (string.IsNullOrEmpty(snapshotId))
+                throw new ArgumentException("snapshotId cannot be empty");
+            if (refreshCount < 0)
+                throw new ArgumentOutOfRangeException("refreshCount");
+            if (refreshDelay < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException("refreshDelay");
+            CheckIdentity(identity);
+
             return WaitForItemToBeDeleted(ShowSnapshot, snapshotId, refreshCount, refreshDelay ?? TimeSpan.FromSeconds(10), region, identity);
         }
 
         /// <inheritdoc />
         public Snapshot WaitForSnapshotState(string snapshotId, string expectedState, string[] errorStates, int refreshCount = 60, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null)
         {
+            if (snapshotId == null)
+                throw new ArgumentNullException("snapshotId");
+            if (expectedState == null)
+                throw new ArgumentNullException("expectedState");
+            if (errorStates == null)
+                throw new ArgumentNullException("errorStates");
+            if (string.IsNullOrEmpty(snapshotId))
+                throw new ArgumentException("snapshotId cannot be empty");
+            if (string.IsNullOrEmpty(expectedState))
+                throw new ArgumentException("expectedState cannot be empty");
+            if (refreshCount < 0)
+                throw new ArgumentOutOfRangeException("refreshCount");
+            if (refreshDelay < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException("refreshDelay");
+            CheckIdentity(identity);
+
             var snapshotInfo = ShowSnapshot(snapshotId, region, identity);
 
             var count = 0;

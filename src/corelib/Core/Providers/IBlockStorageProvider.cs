@@ -270,91 +270,224 @@ namespace net.openstack.Core.Providers
         #endregion
 
         #region Snapshot
+
         /// <summary>
         /// Creates a new snapshot.
-        /// <para/>
-        /// Creating a snapshot makes a point-in-time copy of the volume. 
-        /// All writes to the volume should be flushed before creating the snapshot, either by un-mounting any file systems on the volume, or by detaching the volume before creating the snapshot. 
-        /// Snapshots are incremental, so each time you create a new snapshot, you are appending the incremental changes for the new snapshot to the previous one. 
-        /// The previous snapshot is still available. Note that you can create a new volume from the snapshot if desired.
-        /// <para/>
-        /// Documentation URL: http://docs.rackspace.com/cbs/api/v1.0/cbs-devguide/content/POST_createSnapshot__v1__tenant_id__snapshots.html
         /// </summary>
-        /// <param name="volumeId">The ID of the volume to snapshot.</param>
-        /// <param name="force">Indicates whether to snapshot, even if the volume is attached. Default==False.</param>
-        /// <param name="displayName">Name of the snapshot. Default==None. </param>
-        /// <param name="displayDescription">Description of snapshot. Default==None.</param>
-        /// <param name="region">The region in which to execute this action.<remarks>If not specified, the user’s default region will be used.</remarks></param>
-        /// <param name="identity">The users Cloud Identity <see cref="net.openstack.Core.Domain.CloudIdentity"/><remarks>If not specified, the default identity given in the constructor will be used.</remarks></param>
-        /// <returns><see cref="bool"></see></returns>
-        bool CreateSnapshot(string volumeId, bool force = false, string displayName = "None", string displayDescription = null, string region = null, CloudIdentity identity = null);
+        /// <remarks>
+        /// The snapshot operation is performed asynchronously. After this call returns,
+        /// <see cref="WaitForSnapshotAvailable"/> may be called to wait until the snapshot
+        /// process is complete and the snapshot is available.
+        ///
+        /// <para>Creating a snapshot makes a point-in-time copy of the volume.
+        /// All writes to the volume should be flushed before creating the snapshot, either by un-mounting any file systems on the volume, or by detaching the volume before creating the snapshot.
+        /// Snapshots are incremental, so each time you create a new snapshot, you are appending the incremental changes for the new snapshot to the previous one.
+        /// The previous snapshot is still available. Note that you can create a new volume from the snapshot if desired.</para>
+        /// </remarks>
+        /// <param name="volumeId">The ID of the volume to snapshot. The value should be obtained from <see cref="Volume.Id">Volume.Id</see>.</param>
+        /// <param name="force">If <c>true</c>, the snapshot is created even if the volume is currently attached.</param>
+        /// <param name="displayName">Name of the snapshot.</param>
+        /// <param name="displayDescription">Description of snapshot.</param>
+        /// <param name="region">The region in which to execute this action. If not specified, the user's default region will be used.</param>
+        /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
+        /// <returns>A <see cref="Snapshot"/> object containing the details about the snapshot.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="volumeId"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="volumeId"/> is empty.</exception>
+        /// <exception cref="NotSupportedException">
+        /// If the provider does not support the given <paramref name="identity"/> type.
+        /// <para>-or-</para>
+        /// <para>The specified <paramref name="region"/> is not supported.</para>
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
+        /// <exception cref="ResponseException">If the REST API request failed.</exception>
+        /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/Create_Snapshot.html">Create Snapshot (OpenStack Block Storage Service API Reference)</seealso>
+        Snapshot CreateSnapshot(string volumeId, bool force = false, string displayName = "None", string displayDescription = null, string region = null, CloudIdentity identity = null);
+
         /// <summary>
-        /// View a list of snapshots.
-        /// <para/>
-        /// Documenatation URL: http://docs.rackspace.com/cbs/api/v1.0/cbs-devguide/content/GET_getSnapshotsSimple__v1__tenant_id__snapshots.html
+        /// Get a list of snapshots.
         /// </summary>
-        /// <param name="region">The region in which to execute this action.<remarks>If not specified, the user’s default region will be used.</remarks></param>
-        /// <param name="identity">The users Cloud Identity <see cref="net.openstack.Core.Domain.CloudIdentity"/><remarks>If not specified, the default identity given in the constructor will be used.</remarks></param>
-        /// <returns>List of <see cref="net.openstack.Core.Domain.Snapshot"></see> objects.</returns>
+        /// <param name="region">The region in which to execute this action. If not specified, the user's default region will be used.</param>
+        /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
+        /// <returns>A collection of <see cref="Snapshot"/> objects containing the details of each snapshot.</returns>
+        /// <exception cref="NotSupportedException">
+        /// If the provider does not support the given <paramref name="identity"/> type.
+        /// <para>-or-</para>
+        /// <para>The specified <paramref name="region"/> is not supported.</para>
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
+        /// <exception cref="ResponseException">If the REST API request failed.</exception>
+        /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/List_Snapshots.html">List Snapshot Summaries (OpenStack Block Storage Service API Reference)</seealso>
         IEnumerable<Snapshot> ListSnapshots(string region = null, CloudIdentity identity = null);
+
         /// <summary>
         /// View all information about a single snapshot.
-        /// <para/>
-        /// Documenatation URL: http://docs.rackspace.com/cbs/api/v1.0/cbs-devguide/content/GET_getSnapshot__v1__tenant_id__snapshots.html
         /// </summary>
-        /// <param name="snapshotId">The ID of the snapshot</param>
-        /// <param name="region">The region in which to execute this action.<remarks>If not specified, the user’s default region will be used.</remarks></param>
-        /// <param name="identity">The users Cloud Identity <see cref="net.openstack.Core.Domain.CloudIdentity"/><remarks>If not specified, the default identity given in the constructor will be used.</remarks></param>
-        /// <returns><see cref="net.openstack.Core.Domain.Snapshot"></see></returns>
+        /// <param name="snapshotId">The ID of the snapshot. The value should be obtained from <see cref="Snapshot.Id">Snapshot.Id</see>.</param>
+        /// <param name="region">The region in which to execute this action. If not specified, the user's default region will be used.</param>
+        /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
+        /// <returns>A <see cref="Snapshot"/> object containing the snapshot details.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="snapshotId"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="snapshotId"/> is empty.</exception>
+        /// <exception cref="NotSupportedException">
+        /// If the provider does not support the given <paramref name="identity"/> type.
+        /// <para>-or-</para>
+        /// <para>The specified <paramref name="region"/> is not supported.</para>
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
+        /// <exception cref="ResponseException">If the REST API request failed.</exception>
+        /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/Show_Snapshot.html">Show Snapshot (OpenStack Block Storage Service API Reference)</seealso>
         Snapshot ShowSnapshot(string snapshotId, string region = null, CloudIdentity identity = null);
+
         /// <summary>
-        /// Deletes a single snapshot.
-        /// <para/>
-        /// Documentation URL: http://docs.rackspace.com/cbs/api/v1.0/cbs-devguide/content/DELETE_deleteSnapshot__v1__tenant_id__snapshots.html
+        /// Marks a snapshot for deletion.
         /// </summary>
-        /// <param name="snapshotId">The ID of the snapshot.</param>
-        /// <param name="region">The region in which to execute this action.<remarks>If not specified, the user’s default region will be used.</remarks></param>
-        /// <param name="identity">The users Cloud Identity <see cref="net.openstack.Core.Domain.CloudIdentity"/><remarks>If not specified, the default identity given in the constructor will be used.</remarks></param>
-        /// <returns><see cref="bool"></see></returns>
+        /// <remarks>
+        /// The deletion operation is performed asynchronously. After this call returns,
+        /// <see cref="WaitForSnapshotDeleted"/> may be called to wait until the snapshot
+        /// is finally deleted.
+        /// </remarks>
+        /// <param name="snapshotId">The ID of the snapshot. The value should be obtained from <see cref="Snapshot.Id">Snapshot.Id</see>.</param>
+        /// <param name="region">The region in which to execute this action. If not specified, the user's default region will be used.</param>
+        /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
+        /// <returns><c>true</c> if the snapshot was successfully marked for deletion; otherwise <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="snapshotId"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="snapshotId"/> is empty.</exception>
+        /// <exception cref="NotSupportedException">
+        /// If the provider does not support the given <paramref name="identity"/> type.
+        /// <para>-or-</para>
+        /// <para>The specified <paramref name="region"/> is not supported.</para>
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
+        /// <exception cref="ResponseException">If the REST API request failed.</exception>
+        /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/Delete_Snapshot.html">Delete Snapshot (OpenStack Block Storage Service API Reference)</seealso>
         bool DeleteSnapshot(string snapshotId, string region = null, CloudIdentity identity = null);
+
         /// <summary>
-        /// Waits for a snapshot to be set to AVAILABLE status.  
-        /// This method will be helpful to ensure that a snapshot is correctly created prior to executing additional requests against it.
+        /// Waits for a snapshot to be set to <see cref="VolumeState.AVAILABLE"/> status.
         /// </summary>
-        /// <param name="snapshotId">The ID of the snapshot to poll.</param>
-        /// <param name="refreshCount">The number of times to poll for the snapshot to become "available".</param>
+        /// <remarks>
+        /// This method can be used to ensure that a snapshot is correctly created prior to executing additional requests against it.
+        /// </remarks>
+        /// <param name="snapshotId">The ID of the snapshot to poll. The value should be obtained from <see cref="Snapshot.Id">Snapshot.Id</see>.</param>
+        /// <param name="refreshCount">The number of times to poll for the snapshot to become available.</param>
         /// <param name="refreshDelay">The refresh delay. If the value is <c>null</c>, the default value is 10 seconds.</param>
-        /// <param name="region">The region in which to execute this action.<remarks>If not specified, the user’s default region will be used.</remarks></param>
-        /// <param name="identity">The users Cloud Identity <see cref="net.openstack.Core.Domain.CloudIdentity"/><remarks>If not specified, the default identity given in the constructor will be used.</remarks></param>
-        /// <returns><see cref="net.openstack.Core.Domain.Snapshot"></see></returns>
+        /// <param name="region">The region in which to execute this action. If not specified, the user's default region will be used.</param>
+        /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
+        /// <returns>A <see cref="Snapshot"/> object containing the snapshot details, including the final <see cref="Snapshot.Status"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="snapshotId"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="snapshotId"/> is empty.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="refreshCount"/> is less than 0.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="refreshDelay"/> is negative.</para>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// If the provider does not support the given <paramref name="identity"/> type.
+        /// <para>-or-</para>
+        /// <para>The specified <paramref name="region"/> is not supported.</para>
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
+        /// <exception cref="ResponseException">If the REST API request failed.</exception>
         Snapshot WaitForSnapshotAvailable(string snapshotId, int refreshCount = 360, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null);
+
         /// <summary>
-        /// Waits for a snapshot to be deleted.  
-        /// This method will be helpful to ensure that a snapshot is completely removed.
+        /// Waits for a snapshot to be deleted.
         /// </summary>
-        /// <param name="snapshotId">The ID of the snapshot to poll.</param>
+        /// <remarks>
+        /// This method can be used to ensure that a snapshot is completely removed.
+        /// </remarks>
+        /// <param name="snapshotId">The ID of the snapshot to poll. The value should be obtained from <see cref="Snapshot.Id">Snapshot.Id</see>.</param>
         /// <param name="refreshCount">The number of times to poll for the snapshot to be deleted.</param>
         /// <param name="refreshDelay">The refresh delay. If the value is <c>null</c>, the default value is 10 seconds.</param>
-        /// <param name="region">The region in which to execute this action.<remarks>If not specified, the user’s default region will be used.</remarks></param>
-        /// <param name="identity">The users Cloud Identity <see cref="net.openstack.Core.Domain.CloudIdentity"/><remarks>If not specified, the default identity given in the constructor will be used.</remarks></param>
-        /// <returns><see cref="bool"></see></returns>
+        /// <param name="region">The region in which to execute this action. If not specified, the user's default region will be used.</param>
+        /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
+        /// <returns><c>true</c> if the snapshot was successfully deleted; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="snapshotId"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="snapshotId"/> is empty.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="refreshCount"/> is less than 0.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="refreshDelay"/> is negative.</para>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// If the provider does not support the given <paramref name="identity"/> type.
+        /// <para>-or-</para>
+        /// <para>The specified <paramref name="region"/> is not supported.</para>
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
+        /// <exception cref="ResponseException">If the REST API request failed.</exception>
         bool WaitForSnapshotDeleted(string snapshotId, int refreshCount = 180, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null);
+
         /// <summary>
-        /// Waits for a snapshot to be set to be set to a particular status.  
-        /// This method will be helpful to ensure that a snapshot is in an intended state prior to executing additional requests against it.
-        /// 
-        /// <see cref="net.openstack.Core.Domain.SnapshotState"></see> 
+        /// Waits for a snapshot to be set to be set to a particular status.
         /// </summary>
-        /// <param name="snapshotId">The ID of the snapshot to poll.</param>
+        /// <remarks>
+        /// This method can be used to ensure that a snapshot is in an intended state prior to
+        /// executing additional requests against it.
+        /// </remarks>
+        /// <param name="snapshotId">The ID of the snapshot to poll. The value should be obtained from <see cref="Snapshot.Id">Snapshot.Id</see>.</param>
         /// <param name="expectedState">The expected state for the snapshot.</param>
         /// <param name="errorStates">The error state(s) in which to stop polling once reached.</param>
         /// <param name="refreshCount">The number of times to poll the snapshot.</param>
         /// <param name="refreshDelay">The refresh delay. If the value is <c>null</c>, the default value is 10 seconds.</param>
-        /// <param name="region">The region in which to execute this action.<remarks>If not specified, the user’s default region will be used.</remarks></param>
-        /// <param name="identity">The users Cloud Identity <see cref="net.openstack.Core.Domain.CloudIdentity"/><remarks>If not specified, the default identity given in the constructor will be used.</remarks></param>
-        /// <returns><see cref="net.openstack.Core.Domain.Snapshot"></see></returns>
-        /// <exception cref="net.openstack.Providers.Rackspace.CloudBlockStorageProvider.SnapshotEnteredErrorStateException"></exception>
+        /// <param name="region">The region in which to execute this action. If not specified, the user's default region will be used.</param>
+        /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
+        /// <returns>A <see cref="Snapshot"/> object containing the snapshot details, including the final <see cref="Snapshot.Status"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="snapshotId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="expectedState"/> is <c>null</c>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="errorStates"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If <paramref name="snapshotId"/> is empty.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="expectedState"/> is empty.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="refreshCount"/> is less than 0.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="refreshDelay"/> is negative.</para>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// If the provider does not support the given <paramref name="identity"/> type.
+        /// <para>-or-</para>
+        /// <para>The specified <paramref name="region"/> is not supported.</para>
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
+        /// <exception cref="CloudBlockStorageProvider.SnapshotEnteredErrorStateException">If the method returned due to the snapshot entering one of the <paramref name="errorStates"/>.</exception>
+        /// <exception cref="ResponseException">If the REST API request failed.</exception>
         Snapshot WaitForSnapshotState(string snapshotId, string expectedState, string[] errorStates, int refreshCount = 60, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null);
+
         #endregion
     }
 }
