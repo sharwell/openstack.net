@@ -35,7 +35,11 @@ namespace net.openstack.Core.Providers
         /// <para>-or-</para>
         /// <para>The specified <paramref name="region"/> is not supported.</para>
         /// </exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/Create_Volume.html">Create Volume (OpenStack Block Storage Service API Reference)</seealso>
         bool CreateVolume(int size, string displayDescription = null, string displayName = null, string snapshotId = null, string volumeType = null, string region = null, CloudIdentity identity = null);
@@ -51,7 +55,11 @@ namespace net.openstack.Core.Providers
         /// <para>-or-</para>
         /// <para>The specified <paramref name="region"/> is not supported.</para>
         /// </exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/List_Summary_Volumes.html">List Volume Summaries (OpenStack Block Storage Service API Reference)</seealso>
         IEnumerable<Volume> ListVolumes(string region = null, CloudIdentity identity = null);
@@ -70,7 +78,11 @@ namespace net.openstack.Core.Providers
         /// <para>-or-</para>
         /// <para>The specified <paramref name="region"/> is not supported.</para>
         /// </exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/Show_Volume.html">Show Volume (OpenStack Block Storage Service API Reference)</seealso>
         Volume ShowVolume(string volumeId, string region = null, CloudIdentity identity = null);
@@ -94,7 +106,11 @@ namespace net.openstack.Core.Providers
         /// <para>-or-</para>
         /// <para>The specified <paramref name="region"/> is not supported.</para>
         /// </exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/Delete_Volume.html">Delete Volume (OpenStack Block Storage Service API Reference)</seealso>
         bool DeleteVolume(string volumeId, string region = null, CloudIdentity identity = null);
@@ -110,7 +126,11 @@ namespace net.openstack.Core.Providers
         /// <para>-or-</para>
         /// <para>The specified <paramref name="region"/> is not supported.</para>
         /// </exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/Volume_List_Types.html">List Volume Types (OpenStack Block Storage Service API Reference)</seealso>
         IEnumerable<VolumeType> ListVolumeTypes(string region = null, CloudIdentity identity = null);
@@ -127,7 +147,11 @@ namespace net.openstack.Core.Providers
         /// <para>-or-</para>
         /// <para>The specified <paramref name="region"/> is not supported.</para>
         /// </exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/Volume_Show_Type.html">Show Volume Type (OpenStack Block Storage Service API Reference)</seealso>
         VolumeType DescribeVolumeType(int volumeTypeId, string region = null, CloudIdentity identity = null);
@@ -156,7 +180,11 @@ namespace net.openstack.Core.Providers
         /// <para>-or-</para>
         /// <para>The specified <paramref name="region"/> is not supported.</para>
         /// </exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         Volume WaitForVolumeAvailable(string volumeId, int refreshCount = 600, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null);
 
@@ -184,7 +212,11 @@ namespace net.openstack.Core.Providers
         /// <para>-or-</para>
         /// <para>The specified <paramref name="region"/> is not supported.</para>
         /// </exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         bool WaitForVolumeDeleted(string volumeId, int refreshCount = 360, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null);
 
@@ -225,7 +257,11 @@ namespace net.openstack.Core.Providers
         /// <para>-or-</para>
         /// <para>The specified <paramref name="region"/> is not supported.</para>
         /// </exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <c>null</c> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <c>null</c> and no default region is available for the provider.</para>
+        /// </exception>
         /// <exception cref="CloudBlockStorageProvider.VolumeEnteredErrorStateException">If the method returned due to the volume entering one of the <paramref name="errorStates"/>.</exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         /// <seealso href="http://docs.rackspace.com/cbs/api/v1.0/cbs-devguide/content/volume_status.html">Volume Status (Rackspace Cloud Block Storage Developer Guide - API V1.0)</seealso>
