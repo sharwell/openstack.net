@@ -208,7 +208,7 @@ namespace net.openstack.Providers.Rackspace
                 throw new ArgumentOutOfRangeException("refreshDelay");
             CheckIdentity(identity);
 
-            return WaitForVolumeState(volumeId, VolumeState.AVAILABLE, new[] { VolumeState.ERROR, VolumeState.ERROR_DELETING }, refreshCount, refreshDelay ?? TimeSpan.FromMilliseconds(2400), region, identity);
+            return WaitForVolumeState(volumeId, VolumeState.Available, new[] { VolumeState.Error, VolumeState.ErrorDeleting }, refreshCount, refreshDelay ?? TimeSpan.FromMilliseconds(2400), region, identity);
         }
 
         /// <inheritdoc />
@@ -228,7 +228,7 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <inheritdoc />
-        public Volume WaitForVolumeState(string volumeId, string expectedState, string[] errorStates, int refreshCount = 600, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null)
+        public Volume WaitForVolumeState(string volumeId, VolumeState expectedState, VolumeState[] errorStates, int refreshCount = 600, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null)
         {
             if (volumeId == null)
                 throw new ArgumentNullException("volumeId");
@@ -238,8 +238,6 @@ namespace net.openstack.Providers.Rackspace
                 throw new ArgumentNullException("errorStates");
             if (string.IsNullOrEmpty(volumeId))
                 throw new ArgumentException("volumeId cannot be empty");
-            if (string.IsNullOrEmpty(expectedState))
-                throw new ArgumentException("expectedState cannot be empty");
             if (refreshCount < 0)
                 throw new ArgumentOutOfRangeException("refreshCount");
             if (refreshDelay < TimeSpan.Zero)
@@ -249,7 +247,7 @@ namespace net.openstack.Providers.Rackspace
             var volumeInfo = ShowVolume(volumeId, region, identity);
 
             var count = 0;
-            while (!volumeInfo.Status.Equals(expectedState, StringComparison.OrdinalIgnoreCase) && !errorStates.Contains(volumeInfo.Status) && count < refreshCount)
+            while (!volumeInfo.Status.Equals(expectedState) && !errorStates.Contains(volumeInfo.Status) && count < refreshCount)
             {
                 Thread.Sleep(refreshDelay ?? TimeSpan.FromMilliseconds(2400));
                 volumeInfo = ShowVolume(volumeId, region, identity);
@@ -265,9 +263,9 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public class VolumeEnteredErrorStateException : Exception
         {
-            public string Status { get; private set; }
+            public VolumeState Status { get; private set; }
 
-            public VolumeEnteredErrorStateException(string status)
+            public VolumeEnteredErrorStateException(VolumeState status)
                 : base(string.Format("The volume entered an error state: '{0}'", status))
             {
                 Status = status;
@@ -356,7 +354,7 @@ namespace net.openstack.Providers.Rackspace
                 throw new ArgumentOutOfRangeException("refreshDelay");
             CheckIdentity(identity);
 
-            return WaitForSnapshotState(snapshotId, SnapshotState.AVAILABLE, new[] { SnapshotState.ERROR, SnapshotState.ERROR_DELETING }, refreshCount, refreshDelay ?? TimeSpan.FromSeconds(10), region, identity);
+            return WaitForSnapshotState(snapshotId, SnapshotState.Available, new[] { SnapshotState.Error, SnapshotState.ErrorDeleting }, refreshCount, refreshDelay ?? TimeSpan.FromSeconds(10), region, identity);
         }
 
         /// <inheritdoc />
@@ -376,7 +374,7 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <inheritdoc />
-        public Snapshot WaitForSnapshotState(string snapshotId, string expectedState, string[] errorStates, int refreshCount = 60, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null)
+        public Snapshot WaitForSnapshotState(string snapshotId, SnapshotState expectedState, SnapshotState[] errorStates, int refreshCount = 60, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null)
         {
             if (snapshotId == null)
                 throw new ArgumentNullException("snapshotId");
@@ -386,8 +384,6 @@ namespace net.openstack.Providers.Rackspace
                 throw new ArgumentNullException("errorStates");
             if (string.IsNullOrEmpty(snapshotId))
                 throw new ArgumentException("snapshotId cannot be empty");
-            if (string.IsNullOrEmpty(expectedState))
-                throw new ArgumentException("expectedState cannot be empty");
             if (refreshCount < 0)
                 throw new ArgumentOutOfRangeException("refreshCount");
             if (refreshDelay < TimeSpan.Zero)
@@ -397,7 +393,7 @@ namespace net.openstack.Providers.Rackspace
             var snapshotInfo = ShowSnapshot(snapshotId, region, identity);
 
             var count = 0;
-            while (!snapshotInfo.Status.Equals(expectedState, StringComparison.OrdinalIgnoreCase) && !errorStates.Contains(snapshotInfo.Status) && count < refreshCount)
+            while (!snapshotInfo.Status.Equals(expectedState) && !errorStates.Contains(snapshotInfo.Status) && count < refreshCount)
             {
                 Thread.Sleep(refreshDelay ?? TimeSpan.FromSeconds(10));
                 snapshotInfo = ShowSnapshot(snapshotId, region, identity);
@@ -413,9 +409,9 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public class SnapshotEnteredErrorStateException : Exception
         {
-            public string Status { get; private set; }
+            public SnapshotState Status { get; private set; }
 
-            public SnapshotEnteredErrorStateException(string status)
+            public SnapshotEnteredErrorStateException(SnapshotState status)
                 : base(string.Format("The snapshot entered an error state: '{0}'", status))
             {
                 Status = status;

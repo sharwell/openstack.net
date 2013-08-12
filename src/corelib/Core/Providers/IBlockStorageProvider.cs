@@ -157,7 +157,7 @@ namespace net.openstack.Core.Providers
         VolumeType DescribeVolumeType(int volumeTypeId, string region = null, CloudIdentity identity = null);
 
         /// <summary>
-        /// Waits for a volume to be set to <see cref="VolumeState.AVAILABLE"/> status.
+        /// Waits for a volume to be set to <see cref="VolumeState.Available"/> status.
         /// </summary>
         /// <remarks>
         /// This method can be used to ensure that a volume is correctly created prior to executing additional requests against it.
@@ -244,8 +244,6 @@ namespace net.openstack.Core.Providers
         /// </exception>
         /// <exception cref="ArgumentException">
         /// If <paramref name="volumeId"/> is empty.
-        /// <para>-or-</para>
-        /// <para>If <paramref name="expectedState"/> is empty.</para>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// If <paramref name="refreshCount"/> is less than 0.
@@ -265,7 +263,7 @@ namespace net.openstack.Core.Providers
         /// <exception cref="CloudBlockStorageProvider.VolumeEnteredErrorStateException">If the method returned due to the volume entering one of the <paramref name="errorStates"/>.</exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         /// <seealso href="http://docs.rackspace.com/cbs/api/v1.0/cbs-devguide/content/volume_status.html">Volume Status (Rackspace Cloud Block Storage Developer Guide - API V1.0)</seealso>
-        Volume WaitForVolumeState(string volumeId, string expectedState, string[] errorStates, int refreshCount = 600, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null);
+        Volume WaitForVolumeState(string volumeId, VolumeState expectedState, VolumeState[] errorStates, int refreshCount = 600, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null);
 
         #endregion
 
@@ -379,7 +377,7 @@ namespace net.openstack.Core.Providers
         bool DeleteSnapshot(string snapshotId, string region = null, CloudIdentity identity = null);
 
         /// <summary>
-        /// Waits for a snapshot to be set to <see cref="VolumeState.AVAILABLE"/> status.
+        /// Waits for a snapshot to be set to <see cref="SnapshotState.Available"/> status.
         /// </summary>
         /// <remarks>
         /// This method can be used to ensure that a snapshot is correctly created prior to executing additional requests against it.
@@ -466,8 +464,6 @@ namespace net.openstack.Core.Providers
         /// </exception>
         /// <exception cref="ArgumentException">
         /// If <paramref name="snapshotId"/> is empty.
-        /// <para>-or-</para>
-        /// <para>If <paramref name="expectedState"/> is empty.</para>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// If <paramref name="refreshCount"/> is less than 0.
@@ -486,7 +482,7 @@ namespace net.openstack.Core.Providers
         /// </exception>
         /// <exception cref="CloudBlockStorageProvider.SnapshotEnteredErrorStateException">If the method returned due to the snapshot entering one of the <paramref name="errorStates"/>.</exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
-        Snapshot WaitForSnapshotState(string snapshotId, string expectedState, string[] errorStates, int refreshCount = 60, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null);
+        Snapshot WaitForSnapshotState(string snapshotId, SnapshotState expectedState, SnapshotState[] errorStates, int refreshCount = 60, TimeSpan? refreshDelay = null, string region = null, CloudIdentity identity = null);
 
         #endregion
     }
