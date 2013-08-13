@@ -5,7 +5,7 @@ using net.openstack.Core.Domain;
 namespace net.openstack.Providers.Rackspace.Objects.Response
 {
     [DataContract]
-    public class ServerVolumeListResponse
+    internal class ServerVolumeListResponse
     {
         [DataMember(Name = "volumeAttachments")]
         public IEnumerable<ServerVolume> ServerVolumes { get; set; }
