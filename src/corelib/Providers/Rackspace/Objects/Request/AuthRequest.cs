@@ -7,7 +7,7 @@ namespace net.openstack.Providers.Rackspace.Objects.Request
     internal class AuthRequest
     {
         [DataMember(Name = "auth")]
-        public AuthDetails Credencials { get; set; }
+        public AuthDetails Credentials { get; set; }
 
         public static AuthRequest FromCloudIdentity(CloudIdentity identity)
         {
@@ -23,7 +23,7 @@ namespace net.openstack.Providers.Rackspace.Objects.Request
                 creds.Domain = raxIdentity.Domain;
             }
 
-            return new AuthRequest { Credencials = creds };
+            return new AuthRequest { Credentials = creds };
         }
     }
 }

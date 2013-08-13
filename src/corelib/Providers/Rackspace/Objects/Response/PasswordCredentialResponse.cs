@@ -8,9 +8,9 @@ using net.openstack.Providers.Rackspace.Objects.Request;
 namespace net.openstack.Providers.Rackspace.Objects.Response
 {
     [DataContract]
-    internal class PasswordCredencialResponse
+    internal class PasswordCredentialResponse
     {
         [DataMember(Name = "passwordCredentials")]
-        public PasswordCredencial PasswordCredencial { get; set; }
+        public PasswordCredential PasswordCredential { get; set; }
     }
 }

@@ -8,7 +8,7 @@ using net.openstack.Core.Domain;
 namespace net.openstack.Providers.Rackspace.Objects.Request
 {
     [DataContract]
-    internal class UpdateUserCredencialRequest
+    internal class UpdateUserCredentialRequest
     {
         [DataMember(Name = "RAX-KSKEY:apiKeyCredentials")]
         public UserCredential UserCredential { get; set; }

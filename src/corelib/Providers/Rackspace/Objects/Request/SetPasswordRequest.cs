@@ -10,11 +10,11 @@ namespace net.openstack.Providers.Rackspace.Objects.Request
     internal class SetPasswordRequest
     {
         [DataMember(Name = "passwordCredentials")]
-        public PasswordCredencial PasswordCredencial { get; set; }
+        public PasswordCredential PasswordCredential { get; set; }
     }
 
     [DataContract]
-    internal class PasswordCredencial
+    internal class PasswordCredential
     {
         [DataMember(Name = "username")]
         public string Username { get; set; }
