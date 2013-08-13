@@ -2,15 +2,32 @@ using System.Runtime.Serialization;
 
 namespace net.openstack.Core.Domain
 {
+    /// <summary>
+    /// Contains detailed information about a flavor.
+    /// </summary>
+    /// <seealso cref="IComputeProvider.ListFlavorsWithDetails"/>
+    /// <seealso cref="IComputeProvider.GetFlavor"/>
     [DataContract]
     public class FlavorDetails : Flavor
     {
+        /// <summary>
+        /// Gets the "OS-FLV-DISABLED:disabled" property associated with the flavor.
+        /// <note type="warning">The value of this property is not defined. Do not use.</note>
+        /// </summary>
         [DataMember(Name ="OS-FLV-DISABLED:disabled")]
         public bool Disabled { get; set; }
 
+        /// <summary>
+        /// Gets the "disk" property associated with the flavor.
+        /// <note type="warning">The value of this property is not defined. Do not use.</note>
+        /// </summary>
         [DataMember(Name ="disk")] 
         public int DiskSizeInGB { get; set; }
 
+        /// <summary>
+        /// Gets the "ram" property associated with the flavor.
+        /// <note type="warning">The value of this property is not defined. Do not use.</note>
+        /// </summary>
         [DataMember(Name = "ram")]
         public int RAMInMB { get; set; }
 
@@ -18,6 +35,10 @@ namespace net.openstack.Core.Domain
  
         //"swap": 512, 
 
+        /// <summary>
+        /// Gets the "vcpus" property associated with the flavor.
+        /// <note type="warning">The value of this property is not defined. Do not use.</note>
+        /// </summary>
         [DataMember(Name ="vcpus")]
         public int VirtualCPUCount { get; set; }
     }
