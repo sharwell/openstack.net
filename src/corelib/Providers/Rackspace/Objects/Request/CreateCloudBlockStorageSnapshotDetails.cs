@@ -3,7 +3,7 @@
 namespace net.openstack.Providers.Rackspace.Objects.Request
 {
     [DataContract]
-    public class CreateCloudBlockStorageSnapshotDetails
+    internal class CreateCloudBlockStorageSnapshotDetails
     {
         [DataMember(Name = "volume_id")]
         public string VolumeId { get; set; }

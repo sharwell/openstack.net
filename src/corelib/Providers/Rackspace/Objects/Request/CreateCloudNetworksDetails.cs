@@ -3,7 +3,7 @@
 namespace net.openstack.Providers.Rackspace.Objects.Request
 {
     [DataContract]
-    public class CreateCloudNetworksDetails
+    internal class CreateCloudNetworksDetails
     {
         [DataMember(Name = "cidr")]
         public string Cidr { get; set; }
