@@ -5,6 +5,7 @@ using net.openstack.Core.Domain;
 using net.openstack.Core.Providers;
 using net.openstack.Providers.Rackspace;
 using net.openstack.Providers.Rackspace.Objects;
+using Newtonsoft.Json;
 
 namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
@@ -295,14 +296,8 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         public void Should_Update_NewUser_Username_And_Email_When_Requesting_As_User_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
+            User user = JsonConvert.DeserializeObject<User>(@"{id:""" + _testUser.Id + @""", username:""openstacknettestuser12"", email:""newuser2@me.com"", enabled:true}");
 
-            var user = new User
-                           {
-                               Id = _testUser.Id,
-                               Username = "openstacknettestuser12",
-                               Email = "newuser2@me.com",
-                               Enabled = true
-                           };
             var updatedUser = provider.UpdateUser(user);
 
             Assert.IsNotNull(updatedUser);
@@ -372,15 +367,9 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         public void Should_Update_NewUser_Username_And_Email_And_Default_Region_When_Requesting_As_User_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
+            User user = JsonConvert.DeserializeObject<User>(
+                @"{id:""" + _testUser.Id + @""", username:""openstacknettestuser32"", email:""newuser32@me.com"", enabled:true, ""RAX-AUTH:defaultRegion"":""DFW""}");
 
-            var user = new User
-            {
-                Id = _testUser.Id,
-                Username = "openstacknettestuser32",
-                Email = "newuser32@me.com",
-                Enabled = true,
-                DefaultRegion = "DFW"
-            };
             var updatedUser = provider.UpdateUser(user);
 
             Assert.IsNotNull(updatedUser);
@@ -404,14 +393,8 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         public void Should_Update_NewUser_Username_And_Email_When_Requesting_As_Self()
         {
             IIdentityProvider provider = new CloudIdentityProvider(new RackspaceCloudIdentity { Username = _testUser.Username, Password = _newTestUserPassword });
+            User user = JsonConvert.DeserializeObject<User>(@"{id:""" + _testUser.Id + @""", username:""openstacknettestuser42"", email:""newuser42@me.com"", enabled:true}");
 
-            var user = new User
-            {
-                Id = _testUser.Id,
-                Username = "openstacknettestuser42",
-                Email = "newuser42@me.com",
-                Enabled = true,
-            };
             var updatedUser = provider.UpdateUser(user);
 
             Assert.IsNotNull(updatedUser);
