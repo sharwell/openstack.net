@@ -1,11 +1,17 @@
 namespace net.openstack.Core.Domain
 {
+    using System.Runtime.Serialization;
+
+    [DataContract]
     public class ServiceCatalog
     {
-        public Endpoint[] Endpoints { get; set; }
+        [DataMember(Name = "endpoints")]
+        public Endpoint[] Endpoints { get; private set; }
 
-        public string Name { get; set; }
+        [DataMember(Name = "name")]
+        public string Name { get; private set; }
 
-        public string Type { get; set; }
+        [DataMember(Name = "type")]
+        public string Type { get; private set; }
     }
 }
