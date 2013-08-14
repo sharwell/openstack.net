@@ -18,7 +18,7 @@ namespace net.openstack.Core.Domain
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
         [DataMember]
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// Gets the "hash" value associated with the object.
@@ -26,7 +26,7 @@ namespace net.openstack.Core.Domain
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
         [DataMember]
-        public Guid Hash { get; set; }
+        public Guid Hash { get; private set; }
 
         /// <summary>
         /// Gets the "bytes" value associated with the object.
@@ -34,7 +34,7 @@ namespace net.openstack.Core.Domain
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
         [DataMember]
-        public long Bytes { get; set; }
+        public long Bytes { get; private set; }
 
         /// <summary>
         /// Gets the "content type" value associated with the object.
@@ -42,7 +42,7 @@ namespace net.openstack.Core.Domain
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
         [DataMember(Name = "content_type")]
-        public string ContentType { get; set; }
+        public string ContentType { get; private set; }
 
         /// <summary>
         /// Gets the "last modified" value associated with the object.
@@ -50,6 +50,6 @@ namespace net.openstack.Core.Domain
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
         [DataMember(Name = "last_modified")]
-        public DateTime LastModified { get; set; }
+        public DateTime LastModified { get; private set; }
     }
 }

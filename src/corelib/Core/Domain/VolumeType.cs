@@ -15,12 +15,12 @@ namespace net.openstack.Core.Domain
         /// Gets the volume type ID.
         /// </summary>
         [DataMember]
-        public int Id { get; set; }
+        public int Id { get; private set; }
 
         /// <summary>
         /// Gets the name of the volume type.
         /// </summary>
         [DataMember]
-        public string Name { get; set; }
+        public string Name { get; private set; }
     }
 }

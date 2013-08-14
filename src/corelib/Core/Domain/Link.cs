@@ -9,7 +9,7 @@ namespace net.openstack.Core.Domain
         /// Gets the link target.
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-compute/2/content/LinksReferences.html">Links and References (OpenStack Compute API v2 and Extensions Reference)</seealso>
-        public string Href { get; set; }
+        public string Href { get; private set; }
 
         /// <summary>
         /// Gets the link relation.
@@ -22,6 +22,6 @@ namespace net.openstack.Core.Domain
         /// </list>
         /// </remarks>
         /// <seealso href="http://docs.openstack.org/api/openstack-compute/2/content/LinksReferences.html">Links and References (OpenStack Compute API v2 and Extensions Reference)</seealso>
-        public string Rel { get; set; }
+        public string Rel { get; private set; }
     }
 }

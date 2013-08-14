@@ -5,7 +5,7 @@ namespace net.openstack.Core.Domain
     public class SimpleServer : ServerBase
     {
         [DataMember]
-        public string Name { get; internal set; }
+        public string Name { get; private set; }
 
         protected override void UpdateThis(ServerBase server)
         {

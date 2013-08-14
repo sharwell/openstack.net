@@ -17,20 +17,20 @@ namespace net.openstack.Core.Domain
         /// </summary>
         /// <seealso cref="IIdentityProvider.GetToken"/>
         [DataMember]
-        public string Expires { get; set; }
+        public string Expires { get; private set; }
 
         /// <summary>
         /// Gets the token ID which can be used to make authenticated API calls.
         /// </summary>
         [DataMember]
-        public string Id { get; set; }
+        public string Id { get; private set; }
 
         /// <summary>
         /// Gets a <see cref="Tenant"/> object containing the name and ID of the
         /// tenant (or account) for the authenticated credentials.
         /// </summary>
         [DataMember]
-        public Tenant Tenant { get; set; }
+        public Tenant Tenant { get; private set; }
 
         /// <summary>
         /// Gets whether or not the token has expired. This property simply checks

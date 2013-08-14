@@ -12,13 +12,13 @@ namespace net.openstack.Core.Domain
         /// Gets the network ID.
         /// </summary>
         [DataMember]
-        public string Id { get; set; }
+        public string Id { get; private set; }
 
         /// <summary>
         /// Gets the CIDR for the network.
         /// </summary>
         [DataMember]
-        public string Cidr { get; set; }
+        public string Cidr { get; private set; }
 
         /// <summary>
         /// Gets the name of the network.
@@ -32,6 +32,6 @@ namespace net.openstack.Core.Domain
         /// </remarks>
         /// <seealso href="http://docs.rackspace.com/networks/api/v2/cn-devguide/content/ch_overview.html">Overview (Rackspace Cloud Networks Developer Guide - OpenStack Networking API v2)</seealso>
         [DataMember]
-        public string Label { get; set; }
+        public string Label { get; private set; }
     }
 }

@@ -6,12 +6,12 @@ namespace net.openstack.Core.Domain
     public class VirtualInterfaceAddress
     {
         [DataMember(Name = "address")]
-        public string Address { get; set; }
+        public string Address { get; private set; }
 
         [DataMember(Name = "network_id")]
-        public string NetworkId { get; set; }
+        public string NetworkId { get; private set; }
 
         [DataMember(Name = "network_label")]
-        public string NetworkLabel { get; set; }
+        public string NetworkLabel { get; private set; }
     }
 }

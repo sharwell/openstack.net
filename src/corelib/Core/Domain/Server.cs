@@ -12,25 +12,25 @@ namespace net.openstack.Core.Domain
         private string _status;
 
         [DataMember(Name = "OS-DCF:diskConfig" )]
-        public string DiskConfig { get; internal set; }
+        public string DiskConfig { get; private set; }
 
         [DataMember(Name = "OS-EXT-STS:power_state")]
-        public bool PowerState { get; internal set; }
+        public bool PowerState { get; private set; }
 
         [DataMember(Name = "OS-EXT-STS:task_state")]
-        public string TaskState { get; internal set; }
+        public string TaskState { get; private set; }
 
         [DataMember(Name = "OS-EXT-STS:vm_state")]
-        public string VMState { get; internal set; }
+        public string VMState { get; private set; }
 
         [DataMember]
-        public string AccessIPv4 { get; internal set; }
+        public string AccessIPv4 { get; private set; }
 
         [DataMember]
-        public string AccessIPv6 { get; internal set; }
+        public string AccessIPv6 { get; private set; }
 
         [DataMember(Name = "user_id")]
-        public string UserId { get; internal set; }
+        public string UserId { get; private set; }
 
         private SimpleServerImage _image;
         [DataMember]
@@ -45,7 +45,7 @@ namespace net.openstack.Core.Domain
 
                 return _image;
             }
-            internal set { _image = value;  }
+            private set { _image = value;  }
         }
 
         public ServerState Status
@@ -58,7 +58,7 @@ namespace net.openstack.Core.Domain
                 return ServerState.FromName(_status);
             }
 
-            set
+            private set
             {
                 if (value == null)
                     _status = null;
@@ -68,28 +68,28 @@ namespace net.openstack.Core.Domain
         }
 
         [DataMember]
-        public Flavor Flavor { get; internal set; }
+        public Flavor Flavor { get; private set; }
 
         [DataMember]
-        public ServerAddresses Addresses { get; internal set; }
+        public ServerAddresses Addresses { get; private set; }
 
         [DataMember]
-        public DateTime Created { get; internal set; }
+        public DateTime Created { get; private set; }
 
         [DataMember]
-        public string HostId { get; internal set; }
+        public string HostId { get; private set; }
 
         [DataMember]
-        public int Progress { get; internal set; }
+        public int Progress { get; private set; }
 
         [DataMember(Name = "rax-bandwidth:bandwidth")]
-        public string[] Bandwidth { get; internal set; }
+        public string[] Bandwidth { get; private set; }
 
         [DataMember(Name = "tenant_id")]
-        public string TenantId { get; internal set; }
+        public string TenantId { get; private set; }
 
         [DataMember]
-        public DateTime Updated { get; internal set; }
+        public DateTime Updated { get; private set; }
 
         protected override void UpdateThis(ServerBase server)
         {
