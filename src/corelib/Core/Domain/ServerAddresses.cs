@@ -1,15 +1,16 @@
 namespace net.openstack.Core.Domain
 {
     using System.Collections.Generic;
+    using System.Net;
     using Newtonsoft.Json;
 
-    [JsonDictionary]
-    public class ServerAddresses : Dictionary<string, AddressDetails[]>
+    [JsonDictionary(ItemConverterType = typeof(IPAddressConverter))]
+    public class ServerAddresses : Dictionary<string, IPAddress[]>
     {
         [JsonIgnore]
-        public AddressDetails[] Private { get { return this["private"]; } }
+        public IPAddress[] Private { get { return this["private"]; } }
 
         [JsonIgnore]
-        public AddressDetails[] Public { get { return this["public"]; } }
+        public IPAddress[] Public { get { return this["public"]; } }
     }
 }
