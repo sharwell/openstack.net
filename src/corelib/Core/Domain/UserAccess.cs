@@ -16,18 +16,18 @@ namespace net.openstack.Core.Domain
         /// resource.
         /// </remarks>
         /// <seealso href="http://docs.openstack.org/api/openstack-identity-service/2.0/content/POST_authenticate_v2.0_tokens_.html">Authenticate (OpenStack Identity Service API v2.0 Reference)</seealso>
-        public IdentityToken Token { get; set; }
+        public IdentityToken Token { get; private set; }
 
         /// <summary>
         /// Gets the details for the authenticated user, such as the username and roles.
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-identity-service/2.0/content/POST_authenticate_v2.0_tokens_.html">Authenticate (OpenStack Identity Service API v2.0 Reference)</seealso>
-        public UserDetails User { get; set; }
+        public UserDetails User { get; private set; }
 
         /// <summary>
         /// Gets the services which may be accessed by this user.
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-identity-service/2.0/content/POST_authenticate_v2.0_tokens_.html">Authenticate (OpenStack Identity Service API v2.0 Reference)</seealso>
-        public ServiceCatalog[] ServiceCatalog { get; set; }
+        public ServiceCatalog[] ServiceCatalog { get; private set; }
     }
 }
