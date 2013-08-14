@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-
-namespace net.openstack.Core.Domain
+﻿namespace net.openstack.Core.Domain
 {
-    [DataContract]
+    using Newtonsoft.Json;
+
+    [JsonObject(MemberSerialization.OptIn)]
     public class Personality
     {
-        [DataMember(Name = "path")]
+        [JsonProperty("path")]
         public string Path { get; set; }
 
-        [DataMember(Name = "contents")]
+        [JsonProperty("contents")]
         public string Content { get; set; }
     }
 }

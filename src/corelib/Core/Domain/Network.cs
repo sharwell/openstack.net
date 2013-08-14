@@ -1,14 +1,14 @@
-using System.Runtime.Serialization;
-
 namespace net.openstack.Core.Domain
 {
-    [DataContract]
+    using Newtonsoft.Json;
+
+    [JsonObject(MemberSerialization.OptIn)]
     public class Network
     {
-        [DataMember]
+        [JsonProperty("id")]
         public string Id { get; private set; }
 
-        [DataMember(Name = "ip")]
+        [JsonProperty("ip")]
         public AddressDetails[] Addresses { get; private set; }
 
         public Network(string id, AddressDetails[] addresses)

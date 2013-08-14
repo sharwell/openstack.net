@@ -1,26 +1,26 @@
-﻿using System.Runtime.Serialization;
-using net.openstack.Core.Providers;
-
-namespace net.openstack.Core.Domain
+﻿namespace net.openstack.Core.Domain
 {
+    using net.openstack.Core.Providers;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Represents the type of a volume in the Block Storage service.
     /// </summary>
     /// <seealso cref="IBlockStorageProvider.ListVolumeTypes"/>
     /// <seealso cref="IBlockStorageProvider.DescribeVolumeType"/>
-    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class VolumeType
     {
         /// <summary>
         /// Gets the volume type ID.
         /// </summary>
-        [DataMember]
+        [JsonProperty]
         public int Id { get; private set; }
 
         /// <summary>
         /// Gets the name of the volume type.
         /// </summary>
-        [DataMember]
+        [JsonProperty]
         public string Name { get; private set; }
     }
 }

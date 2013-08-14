@@ -1,41 +1,42 @@
-using System.Runtime.Serialization;
-
 namespace net.openstack.Core.Domain
 {
+    using net.openstack.Core.Providers;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Contains detailed information about a flavor.
     /// </summary>
     /// <seealso cref="IComputeProvider.ListFlavorsWithDetails"/>
     /// <seealso cref="IComputeProvider.GetFlavor"/>
-    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class FlavorDetails : Flavor
     {
         /// <summary>
         /// Gets the "OS-FLV-DISABLED:disabled" property associated with the flavor.
         /// <note type="warning">The value of this property is not defined. Do not use.</note>
         /// </summary>
-        [DataMember(Name ="OS-FLV-DISABLED:disabled")]
+        [JsonProperty("OS-FLV-DISABLED:disabled")]
         public bool Disabled { get; private set; }
 
         /// <summary>
         /// Gets the "disk" property associated with the flavor.
         /// <note type="warning">The value of this property is not defined. Do not use.</note>
         /// </summary>
-        [DataMember(Name ="disk")] 
+        [JsonProperty("disk")] 
         public int DiskSizeInGB { get; private set; }
 
         /// <summary>
         /// Gets the "ram" property associated with the flavor.
         /// <note type="warning">The value of this property is not defined. Do not use.</note>
         /// </summary>
-        [DataMember(Name = "ram")]
+        [JsonProperty("ram")]
         public int RAMInMB { get; private set; }
 
         /// <summary>
         /// Gets the "vcpus" property associated with the flavor.
         /// <note type="warning">The value of this property is not defined. Do not use.</note>
         /// </summary>
-        [DataMember(Name ="vcpus")]
+        [JsonProperty("vcpus")]
         public int VirtualCPUCount { get; private set; }
     }
 }

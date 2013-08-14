@@ -1,15 +1,15 @@
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-
 namespace net.openstack.Core.Domain
 {
-    [DataContract]
+    using System.Collections.Generic;
+    using Newtonsoft.Json;
+
+    [JsonDictionary]
     public class ServerAddresses : Dictionary<string, AddressDetails[]>
     {
-        [IgnoreDataMember]
+        [JsonIgnore]
         public AddressDetails[] Private { get { return this["private"]; } }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public AddressDetails[] Public { get { return this["public"]; } }
     }
 }

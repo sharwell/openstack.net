@@ -1,14 +1,18 @@
 namespace net.openstack.Core.Domain
 {
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Represents a link associated with a resource.
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class Link
     {
         /// <summary>
         /// Gets the link target.
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-compute/2/content/LinksReferences.html">Links and References (OpenStack Compute API v2 and Extensions Reference)</seealso>
+        [JsonProperty("href")]
         public string Href { get; private set; }
 
         /// <summary>
@@ -22,6 +26,7 @@ namespace net.openstack.Core.Domain
         /// </list>
         /// </remarks>
         /// <seealso href="http://docs.openstack.org/api/openstack-compute/2/content/LinksReferences.html">Links and References (OpenStack Compute API v2 and Extensions Reference)</seealso>
+        [JsonProperty("rel")]
         public string Rel { get; private set; }
     }
 }

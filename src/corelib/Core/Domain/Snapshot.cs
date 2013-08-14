@@ -1,24 +1,24 @@
-﻿using System;
-using System.Runtime.Serialization;
-
-namespace net.openstack.Core.Domain
+﻿namespace net.openstack.Core.Domain
 {
-    [DataContract]
+    using System;
+    using Newtonsoft.Json;
+
+    [JsonObject(MemberSerialization.OptIn)]
     public class Snapshot
     {
-        [DataMember(Name = "status")]
+        [JsonProperty("status")]
         private string _status;
 
-        [DataMember]
+        [JsonProperty]
         public string Id { get; private set; }
 
-        [DataMember(Name = "display_name")]
+        [JsonProperty("display_name")]
         public string DisplayName { get; private set; }
 
-        [DataMember(Name = "display_description")]
+        [JsonProperty("display_description")]
         public string DisplayDescription { get; private set; }
 
-        [DataMember(Name = "volume_id")]
+        [JsonProperty("volume_id")]
         public string VolumeId { get; private set; }
 
         public SnapshotState Status
@@ -32,10 +32,10 @@ namespace net.openstack.Core.Domain
             }
         }
 
-        [DataMember]
+        [JsonProperty]
         public string Size { get; private set; }
 
-        [DataMember(Name = "created_at")]
+        [JsonProperty("created_at")]
         public DateTime CreatedAt { get; private set; }
     }
 }

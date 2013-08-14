@@ -1,14 +1,14 @@
-﻿using System;
-using System.Runtime.Serialization;
-using net.openstack.Core.Providers;
-
-namespace net.openstack.Core.Domain
+﻿namespace net.openstack.Core.Domain
 {
+    using System;
+    using net.openstack.Core.Providers;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Represents the authentication token used for making authenticated calls to
     /// multiple APIs.
     /// </summary>
-    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class IdentityToken
     {
         /// <summary>
@@ -16,20 +16,20 @@ namespace net.openstack.Core.Domain
         /// authentication response.
         /// </summary>
         /// <seealso cref="IIdentityProvider.GetToken"/>
-        [DataMember]
+        [JsonProperty("expires")]
         public string Expires { get; private set; }
 
         /// <summary>
         /// Gets the token ID which can be used to make authenticated API calls.
         /// </summary>
-        [DataMember]
+        [JsonProperty("id")]
         public string Id { get; private set; }
 
         /// <summary>
         /// Gets a <see cref="Tenant"/> object containing the name and ID of the
         /// tenant (or account) for the authenticated credentials.
         /// </summary>
-        [DataMember]
+        [JsonProperty("tenant")]
         public Tenant Tenant { get; private set; }
 
         /// <summary>

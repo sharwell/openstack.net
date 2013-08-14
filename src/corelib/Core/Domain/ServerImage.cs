@@ -1,15 +1,15 @@
-using System;
-using System.Runtime.Serialization;
-
 namespace net.openstack.Core.Domain
 {
-    [DataContract]
+    using System;
+    using Newtonsoft.Json;
+
+    [JsonObject(MemberSerialization.OptIn)]
     public class ServerImage : SimpleServerImage
     {
-        [DataMember(Name = "status")]
+        [JsonProperty("status")]
         private string _status;
 
-        [DataMember(Name = "OS-DCF:diskConfig")]
+        [JsonProperty("OS-DCF:diskConfig")]
         public string DiskConfig { get; private set; }
 
         public ImageState Status
@@ -31,20 +31,20 @@ namespace net.openstack.Core.Domain
             }
         }
 
-        [DataMember]
+        [JsonProperty]
         public DateTime Created { get; private set; }
 
-        [DataMember]
+        [JsonProperty]
         public int Progress { get; private set; }
 
-        [DataMember]
+        [JsonProperty]
         public DateTime Updated { get; private set; }
 
-        [DataMember]
+        [JsonProperty]
         public int MinDisk { get; private set; }
 
         private SimpleServer _server;
-        [DataMember]
+        [JsonProperty]
         public SimpleServer Server { 
             get {
                 if (_server != null)
@@ -58,7 +58,7 @@ namespace net.openstack.Core.Domain
             private set { _server = value; } 
         }
 
-        [DataMember]
+        [JsonProperty]
         public int MinRAM { get; private set; }
 
         protected override void UpdateThis(SimpleServerImage serverImage)

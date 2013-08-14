@@ -1,23 +1,23 @@
-﻿using System.Runtime.Serialization;
-
-namespace net.openstack.Core.Domain
+﻿namespace net.openstack.Core.Domain
 {
-    [DataContract]
+    using Newtonsoft.Json;
+
+    [JsonObject(MemberSerialization.OptIn)]
     public class NewUser
     {
-        [DataMember(Name = "OS-KSADM:password")]
+        [JsonProperty("OS-KSADM:password")]
         public string Password { get; internal set; }
 
-        [DataMember(Name = "id", EmitDefaultValue = true)]
+        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Include)]
         public string Id { get; private set; }
 
-        [DataMember(Name = "username")]
+        [JsonProperty("username")]
         public string Username { get; private set; }
 
-        [DataMember(Name = "email")]
+        [JsonProperty("email")]
         public string Email { get; private set; }
 
-        [DataMember(Name = "enabled")]
+        [JsonProperty("enabled")]
         public bool Enabled { get; private set; }
 
         public NewUser(string username, string email, string password = null, bool enabled = true)

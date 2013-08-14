@@ -1,23 +1,23 @@
-﻿using System.Runtime.Serialization;
-
-namespace net.openstack.Core.Domain
+﻿namespace net.openstack.Core.Domain
 {
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Represents the detailed information for a labeled network in Rackspace Cloud Networks.
     /// </summary>
-    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class CloudNetwork
     {
         /// <summary>
         /// Gets the network ID.
         /// </summary>
-        [DataMember]
+        [JsonProperty("id")]
         public string Id { get; private set; }
 
         /// <summary>
         /// Gets the CIDR for the network.
         /// </summary>
-        [DataMember]
+        [JsonProperty("cidr")]
         public string Cidr { get; private set; }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace net.openstack.Core.Domain
         /// </list>
         /// </remarks>
         /// <seealso href="http://docs.rackspace.com/networks/api/v2/cn-devguide/content/ch_overview.html">Overview (Rackspace Cloud Networks Developer Guide - OpenStack Networking API v2)</seealso>
-        [DataMember]
+        [JsonProperty("label")]
         public string Label { get; private set; }
     }
 }

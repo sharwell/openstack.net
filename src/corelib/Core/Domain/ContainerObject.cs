@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-
-namespace net.openstack.Core.Domain
+﻿namespace net.openstack.Core.Domain
 {
+    using System;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Provides the details of an object stored in an Object Storage provider.
     /// </summary>
-    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class ContainerObject
     {
         /// <summary>
@@ -17,7 +14,7 @@ namespace net.openstack.Core.Domain
         /// <note type="warning">The value of this property is not defined. Do not use.</note>
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
-        [DataMember]
+        [JsonProperty("name")]
         public string Name { get; private set; }
 
         /// <summary>
@@ -25,7 +22,7 @@ namespace net.openstack.Core.Domain
         /// <note type="warning">The value of this property is not defined. Do not use.</note>
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
-        [DataMember]
+        [JsonProperty("hash")]
         public string Hash { get; private set; }
 
         /// <summary>
@@ -33,7 +30,7 @@ namespace net.openstack.Core.Domain
         /// <note type="warning">The value of this property is not defined. Do not use.</note>
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
-        [DataMember]
+        [JsonProperty("bytes")]
         public long Bytes { get; private set; }
 
         /// <summary>
@@ -41,7 +38,7 @@ namespace net.openstack.Core.Domain
         /// <note type="warning">The value of this property is not defined. Do not use.</note>
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
-        [DataMember(Name = "content_type")]
+        [JsonProperty("content_type")]
         public string ContentType { get; private set; }
 
         /// <summary>
@@ -49,7 +46,7 @@ namespace net.openstack.Core.Domain
         /// <note type="warning">The value of this property is not defined. Do not use.</note>
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
-        [DataMember(Name = "last_modified")]
+        [JsonProperty("last_modified")]
         public DateTime LastModified { get; private set; }
     }
 }
