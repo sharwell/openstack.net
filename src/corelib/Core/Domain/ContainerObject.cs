@@ -26,7 +26,7 @@ namespace net.openstack.Core.Domain
         /// </summary>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/serialized-list-output.html">Serialized List Output (OpenStack Object Storage API v1 Reference)</seealso>
         [DataMember]
-        public Guid Hash { get; private set; }
+        public string Hash { get; private set; }
 
         /// <summary>
         /// Gets the "bytes" value associated with the object.
