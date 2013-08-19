@@ -17,8 +17,8 @@ namespace net.openstack.Providers.Rackspace
         /// Lists all roles.
         /// </summary>
         /// <param name="serviceId">The ID of service to filter by.</param>
-        /// <param name="markerId">The index of the last item in the previous list. <remarks>Used for pagination.</remarks></param>
-        /// <param name="limit">Indicates the number of items to return <remarks>Default value depends on the provider's implemenation.</remarks><remarks>Used for pagination.</remarks></param>
+        /// <param name="markerId">The index of the last item in the previous list. The behavior is unspecified if the value is not obtained from <see cref="Role.Id">Role.Id</see></param>
+        /// <param name="limit">The maximum number of items to return. If this value is <c>null</c>, a provider-specific default value will be used.</param>
         /// <param name="identity">The users Cloud Identity <see cref="net.openstack.Core.Domain.CloudIdentity" /><remarks>If not specified, the default identity given in the constructor will be used.</remarks></param>
         /// <returns>List of <see cref="Role"/></returns>
         IEnumerable<Role> ListRoles(string serviceId = null, string markerId = null, int? limit = null, CloudIdentity identity = null);

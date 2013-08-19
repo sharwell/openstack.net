@@ -6,6 +6,7 @@ using net.openstack.Core.Validators;
 
 namespace net.openstack.Providers.Rackspace.Validators
 {
+    /// <threadsafety static="true" instance="false"/>
     internal class HttpResponseCodeValidator : IHttpResponseCodeValidator
     {
         /// <summary>

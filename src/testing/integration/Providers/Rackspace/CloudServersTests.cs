@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using net.openstack.Core.Domain;
+using net.openstack.Core.Providers;
 using net.openstack.Providers.Rackspace;
 using net.openstack.Providers.Rackspace.Objects;
 
@@ -54,6 +56,96 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             {
                 testContextInstance = value;
             }
+        }
+
+        [TestMethod]
+        public void UserTest()
+        {
+            var testIdentity = Bootstrapper.Settings.TestIdentity;
+            ListAllServers(testIdentity);
+            //CreateServer(testIdentity);
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    ListAllServers(testIdentity);
+            //}
+        }
+
+        private void CreateServer(ExtendedCloudIdentity testIdentity)
+        {
+            IComputeProvider prov = new CloudServersProvider(testIdentity);
+            NewServer newServer = prov.CreateServer("newservername", "Windows Server 2012", "512MB Standard Instance", DiskConfiguration.Manual, null, null, false, false, null, "ORD", testIdentity);
+        }
+
+        private static void ListAllServers(ExtendedCloudIdentity testIdentity)
+        {
+            Stopwatch timer = Stopwatch.StartNew();
+
+            Console.WriteLine("(authenticating...)");
+            var identityProvider = new CloudIdentityProvider(testIdentity);
+            identityProvider.Authenticate(Bootstrapper.Settings.TestIdentity);
+            var provider = new CloudServersProvider(identityProvider);
+            Console.WriteLine("Operation took {0} ms\n", timer.ElapsedMilliseconds);
+
+            Console.WriteLine("(getting list of all images with details...)");
+            timer.Restart();
+            IEnumerable<ServerImage> myImages = provider.ListImagesWithDetails();
+            Console.WriteLine("Operation took {0} ms\n", timer.ElapsedMilliseconds);
+
+            Console.WriteLine("(getting list of all servers with details...)");
+            timer.Restart();
+            IEnumerable<Server> myServers = provider.ListServersWithDetails();
+            Console.WriteLine("Operation took {0} ms\n", timer.ElapsedMilliseconds);
+
+            // We have a list of servers; now, we can iterate through them to
+            // write out all the information
+            foreach (Server aServer in myServers)
+            {
+                Console.WriteLine("Server name\t\t{0}", aServer.Name);
+                Console.WriteLine("Server ID\t\t{0}", aServer.Id);
+                Flavor serverFlavor = aServer.Flavor;
+                Console.WriteLine("Server Flavor\t\t{0}", serverFlavor.Name);
+                var theStatus = aServer.Status;
+                Console.WriteLine("Current status\t\t{0}", theStatus);
+                Console.WriteLine("AccessIPv4\t\t{0}", aServer.AccessIPv4);
+                Console.WriteLine("AccessIPv6\t\t{0}", aServer.AccessIPv6);
+                ServerAddresses allServerAddresses = aServer.Addresses;
+                if (allServerAddresses != null)
+                {
+                    foreach (var anAddressDetailItem in allServerAddresses)
+                    {
+                        Console.WriteLine("{0} (address(es))", anAddressDetailItem.Key);
+                        foreach (var item in anAddressDetailItem.Value)
+                        {
+                            Console.WriteLine("\t\t\t{0}", item.Address);
+                        }
+                    }
+                }
+
+                Console.WriteLine("Disk Config\t\t{0}", aServer.DiskConfig);
+                Console.WriteLine("Bandwidth\t\t\t{0}", aServer.Bandwidth);
+                Console.WriteLine("Created\t\t\t{0}", aServer.Created);
+                Console.WriteLine("HostId\t\t\t{0}", aServer.HostId);
+                Console.WriteLine("Progress\t\t{0}", aServer.Progress.ToString());
+                Console.WriteLine("Tenant ID\t\t{0}", aServer.TenantId);
+                Console.WriteLine("VMState\t\t\t{0}", aServer.VMState);
+
+                // Is the server up and running?
+                string powerState;
+                bool bPower = aServer.PowerState;
+                if (bPower)
+                {
+                    powerState = "Up and running!";
+                }
+                else
+                {
+                    powerState = "Powered down";
+
+                    Console.WriteLine("Power State is\t\t\t" + powerState);
+
+                }
+            }
+
+            Console.WriteLine("Operation took {0} ms\n", timer.ElapsedMilliseconds);
         }
 
         #region Initialize and Build Test Servers
@@ -221,7 +313,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         {
             var addresses = _testServer2.ListAddresses();
 
-            Assert.IsTrue(addresses.Public.Any());
+            Assert.IsTrue(addresses["public"].Any());
         }
 
         [TestMethod]
@@ -858,7 +950,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         [TestMethod]
         public void Should_Attach_Server_Volume()
         {
-            _testVolume = _testServer.AttachVolume("2da9ce90-076e-450a-be3e-c822c9aa73f5");
+            _testVolume = _testServer.AttachVolume("2da9ce90-076e-450a-be3e-c822c9aa73f5", null);
 
             Assert.IsNotNull(_testVolume);
         }

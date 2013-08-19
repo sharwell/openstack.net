@@ -11,6 +11,7 @@ using net.openstack.Core.Exceptions.Response;
 using net.openstack.Providers.Rackspace;
 using net.openstack.Providers.Rackspace.Exceptions;
 using net.openstack.Providers.Rackspace.Objects;
+using System.Xml.Linq;
 
 namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
@@ -78,6 +79,33 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             file = Path.Combine(Directory.GetCurrentDirectory(), saveFileNane2);
             if (File.Exists(file))
                 File.Delete(file);
+        }
+
+        [TestMethod]
+        public void TestFileUpload()
+        {
+            CloudFilesProvider provider = new CloudFilesProvider(Bootstrapper.Settings.TestAdminIdentity);
+            XDocument document = XDocument.Load(@"C:\Program Files (x86)\Microsoft Visual Studio 11.0\Xml\Schemas\DotNetConfig30.xsd");
+            using (MemoryStream ms = new MemoryStream())
+            {
+                document.Save(ms);
+                ms.Position = 0;
+
+                provider.CreateContainer("XMLFiles", region: "syd");
+                provider.CreateObject("XMLFiles", ms, "xmlFile1.xml", region: "syd");
+            }
+        }
+
+        [TestMethod]
+        public void TestFileDownload()
+        {
+            CloudFilesProvider provider = new CloudFilesProvider(Bootstrapper.Settings.TestAdminIdentity);
+            using (MemoryStream ms = new MemoryStream())
+            {
+                provider.GetObject("XMLFiles", "xmlFile1.xml", ms, region: "syd");
+                Console.WriteLine("Received {0} bytes.", ms.Length);
+                Assert.IsTrue(ms.Length > 1000);
+            }
         }
 
         #region Container Tests

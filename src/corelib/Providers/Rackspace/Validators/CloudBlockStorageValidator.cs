@@ -4,6 +4,7 @@ using net.openstack.Providers.Rackspace.Exceptions;
 
 namespace net.openstack.Providers.Rackspace.Validators
 {
+    /// <threadsafety static="true" instance="false"/>
     public class CloudBlockStorageValidator : IBlockStorageValidator
     {
         /// <summary>

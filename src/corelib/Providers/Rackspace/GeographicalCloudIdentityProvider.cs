@@ -35,6 +35,7 @@ namespace net.openstack.Providers.Rackspace
 
         #region Roles
 
+        /// <inheritdoc/>
         public IEnumerable<Role> ListRoles(string serviceId = null, string markerId = null, int? limit = null, CloudIdentity identity = null)
         {
             var parameters = BuildOptionalParameterList(new Dictionary<string, string>
@@ -427,7 +428,7 @@ namespace net.openstack.Providers.Rackspace
                 throw new ArgumentNullException("newUser");
             if (string.IsNullOrEmpty(newUser.Username))
                 throw new ArgumentException("newUser.Username cannot be null or empty");
-            if (newUser.Id == null)
+            if (newUser.Id != null)
                 throw new InvalidOperationException("newUser.Id must be null");
             CheckIdentity(identity);
 

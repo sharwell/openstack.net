@@ -55,6 +55,7 @@ namespace net.openstack.Providers.Rackspace
             _defaultIdentity = defaultIdentity;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<Role> ListRoles(string serviceId = null, string markerId = null, int? limit = null, CloudIdentity identity = null)
         {
             var provider = GetProvider(identity);
@@ -158,7 +159,7 @@ namespace net.openstack.Providers.Rackspace
                 throw new ArgumentNullException("user");
             if (string.IsNullOrEmpty(user.Username))
                 throw new ArgumentException("user.Username cannot be null or empty");
-            if (user == null)
+            if (user.Id != null)
                 throw new InvalidOperationException("user.Id must be null");
 
             var provider = GetProvider(identity);

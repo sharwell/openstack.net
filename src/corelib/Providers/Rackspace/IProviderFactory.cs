@@ -5,7 +5,7 @@ namespace net.openstack.Providers.Rackspace
     /// </summary>
     /// <typeparam name="T">The provider type.</typeparam>
     /// <typeparam name="T2">The key type.</typeparam>
-    internal interface IProviderFactory<T, T2>
+    internal interface IProviderFactory<out T, in T2>
     {
         /// <summary>
         /// Get a provider for the specified <paramref name="key"/>.
