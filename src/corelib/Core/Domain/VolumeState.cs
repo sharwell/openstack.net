@@ -13,7 +13,7 @@
     public sealed class VolumeState : IEquatable<VolumeState>
     {
         private static readonly ConcurrentDictionary<string, VolumeState> _states =
-            new ConcurrentDictionary<string, VolumeState>();
+            new ConcurrentDictionary<string, VolumeState>(StringComparer.OrdinalIgnoreCase);
         private static readonly VolumeState _creating = FromName("CREATING");
         private static readonly VolumeState _available = FromName("AVAILABLE");
         private static readonly VolumeState _attaching = FromName("ATTACHING");
