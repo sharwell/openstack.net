@@ -13,7 +13,7 @@
     public sealed class ImageType : IEquatable<ImageType>
     {
         private static readonly ConcurrentDictionary<string, ImageType> _types =
-            new ConcurrentDictionary<string, ImageType>();
+            new ConcurrentDictionary<string, ImageType>(StringComparer.OrdinalIgnoreCase);
         private static readonly ImageType _base = FromName("BASE");
         private static readonly ImageType _snapshot = FromName("SNAPSHOT");
 
