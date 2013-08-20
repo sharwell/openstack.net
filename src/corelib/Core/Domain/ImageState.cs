@@ -14,7 +14,7 @@
     public sealed class ImageState : IEquatable<ImageState>
     {
         private static readonly ConcurrentDictionary<string, ImageState> _states =
-            new ConcurrentDictionary<string, ImageState>();
+            new ConcurrentDictionary<string, ImageState>(StringComparer.OrdinalIgnoreCase);
         private static readonly ImageState _active = FromName("ACTIVE");
         private static readonly ImageState _saving = FromName("SAVING");
         private static readonly ImageState _deleted = FromName("DELETED");
