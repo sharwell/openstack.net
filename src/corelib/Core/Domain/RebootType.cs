@@ -13,7 +13,7 @@
     public sealed class RebootType : IEquatable<RebootType>
     {
         private static readonly ConcurrentDictionary<string, RebootType> _types =
-            new ConcurrentDictionary<string, RebootType>();
+            new ConcurrentDictionary<string, RebootType>(StringComparer.OrdinalIgnoreCase);
         private static readonly RebootType _hard = FromName("HARD");
         private static readonly RebootType _soft = FromName("SOFT");
 
