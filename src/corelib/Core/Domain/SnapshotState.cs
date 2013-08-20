@@ -13,7 +13,7 @@
     public sealed class SnapshotState : IEquatable<SnapshotState>
     {
         private static readonly ConcurrentDictionary<string, SnapshotState> _states =
-            new ConcurrentDictionary<string, SnapshotState>();
+            new ConcurrentDictionary<string, SnapshotState>(StringComparer.OrdinalIgnoreCase);
         private static readonly SnapshotState _creating = FromName("CREATING");
         private static readonly SnapshotState _available = FromName("AVAILABLE");
         private static readonly SnapshotState _attaching = FromName("ATTACHING");
