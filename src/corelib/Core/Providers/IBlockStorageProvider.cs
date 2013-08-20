@@ -154,7 +154,7 @@ namespace net.openstack.Core.Providers
         /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/Volume_Show_Type.html">Show Volume Type (OpenStack Block Storage Service API Reference)</seealso>
-        VolumeType DescribeVolumeType(int volumeTypeId, string region = null, CloudIdentity identity = null);
+        VolumeType DescribeVolumeType(string volumeTypeId, string region = null, CloudIdentity identity = null);
 
         /// <summary>
         /// Waits for a volume to be set to <see cref="VolumeState.Available"/> status.

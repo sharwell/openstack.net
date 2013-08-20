@@ -15,7 +15,7 @@
         /// Gets the volume type ID.
         /// </summary>
         [JsonProperty]
-        public int Id { get; private set; }
+        public string Id { get; private set; }
 
         /// <summary>
         /// Gets the name of the volume type.
