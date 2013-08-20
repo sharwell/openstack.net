@@ -17,7 +17,7 @@ namespace net.openstack.Core.Domain
     public sealed class ServerState : IEquatable<ServerState>
     {
         private static readonly ConcurrentDictionary<string, ServerState> _states =
-            new ConcurrentDictionary<string, ServerState>();
+            new ConcurrentDictionary<string, ServerState>(StringComparer.OrdinalIgnoreCase);
         private static readonly ServerState _active = FromName("ACTIVE");
         private static readonly ServerState _build = FromName("BUILD");
         private static readonly ServerState _deleted = FromName("DELETED");
