@@ -42,7 +42,7 @@ namespace net.openstack.Core.Providers
         /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
         /// <seealso href="http://docs.openstack.org/api/openstack-block-storage/2.0/content/Create_Volume.html">Create Volume (OpenStack Block Storage Service API Reference)</seealso>
-        bool CreateVolume(int size, string displayDescription = null, string displayName = null, string snapshotId = null, string volumeType = null, string region = null, CloudIdentity identity = null);
+        Volume CreateVolume(int size, string displayDescription = null, string displayName = null, string snapshotId = null, string volumeType = null, string region = null, CloudIdentity identity = null);
 
         /// <summary>
         /// Gets a list of volumes.
