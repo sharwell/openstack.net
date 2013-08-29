@@ -81,6 +81,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.ObjectStorage)]
+        [TestCategory(TestCategories.Cleanup)]
         [Ignore]
         public void CleanupAllContainerMetadata()
         {
@@ -100,6 +101,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.ObjectStorage)]
+        [TestCategory(TestCategories.Cleanup)]
         public void CleanupTestContainerMetadata()
         {
             IObjectStorageProvider provider = new CloudFilesProvider(Bootstrapper.Settings.TestIdentity);
@@ -118,6 +120,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.ObjectStorage)]
+        [TestCategory(TestCategories.Cleanup)]
         public void CleanupTestContainers()
         {
             IObjectStorageProvider provider = new CloudFilesProvider(Bootstrapper.Settings.TestIdentity);
@@ -659,6 +662,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.ObjectStorage)]
+        [TestCategory(TestCategories.Cleanup)]
         [Ignore]
         public void CleanupAllAccountMetadata()
         {
@@ -675,6 +679,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.ObjectStorage)]
+        [TestCategory(TestCategories.Cleanup)]
         public void CleanupTestAccountMetadata()
         {
             IObjectStorageProvider provider = new CloudFilesProvider(Bootstrapper.Settings.TestIdentity);

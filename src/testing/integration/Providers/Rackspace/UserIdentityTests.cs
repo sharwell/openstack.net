@@ -105,6 +105,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Identity)]
+        [TestCategory(TestCategories.Cleanup)]
         [Ignore]
         public void CleanupUsers()
         {
