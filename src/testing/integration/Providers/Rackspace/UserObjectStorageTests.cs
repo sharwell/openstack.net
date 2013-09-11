@@ -3,7 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
     using System.Text;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Exceptions;
@@ -131,21 +133,26 @@
             IEnumerable<Container> containers = ListAllContainers(provider);
             foreach (Container container in containers)
             {
-                if (container.Name.StartsWith(TestContainerPrefix))
+                if (container.Name.StartsWith(TestContainerPrefix) || true)
                 {
-                    try
-                    {
-                        provider.DeleteContainer(container.Name, deleteObjects: true);
-                    }
-                    catch (ContainerNotEmptyException)
-                    {
-                        // this works around a bug in bulk delete, where files with trailing whitespace
-                        // in the name do not get deleted
-                        foreach (ContainerObject containerObject in ListAllObjects(provider, container.Name))
-                            provider.DeleteObject(container.Name, containerObject.Name);
+                    string containerName = container.Name;
 
-                        provider.DeleteContainer(container.Name, deleteObjects: false);
+                    List<Task> tasks = new List<Task>();
+                    foreach (ContainerObject containerObject in ListAllObjects(provider, container.Name))
+                    {
+                        string objectName = containerObject.Name;
+                        Task task = Task.Factory.StartNew(
+                            () =>
+                            {
+                                IObjectStorageProvider subProvider = new CloudFilesProvider(Bootstrapper.Settings.TestIdentity);
+                                ((CloudFilesProvider)subProvider).ConnectionLimit = 20;
+                                subProvider.DeleteObject(containerName, objectName);
+                            });
+                        tasks.Add(task);
                     }
+
+                    Task.WaitAll(tasks.ToArray());
+                    provider.DeleteContainer(container.Name, deleteObjects: false);
                 }
                 else if (container.Name.Equals(".CDN_ACCESS_LOGS"))
                 {
