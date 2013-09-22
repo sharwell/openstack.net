@@ -24,6 +24,9 @@
     using StreamReader = System.IO.StreamReader;
     using WebRequest = System.Net.WebRequest;
     using WebResponse = System.Net.WebResponse;
+    using System.Diagnostics;
+    using System.Threading.Tasks.Schedulers;
+    using System.Threading;
 
     /// <summary>
     /// This class contains integration tests for the Rackspace Object Storage Provider
@@ -148,7 +151,12 @@
                                 ((CloudFilesProvider)subProvider).ConnectionLimit = 20;
                                 subProvider.DeleteObject(containerName, objectName);
                             });
-                        tasks.Add(task);
+                        tasks.Add(task.ContinueWith(
+                            t =>
+                            {
+                                var ignored = t.Exception;
+                                Console.WriteLine("Could not delete: /{0}/{1}", containerName, objectName);
+                            }, TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnFaulted));
                     }
 
                     Task.WaitAll(tasks.ToArray());
@@ -1232,6 +1240,100 @@
             /* Cleanup
              */
             provider.DeleteContainer(containerName, deleteObjects: true);
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
+        [Timeout(TestTimeout.Infinite)]
+        public void TestCreateManyObjects()
+        {
+            int objectCount = 1000000;
+            int threadCount = 50;
+            int containerCount = 20;
+            Console.WriteLine("Creating {0} objects using {1} connections, spread over {2} containers", objectCount, threadCount, containerCount);
+
+            IObjectStorageProvider provider = new CloudFilesProvider(Bootstrapper.Settings.TestIdentity);
+
+            List<string> containerNames = new List<string>();
+            for (int i = 0; i < containerCount; i++)
+            {
+                string containerName = TestContainerPrefix + Path.GetRandomFileName();
+                containerNames.Add(containerName);
+                ObjectStore containerResult = provider.CreateContainer(containerName);
+                Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            }
+
+            Random random = new Random();
+            QueuedTaskScheduler queuedScheduler = new QueuedTaskScheduler(threadCount);
+            TaskScheduler scheduler = queuedScheduler.ActivateNewQueue();
+
+            {
+                Stopwatch timer = Stopwatch.StartNew();
+                List<Task> tasks = new List<Task>();
+                for (int i = 0; i < objectCount; i++)
+                {
+                    string objectName = Path.GetRandomFileName();
+                    // another random name counts as random content
+                    string fileData = Path.GetRandomFileName();
+                    string containerName = containerNames[random.Next(containerCount)];
+                    Task task = Task.Factory.StartNew(
+                        () =>
+                        {
+                            IObjectStorageProvider subProvider = new CloudFilesProvider(Bootstrapper.Settings.TestIdentity);
+                            ((CloudFilesProvider)subProvider).ConnectionLimit = threadCount;
+
+                            using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
+                            {
+                                subProvider.CreateObject(containerName, uploadStream, objectName);
+                            }
+                        }, CancellationToken.None, TaskCreationOptions.None, scheduler);
+                    tasks.Add(task.ContinueWith(
+                            t =>
+                            {
+                                var ignored = t.Exception;
+                                Console.WriteLine("Could not create: /{0}/{1}", containerName, objectName);
+                            }, TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnFaulted));
+                }
+
+                Task.WaitAll(tasks.ToArray());
+                double elapsedMillis = timer.Elapsed.TotalMilliseconds;
+                Console.WriteLine("Created {0} objects in {1} ms ({2} ms/obj, {3} obj/sec).", tasks.Count, (long)elapsedMillis, elapsedMillis / objectCount, 1000 * objectCount / elapsedMillis);
+            }
+
+            /* Cleanup
+             */
+
+            {
+                foreach (string containerName in containerNames)
+                {
+                    Stopwatch timer = Stopwatch.StartNew();
+                    List<Task> tasks = new List<Task>();
+                    foreach (ContainerObject containerObject in ListAllObjects(provider, containerName))
+                    {
+                        string objectName = containerObject.Name;
+                        Task task = Task.Factory.StartNew(
+                            () =>
+                            {
+                                IObjectStorageProvider subProvider = new CloudFilesProvider(Bootstrapper.Settings.TestIdentity);
+                                ((CloudFilesProvider)subProvider).ConnectionLimit = threadCount;
+                                subProvider.DeleteObject(containerName, objectName);
+                            }, CancellationToken.None, TaskCreationOptions.None, scheduler);
+                        tasks.Add(task.ContinueWith(
+                            t =>
+                            {
+                                var ignored = t.Exception;
+                                Console.WriteLine("Could not delete: /{0}/{1}", containerName, objectName);
+                            }, TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnFaulted));
+                    }
+
+                    Task.WaitAll(tasks.ToArray());
+                    double elapsedMillis = timer.Elapsed.TotalMilliseconds;
+                    Console.WriteLine("Deleted {0} objects in {1} ms ({2} ms/obj, {3} obj/sec).", tasks.Count, (long)elapsedMillis, elapsedMillis / tasks.Count, 1000 * tasks.Count / elapsedMillis);
+
+                    provider.DeleteContainer(containerName, deleteObjects: false);
+                }
+            }
         }
 
         [TestMethod]
