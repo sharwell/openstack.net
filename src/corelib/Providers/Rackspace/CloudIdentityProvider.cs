@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using JSIStudios.SimpleRESTServices.Client;
 using JSIStudios.SimpleRESTServices.Client.Json;
 using net.openstack.Core;
@@ -9,7 +10,6 @@ using net.openstack.Core.Caching;
 using net.openstack.Core.Domain;
 using net.openstack.Core.Exceptions.Response;
 using net.openstack.Core.Providers;
-using net.openstack.Core.Validators;
 using net.openstack.Providers.Rackspace.Objects;
 using net.openstack.Providers.Rackspace.Objects.Request;
 using net.openstack.Providers.Rackspace.Objects.Response;
@@ -25,7 +25,7 @@ namespace net.openstack.Providers.Rackspace
     /// <seealso href="http://docs.openstack.org/api/openstack-identity-service/2.0/content/">OpenStack Identity Service API v2.0 Reference</seealso>
     /// <seealso href="http://docs.rackspace.com/auth/api/v2.0/auth-client-devguide/content/index.html">Rackspace Cloud Identity Client Developer Guide - API v2.0</seealso>
     /// <threadsafety static="true" instance="false"/>
-    public class CloudIdentityProvider : ProviderBase<IIdentityProvider>, IExtendedCloudIdentityProvider, IIdentityProvider
+    public class CloudIdentityProvider : ProviderBase<IIdentityProvider>, IExtendedCloudIdentityProvider, IIdentityProvider, IIdentityService
     {
         private readonly ICache<UserAccess> _userAccessCache;
         private readonly Uri _urlBase;
@@ -666,11 +666,25 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <inheritdoc/>
+        public Task<IdentityToken> GetTokenAsync(CloudIdentity identity)
+        {
+            return GetUserAccessAsync(identity, false)
+                .ContinueWith(task => task.Result.Token);
+        }
+
+        /// <inheritdoc/>
         public UserAccess Authenticate(CloudIdentity identity)
         {
             CheckIdentity(identity);
 
             return GetUserAccess(identity, true);
+        }
+
+        /// <inheritdoc/>
+        public Task<UserAccess> AuthenticateAsync(CloudIdentity identity)
+        {
+            CheckIdentity(identity);
+            return GetUserAccessAsync(identity, true);
         }
 
         /// <inheritdoc/>
@@ -702,6 +716,12 @@ namespace net.openstack.Providers.Rackspace
                             }, forceCacheRefresh);
 
             return userAccess;
+        }
+
+        /// <inheritdoc/>
+        public Task<UserAccess> GetUserAccessAsync(CloudIdentity identity, bool forceCacheRefresh)
+        {
+            return Task.Factory.StartNew(() => GetUserAccess(identity, forceCacheRefresh));
         }
 
         /// <summary>

@@ -38,6 +38,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="ParallelExtensionsExtras">
+      <HintPath>..\packages\MSFT.ParallelExtensionsExtras.1.2.0\lib\ParallelExtensionsExtras.dll</HintPath>
+    </Reference>
     <Reference Include="SimpleRESTServices, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SimpleRESTServices.1.2.0.0\lib\net40\SimpleRESTServices.dll</HintPath>
@@ -45,20 +48,28 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Caching\ICache`1.cs" />
     <Compile Include="Core\Caching\NamespaceDoc.cs" />
+    <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\Converters\NamespaceDoc.cs" />
     <Compile Include="Core\Domain\Converters\PhysicalAddressSimpleConverter.cs" />
     <Compile Include="Core\Domain\Converters\SimpleStringJsonConverter`1.cs" />
     <Compile Include="Core\Domain\Converters\IPAddressSimpleConverter.cs" />
+    <Compile Include="Core\Domain\Message`1.cs" />
     <Compile Include="Core\Domain\DiskConfiguration.cs" />
     <Compile Include="Core\Domain\ExtendedEndpoint.cs" />
     <Compile Include="Core\Domain\ImageState.cs" />
     <Compile Include="Core\Domain\IPAddressList.cs" />
+    <Compile Include="Core\Domain\Message.cs" />
+    <Compile Include="Core\Domain\MessageStatistics.cs" />
     <Compile Include="Core\Domain\PowerState.cs" />
+    <Compile Include="Core\Domain\QueueMessagesStatistics.cs" />
+    <Compile Include="Core\Domain\ResourceHints.cs" />
+    <Compile Include="Core\Domain\ResourceObject.cs" />
     <Compile Include="Core\Domain\SnapshotState.cs" />
     <Compile Include="Core\Domain\Converters\IPAddressDetailsConverter.cs" />
     <Compile Include="Core\Domain\Mapping\NamespaceDoc.cs" />
@@ -89,11 +100,20 @@
     <Compile Include="Core\Exceptions\Response\NamespaceDoc.cs" />
     <Compile Include="Core\Exceptions\SnapshotEnteredErrorStateException.cs" />
     <Compile Include="Core\Exceptions\VolumeEnteredErrorStateException.cs" />
+    <Compile Include="Core\InternalTaskExtensions.cs" />
     <Compile Include="Core\NamespaceDoc.cs" />
+    <Compile Include="Core\Domain\Claim.cs" />
+    <Compile Include="Core\Domain\HomeDocument.cs" />
+    <Compile Include="Core\Domain\CloudQueue.cs" />
+    <Compile Include="Core\Providers\IIdentityService.cs" />
+    <Compile Include="Core\Providers\IQueueingService.cs" />
     <Compile Include="Core\Providers\NamespaceDoc.cs" />
+    <Compile Include="Core\Domain\QueueStatistics.cs" />
+    <Compile Include="Core\Domain\QueuedMessage.cs" />
     <Compile Include="Core\ResponseExtensions.cs" />
     <Compile Include="Core\RestWebHeaderCollection.cs" />
     <Compile Include="Core\Validators\NamespaceDoc.cs" />
+    <Compile Include="Providers\Rackspace\CloudQueuesProvider.cs" />
     <Compile Include="Providers\Rackspace\Exceptions\BulkDeletionException.cs" />
     <Compile Include="Core\HttpStatusCodeParser.cs" />
     <Compile Include="Core\IStatusParser.cs" />
@@ -145,10 +165,13 @@
     <Compile Include="Providers\Rackspace\Objects\Mapping\BulkDeletionResultMapper.cs" />
     <Compile Include="Providers\Rackspace\Objects\Mapping\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\NamespaceDoc.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Request\ClaimMessagesRequest.cs" />
     <Compile Include="Providers\Rackspace\Objects\Request\CreateVirtualInterfaceRequest.cs" />
     <Compile Include="Providers\Rackspace\Objects\Request\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Request\PasswordCredential.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\BulkDeleteResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Response\ListCloudQueueMessagesResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Response\ListCloudQueuesResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\ListEndpointsResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\MetadataItemResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\ListVirtualInterfacesResponse.cs" />
