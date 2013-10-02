@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core.Domain;
@@ -23,6 +24,12 @@
         /// The prefix to use for names of queues created during integration testing.
         /// </summary>
         public static readonly string TestQueuePrefix = "UnitTestQueue-";
+
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext testContext)
+        {
+            ServicePointManager.DefaultConnectionLimit = 80;
+        }
 
         /// <summary>
         /// This method can be used to clean up queues created during integration testing.
@@ -265,8 +272,8 @@
             await provider.CreateQueueAsync(requestQueueName, testCancellationTokenSource.Token);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
 
-            int clientCount = 20;
-            int serverCount = 10;
+            int clientCount = 80;
+            int serverCount = 40;
             List<Task<int>> clientTasks = new List<Task<int>>();
             List<Task<int>> serverTasks = new List<Task<int>>();
             for (int i = 0; i < clientCount; i++)

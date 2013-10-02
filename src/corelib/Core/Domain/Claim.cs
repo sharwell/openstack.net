@@ -119,8 +119,7 @@
                 if (_location == null)
                     return null;
 
-                string locationPath = _location.AbsolutePath;
-                return locationPath.Substring(locationPath.LastIndexOf('/') + 1);
+                return _location.Segments.Last();
             }
         }
 

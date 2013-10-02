@@ -2,14 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
-    using System.Net;
-    using System.Text;
-    using System.Threading;
+    using System.Net.Http;
     using System.Threading.Tasks;
-    using JSIStudios.SimpleRESTServices.Client;
-    using JSIStudios.SimpleRESTServices.Client.Json;
     using net.openstack.Core;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Exceptions;
@@ -19,6 +14,11 @@
     using net.openstack.Providers.Rackspace.Validators;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using CancellationToken = System.Threading.CancellationToken;
+    using Encoding = System.Text.Encoding;
+    using HttpStatusCode = System.Net.HttpStatusCode;
+    using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
+    using JsonRequestSettings = JSIStudios.SimpleRESTServices.Client.Json.JsonRequestSettings;
 
     /// <summary>
     /// Provides an implementation of <see cref="IQueueingService"/> for operating
@@ -50,6 +50,8 @@
         /// </summary>
         private HomeDocument _homeDocument;
 
+        private HttpClient _httpClient;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudQueuesProvider"/> class with
         /// the specified values.
@@ -65,86 +67,86 @@
         {
             _clientId = clientId;
             _internalUrl = internalUrl;
+
+            _httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.Add("Accept", JsonRequestSettings.JsonContentType);
+            _httpClient.DefaultRequestHeaders.Add("Client-Id", _clientId.ToString("B"));
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgentGenerator.UserAgent);
         }
 
         #region IQueueingService Members
 
         /// <inheritdoc/>
-        public Task<HomeDocument> GetHomeAsync(CancellationToken cancellationToken)
+        public async Task<HomeDocument> GetHomeAsync(CancellationToken cancellationToken)
         {
             if (_homeDocument != null)
             {
-                return InternalTaskExtensions.CompletedTask(_homeDocument);
+                return _homeDocument;
             }
 
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
+
             UriTemplate template = new UriTemplate("/v1/");
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, new Dictionary<string, string>());
+            Uri uri = template.BindByName(authentication.Item2, new Dictionary<string, string>());
 
-            Func<Task<HttpWebRequest>, Task<HomeDocument>> requestResource =
-                GetResponseAsyncFunc<HomeDocument>(cancellationToken);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<HomeDocument>, HomeDocument> cacheResult =
-                task =>
-                {
-                    _homeDocument = task.Result;
-                    return task.Result;
-                };
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
 
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap()
-                .ContinueWith(cacheResult);
+            string body = await response.Content.ReadAsStringAsync();
+            HomeDocument document = await JsonConvert.DeserializeObjectAsync<HomeDocument>(body);
+            _homeDocument = document;
+            return document;
         }
 
         /// <inheritdoc/>
-        public Task GetNodeHealthAsync(CancellationToken cancellationToken)
+        public async Task GetNodeHealthAsync(CancellationToken cancellationToken)
         {
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
+
             UriTemplate template = new UriTemplate("/v1/health");
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.HEAD, template, new Dictionary<string, string>());
+            Uri uri = template.BindByName(authentication.Item2, new Dictionary<string, string>());
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Head, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <inheritdoc/>
-        public Task CreateQueueAsync(string queueName, CancellationToken cancellationToken)
+        public async Task CreateQueueAsync(string queueName, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
 
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
+
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}");
             var parameters = new Dictionary<string, string>
                 {
                     { "queue_name", queueName }
                 };
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <inheritdoc/>
-        public Task<IEnumerable<CloudQueue>> ListQueuesAsync(string marker, int? limit, bool detailed, CancellationToken cancellationToken)
+        public async Task<IEnumerable<CloudQueue>> ListQueuesAsync(string marker, int? limit, bool detailed, CancellationToken cancellationToken)
         {
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
+
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
 
             UriTemplate template = new UriTemplate("/v1/queues?marker={marker}&limit={limit}&detailed={detailed}");
             var parameters = new Dictionary<string, string>
@@ -155,102 +157,80 @@
                 parameters.Add("marker", marker);
             if (limit.HasValue)
                 parameters.Add("limit", limit.ToString());
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<HttpWebRequest>, Task<ListCloudQueuesResponse>> requestResource =
-                GetResponseAsyncFunc<ListCloudQueuesResponse>(cancellationToken);
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
 
-            Func<Task<ListCloudQueuesResponse>, IEnumerable<CloudQueue>> resultSelector =
-                task => (task.Result != null ? task.Result.Queues : null) ?? Enumerable.Empty<CloudQueue>();
+            string body = await response.Content.ReadAsStringAsync();
+            ListCloudQueuesResponse result = await JsonConvert.DeserializeObjectAsync<ListCloudQueuesResponse>(body);
+            if (result == null || result.Queues == null)
+                return Enumerable.Empty<CloudQueue>();
 
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap()
-                .ContinueWith(resultSelector);
+            return result.Queues;
         }
 
         /// <inheritdoc/>
-        public Task<bool> QueueExistsAsync(string queueName, CancellationToken cancellationToken)
+        public async Task<bool> QueueExistsAsync(string queueName, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
+
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
 
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}");
             var parameters = new Dictionary<string, string>() { { "queue_name", queueName } };
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.HEAD, template, parameters);
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Head, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<string>, bool> interpretResult =
-                task =>
-                {
-                    // a WebException would have been thrown if the queue didn't exist
-                    if (task.Status == TaskStatus.RanToCompletion)
-                        return true;
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            switch (response.StatusCode)
+            {
+            case HttpStatusCode.NoContent:
+                return true;
 
-                    task.Exception.Flatten().Handle(
-                        ex =>
-                        {
-                            WebException webException = ex as WebException;
-                            if (webException == null)
-                                return false;
+            case HttpStatusCode.NotFound:
+                return false;
 
-                            HttpWebResponse response = webException.Response as HttpWebResponse;
-                            if (response == null)
-                                return false;
-
-                            if (response.StatusCode != HttpStatusCode.NotFound)
-                                return false;
-
-                            // a 404 error means the queue does not exist
-                            return true;
-                        });
-
-                    return false;
-                };
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap()
-                .ContinueWith(interpretResult);
+            default:
+                response.EnsureSuccessStatusCode();
+                return true;
+            }
         }
 
         /// <inheritdoc/>
-        public Task DeleteQueueAsync(string queueName, CancellationToken cancellationToken)
+        public async Task DeleteQueueAsync(string queueName, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
+
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
 
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}");
             var parameters = new Dictionary<string, string>
                 {
                     { "queue_name", queueName }
                 };
+            Uri uri = template.BindByName(authentication.Item2, parameters);
+            
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
-
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <inheritdoc/>
-        public Task SetQueueMetadataAsync<T>(string queueName, T metadata, CancellationToken cancellationToken)
+        public async Task SetQueueMetadataAsync<T>(string queueName, T metadata, CancellationToken cancellationToken)
             where T : class
         {
             if (queueName == null)
@@ -258,22 +238,22 @@
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
 
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
+
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/metadata");
             var parameters = new Dictionary<string, string>
                 {
                     { "queue_name", queueName }
                 };
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, metadata);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
+            string body = await JsonConvert.SerializeObjectAsync(metadata);
+            request.Content = new StringContent(body, Encoding.UTF8, JsonRequestSettings.JsonContentType);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest).Unwrap()
-                .ContinueWith(requestResource).Unwrap();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <inheritdoc/>
@@ -283,7 +263,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<T> GetQueueMetadataAsync<T>(string queueName, CancellationToken cancellationToken)
+        public async Task<T> GetQueueMetadataAsync<T>(string queueName, CancellationToken cancellationToken)
             where T : class
         {
             if (queueName == null)
@@ -291,48 +271,51 @@
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
 
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
+
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/metadata");
             var parameters = new Dictionary<string, string>
                 {
                     { "queue_name", queueName }
                 };
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<HttpWebRequest>, Task<T>> requestResource =
-                GetResponseAsyncFunc<T>(cancellationToken);
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
 
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            string body = await response.Content.ReadAsStringAsync();
+            return await JsonConvert.DeserializeObjectAsync<T>(body);
         }
 
         /// <inheritdoc/>
-        public Task<QueueStatistics> GetQueueStatisticsAsync(string queueName, CancellationToken cancellationToken)
+        public async Task<QueueStatistics> GetQueueStatisticsAsync(string queueName, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
 
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
+
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/stats");
             var parameters = new Dictionary<string, string>() { { "queue_name", queueName } };
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<HttpWebRequest>, Task<QueueStatistics>> requestResource =
-                GetResponseAsyncFunc<QueueStatistics>(cancellationToken);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            string body = await response.Content.ReadAsStringAsync();
+            return await JsonConvert.DeserializeObjectAsync<QueueStatistics>(body);
         }
 
         /// <inheritdoc/>
-        public Task<IEnumerable<QueuedMessage>> ListMessagesAsync(string queueName, string marker, int? limit, bool echo, bool includeClaimed, CancellationToken cancellationToken)
+        public async Task<IEnumerable<QueuedMessage>> ListMessagesAsync(string queueName, string marker, int? limit, bool echo, bool includeClaimed, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -340,6 +323,8 @@
                 throw new ArgumentException("queueName cannot be empty");
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
+
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
 
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/messages?marker={marker}&limit={limit}&echo={echo}&include_claimed={include_claimed}");
 
@@ -354,30 +339,28 @@
                 parameters["marker"] = marker;
             if (limit != null)
                 parameters["limit"] = limit.ToString();
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<HttpWebRequest>, Task<ListCloudQueueMessagesResponse>> requestResource =
-                GetResponseAsyncFunc<ListCloudQueueMessagesResponse>(cancellationToken);
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
 
-            Func<Task<ListCloudQueueMessagesResponse>, IEnumerable<QueuedMessage>> resultSelector =
-                task => task.Result.Messages;
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap()
-                .ContinueWith(resultSelector);
+            string body = await response.Content.ReadAsStringAsync();
+            ListCloudQueueMessagesResponse result = await JsonConvert.DeserializeObjectAsync<ListCloudQueueMessagesResponse>(body);
+            return result.Messages;
         }
 
         /// <inheritdoc/>
-        public Task<QueuedMessage> GetMessageAsync(string queueName, string messageId, CancellationToken cancellationToken)
+        public async Task<QueuedMessage> GetMessageAsync(string queueName, string messageId, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
+
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
 
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/messages/{message_id}");
 
@@ -387,21 +370,20 @@
                     { "queue_name", queueName },
                     { "message_id", messageId },
                 };
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<HttpWebRequest>, Task<QueuedMessage>> requestResource =
-                GetResponseAsyncFunc<QueuedMessage>(cancellationToken);
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
 
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            string body = await response.Content.ReadAsStringAsync();
+            return await JsonConvert.DeserializeObjectAsync<QueuedMessage>(body);
         }
 
         /// <inheritdoc/>
-        public Task<IEnumerable<QueuedMessage>> GetMessagesAsync(string queueName, IEnumerable<string> messageIds, CancellationToken cancellationToken)
+        public async Task<IEnumerable<QueuedMessage>> GetMessagesAsync(string queueName, IEnumerable<string> messageIds, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -409,6 +391,8 @@
                 throw new ArgumentNullException("messageIds");
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
+
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
 
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/messages?ids={ids}");
 
@@ -418,17 +402,16 @@
                     { "queue_name", queueName },
                     { "ids", string.Join(",", messageIds.ToArray()) },
                 };
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<HttpWebRequest>, Task<IEnumerable<QueuedMessage>>> requestResource =
-                GetResponseAsyncFunc<IEnumerable<QueuedMessage>>(cancellationToken);
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
 
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            string body = await response.Content.ReadAsStringAsync();
+            return await JsonConvert.DeserializeObjectAsync<IEnumerable<QueuedMessage>>(body);
         }
 
         /// <inheritdoc/>
@@ -438,7 +421,7 @@
         }
 
         /// <inheritdoc/>
-        public Task PostMessagesAsync(string queueName, CancellationToken cancellationToken, params Message[] messages)
+        public async Task PostMessagesAsync(string queueName, CancellationToken cancellationToken, params Message[] messages)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -447,6 +430,8 @@
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
 
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
+
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/messages");
 
             var parameters =
@@ -454,17 +439,15 @@
                 {
                     { "queue_name", queueName },
                 };
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, messages);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
+            string body = await JsonConvert.SerializeObjectAsync(messages);
+            request.Content = new StringContent(body, Encoding.UTF8, JsonRequestSettings.JsonContentType);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest).Unwrap()
-                .ContinueWith(requestResource).Unwrap();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <inheritdoc/>
@@ -474,7 +457,7 @@
         }
 
         /// <inheritdoc/>
-        public Task PostMessagesAsync<T>(string queueName, CancellationToken cancellationToken, params Message<T>[] messages)
+        public async Task PostMessagesAsync<T>(string queueName, CancellationToken cancellationToken, params Message<T>[] messages)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -483,6 +466,8 @@
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
 
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
+
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/messages");
 
             var parameters =
@@ -490,26 +475,26 @@
                 {
                     { "queue_name", queueName },
                 };
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, messages);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
+            string body = await JsonConvert.SerializeObjectAsync(messages);
+            request.Content = new StringContent(body, Encoding.UTF8, JsonRequestSettings.JsonContentType);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest).Unwrap()
-                .ContinueWith(requestResource).Unwrap();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <inheritdoc/>
-        public Task DeleteMessageAsync(string queueName, string messageId, Claim claim, CancellationToken cancellationToken)
+        public async Task DeleteMessageAsync(string queueName, string messageId, Claim claim, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
+
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
 
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/messages/{message_id}?claim_id={claim_id}");
 
@@ -521,21 +506,17 @@
                 };
             if (claim != null)
                 parameters["claim_id"] = claim.Id;
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <inheritdoc/>
-        public Task DeleteMessagesAsync(string queueName, IEnumerable<string> messageIds, CancellationToken cancellationToken)
+        public async Task DeleteMessagesAsync(string queueName, IEnumerable<string> messageIds, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -543,6 +524,8 @@
                 throw new ArgumentNullException("messageIds");
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
+
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
 
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/messages?ids={ids}");
 
@@ -552,21 +535,17 @@
                     { "queue_name", queueName },
                     { "ids", string.Join(",", messageIds.ToArray()) },
                 };
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <inheritdoc/>
-        public Task<Claim> ClaimMessageAsync(string queueName, int? limit, TimeSpan timeToLive, TimeSpan gracePeriod, CancellationToken cancellationToken)
+        public async Task<Claim> ClaimMessageAsync(string queueName, int? limit, TimeSpan timeToLive, TimeSpan gracePeriod, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -574,6 +553,8 @@
                 throw new ArgumentException("queueName cannot be empty");
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
+
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
 
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/claims?limit={limit}");
 
@@ -584,40 +565,32 @@
                 };
             if (limit != null)
                 parameters["limit"] = limit.ToString();
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            var request = new ClaimMessagesRequest(timeToLive, gracePeriod);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
+            var body = new ClaimMessagesRequest(timeToLive, gracePeriod);
+            string bodyText = await JsonConvert.SerializeObjectAsync(body);
+            request.Content = new StringContent(bodyText, Encoding.UTF8, JsonRequestSettings.JsonContentType);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, request);
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
 
-            Func<Task<Tuple<HttpWebResponse, string>>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> parseResult =
-                task =>
-                {
-                    string location = task.Result.Item1.Headers[HttpResponseHeader.Location];
-                    Uri locationUri = location != null ? new Uri(_baseUri, location) : null;
+            Uri location = response.Headers.Location;
+            if (location != null && !location.IsAbsoluteUri)
+                location = new Uri(authentication.Item2, location.ToString());
 
-                    if (task.Result.Item1.StatusCode == HttpStatusCode.NoContent)
-                    {
-                        // the queue did not contain any messages to claim
-                        Tuple<Uri, IEnumerable<QueuedMessage>> result = Tuple.Create(locationUri, Enumerable.Empty<QueuedMessage>());
-                        return InternalTaskExtensions.CompletedTask(result);
-                    }
+            IEnumerable<QueuedMessage> messages;
+            if (response.StatusCode == HttpStatusCode.NoContent)
+            {
+                messages = Enumerable.Empty<QueuedMessage>();
+            }
+            else
+            {
+                messages = await JsonConvert.DeserializeObjectAsync<IEnumerable<QueuedMessage>>(await response.Content.ReadAsStringAsync());
+            }
 
-                    IEnumerable<QueuedMessage> messages = JsonConvert.DeserializeObject<IEnumerable<QueuedMessage>>(task.Result.Item2);
-
-                    return InternalTaskExtensions.CompletedTask(Tuple.Create(locationUri, messages));
-                };
-            Func<Task<HttpWebRequest>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> requestResource =
-                GetResponseAsyncFunc<Tuple<Uri, IEnumerable<QueuedMessage>>>(cancellationToken, parseResult);
-
-            Func<Task<Tuple<Uri, IEnumerable<QueuedMessage>>>, Claim> resultSelector =
-                task => new Claim(this, queueName, task.Result.Item1, timeToLive, TimeSpan.Zero, task.Result.Item2);
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest).Unwrap()
-                .ContinueWith(requestResource).Unwrap()
-                .ContinueWith(resultSelector);
+            return new Claim(this, queueName, location, timeToLive, TimeSpan.Zero, messages);
         }
 
         /// <inheritdoc/>
@@ -633,7 +606,7 @@
         }
 
         /// <inheritdoc/>
-        public Task ReleaseClaimAsync(string queueName, Claim claim, CancellationToken cancellationToken)
+        public async Task ReleaseClaimAsync(string queueName, Claim claim, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -641,6 +614,8 @@
                 throw new ArgumentNullException("claim");
             if (string.IsNullOrEmpty(queueName))
                 throw new ArgumentException("queueName cannot be empty");
+
+            Tuple<IdentityToken, Uri> authentication = await AuthenticateServiceAsync(cancellationToken);
 
             UriTemplate template = new UriTemplate("/v1/queues/{queue_name}/claims/{claim_id}");
 
@@ -650,26 +625,27 @@
                     { "queue_name", queueName },
                     { "claim_id", claim.Id },
                 };
+            Uri uri = template.BindByName(authentication.Item2, parameters);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, uri);
+            request.Headers.Add("X-Auth-Token", authentication.Item1.Id);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
-            // authenticate -> request resource -> check result -> parse result -> cache result -> return
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
         }
 
         #endregion
 
+        /// <summary>
+        /// Gets the base URI for accessing this API.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which may be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
         private Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken)
         {
             if (_baseUri != null)
             {
-                return InternalTaskExtensions.CompletedTask(_baseUri);
+                return Task.FromResult(_baseUri);
             }
 
             return Task.Factory.StartNew(
@@ -723,161 +699,22 @@
                 });
         }
 
-        private Task<Tuple<IdentityToken, Uri>> AuthenticateServiceAsync(CancellationToken cancellationToken)
+        /// <summary>
+        /// Authenticates the user and gets the base URI for accessing this API.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which may be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        private async Task<Tuple<IdentityToken, Uri>> AuthenticateServiceAsync(CancellationToken cancellationToken)
         {
-            Task<IdentityToken> authenticate;
+            IdentityToken token;
             IIdentityService identityService = IdentityProvider as IIdentityService;
             if (identityService != null)
-                authenticate = identityService.GetTokenAsync(GetDefaultIdentity(null));
+                token = await identityService.GetTokenAsync(GetDefaultIdentity(null));
             else
-                authenticate = Task.Factory.StartNew(() => IdentityProvider.GetToken(GetDefaultIdentity(null)));
+                token = await Task.Factory.StartNew(() => IdentityProvider.GetToken(GetDefaultIdentity(null)));
 
-            Func<Task<IdentityToken>, Task<Tuple<IdentityToken, Uri>>> getBaseUri =
-                task =>
-                {
-                    Task[] tasks = { task, GetBaseUriAsync(cancellationToken) };
-                    return Task.Factory.ContinueWhenAll(tasks,
-                        ts =>
-                        {
-                            Task<IdentityToken> first = (Task<IdentityToken>)ts[0];
-                            Task<Uri> second = (Task<Uri>)ts[1];
-                            return Tuple.Create(first.Result, second.Result);
-                        });
-                };
-
-            return authenticate.ContinueWith(getBaseUri).Unwrap();
-        }
-
-        private Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> PrepareRequestAsyncFunc(HttpMethod method, UriTemplate template, IDictionary<string, string> parameters)
-        {
-            return 
-                task =>
-                {
-                    Uri baseUri = task.Result.Item2;
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(template.BindByName(baseUri, parameters));
-                    request.Method = method.ToString().ToUpperInvariant();
-                    request.Accept = JsonRequestSettings.JsonContentType;
-                    request.Headers["X-Auth-Token"] = task.Result.Item1.Id;
-                    request.Headers["Client-Id"] = _clientId.ToString("B");
-                    request.UserAgent = UserAgentGenerator.UserAgent;
-                    request.Timeout = (int)TimeSpan.FromSeconds(14400).TotalMilliseconds;
-                    if (ConnectionLimit.HasValue)
-                        request.ServicePoint.ConnectionLimit = ConnectionLimit.Value;
-
-                    return request;
-                };
-        }
-
-        private Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> PrepareRequestAsyncFunc<TBody>(HttpMethod method, UriTemplate template, IDictionary<string, string> parameters, TBody body)
-        {
-            return 
-                task =>
-                {
-                    Uri baseUri = task.Result.Item2;
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(template.BindByName(baseUri, parameters));
-                    request.Method = method.ToString().ToUpperInvariant();
-                    request.Accept = JsonRequestSettings.JsonContentType;
-                    request.Headers["X-Auth-Token"] = task.Result.Item1.Id;
-                    request.Headers["Client-Id"] = _clientId.ToString("B");
-                    request.UserAgent = UserAgentGenerator.UserAgent;
-                    request.Timeout = (int)TimeSpan.FromSeconds(14400).TotalMilliseconds;
-                    if (ConnectionLimit.HasValue)
-                        request.ServicePoint.ConnectionLimit = ConnectionLimit.Value;
-
-                    string bodyText = JsonConvert.SerializeObject(body);
-                    byte[] encodedBody = Encoding.UTF8.GetBytes(bodyText);
-                    request.ContentType = JsonRequestSettings.JsonContentType + "; charset=UTF-8";
-                    request.ContentLength = encodedBody.Length;
-
-                    Task<Stream> streamTask = Task.Factory.FromAsync<Stream>(request.BeginGetRequestStream(null, null), request.EndGetRequestStream);
-                    return
-                        streamTask.ContinueWith(subTask =>
-                        {
-                            using (Stream stream = subTask.Result)
-                            {
-                                stream.Write(encodedBody, 0, encodedBody.Length);
-                            }
-
-                            return request;
-                        });
-                };
-        }
-
-        private Func<Task<HttpWebRequest>, Task<string>> GetResponseAsyncFunc(CancellationToken cancellationToken)
-        {
-            Func<Task<HttpWebRequest>, Task<WebResponse>> requestResource =
-                task =>
-                {
-                    return task.Result.GetResponseAsync(cancellationToken);
-                };
-            //Func<Task<WebResponse>, HttpWebResponse> checkResult =
-            //    task =>
-            //    {
-            //        return (HttpWebResponse)task.Result;
-            //    };
-            Func<Task<WebResponse>, string> readResult =
-                task =>
-                {
-                    using (StreamReader reader = new StreamReader(task.Result.GetResponseStream()))
-                    {
-                        return reader.ReadToEnd();
-                    }
-                };
-
-            Func<Task<HttpWebRequest>, Task<string>> result =
-                task =>
-                {
-                    return task.ContinueWith(requestResource).Unwrap()
-                        //.ContinueWith(checkResult)
-                        .ContinueWith(readResult);
-                };
-
-            return result;
-        }
-
-        private Func<Task<HttpWebRequest>, Task<T>> GetResponseAsyncFunc<T>(CancellationToken cancellationToken, Func<Task<Tuple<HttpWebResponse, string>>, Task<T>> parseResult = null)
-        {
-            Func<Task<HttpWebRequest>, Task<WebResponse>> requestResource =
-                task =>
-                {
-                    return task.Result.GetResponseAsync(cancellationToken);
-                };
-            Func<Task<WebResponse>, HttpWebResponse> checkResult =
-                task =>
-                {
-                    return (HttpWebResponse)task.Result;
-                };
-            Func<Task<HttpWebResponse>, Tuple<HttpWebResponse, string>> readResult =
-                task =>
-                {
-                    using (StreamReader reader = new StreamReader(task.Result.GetResponseStream()))
-                    {
-                        return Tuple.Create(task.Result, reader.ReadToEnd());
-                    }
-                };
-            if (parseResult == null)
-            {
-                parseResult =
-                    task =>
-                    {
-#if NET35
-                        return Task.Factory.StartNew(() => JsonConvert.DeserializeObject<T>(task.Result.Item2));
-#else
-                        return JsonConvert.DeserializeObjectAsync<T>(task.Result.Item2);
-#endif
-                    };
-            }
-
-            Func<Task<HttpWebRequest>, Task<T>> result =
-                task =>
-                {
-                    return task.ContinueWith(requestResource).Unwrap()
-                        .ContinueWith(checkResult)
-                        .ContinueWith(readResult)
-                        .ContinueWith(parseResult).Unwrap();
-                };
-
-            return result;
+            Uri baseUri = await GetBaseUriAsync(cancellationToken);
+            return Tuple.Create(token, baseUri);
         }
     }
 }
