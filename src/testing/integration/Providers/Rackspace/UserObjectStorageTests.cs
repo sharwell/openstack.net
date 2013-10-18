@@ -1291,9 +1291,10 @@
                     tasks.Add(task.ContinueWith(
                             t =>
                             {
-                                var ignored = t.Exception;
-                                Console.WriteLine("Could not create: /{0}/{1}", containerName, objectName);
-                            }, TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnFaulted));
+                                t.IgnoreExceptions();
+                                if (!t.IsCompleted)
+                                    Console.WriteLine("Could not create: /{0}/{1}", containerName, objectName);
+                            }, TaskContinuationOptions.ExecuteSynchronously));
                 }
 
                 Task.WaitAll(tasks.ToArray());
@@ -1322,9 +1323,10 @@
                         tasks.Add(task.ContinueWith(
                             t =>
                             {
-                                var ignored = t.Exception;
-                                Console.WriteLine("Could not delete: /{0}/{1}", containerName, objectName);
-                            }, TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnFaulted));
+                                t.IgnoreExceptions();
+                                if (!t.IsCompleted)
+                                    Console.WriteLine("Could not delete: /{0}/{1}", containerName, objectName);
+                            }, TaskContinuationOptions.ExecuteSynchronously));
                     }
 
                     Task.WaitAll(tasks.ToArray());
