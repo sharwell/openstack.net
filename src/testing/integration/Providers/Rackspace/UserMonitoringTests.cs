@@ -622,9 +622,31 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestListAgentConnections()
+        public void TestListAgentConnections()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                bool foundConnection = false;
+                foreach (Agent agent in agents)
+                {
+                    Console.WriteLine("Connections for Agent {0}", agent.Id);
+                    AgentConnection[] connections = ListAllAgentConnections(provider, agent.Id, null, cancellationTokenSource.Token).ToArray();
+                    foundConnection |= connections.Any();
+                    foreach (AgentConnection connection in connections)
+                    {
+                        Assert.AreEqual(agent.Id, connection.AgentId);
+                        Console.WriteLine("    {0}", connection.Id);
+                    }
+                }
+
+                if (!foundConnection)
+                    Assert.Inconclusive("The service did not report any agent connections.");
+            }
         }
 
         [TestMethod]
@@ -632,7 +654,35 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetAgentConnection()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                bool foundConnection = false;
+                foreach (Agent agent in agents)
+                {
+                    AgentConnection[] connections = ListAllAgentConnections(provider, agent.Id, null, cancellationTokenSource.Token).ToArray();
+                    foundConnection |= connections.Any();
+                    foreach (AgentConnection connection in connections)
+                    {
+                        AgentConnection singleConnection = await provider.GetAgentConnectionAsync(agent.Id, connection.Id, cancellationTokenSource.Token);
+                        Assert.IsNotNull(singleConnection);
+                        Assert.AreEqual(connection.Id, singleConnection.Id);
+                        Assert.AreEqual(connection.Guid, singleConnection.Guid);
+                        Assert.AreEqual(connection.ProcessVersion, singleConnection.ProcessVersion);
+                        Assert.AreEqual(connection.Endpoint, singleConnection.Endpoint);
+                        Assert.AreEqual(connection.BundleVersion, singleConnection.BundleVersion);
+                        Assert.AreEqual(connection.AgentAddress, singleConnection.AgentAddress);
+                        Assert.AreEqual(connection.AgentId, singleConnection.AgentId);
+                    }
+                }
+
+                if (!foundConnection)
+                    Assert.Inconclusive("The service did not report any agent connections.");
+            }
         }
 
         [TestMethod]
