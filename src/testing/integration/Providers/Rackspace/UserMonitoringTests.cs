@@ -53,10 +53,12 @@
                     if (entity.Label == null || !entity.Label.StartsWith(TestEntityPrefix, StringComparison.OrdinalIgnoreCase))
                         continue;
 
+                    Console.WriteLine("Removing entity '{0}' ({1})", entity.Label, entity.Id);
                     cleanupTasks.Add(provider.RemoveEntityAsync(entity.Id, cancellationTokenSource.Token));
                 }
 
-                await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                if (cleanupTasks.Count > 0)
+                    await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
             }
         }
 
@@ -88,10 +90,12 @@
                     if (plan.Label == null || !plan.Label.Value.StartsWith(TestNotificationPlanPrefix, StringComparison.OrdinalIgnoreCase))
                         continue;
 
+                    Console.WriteLine("Removing notification plan '{0}'", plan.Label);
                     cleanupTasks.Add(provider.RemoveNotificationPlansAsync(plan.Label, cancellationTokenSource.Token));
                 }
 
-                await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                if (cleanupTasks.Count > 0)
+                    await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
             }
         }
 
@@ -109,10 +113,12 @@
                     if (notification.Label == null || !notification.Label.StartsWith(TestNotificationPrefix, StringComparison.OrdinalIgnoreCase))
                         continue;
 
+                    Console.WriteLine("Removing notification '{0}' ({1})", notification.Label, notification.Id);
                     cleanupTasks.Add(provider.RemoveNotificationAsync(notification.Id, cancellationTokenSource.Token));
                 }
 
-                await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                if (cleanupTasks.Count > 0)
+                    await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
             }
         }
 
@@ -127,13 +133,15 @@
                 AgentToken[] agentTokens = ListAllAgentTokens(provider, null, cancellationTokenSource.Token).ToArray();
                 foreach (AgentToken agentToken in agentTokens)
                 {
-                    if (agentToken.Label == null || !agentToken.Label.StartsWith(TestNotificationPrefix, StringComparison.OrdinalIgnoreCase))
+                    if (agentToken.Label == null || !agentToken.Label.StartsWith(TestAgentTokenPrefix, StringComparison.OrdinalIgnoreCase))
                         continue;
 
+                    Console.WriteLine("Removing agent token '{0}' ({1})", agentToken.Label, agentToken.Id);
                     cleanupTasks.Add(provider.RemoveAgentTokenAsync(agentToken.Id, cancellationTokenSource.Token));
                 }
 
-                await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                if (cleanupTasks.Count > 0)
+                    await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
             }
         }
 
