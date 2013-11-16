@@ -1,9 +1,5 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using Newtonsoft.Json;
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -16,10 +12,11 @@
         private string _label;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AgentTokenConfiguration"/> class.
+        /// Initializes a new instance of the <see cref="AgentTokenConfiguration"/> class
+        /// with no label.
         /// </summary>
         [JsonConstructor]
-        protected AgentTokenConfiguration()
+        public AgentTokenConfiguration()
         {
         }
 

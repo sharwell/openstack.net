@@ -698,23 +698,39 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestCreateAgentToken()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomAgentTokenName();
+                AgentTokenConfiguration configuration = new AgentTokenConfiguration(label);
+
+                AgentTokenId agentTokenId = await provider.CreateAgentTokenAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(agentTokenId);
+
+                AgentToken agentToken = await provider.GetAgentTokenAsync(agentTokenId, cancellationTokenSource.Token);
+                Assert.IsNotNull(agentToken);
+                Assert.AreEqual(agentTokenId, agentToken.Id);
+                Assert.AreEqual(label, agentToken.Label);
+
+                await provider.RemoveAgentTokenAsync(agentTokenId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestListAgentTokens()
+        public void TestListAgentTokens()
         {
-            Assert.Inconclusive("Not yet implemented.");
-        }
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                AgentToken[] agentTokens = ListAllAgentTokens(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agentTokens.Length == 0)
+                    Assert.Inconclusive("The service did not report any agent tokens.");
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
-        public async Task TestGetAgentToken()
-        {
-            Assert.Inconclusive("Not yet implemented.");
+                foreach (AgentToken agentToken in agentTokens)
+                    Console.WriteLine("Agent Token {0} ({1})", agentToken.Label, agentToken.Id);
+            }
         }
 
         [TestMethod]
@@ -722,15 +738,32 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestUpdateAgentToken()
         {
-            Assert.Inconclusive("Not yet implemented.");
-        }
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomAgentTokenName();
+                AgentTokenConfiguration configuration = new AgentTokenConfiguration(label);
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
-        public async Task TestRemoveAgentToken()
-        {
-            Assert.Inconclusive("Not yet implemented.");
+                AgentTokenId agentTokenId = await provider.CreateAgentTokenAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(agentTokenId);
+
+                AgentToken agentToken = await provider.GetAgentTokenAsync(agentTokenId, cancellationTokenSource.Token);
+                Assert.IsNotNull(agentToken);
+                Assert.AreEqual(agentTokenId, agentToken.Id);
+                Assert.AreEqual(label, agentToken.Label);
+
+                string updatedLabel = CreateRandomAgentTokenName();
+                AgentTokenConfiguration updateConfiguration = new AgentTokenConfiguration(updatedLabel);
+                await provider.UpdateAgentTokenAsync(agentTokenId, updateConfiguration, cancellationTokenSource.Token);
+
+                AgentToken updatedAgentToken = await provider.GetAgentTokenAsync(agentTokenId, cancellationTokenSource.Token);
+                Assert.IsNotNull(updatedAgentToken);
+                Assert.AreEqual(updatedLabel, updatedAgentToken.Label);
+                Assert.AreEqual(agentToken.Id, updatedAgentToken.Id);
+                Assert.AreEqual(agentToken.Token, updatedAgentToken.Token);
+
+                await provider.RemoveAgentTokenAsync(agentTokenId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -898,6 +931,23 @@
             } while (marker != null);
         }
 
+        protected static IEnumerable<AgentConnection> ListAllAgentConnections(IMonitoringService service, AgentId agentId, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            AgentConnectionId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<AgentConnection, AgentConnectionId> page = service.ListAgentConnectionsAsync(agentId, marker, blockSize, cancellationToken).Result;
+                foreach (AgentConnection connection in page)
+                    yield return connection;
+
+                marker = page.Marker;
+            } while (marker != null);
+        }
+
         protected static IEnumerable<AgentToken> ListAllAgentTokens(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
         {
             if (service == null)
@@ -991,12 +1041,12 @@
             provider.BeforeAsyncWebRequest +=
                 (sender, e) =>
                 {
-                    Console.WriteLine("{0} (Request) {1} {2}", DateTime.Now, e.Request.Method, e.Request.RequestUri);
+                    Console.Error.WriteLine("{0} (Request) {1} {2}", DateTime.Now, e.Request.Method, e.Request.RequestUri);
                 };
             provider.AfterAsyncWebResponse +=
                 (sender, e) =>
                 {
-                    Console.WriteLine("{0} (Result {1}) {2}", DateTime.Now, e.Response.StatusCode, e.Response.ResponseUri);
+                    Console.Error.WriteLine("{0} (Result {1}) {2}", DateTime.Now, e.Response.StatusCode, e.Response.ResponseUri);
                 };
 
             return provider;
@@ -1015,14 +1065,14 @@
                 {
                     Tuple<HttpWebResponse, string> result = base.ReadResultImpl(task, cancellationToken);
                     if (!string.IsNullOrEmpty(result.Item2))
-                        Console.WriteLine("==> " + result.Item2);
+                        Console.Error.WriteLine("==> " + result.Item2);
 
                     return result;
                 }
                 catch (WebException ex)
                 {
                     if (task.Result.ContentLength > 0)
-                        Console.WriteLine("==> " + ex.Message);
+                        Console.Error.WriteLine("==> " + ex.Message);
 
                     throw;
                 }

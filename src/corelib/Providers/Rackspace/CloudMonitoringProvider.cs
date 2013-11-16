@@ -561,31 +561,135 @@
         /// <inheritdoc/>
         public Task<AgentTokenId> CreateAgentTokenAsync(AgentTokenConfiguration configuration, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (configuration == null)
+                throw new ArgumentNullException("configuration");
+
+            UriTemplate template = new UriTemplate("/agent_tokens");
+            var parameters = new Dictionary<string, string>();
+
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, configuration);
+
+            Func<Task<Tuple<HttpWebResponse, string>>, Task<AgentTokenId>> parseResult =
+                task =>
+                {
+                    UriTemplate agentTokenTemplate = new UriTemplate("/agent_tokens/{tokenId}");
+                    string location = task.Result.Item1.Headers[HttpResponseHeader.Location];
+                    UriTemplateMatch match = agentTokenTemplate.Match(_baseUri, new Uri(location));
+                    return InternalTaskExtensions.CompletedTask(new AgentTokenId(match.BoundVariables["tokenId"]));
+                };
+
+            Func<Task<HttpWebRequest>, Task<AgentTokenId>> requestResource =
+                GetResponseAsyncFunc(cancellationToken, parseResult);
+
+            return AuthenticateServiceAsync(cancellationToken)
+                .ContinueWith(prepareRequest).Unwrap()
+                .ContinueWith(requestResource).Unwrap();
         }
 
         /// <inheritdoc/>
         public Task<ReadOnlyCollectionPage<AgentToken, AgentTokenId>> ListAgentTokensAsync(AgentTokenId marker, int? limit, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (limit < 0)
+                throw new ArgumentOutOfRangeException("limit");
+
+            UriTemplate template = new UriTemplate("/agent_tokens?marker={marker}&limit={limit}");
+            var parameters = new Dictionary<string, string>();
+            if (marker != null)
+                parameters.Add("marker", marker.Value);
+            if (limit != null)
+                parameters.Add("limit", limit.ToString());
+
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+
+            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+                GetResponseAsyncFunc<JObject>(cancellationToken);
+
+            Func<Task<JObject>, ReadOnlyCollectionPage<AgentToken, AgentTokenId>> resultSelector =
+                task =>
+                {
+                    JObject result = task.Result;
+                    if (result == null)
+                        return null;
+
+                    JToken valuesToken = result["values"];
+                    if (valuesToken == null)
+                        return null;
+
+                    JToken metadataToken = result["metadata"];
+
+                    AgentToken[] values = valuesToken.ToObject<AgentToken[]>();
+                    IDictionary<string, object> metadata = metadataToken != null ? metadataToken.ToObject<IDictionary<string, object>>() : null;
+                    return new ReadOnlyCollectionPage<AgentToken, AgentTokenId>(values, metadata);
+                };
+
+            return AuthenticateServiceAsync(cancellationToken)
+                .ContinueWith(prepareRequest)
+                .ContinueWith(requestResource).Unwrap()
+                .ContinueWith(resultSelector);
         }
 
         /// <inheritdoc/>
         public Task<AgentToken> GetAgentTokenAsync(AgentTokenId agentTokenId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (agentTokenId == null)
+                throw new ArgumentNullException("agentTokenId");
+
+            UriTemplate template = new UriTemplate("/agent_tokens/{tokenId}");
+            var parameters = new Dictionary<string, string> { { "tokenId", agentTokenId.Value } };
+
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+
+            Func<Task<HttpWebRequest>, Task<AgentToken>> requestResource =
+                GetResponseAsyncFunc<AgentToken>(cancellationToken);
+
+            return AuthenticateServiceAsync(cancellationToken)
+                .ContinueWith(prepareRequest)
+                .ContinueWith(requestResource).Unwrap();
         }
 
         /// <inheritdoc/>
-        public Task UpdateAgentTokenAsync(AgentTokenId agentTokenId, UpdateAgentTokenConfiguration configuration, CancellationToken cancellationToken)
+        public Task UpdateAgentTokenAsync(AgentTokenId agentTokenId, AgentTokenConfiguration configuration, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (agentTokenId == null)
+                throw new ArgumentNullException("agentTokenId");
+            if (configuration == null)
+                throw new ArgumentNullException("configuration");
+
+            UriTemplate template = new UriTemplate("/agent_tokens/{tokenId}");
+            var parameters = new Dictionary<string, string> { { "tokenId", agentTokenId.Value } };
+
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, configuration);
+
+            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                GetResponseAsyncFunc(cancellationToken);
+
+            return AuthenticateServiceAsync(cancellationToken)
+                .ContinueWith(prepareRequest).Unwrap()
+                .ContinueWith(requestResource).Unwrap();
         }
 
         /// <inheritdoc/>
         public Task RemoveAgentTokenAsync(AgentTokenId agentTokenId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (agentTokenId == null)
+                throw new ArgumentNullException("agentTokenId");
+
+            UriTemplate template = new UriTemplate("/agent_tokens/{tokenId}");
+            var parameters = new Dictionary<string, string> { { "tokenId", agentTokenId.Value } };
+
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+
+            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                GetResponseAsyncFunc(cancellationToken);
+
+            return AuthenticateServiceAsync(cancellationToken)
+                .ContinueWith(prepareRequest)
+                .ContinueWith(requestResource).Unwrap();
         }
 
         /// <inheritdoc/>

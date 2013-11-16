@@ -222,7 +222,7 @@
 
         Task<AgentToken> GetAgentTokenAsync(AgentTokenId agentTokenId, CancellationToken cancellationToken);
 
-        Task UpdateAgentTokenAsync(AgentTokenId agentTokenId, UpdateAgentTokenConfiguration configuration, CancellationToken cancellationToken);
+        Task UpdateAgentTokenAsync(AgentTokenId agentTokenId, AgentTokenConfiguration configuration, CancellationToken cancellationToken);
 
         Task RemoveAgentTokenAsync(AgentTokenId agentTokenId, CancellationToken cancellationToken);
 
