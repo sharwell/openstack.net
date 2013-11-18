@@ -704,7 +704,23 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetMonitoringZone()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                MonitoringZone[] monitoringZones = ListAllMonitoringZones(provider, null, cancellationTokenSource.Token).ToArray();
+                if (monitoringZones.Length == 0)
+                    Assert.Inconclusive("The provider did not return any monitoring zones.");
+
+                foreach (MonitoringZone monitoringZone in monitoringZones)
+                {
+                    MonitoringZone singleMonitoringZone = await provider.GetMonitoringZoneAsync(monitoringZone.Id, cancellationTokenSource.Token);
+                    Assert.IsNotNull(singleMonitoringZone);
+                    Assert.AreEqual(monitoringZone.Id, singleMonitoringZone.Id);
+                    Assert.AreEqual(monitoringZone.CountryCode, singleMonitoringZone.CountryCode);
+                    Assert.AreEqual(monitoringZone.Label, singleMonitoringZone.Label);
+                    CollectionAssert.AreEqual(monitoringZone.SourceAddresses, singleMonitoringZone.SourceAddresses);
+                }
+            }
         }
 
         [TestMethod]
