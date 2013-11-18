@@ -19,6 +19,13 @@
     {
         private static readonly ConcurrentDictionary<string, AgentCheckType> _types =
             new ConcurrentDictionary<string, AgentCheckType>(StringComparer.OrdinalIgnoreCase);
+        private static readonly AgentCheckType _agentFilesystem = AgentCheckType.FromName("agent.filesystem");
+        private static readonly AgentCheckType _agentMemory = AgentCheckType.FromName("agent.memory");
+        private static readonly AgentCheckType _agentLoadAverage = AgentCheckType.FromName("agent.load_average");
+        private static readonly AgentCheckType _agentCpu = AgentCheckType.FromName("agent.cpu");
+        private static readonly AgentCheckType _agentDisk = AgentCheckType.FromName("agent.disk");
+        private static readonly AgentCheckType _agentNetwork = AgentCheckType.FromName("agent.network");
+        private static readonly AgentCheckType _agentPlugin = AgentCheckType.FromName("agent.plugin");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentCheckType"/> class with the specified name.
@@ -43,6 +50,62 @@
                 throw new ArgumentException("name cannot be empty");
 
             return _types.GetOrAdd(name, i => new AgentCheckType(i));
+        }
+
+        public static AgentCheckType AgentFilesystem
+        {
+            get
+            {
+                return _agentFilesystem;
+            }
+        }
+
+        public static AgentCheckType AgentMemory
+        {
+            get
+            {
+                return _agentMemory;
+            }
+        }
+
+        public static AgentCheckType AgentLoadAverage
+        {
+            get
+            {
+                return _agentLoadAverage;
+            }
+        }
+
+        public static AgentCheckType AgentCpu
+        {
+            get
+            {
+                return _agentCpu;
+            }
+        }
+
+        public static AgentCheckType AgentDisk
+        {
+            get
+            {
+                return _agentDisk;
+            }
+        }
+
+        public static AgentCheckType AgentNetwork
+        {
+            get
+            {
+                return _agentNetwork;
+            }
+        }
+
+        public static AgentCheckType AgentPlugin
+        {
+            get
+            {
+                return _agentPlugin;
+            }
         }
 
         /// <summary>
