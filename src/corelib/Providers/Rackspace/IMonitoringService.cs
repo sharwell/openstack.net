@@ -48,7 +48,7 @@
 
         Task<CheckId> CreateCheckAsync(EntityId entityId, CheckConfiguration configuration, CancellationToken cancellationToken);
 
-        Task<CheckData[]> TestCheckAsync(EntityId entityId, CheckConfiguration configuration, CancellationToken cancellationToken);
+        Task<CheckData[]> TestCheckAsync(EntityId entityId, CheckConfiguration configuration, bool? debug, CancellationToken cancellationToken);
 
         Task<CheckData[]> TestExistingCheckAsync(EntityId entityId, CheckId checkId, CancellationToken cancellationToken);
 
@@ -88,7 +88,7 @@
 
         Task<AlarmId> CreateAlarmAsync(EntityId entityId, AlarmConfiguration configuration, CancellationToken cancellationToken);
 
-        Task<AlarmData[]> TestAlarmAsync(EntityId entityId, AlarmConfiguration configuration, IEnumerable<CheckData> checkData, CancellationToken cancellationToken);
+        Task<AlarmData[]> TestAlarmAsync(EntityId entityId, TestAlarmConfiguration configuration, CancellationToken cancellationToken);
 
         Task<ReadOnlyCollectionPage<Alarm, AlarmId>> ListAlarmsAsync(EntityId entityId, AlarmId marker, int? limit, CancellationToken cancellationToken);
 

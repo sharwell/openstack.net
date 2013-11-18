@@ -413,6 +413,7 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\ReadOnlyCollectionPage`1.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\SystemInformation.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\TargetResolverType.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\TestAlarmConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\TraceRoute.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\TraceRouteConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\TraceRouteHop.cs" />
