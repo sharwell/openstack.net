@@ -194,7 +194,7 @@
 
         Task<AlarmExample> GetAlarmExampleAsync(AlarmExampleId alarmExampleId, CancellationToken cancellationToken);
 
-        Task<BoundAlarmExample> EvaluateAlarmExampleAsync(AlarmExampleId alarmExampleId, AlarmExampleData exampleData, CancellationToken cancellationToken);
+        Task<BoundAlarmExample> EvaluateAlarmExampleAsync(AlarmExampleId alarmExampleId, IDictionary<string, object> exampleParameters, CancellationToken cancellationToken);
 
         #endregion Alarm Examples
 

@@ -1514,9 +1514,26 @@
         }
 
         /// <inheritdoc/>
-        public Task<BoundAlarmExample> EvaluateAlarmExampleAsync(AlarmExampleId alarmExampleId, AlarmExampleData exampleData, CancellationToken cancellationToken)
+        public Task<BoundAlarmExample> EvaluateAlarmExampleAsync(AlarmExampleId alarmExampleId, IDictionary<string, object> exampleParameters, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (alarmExampleId == null)
+                throw new ArgumentNullException("alarmExampleId");
+
+            UriTemplate template = new UriTemplate("/alarm_examples/{alarmExampleId}");
+            var parameters = new Dictionary<string, string> { { "alarmExampleId", alarmExampleId.Value } };
+
+            JObject body = new JObject(
+                new JProperty("values", JObject.FromObject(exampleParameters)));
+
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, body);
+
+            Func<Task<HttpWebRequest>, Task<BoundAlarmExample>> requestResource =
+                GetResponseAsyncFunc<BoundAlarmExample>(cancellationToken);
+
+            return AuthenticateServiceAsync(cancellationToken)
+                .ContinueWith(prepareRequest).Unwrap()
+                .ContinueWith(requestResource).Unwrap();
         }
 
         /// <inheritdoc/>

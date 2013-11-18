@@ -1358,7 +1358,49 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestEvaluateAlarmExample()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                AlarmExample[] alarmExamples = ListAllAlarmExamples(provider, null, cancellationTokenSource.Token).ToArray();
+                if (alarmExamples.Length == 0)
+                    Assert.Inconclusive("The provider did not return any alarm examples.");
+
+                List<Task> tasks = new List<Task>();
+                foreach (AlarmExample alarmExample in alarmExamples)
+                    tasks.Add(TestEvaluateAlarmExampleAsync(provider, alarmExample, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+            }
+        }
+
+        private async Task TestEvaluateAlarmExampleAsync(IMonitoringService provider, AlarmExample alarmExample, CancellationToken cancellationToken)
+        {
+            string expected = alarmExample.Criteria;
+            Dictionary<string, object> exampleParameters = new Dictionary<string, object>();
+            foreach (var field in alarmExample.Fields)
+            {
+                object value;
+                switch (field.Type)
+                {
+                case "string":
+                    value = field.Name;
+                    break;
+
+                case "integer":
+                case "whole number (may be zero padded)":
+                    value = 3;
+                    break;
+
+                default:
+                    throw new NotImplementedException(string.Format("Integration test support for fields of type '{0}' is not yet implemented.", field.Type));
+                }
+
+                expected = expected.Replace("${" + field.Name + "}", value.ToString());
+                exampleParameters.Add(field.Name, value);
+            }
+
+            BoundAlarmExample boundAlarmExample = await provider.EvaluateAlarmExampleAsync(alarmExample.Id, exampleParameters, cancellationToken);
+            Assert.AreEqual(expected, boundAlarmExample.BoundCriteria);
         }
 
         [TestMethod]

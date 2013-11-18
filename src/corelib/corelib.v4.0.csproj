@@ -354,7 +354,6 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmData.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmExample.cs" />
-    <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmExampleData.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmExampleField.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmExampleId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmId.cs" />
