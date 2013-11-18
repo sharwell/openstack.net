@@ -35,6 +35,15 @@
 
         public NotificationConfiguration(string label, NotificationTypeId notificationTypeId, NotificationDetails details, IDictionary<string, string> metadata = null)
         {
+            if (label == null)
+                throw new ArgumentNullException("label");
+            if (notificationTypeId == null)
+                throw new ArgumentNullException("notificationTypeId");
+            if (details == null)
+                throw new ArgumentNullException("details");
+            if (string.IsNullOrEmpty(label))
+                throw new ArgumentException("label cannot be empty");
+
             _label = label;
             _type = notificationTypeId;
             if (details != null)

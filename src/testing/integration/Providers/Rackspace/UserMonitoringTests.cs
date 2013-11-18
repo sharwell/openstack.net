@@ -15,6 +15,7 @@
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using net.openstack.Providers.Rackspace.Objects.Monitoring;
+    using Newtonsoft.Json;
 
     [TestClass]
     public class UserMonitoringTests
@@ -87,11 +88,11 @@
                 NotificationPlan[] plans = ListAllNotificationPlans(provider, null, cancellationTokenSource.Token).ToArray();
                 foreach (NotificationPlan plan in plans)
                 {
-                    if (plan.Label == null || !plan.Label.Value.StartsWith(TestNotificationPlanPrefix, StringComparison.OrdinalIgnoreCase))
+                    if (plan.Label == null || !plan.Label.StartsWith(TestNotificationPlanPrefix, StringComparison.OrdinalIgnoreCase))
                         continue;
 
-                    Console.WriteLine("Removing notification plan '{0}'", plan.Label);
-                    cleanupTasks.Add(provider.RemoveNotificationPlansAsync(plan.Label, cancellationTokenSource.Token));
+                    Console.WriteLine("Removing notification plan '{0}' ({1})", plan.Label, plan.Id);
+                    cleanupTasks.Add(provider.RemoveNotificationPlanAsync(plan.Id, cancellationTokenSource.Token));
                 }
 
                 if (cleanupTasks.Count > 0)
@@ -462,7 +463,81 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestCreateNotificationPlan()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationPlanName();
+                NotificationPlanConfiguration configuration = new NotificationPlanConfiguration(label);
+                NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationPlanId);
+
+                NotificationPlan notificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationPlan);
+                Assert.AreEqual(notificationPlanId, notificationPlan.Id);
+                Assert.AreEqual(label, notificationPlan.Label);
+
+                await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public async Task TestCreateNotificationPlanWithEmptyNotifications()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationPlanName();
+                IEnumerable<NotificationId> emptyNotifications = Enumerable.Empty<NotificationId>();
+                NotificationPlanConfiguration configuration = new NotificationPlanConfiguration(label, emptyNotifications, emptyNotifications, emptyNotifications);
+                NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationPlanId);
+
+                NotificationPlan notificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationPlan);
+                Assert.AreEqual(notificationPlanId, notificationPlan.Id);
+                Assert.AreEqual(label, notificationPlan.Label);
+                CollectionAssert.AreEqual(emptyNotifications.ToArray(), notificationPlan.CriticalState);
+                CollectionAssert.AreEqual(emptyNotifications.ToArray(), notificationPlan.WarningState);
+                CollectionAssert.AreEqual(emptyNotifications.ToArray(), notificationPlan.OkState);
+
+                await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public async Task TestCreateNotificationPlanWithMetadata()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationPlanName();
+                Dictionary<string, string> metadata =
+                    new Dictionary<string, string>
+                    {
+                        { "Key 1", "Value 1" },
+                        { "key 1", "value 1" },
+                        { "Key ²", "Value ²" },
+                    };
+                NotificationPlanConfiguration configuration = new NotificationPlanConfiguration(label, metadata: metadata);
+                NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationPlanId);
+
+                NotificationPlan notificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationPlan);
+                Assert.AreEqual(notificationPlanId, notificationPlan.Id);
+                Assert.AreEqual(label, notificationPlan.Label);
+
+                Assert.IsNotNull(notificationPlan.Metadata);
+                Assert.AreEqual("Value 1", notificationPlan.Metadata["Key 1"]);
+                Assert.AreEqual("value 1", notificationPlan.Metadata["key 1"]);
+                Assert.AreEqual("Value ²", notificationPlan.Metadata["Key ²"]);
+
+                await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -487,7 +562,27 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetNotificationPlan()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                NotificationPlan[] notificationPlans = ListAllNotificationPlans(provider, null, cancellationTokenSource.Token).ToArray();
+                if (notificationPlans.Length == 0)
+                    Assert.Inconclusive("The service did not report any notification plans.");
+
+                foreach (NotificationPlan notificationPlan in notificationPlans)
+                {
+                    NotificationPlan singlePlan = await provider.GetNotificationPlanAsync(notificationPlan.Id, cancellationTokenSource.Token);
+                    Assert.IsNotNull(singlePlan);
+                    Assert.AreEqual(notificationPlan.Id, singlePlan.Id);
+                    Assert.AreEqual(notificationPlan.Label, singlePlan.Label);
+                    Assert.AreEqual(notificationPlan.Created, singlePlan.Created);
+                    Assert.AreEqual(notificationPlan.LastModified, singlePlan.LastModified);
+                    CollectionAssert.AreEqual(notificationPlan.CriticalState, singlePlan.CriticalState);
+                    CollectionAssert.AreEqual(notificationPlan.WarningState, singlePlan.WarningState);
+                    CollectionAssert.AreEqual(notificationPlan.OkState, singlePlan.OkState);
+                    CollectionAssert.AreEqual(notificationPlan.Metadata, singlePlan.Metadata);
+                }
+            }
         }
 
         [TestMethod]
@@ -495,15 +590,96 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestUpdateNotificationPlan()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationPlanName();
+                NotificationPlanConfiguration configuration = new NotificationPlanConfiguration(label);
+                NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationPlanId);
+
+                NotificationPlan notificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationPlan);
+                Assert.AreEqual(notificationPlanId, notificationPlan.Id);
+                Assert.AreEqual(label, notificationPlan.Label);
+
+                string newLabel = CreateRandomNotificationPlanName();
+                UpdateNotificationPlanConfiguration updateConfiguration = new UpdateNotificationPlanConfiguration(newLabel);
+                await provider.UpdateNotificationPlanAsync(notificationPlanId, updateConfiguration, cancellationTokenSource.Token);
+
+                NotificationPlan updatedNotificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+                Assert.IsNotNull(updatedNotificationPlan);
+                Assert.AreEqual(notificationPlanId, updatedNotificationPlan.Id);
+                Assert.AreEqual(newLabel, updatedNotificationPlan.Label);
+
+                await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestRemoveNotificationPlan()
+        public async Task TestUpdateNotificationPlanWithMetadata()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationPlanName();
+                Dictionary<string, string> metadata =
+                    new Dictionary<string, string>
+                    {
+                        { "Key 1", "Value 1" },
+                        { "key 1", "value 1" },
+                        { "Key ²", "Value ²" },
+                    };
+                NotificationPlanConfiguration configuration = new NotificationPlanConfiguration(label, metadata: metadata);
+                NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationPlanId);
+
+                NotificationPlan notificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationPlan);
+                Assert.AreEqual(notificationPlanId, notificationPlan.Id);
+                Assert.AreEqual(label, notificationPlan.Label);
+
+                Assert.IsNotNull(notificationPlan.Metadata);
+                Assert.AreEqual("Value 1", notificationPlan.Metadata["Key 1"]);
+                Assert.AreEqual("value 1", notificationPlan.Metadata["key 1"]);
+                Assert.AreEqual("Value ²", notificationPlan.Metadata["Key ²"]);
+
+                // setting the label alone doesn't affect metadata
+                string newLabel = CreateRandomNotificationPlanName();
+                UpdateNotificationPlanConfiguration updateConfiguration = new UpdateNotificationPlanConfiguration(newLabel);
+                await provider.UpdateNotificationPlanAsync(notificationPlanId, updateConfiguration, cancellationTokenSource.Token);
+
+                NotificationPlan updatedNotificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+                Assert.IsNotNull(updatedNotificationPlan);
+                Assert.AreEqual(notificationPlanId, updatedNotificationPlan.Id);
+                Assert.AreEqual(newLabel, updatedNotificationPlan.Label);
+
+                Assert.IsNotNull(notificationPlan.Metadata);
+                Assert.AreEqual("Value 1", updatedNotificationPlan.Metadata["Key 1"]);
+                Assert.AreEqual("value 1", updatedNotificationPlan.Metadata["key 1"]);
+                Assert.AreEqual("Value ²", updatedNotificationPlan.Metadata["Key ²"]);
+
+                // setting metadata replaces all metadata
+                Dictionary<string, string> newMetadata =
+                    new Dictionary<string, string>
+                    {
+                        { "Key 3", "Value ³" }
+                    };
+                updateConfiguration = new UpdateNotificationPlanConfiguration(metadata: newMetadata);
+                await provider.UpdateNotificationPlanAsync(notificationPlanId, updateConfiguration, cancellationTokenSource.Token);
+
+                updatedNotificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+                Assert.IsNotNull(updatedNotificationPlan);
+                Assert.AreEqual(notificationPlanId, updatedNotificationPlan.Id);
+                Assert.AreEqual(newLabel, updatedNotificationPlan.Label);
+
+                Assert.IsNotNull(updatedNotificationPlan.Metadata);
+                CollectionAssert.AreEqual(newMetadata, updatedNotificationPlan.Metadata);
+
+                await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -729,9 +905,73 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestCreateNotification()
+        public async Task TestCreateWebhookNotification()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
+                NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
+
+                Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notification);
+                Assert.AreEqual(notificationId, notification.Id);
+                Assert.AreEqual(label, notification.Label);
+                Assert.AreEqual(configuration.Type, notification.Type);
+
+                await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public async Task TestCreateEmailNotification()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.Email;
+                NotificationDetails notificationDetails = new EmailNotificationDetails("sample@example.com");
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
+
+                Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notification);
+                Assert.AreEqual(notificationId, notification.Id);
+                Assert.AreEqual(label, notification.Label);
+                Assert.AreEqual(configuration.Type, notification.Type);
+
+                await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public async Task TestCreatePagerDutyNotification()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.PagerDuty;
+                NotificationDetails notificationDetails = new PagerDutyNotificationDetails("XXXXX");
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
+
+                Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notification);
+                Assert.AreEqual(notificationId, notification.Id);
+                Assert.AreEqual(label, notification.Label);
+                Assert.AreEqual(configuration.Type, notification.Type);
+
+                await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]

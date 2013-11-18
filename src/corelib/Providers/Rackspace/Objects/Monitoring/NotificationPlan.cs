@@ -1,23 +1,21 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
+    using System;
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
 
     [JsonObject(MemberSerialization.OptIn)]
-    public class NotificationPlan
+    public class NotificationPlan : NotificationPlanConfiguration
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
-        [JsonProperty("label")]
-        private NotificationPlanId _label;
+        [JsonProperty("id")]
+        private NotificationPlanId _id;
 
-        [JsonProperty("critical_state")]
-        private NotificationId[] _criticalState;
+        [JsonProperty("created_at")]
+        private long? _createdAt;
 
-        [JsonProperty("warning_state")]
-        private NotificationId[] _warningState;
-
-        [JsonProperty("ok_state")]
-        private NotificationId[] _okState;
+        [JsonProperty("updated_at")]
+        private long? _updatedAt;
 #pragma warning restore 649
 
         /// <summary>
@@ -29,44 +27,27 @@
         {
         }
 
-        public NotificationPlanId Label
+        public NotificationPlanId Id
         {
             get
             {
-                return _label;
+                return _id;
             }
         }
 
-        public ReadOnlyCollection<NotificationId> CriticalState
+        public DateTimeOffset? Created
         {
             get
             {
-                if (_criticalState == null)
-                    return null;
-
-                return new ReadOnlyCollection<NotificationId>(_criticalState);
+                return DateTimeOffsetExtensions.ToDateTimeOffset(_createdAt);
             }
         }
 
-        public ReadOnlyCollection<NotificationId> WarningState
+        public DateTimeOffset? LastModified
         {
             get
             {
-                if (_warningState == null)
-                    return null;
-
-                return new ReadOnlyCollection<NotificationId>(_warningState);
-            }
-        }
-
-        public ReadOnlyCollection<NotificationId> OkState
-        {
-            get
-            {
-                if (_okState == null)
-                    return null;
-
-                return new ReadOnlyCollection<NotificationId>(_okState);
+                return DateTimeOffsetExtensions.ToDateTimeOffset(_updatedAt);
             }
         }
     }
