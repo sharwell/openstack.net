@@ -2,10 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using net.openstack.Core.Collections;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of the configurable properties of a monitoring account.
+    /// </summary>
+    /// <seealso cref="IMonitoringService.UpdateAccountAsync"/>
     [JsonObject(MemberSerialization.OptIn)]
     public class AccountConfiguration
     {

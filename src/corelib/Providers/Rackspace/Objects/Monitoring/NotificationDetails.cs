@@ -16,5 +16,18 @@
         protected NotificationDetails()
         {
         }
+
+        public NotificationDetails(string url)
+        {
+            _url = url;
+        }
+
+        public string Url
+        {
+            get
+            {
+                return _url;
+            }
+        }
     }
 }

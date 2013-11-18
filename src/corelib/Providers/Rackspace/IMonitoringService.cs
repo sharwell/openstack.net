@@ -102,7 +102,7 @@
 
         #region Notification Plans
 
-        Task<NotificationPlanId> CreateNotificationPlanAsync(NotificationPlanConfiguration configuration, CancellationToken cancellationTokne);
+        Task<NotificationPlanId> CreateNotificationPlanAsync(NotificationPlanConfiguration configuration, CancellationToken cancellationToken);
 
         Task<ReadOnlyCollectionPage<NotificationPlan, NotificationPlanId>> ListNotificationPlansAsync(NotificationPlanId marker, int? limit, CancellationToken cancellationToken);
 

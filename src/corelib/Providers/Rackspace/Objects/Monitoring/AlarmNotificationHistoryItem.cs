@@ -82,6 +82,7 @@
             }
         }
 
+#warning this should be an extensible enumeration
         public string State
         {
             get
@@ -90,6 +91,7 @@
             }
         }
 
+#warning this should be an extensible enumeration
         public string PreviousState
         {
             get

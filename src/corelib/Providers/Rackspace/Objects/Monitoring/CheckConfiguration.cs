@@ -1,7 +1,9 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using Newtonsoft.Json;
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -35,6 +37,17 @@
         [JsonConstructor]
         protected CheckConfiguration()
         {
+        }
+
+        public CheckConfiguration(string label, CheckTypeId checkTypeId, CheckDetails details, IEnumerable<MonitoringZoneId> monitoringZonesPoll, TimeSpan? timeout, int? period, string targetAlias)
+        {
+            _label = label;
+            _type = checkTypeId;
+            _details = details;
+            _monitoringZonesPoll = monitoringZonesPoll != null ? monitoringZonesPoll.ToArray() : null;
+            _timeout = timeout.HasValue ? (int?)timeout.Value.TotalSeconds : null;
+            _period = period;
+            _targetAlias = targetAlias;
         }
 
         public string Label

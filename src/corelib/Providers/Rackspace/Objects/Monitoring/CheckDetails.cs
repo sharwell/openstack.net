@@ -30,6 +30,14 @@
         {
         }
 
+        public CheckDetails(string url, HttpMethod? method, bool? followRedirects, bool? includeBody)
+        {
+            _url = url;
+            _method = method;
+            _followRedirects = followRedirects;
+            _includeBody = includeBody;
+        }
+
         public Uri Url
         {
             get

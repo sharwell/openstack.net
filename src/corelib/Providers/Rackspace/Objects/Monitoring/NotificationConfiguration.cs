@@ -23,6 +23,13 @@
         {
         }
 
+        public NotificationConfiguration(string label, NotificationTypeId notificationTypeId, NotificationDetails details)
+        {
+            _label = label;
+            _type = notificationTypeId;
+            _details = details;
+        }
+
         public string Label
         {
             get
