@@ -6,6 +6,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class LoginInformation
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("user")]
         private string _user;
 
@@ -17,6 +18,7 @@
 
         [JsonProperty("host")]
         private string _host;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginInformation"/> class

@@ -6,6 +6,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class NotificationPlan
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("label")]
         private NotificationPlanId _label;
 
@@ -17,6 +18,7 @@
 
         [JsonProperty("ok_state")]
         private NotificationId[] _okState;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NotificationPlan"/> class

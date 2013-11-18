@@ -6,6 +6,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class Agent
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>
         /// This is the backing field for the <see cref="Id"/> property.
         /// </summary>
@@ -17,6 +18,7 @@
         /// </summary>
         [JsonProperty("last_connected", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private long? _lastConnected;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Agent"/> class

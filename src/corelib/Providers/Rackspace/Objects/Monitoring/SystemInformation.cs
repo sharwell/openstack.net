@@ -5,6 +5,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class SystemInformation
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("arch")]
         private string _arch;
 
@@ -19,6 +20,7 @@
 
         [JsonProperty("version")]
         private string _version;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SystemInformation"/> class

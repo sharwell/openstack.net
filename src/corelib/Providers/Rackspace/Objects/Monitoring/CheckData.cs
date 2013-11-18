@@ -10,6 +10,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class CheckData
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("timestamp")]
         private long? _timestamp;
 
@@ -24,6 +25,7 @@
 
         [JsonProperty("metrics")]
         private Dictionary<string, CheckMetric> _metrics;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckData"/> class
@@ -83,11 +85,13 @@
         [JsonObject(MemberSerialization.OptIn)]
         public class CheckMetric
         {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
             [JsonProperty("type")]
             private CheckMetricType _type;
 
             [JsonProperty("data")]
             private string _data;
+#pragma warning restore 649
 
             /// <summary>
             /// Initializes a new instance of the <see cref="CheckMetric"/> class

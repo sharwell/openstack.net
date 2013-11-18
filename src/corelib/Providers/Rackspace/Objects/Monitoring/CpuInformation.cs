@@ -6,6 +6,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class CpuInformation
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("name")]
         private string _name;
 
@@ -47,6 +48,7 @@
 
         [JsonProperty("total_sockets")]
         private int? _totalSockets;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CpuInformation"/> class

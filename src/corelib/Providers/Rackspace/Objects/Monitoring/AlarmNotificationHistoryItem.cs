@@ -7,6 +7,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class AlarmNotificationHistoryItem
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("id")]
         private AlarmNotificationHistoryItemId _id;
 
@@ -30,6 +31,7 @@
 
         [JsonProperty("notification_results")]
         private NotificationResult[] _results;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AlarmNotificationHistoryItem"/> class

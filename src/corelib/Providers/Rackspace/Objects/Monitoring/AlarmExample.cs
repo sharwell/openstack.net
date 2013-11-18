@@ -6,6 +6,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class AlarmExample
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("id")]
         private AlarmExampleId _id;
 
@@ -23,6 +24,7 @@
 
         [JsonProperty("fields")]
         private AlarmExampleField[] _fields;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AlarmExample"/> class

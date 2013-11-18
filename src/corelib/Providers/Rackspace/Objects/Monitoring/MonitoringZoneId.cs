@@ -7,7 +7,7 @@
     /// <summary>
     /// Represents the unique identifier of a <placeholder>item placeholder</placeholder> in the <see cref="IMonitoringService"/>.
     /// </summary>
-    /// <seealso cref="SomeItem.Id"/>
+    /// <seealso cref="MonitoringZone.Id"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonConverter(typeof(MonitoringZoneId.Converter))]

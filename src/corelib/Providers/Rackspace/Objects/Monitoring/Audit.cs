@@ -9,6 +9,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class Audit
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("id")]
         private AuditId _id;
 
@@ -44,5 +45,6 @@
 
         [JsonProperty("statusCode")]
         private int _statusCode;
+#pragma warning restore 649
     }
 }

@@ -6,6 +6,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class MonitoringZone
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("id")]
         private MonitoringZoneId _id;
 
@@ -17,6 +18,7 @@
 
         [JsonProperty("source_ips")]
         private string[] _sourceAddresses;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MonitoringZone"/> class

@@ -6,6 +6,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class AlarmChangelog
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("id")]
         private AlarmChangelogId _id;
 
@@ -23,6 +24,7 @@
 
         [JsonProperty("analyzed_by_monitoring_zone_id", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private MonitoringZoneId _analyzedByMonitoringZoneId;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AlarmChangelog"/> class

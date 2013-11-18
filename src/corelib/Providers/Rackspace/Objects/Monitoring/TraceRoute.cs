@@ -6,8 +6,10 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class TraceRoute
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("result")]
         private TraceRouteHop[] _hops;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TraceRoute"/> class

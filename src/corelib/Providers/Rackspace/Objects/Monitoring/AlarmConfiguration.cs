@@ -37,8 +37,11 @@
         public AlarmConfiguration(CheckId checkId, NotificationPlanId notificationPlanId, string criteria, bool? enabled, string label, IDictionary<string, string> metadata)
         {
             _checkId = checkId;
-            _criteria = criteria;
             _notificationPlanId = notificationPlanId;
+            _criteria = criteria;
+            _disabled = !enabled;
+            _label = label;
+            _metadata = metadata;
         }
 
         /// <summary>
@@ -56,7 +59,7 @@
         /// <summary>
         /// Gets the ID of the notification plan to execute when the state changes.
         /// </summary>
-        /// <seealso cref="NotificationPlan.Id"/>
+        /// <seealso cref="NotificationPlan.Label"/>
         public NotificationPlanId NotificationPlanId
         {
             get

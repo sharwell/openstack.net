@@ -6,6 +6,7 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class NotificationResult
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("notification_id")]
         private NotificationId _notificationId;
 
@@ -26,6 +27,7 @@
 
         [JsonProperty("attempts")]
         private NotificationAttempt[] _attempts;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NotificationResult"/> class
