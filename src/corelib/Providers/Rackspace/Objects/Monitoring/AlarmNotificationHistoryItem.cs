@@ -1,5 +1,7 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
+    using System;
+    using System.Collections.ObjectModel;
     using Newtonsoft.Json;
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -36,6 +38,76 @@
         [JsonConstructor]
         protected AlarmNotificationHistoryItem()
         {
+        }
+
+        public AlarmNotificationHistoryItemId Id
+        {
+            get
+            {
+                return _id;
+            }
+        }
+
+        public DateTimeOffset? Timestamp
+        {
+            get
+            {
+                if (_timestamp == null)
+                    return null;
+
+                return new DateTimeOffset(new DateTime(1970, 1, 1), TimeSpan.Zero).AddMilliseconds(_timestamp.Value);
+            }
+        }
+
+        public NotificationPlanId NotificationPlanId
+        {
+            get
+            {
+                return _notificationPlanId;
+            }
+        }
+
+        public TransactionId TransactionId
+        {
+            get
+            {
+                return _transactionId;
+            }
+        }
+
+        public string Status
+        {
+            get
+            {
+                return _status;
+            }
+        }
+
+        public string State
+        {
+            get
+            {
+                return _state;
+            }
+        }
+
+        public string PreviousState
+        {
+            get
+            {
+                return _previousState;
+            }
+        }
+
+        public ReadOnlyCollection<NotificationResult> Results
+        {
+            get
+            {
+                if (_results == null)
+                    return null;
+
+                return new ReadOnlyCollection<NotificationResult>(_results);
+            }
         }
     }
 }

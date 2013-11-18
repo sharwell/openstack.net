@@ -1,5 +1,6 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
+    using System.Collections.ObjectModel;
     using Newtonsoft.Json;
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -33,6 +34,65 @@
         [JsonConstructor]
         protected NotificationResult()
         {
+        }
+
+        public NotificationId NotificationId
+        {
+            get
+            {
+                return _notificationId;
+            }
+        }
+
+        public NotificationTypeId NotificationTypeId
+        {
+            get
+            {
+                return _notificationTypeId;
+            }
+        }
+
+        public NotificationDetails NotificationDetails
+        {
+            get
+            {
+                return _notificationDetails;
+            }
+        }
+
+        public bool? InProgress
+        {
+            get
+            {
+                return _inProgress;
+            }
+        }
+
+        public string Message
+        {
+            get
+            {
+                return _message;
+            }
+        }
+
+        public bool? Success
+        {
+            get
+            {
+                return _success;
+            }
+        }
+
+        public ReadOnlyCollection<NotificationAttempt> Attempts
+        {
+            get
+            {
+                if (_attempts == null)
+                    return null;
+
+                return new ReadOnlyCollection<NotificationAttempt>(_attempts);
+            }
         }
     }
 }

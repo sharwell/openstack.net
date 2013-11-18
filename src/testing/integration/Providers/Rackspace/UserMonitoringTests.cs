@@ -182,15 +182,71 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestCreateEntity()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                Entity entity = await provider.GetEntityAsync(entityId, cancellationTokenSource.Token);
+                Assert.IsNotNull(entity);
+                Assert.AreEqual(entityId, entity.Id);
+                Assert.AreEqual(entityName, entity.Label);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestListEntities()
+        public async Task TestCreateEntityWithMetadata()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                IDictionary<string, string> metadata =
+                    new Dictionary<string, string>
+                    {
+                        { "Key 1", "Value 1" },
+                        { "key 1", "value 1" },
+                        { "Key ²", "Value ²" },
+                    };
+
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, metadata);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                Entity entity = await provider.GetEntityAsync(entityId, cancellationTokenSource.Token);
+                Assert.IsNotNull(entity);
+                Assert.AreEqual(entityId, entity.Id);
+                Assert.AreEqual(entityName, entity.Label);
+                Assert.AreEqual("Value 1", entity.Metadata["Key 1"]);
+                Assert.AreEqual("value 1", entity.Metadata["key 1"]);
+                Assert.AreEqual("Value ²", entity.Metadata["Key ²"]);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public void TestListEntities()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Entity[] entities = ListAllEntities(provider, null, cancellationTokenSource.Token).ToArray();
+                if (entities.Length == 0)
+                    Assert.Inconclusive("The service did not report any entities.");
+
+                foreach (Entity entity in entities)
+                    Console.WriteLine("Entity {0} ({1})", entity.Label, entity.Id);
+            }
         }
 
         [TestMethod]
@@ -198,21 +254,28 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetEntity()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Entity[] entities = ListAllEntities(provider, null, cancellationTokenSource.Token).ToArray();
+                if (entities.Length == 0)
+                    Assert.Inconclusive("The service did not report any entities.");
+
+                foreach (Entity entity in entities)
+                {
+                    Entity singleEntity = await provider.GetEntityAsync(entity.Id, cancellationTokenSource.Token);
+                    Assert.IsNotNull(singleEntity);
+                    Assert.AreEqual(entity.Id, singleEntity.Id);
+                    Assert.AreEqual(entity.AgentId, singleEntity.AgentId);
+                    Assert.AreEqual(entity.Label, singleEntity.Label);
+                }
+            }
         }
 
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestUpdateEntity()
-        {
-            Assert.Inconclusive("Not yet implemented.");
-        }
-
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
-        public async Task TestRemoveEntity()
         {
             Assert.Inconclusive("Not yet implemented.");
         }
@@ -366,7 +429,16 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestListNotificationPlans()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                NotificationPlan[] notificationPlans = ListAllNotificationPlans(provider, null, cancellationTokenSource.Token).ToArray();
+                if (notificationPlans.Length == 0)
+                    Assert.Inconclusive("The service did not report any notification plans.");
+
+                foreach (NotificationPlan notificationPlan in notificationPlans)
+                    Console.WriteLine("Notification plan {0}", notificationPlan.Label);
+            }
         }
 
         [TestMethod]
@@ -398,7 +470,16 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestListMonitoringZones()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                MonitoringZone[] monitoringZones = ListAllMonitoringZones(provider, null, cancellationTokenSource.Token).ToArray();
+                if (monitoringZones.Length == 0)
+                    Assert.Inconclusive("The provider did not return any monitoring zones.");
+
+                foreach (MonitoringZone monitoringZone in monitoringZones)
+                    Console.WriteLine("Monitoring zone '{0}'", monitoringZone.Label);
+            }
         }
 
         [TestMethod]
@@ -420,17 +501,83 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestDiscoverAlarmNotificationHistory()
+        public async Task TestListAlarmNotificationHistory()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                bool foundHistoryItem = false;
+                foreach (Entity entity in ListAllEntities(provider, null, cancellationTokenSource.Token))
+                {
+                    foreach (Alarm alarm in ListAllAlarms(provider, entity.Id, null, cancellationTokenSource.Token))
+                    {
+                        foreach (CheckId checkId in await provider.DiscoverAlarmNotificationHistoryAsync(entity.Id, alarm.Id, cancellationTokenSource.Token))
+                        {
+                            AlarmNotificationHistoryItem[] alarmNotificationHistory = ListAllAlarmNotificationHistory(provider, entity.Id, alarm.Id, checkId, null, cancellationTokenSource.Token).ToArray();
+                            foundHistoryItem |= alarmNotificationHistory.Any();
+                            foreach (AlarmNotificationHistoryItem item in alarmNotificationHistory)
+                                Console.WriteLine("Alarm notification history item '{0}'", item.Id);
+                        }
+                    }
+                }
+
+                if (!foundHistoryItem)
+                    Assert.Inconclusive("The provider did not return any alarm notification history items.");
+            }
         }
 
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestListAlarmNotificationHistory()
+        public async Task TestGetAlarmNotificationHistorySequential()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                bool foundHistoryItem = false;
+                foreach (Entity entity in ListAllEntities(provider, null, cancellationTokenSource.Token))
+                {
+                    foreach (Alarm alarm in ListAllAlarms(provider, entity.Id, null, cancellationTokenSource.Token))
+                    {
+                        foreach (CheckId checkId in await provider.DiscoverAlarmNotificationHistoryAsync(entity.Id, alarm.Id, cancellationTokenSource.Token))
+                        {
+                            AlarmNotificationHistoryItem[] alarmNotificationHistory = ListAllAlarmNotificationHistory(provider, entity.Id, alarm.Id, checkId, null, cancellationTokenSource.Token).ToArray();
+                            foundHistoryItem |= alarmNotificationHistory.Any();
+                            foreach (AlarmNotificationHistoryItem item in alarmNotificationHistory)
+                            {
+                                AlarmNotificationHistoryItem singleItem = await provider.GetAlarmNotificationHistoryAsync(entity.Id, alarm.Id, checkId, item.Id, cancellationTokenSource.Token);
+                                Assert.IsNotNull(singleItem);
+                                Assert.AreEqual(item.Id, singleItem.Id);
+                                Assert.AreEqual(item.NotificationPlanId, singleItem.NotificationPlanId);
+                                Assert.AreEqual(item.PreviousState, singleItem.PreviousState);
+                                Assert.AreEqual(item.State, singleItem.State);
+                                Assert.AreEqual(item.Status, singleItem.Status);
+                                Assert.AreEqual(item.Timestamp, singleItem.Timestamp);
+                                Assert.AreEqual(item.TransactionId, singleItem.TransactionId);
+                                if (item.Results == null)
+                                {
+                                    Assert.IsNull(singleItem.Results);
+                                }
+                                else
+                                {
+                                    Assert.AreEqual(item.Results.Count, singleItem.Results.Count);
+                                    for (int i = 0; i < item.Results.Count; i++)
+                                    {
+                                        Assert.AreEqual(item.Results[i].NotificationId, singleItem.Results[i].NotificationId);
+                                        Assert.AreEqual(item.Results[i].NotificationTypeId, singleItem.Results[i].NotificationTypeId);
+                                        Assert.AreEqual(item.Results[i].InProgress, singleItem.Results[i].InProgress);
+                                        Assert.AreEqual(item.Results[i].Success, singleItem.Results[i].Success);
+                                        Assert.AreEqual(item.Results[i].Message, singleItem.Results[i].Message);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!foundHistoryItem)
+                    Assert.Inconclusive("The provider did not return any alarm notification history items.");
+            }
         }
 
         [TestMethod]
@@ -438,7 +585,104 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetAlarmNotificationHistory()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                // force authentication before starting the timer
+                await provider.ListMonitoringZonesAsync(null, null, cancellationTokenSource.Token);
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                List<Task<bool>> tasks = new List<Task<bool>>();
+                foreach (Entity entity in await ListAllEntitiesAsync(provider, null, cancellationTokenSource.Token))
+                {
+                    tasks.Add(TestGetAlarmNotificationHistory(provider, entity, cancellationTokenSource.Token));
+                }
+
+                if (tasks.Count > 0)
+                    await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+                bool foundHistoryItem = tasks.Any(i => i.Result);
+
+                Console.WriteLine("Elapsed time: {0}ms", stopwatch.ElapsedMilliseconds);
+
+                if (!foundHistoryItem)
+                    Assert.Inconclusive("The provider did not return any alarm notification history items.");
+            }
+        }
+
+        private async Task<bool> TestGetAlarmNotificationHistory(IMonitoringService provider, Entity entity, CancellationToken cancellationToken)
+        {
+            List<Task<bool>> tasks = new List<Task<bool>>();
+            foreach (Alarm alarm in await ListAllAlarmsAsync(provider, entity.Id, null, cancellationToken))
+            {
+                tasks.Add(TestGetAlarmNotificationHistory(provider, entity, alarm, cancellationToken));
+            }
+
+            if (tasks.Count > 0)
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+            return tasks.Any(i => i.Result);
+        }
+
+        private async Task<bool> TestGetAlarmNotificationHistory(IMonitoringService provider, Entity entity, Alarm alarm, CancellationToken cancellationToken)
+        {
+            List<Task<bool>> tasks = new List<Task<bool>>();
+            foreach (CheckId checkId in await provider.DiscoverAlarmNotificationHistoryAsync(entity.Id, alarm.Id, cancellationToken))
+            {
+                tasks.Add(TestGetAlarmNotificationHistory(provider, entity, alarm, checkId, cancellationToken));
+            }
+
+            if (tasks.Count > 0)
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+            return tasks.Any(i => i.Result);
+        }
+
+        private async Task<bool> TestGetAlarmNotificationHistory(IMonitoringService provider, Entity entity, Alarm alarm, CheckId checkId, CancellationToken cancellationToken)
+        {
+            List<Task<bool>> tasks = new List<Task<bool>>();
+            AlarmNotificationHistoryItem[] alarmNotificationHistory = await ListAllAlarmNotificationHistoryAsync(provider, entity.Id, alarm.Id, checkId, null, cancellationToken);
+            foreach (AlarmNotificationHistoryItem item in alarmNotificationHistory)
+            {
+                tasks.Add(TestGetAlarmNotificationHistory(provider, entity, alarm, checkId, item, cancellationToken));
+            }
+
+            if (tasks.Count > 0)
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+            return tasks.Any(i => i.Result);
+        }
+
+        private async Task<bool> TestGetAlarmNotificationHistory(IMonitoringService provider, Entity entity, Alarm alarm, CheckId checkId, AlarmNotificationHistoryItem item, CancellationToken cancellationToken)
+        {
+            AlarmNotificationHistoryItem singleItem = await provider.GetAlarmNotificationHistoryAsync(entity.Id, alarm.Id, checkId, item.Id, cancellationToken);
+            Assert.IsNotNull(singleItem);
+            Assert.AreEqual(item.Id, singleItem.Id);
+            Assert.AreEqual(item.NotificationPlanId, singleItem.NotificationPlanId);
+            Assert.AreEqual(item.PreviousState, singleItem.PreviousState);
+            Assert.AreEqual(item.State, singleItem.State);
+            Assert.AreEqual(item.Status, singleItem.Status);
+            Assert.AreEqual(item.Timestamp, singleItem.Timestamp);
+            Assert.AreEqual(item.TransactionId, singleItem.TransactionId);
+            if (item.Results == null)
+            {
+                Assert.IsNull(singleItem.Results);
+            }
+            else
+            {
+                Assert.AreEqual(item.Results.Count, singleItem.Results.Count);
+                for (int i = 0; i < item.Results.Count; i++)
+                {
+                    Assert.AreEqual(item.Results[i].NotificationId, singleItem.Results[i].NotificationId);
+                    Assert.AreEqual(item.Results[i].NotificationTypeId, singleItem.Results[i].NotificationTypeId);
+                    Assert.AreEqual(item.Results[i].InProgress, singleItem.Results[i].InProgress);
+                    Assert.AreEqual(item.Results[i].Success, singleItem.Results[i].Success);
+                    Assert.AreEqual(item.Results[i].Message, singleItem.Results[i].Message);
+                }
+            }
+
+            return true;
         }
 
         [TestMethod]
@@ -468,9 +712,18 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestListNotifications()
+        public void TestListNotifications()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Notification[] notifications = ListAllNotifications(provider, null, cancellationTokenSource.Token).ToArray();
+                if (notifications.Length == 0)
+                    Assert.Inconclusive("The service did not report any notifications.");
+
+                foreach (Notification notification in notifications)
+                    Console.WriteLine("Notification '{0}' ({1})", notification.Label, notification.Id);
+            }
         }
 
         [TestMethod]
@@ -478,7 +731,28 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetNotification()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Notification[] notifications = ListAllNotifications(provider, null, cancellationTokenSource.Token).ToArray();
+                if (notifications.Length == 0)
+                    Assert.Inconclusive("The service did not report any notifications.");
+
+                foreach (Notification notification in notifications)
+                {
+                    Notification singleNotification = await provider.GetNotificationAsync(notification.Id, cancellationTokenSource.Token);
+                    Assert.IsNotNull(singleNotification);
+                    Assert.AreEqual(notification.Id, singleNotification.Id);
+                    Assert.AreEqual(notification.Label, singleNotification.Label);
+                    Assert.AreEqual(notification.Type, singleNotification.Type);
+
+                    if (notification.Type != null)
+                    {
+                        NotificationType notificationType = await provider.GetNotificationTypeAsync(notification.Type, cancellationTokenSource.Token);
+                        Assert.IsNotNull(notificationType);
+                    }
+                }
+            }
         }
 
         [TestMethod]
@@ -500,9 +774,22 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestListNotificationTypes()
+        public void TestListNotificationTypes()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                NotificationType[] notifications = ListAllNotificationTypes(provider, null, cancellationTokenSource.Token).ToArray();
+                if (notifications.Length == 0)
+                    Assert.Inconclusive("The service did not report any notification types.");
+
+                foreach (NotificationType notificationType in notifications)
+                {
+                    Console.WriteLine("Notification '{0}'", notificationType.Id);
+                    foreach (NotificationTypeField field in notificationType.Fields)
+                        Console.WriteLine("    {0}{1} // {2}", field.Name, (field.Optional ?? false) ? " (optional)" : string.Empty, field.Description);
+                }
+            }
         }
 
         [TestMethod]
@@ -510,7 +797,34 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetNotificationType()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                NotificationType[] notifications = ListAllNotificationTypes(provider, null, cancellationTokenSource.Token).ToArray();
+                if (notifications.Length == 0)
+                    Assert.Inconclusive("The service did not report any notification types.");
+
+                foreach (NotificationType notificationType in notifications)
+                {
+                    NotificationType singleNotificationType = await provider.GetNotificationTypeAsync(notificationType.Id, cancellationTokenSource.Token);
+                    Assert.IsNotNull(singleNotificationType);
+                    Assert.AreEqual(notificationType.Id, singleNotificationType.Id);
+                    if (notificationType.Fields == null)
+                    {
+                        Assert.IsNull(singleNotificationType.Fields);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(notificationType.Fields.Count, singleNotificationType.Fields.Count);
+                        for (int i = 0; i < notificationType.Fields.Count; i++)
+                        {
+                            Assert.AreEqual(notificationType.Fields[i].Name, singleNotificationType.Fields[i].Name);
+                            Assert.AreEqual(notificationType.Fields[i].Optional, singleNotificationType.Fields[i].Optional);
+                            Assert.AreEqual(notificationType.Fields[i].Description, singleNotificationType.Fields[i].Description);
+                        }
+                    }
+                }
+            }
         }
 
         [TestMethod]
@@ -518,7 +832,16 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestListAlarmChangelogs()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                AlarmChangelog[] alarmChangelogs = ListAllAlarmChangelogs(provider, null, cancellationTokenSource.Token).ToArray();
+                if (alarmChangelogs.Length == 0)
+                    Assert.Inconclusive("The service did not report any alarm changelogs.");
+
+                foreach (AlarmChangelog alarmChangelog in alarmChangelogs)
+                    Console.WriteLine("Alarm changelog '{0}'", alarmChangelog.Id);
+            }
         }
 
         [TestMethod]
@@ -554,6 +877,9 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 AlarmExample[] alarmExamples = ListAllAlarmExamples(provider, null, cancellationTokenSource.Token).ToArray();
+                if (alarmExamples.Length == 0)
+                    Assert.Inconclusive("The provider did not return any alarm examples.");
+
                 foreach (AlarmExample alarmExample in alarmExamples)
                     Console.WriteLine(alarmExample.Label);
             }
@@ -846,6 +1172,23 @@
             Assert.Inconclusive("Not yet implemented.");
         }
 
+        protected static IEnumerable<AlarmChangelog> ListAllAlarmChangelogs(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            AlarmChangelogId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId> page = service.ListAlarmChangelogsAsync(marker, blockSize, cancellationToken).Result;
+                foreach (AlarmChangelog alarmChangelog in page)
+                    yield return alarmChangelog;
+
+                marker = page.Marker;
+            } while (marker != null);
+        }
+
         protected static IEnumerable<AlarmExample> ListAllAlarmExamples(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
         {
             if (service == null)
@@ -863,6 +1206,53 @@
             } while (marker != null);
         }
 
+        protected static IEnumerable<AlarmNotificationHistoryItem> ListAllAlarmNotificationHistory(IMonitoringService service, EntityId entityId, AlarmId alarmId, CheckId checkId, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+            if (entityId == null)
+                throw new ArgumentNullException("entityId");
+            if (alarmId == null)
+                throw new ArgumentNullException("alarmId");
+            if (checkId == null)
+                throw new ArgumentNullException("checkId");
+
+            AlarmNotificationHistoryItemId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId> page = service.ListAlarmNotificationHistoryAsync(entityId, alarmId, checkId, marker, blockSize, cancellationToken).Result;
+                foreach (AlarmNotificationHistoryItem example in page)
+                    yield return example;
+
+                marker = page.Marker;
+            } while (marker != null);
+        }
+
+        protected static async Task<AlarmNotificationHistoryItem[]> ListAllAlarmNotificationHistoryAsync(IMonitoringService service, EntityId entityId, AlarmId alarmId, CheckId checkId, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+            if (entityId == null)
+                throw new ArgumentNullException("entityId");
+            if (alarmId == null)
+                throw new ArgumentNullException("alarmId");
+            if (checkId == null)
+                throw new ArgumentNullException("checkId");
+
+            List<AlarmNotificationHistoryItem> result = new List<AlarmNotificationHistoryItem>();
+            AlarmNotificationHistoryItemId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId> page = await service.ListAlarmNotificationHistoryAsync(entityId, alarmId, checkId, marker, blockSize, cancellationToken);
+                result.AddRange(page);
+                marker = page.Marker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
         protected static IEnumerable<Entity> ListAllEntities(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
         {
             if (service == null)
@@ -875,6 +1265,99 @@
                 ReadOnlyCollectionPage<Entity, EntityId> page = service.ListEntitiesAsync(marker, blockSize, cancellationToken).Result;
                 foreach (Entity entity in page)
                     yield return entity;
+
+                marker = page.Marker;
+            } while (marker != null);
+        }
+
+        protected static async Task<Entity[]> ListAllEntitiesAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<Entity> result = new List<Entity>();
+            EntityId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Entity, EntityId> page = await service.ListEntitiesAsync(marker, blockSize, cancellationToken);
+                result.AddRange(page);
+                marker = page.Marker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
+        protected static IEnumerable<Alarm> ListAllAlarms(IMonitoringService service, EntityId entityId, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+            if (entityId == null)
+                throw new ArgumentNullException("entityId");
+
+            AlarmId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Alarm, AlarmId> page = service.ListAlarmsAsync(entityId, marker, blockSize, cancellationToken).Result;
+                foreach (Alarm alarm in page)
+                    yield return alarm;
+
+                marker = page.Marker;
+            } while (marker != null);
+        }
+
+        protected static async Task<Alarm[]> ListAllAlarmsAsync(IMonitoringService service, EntityId entityId, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+            if (entityId == null)
+                throw new ArgumentNullException("entityId");
+
+            List<Alarm> result = new List<Alarm>();
+            AlarmId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Alarm, AlarmId> page = await service.ListAlarmsAsync(entityId, marker, blockSize, cancellationToken);
+                result.AddRange(page);
+                marker = page.Marker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
+        protected static IEnumerable<Check> ListAllChecks(IMonitoringService service, EntityId entityId, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+            if (entityId == null)
+                throw new ArgumentNullException("entityId");
+
+            CheckId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Check, CheckId> page = service.ListChecksAsync(entityId, marker, blockSize, cancellationToken).Result;
+                foreach (Check check in page)
+                    yield return check;
+
+                marker = page.Marker;
+            } while (marker != null);
+        }
+
+        protected static IEnumerable<MonitoringZone> ListAllMonitoringZones(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            MonitoringZoneId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<MonitoringZone, MonitoringZoneId> page = service.ListMonitoringZonesAsync(marker, blockSize, cancellationToken).Result;
+                foreach (MonitoringZone monitoringZone in page)
+                    yield return monitoringZone;
 
                 marker = page.Marker;
             } while (marker != null);
@@ -909,6 +1392,23 @@
                 ReadOnlyCollectionPage<Notification, NotificationId> page = service.ListNotificationsAsync(marker, blockSize, cancellationToken).Result;
                 foreach (Notification notification in page)
                     yield return notification;
+
+                marker = page.Marker;
+            } while (marker != null);
+        }
+
+        protected static IEnumerable<NotificationType> ListAllNotificationTypes(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            NotificationTypeId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<NotificationType, NotificationTypeId> page = service.ListNotificationTypesAsync(marker, blockSize, cancellationToken).Result;
+                foreach (NotificationType notificationType in page)
+                    yield return notificationType;
 
                 marker = page.Marker;
             } while (marker != null);
@@ -1049,6 +1549,7 @@
                     Console.Error.WriteLine("{0} (Result {1}) {2}", DateTime.Now, e.Response.StatusCode, e.Response.ResponseUri);
                 };
 
+            //provider.ConnectionLimit = 8;
             return provider;
         }
 
