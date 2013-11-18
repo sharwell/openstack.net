@@ -977,33 +977,151 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestTestNotification()
-        {
-            Assert.Inconclusive("Not yet implemented.");
-        }
-
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
-        public async Task TestTestExistingNotification()
-        {
-            Assert.Inconclusive("Not yet implemented.");
-        }
-
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
-        public void TestListNotifications()
+        public async Task TestTestWebhookNotification()
         {
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
+                NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationData notificationData = await provider.TestNotificationAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationData);
+                Assert.AreEqual("success", notificationData.Status);
+                Assert.AreEqual("Success: Webhook successfully executed", notificationData.Message);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public async Task TestTestEmailNotification()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.Email;
+                NotificationDetails notificationDetails = new EmailNotificationDetails("sample@example.com");
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationData notificationData = await provider.TestNotificationAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationData);
+                Assert.AreEqual("success", notificationData.Status);
+                Assert.AreEqual("Email successfully sent", notificationData.Message);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public async Task TestTestPagerDutyNotification()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.PagerDuty;
+                NotificationDetails notificationDetails = new PagerDutyNotificationDetails("XXXXX");
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationData notificationData = await provider.TestNotificationAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationData);
+                Assert.AreEqual("error", notificationData.Status);
+                Assert.AreEqual("Unexpected status code \"400\". Expected one of: /2[0-9]{2}/", notificationData.Message);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public async Task TestTestExistingWebhookNotification()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
+                NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
+
+                NotificationData notificationData = await provider.TestExistingNotificationAsync(notificationId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationData);
+                Assert.AreEqual("success", notificationData.Status);
+                Assert.AreEqual("Success: Webhook successfully executed", notificationData.Message);
+
+                await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public async Task TestTestExistingEmailNotification()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.Email;
+                NotificationDetails notificationDetails = new EmailNotificationDetails("sample@example.com");
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
+
+                NotificationData notificationData = await provider.TestExistingNotificationAsync(notificationId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationData);
+                Assert.AreEqual("success", notificationData.Status);
+                Assert.AreEqual("Email successfully sent", notificationData.Message);
+
+                await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public async Task TestTestExistingPagerDutyNotification()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.PagerDuty;
+                NotificationDetails notificationDetails = new PagerDutyNotificationDetails("XXXXX");
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
+
+                NotificationData notificationData = await provider.TestExistingNotificationAsync(notificationId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notificationData);
+                Assert.AreEqual("error", notificationData.Status);
+                Assert.AreEqual("Unexpected status code \"400\". Expected one of: /2[0-9]{2}/", notificationData.Message);
+
+                await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Monitoring)]
+        public async Task TestListNotifications()
+        {
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
+                NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
+
                 Notification[] notifications = ListAllNotifications(provider, null, cancellationTokenSource.Token).ToArray();
-                if (notifications.Length == 0)
-                    Assert.Inconclusive("The service did not report any notifications.");
+                Assert.IsNotNull(notifications);
+                Assert.IsTrue(notifications.Length > 0);
 
                 foreach (Notification notification in notifications)
                     Console.WriteLine("Notification '{0}' ({1})", notification.Label, notification.Id);
+
+                await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
             }
         }
 
@@ -1015,9 +1133,15 @@
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
+                NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
+
                 Notification[] notifications = ListAllNotifications(provider, null, cancellationTokenSource.Token).ToArray();
-                if (notifications.Length == 0)
-                    Assert.Inconclusive("The service did not report any notifications.");
+                Assert.IsNotNull(notifications);
+                Assert.IsTrue(notifications.Length > 0);
 
                 foreach (Notification notification in notifications)
                 {
@@ -1033,6 +1157,8 @@
                         Assert.IsNotNull(notificationType);
                     }
                 }
+
+                await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
             }
         }
 
