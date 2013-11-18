@@ -1,6 +1,8 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
     using System;
+    using System.Collections.Generic;
+    using net.openstack.Core.Collections;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -17,6 +19,12 @@
         private JObject _details;
 
         /// <summary>
+        /// This is the backing field for the <see cref="Metadata"/> property.
+        /// </summary>
+        [JsonProperty("metadata", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private IDictionary<string, string> _metadata;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NotificationConfiguration"/> class
         /// during JSON deserialization.
         /// </summary>
@@ -25,7 +33,7 @@
         {
         }
 
-        public NotificationConfiguration(string label, NotificationTypeId notificationTypeId, NotificationDetails details)
+        public NotificationConfiguration(string label, NotificationTypeId notificationTypeId, NotificationDetails details, IDictionary<string, string> metadata = null)
         {
             _label = label;
             _type = notificationTypeId;
@@ -36,6 +44,8 @@
 
                 _details = JObject.FromObject(details);
             }
+
+            _metadata = metadata;
         }
 
         public string Label
@@ -59,6 +69,20 @@
             get
             {
                 return NotificationDetails.FromJObject(Type, _details);
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of metadata associated with the notification plan.
+        /// </summary>
+        public ReadOnlyDictionary<string, string> Metadata
+        {
+            get
+            {
+                if (_metadata == null)
+                    return null;
+
+                return new ReadOnlyDictionary<string, string>(_metadata);
             }
         }
     }
