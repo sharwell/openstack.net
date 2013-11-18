@@ -47,10 +47,7 @@
         {
             get
             {
-                if (_lastConnected == null)
-                    return null;
-
-                return new DateTimeOffset(new DateTime(1970, 1, 1), TimeSpan.Zero).AddMilliseconds(_lastConnected.Value);
+                return DateTimeOffsetExtensions.ToDateTimeOffset(_lastConnected);
             }
         }
     }

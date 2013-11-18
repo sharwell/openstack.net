@@ -377,6 +377,7 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\DataPoint.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\DataPointGranularity.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\DataPointStatistic.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\DateTimeOffsetExtensions.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\DiskInformation.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\Entity.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\EntityConfiguration.cs" />

@@ -47,10 +47,7 @@
         {
             get
             {
-                if (_timestamp == null)
-                    return null;
-
-                return new DateTimeOffset(new DateTime(1970, 1, 1), TimeSpan.Zero).AddMilliseconds(_timestamp.Value);
+                return DateTimeOffsetExtensions.ToDateTimeOffset(_timestamp);
             }
         }
 
