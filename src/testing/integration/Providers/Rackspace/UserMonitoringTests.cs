@@ -151,7 +151,14 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetAccount()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                MonitoringAccount account = await provider.GetAccountAsync(cancellationTokenSource.Token);
+                Assert.IsNotNull(account);
+                Assert.IsNotNull(account.Id);
+                Assert.IsNotNull(account.WebhookToken);
+            }
         }
 
         [TestMethod]
@@ -167,7 +174,17 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetLimits()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                MonitoringLimits limits = await provider.GetLimitsAsync(cancellationTokenSource.Token);
+                Assert.IsNotNull(limits);
+                Assert.IsNotNull(limits.RateLimits);
+                Assert.IsTrue(limits.RateLimits.ContainsKey("global"));
+                Assert.IsNotNull(limits.ResourceLimits);
+                Assert.IsTrue(limits.ResourceLimits.ContainsKey("checks"));
+                Assert.IsTrue(limits.ResourceLimits.ContainsKey("alarms"));
+            }
         }
 
         [TestMethod]
@@ -175,7 +192,16 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestListAudits()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Audit[] audits = ListAllAudits(provider, null, null, null, cancellationTokenSource.Token).ToArray();
+                if (audits.Length == 0)
+                    Assert.Inconclusive("The service did not report any audits.");
+
+                foreach (Audit audit in audits)
+                    Console.WriteLine("Audit {0} ({1})", audit.Url, audit.Id);
+            }
         }
 
         [TestMethod]
@@ -1213,14 +1239,6 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestRemoveNotification()
-        {
-            Assert.Inconclusive("Not yet implemented.");
-        }
-
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
         public void TestListNotificationTypes()
         {
             IMonitoringService provider = CreateProvider();
@@ -1594,7 +1612,34 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetCpuInformation()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                List<Task<string>> tasks = new List<Task<string>>();
+                foreach (Agent agent in agents)
+                    tasks.Add(TestGetCpuInformation(provider, agent, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+                foreach (Task<string> task in tasks)
+                    Console.WriteLine(task.Result);
+            }
+        }
+
+        private async Task<string> TestGetCpuInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(string.Format("CPU information for agent {0}", agent.Id));
+            HostInformation<CpuInformation> information = await provider.GetCpuInformationAsync(agent.Id, cancellationToken);
+            Assert.IsNotNull(information);
+            foreach (CpuInformation cpuInformation in information.Info)
+                builder.AppendLine(string.Format("    {0} ({1} MHz)", cpuInformation.Model, cpuInformation.Frequency));
+
+            return builder.ToString();
         }
 
         [TestMethod]
@@ -1658,7 +1703,47 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestListAgentCheckTargets()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Entity[] entities = ListAllEntities(provider, null, cancellationTokenSource.Token).ToArray();
+                if (entities.Length == 0)
+                    Assert.Inconclusive("The service did not report any entities.");
+
+                List<Task> tasks = new List<Task>();
+                foreach (Entity entity in entities)
+                    tasks.Add(TestListAgentCheckTargets(provider, entity, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+            }
+        }
+
+        private async Task TestListAgentCheckTargets(IMonitoringService provider, Entity entity, CancellationToken cancellationToken)
+        {
+            AgentCheckType[] agentCheckTypes =
+                {
+                    AgentCheckType.AgentFilesystem,
+                    AgentCheckType.AgentMemory,
+                    AgentCheckType.AgentLoadAverage,
+                    AgentCheckType.AgentCpu,
+                    AgentCheckType.AgentDisk,
+                    AgentCheckType.AgentNetwork,
+                    AgentCheckType.AgentPlugin,
+                };
+
+            List<Task> tasks = new List<Task>();
+            foreach (AgentCheckType agentCheckType in agentCheckTypes)
+                tasks.Add(TestListAgentCheckTargets(provider, entity, agentCheckType, cancellationToken));
+
+            await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+        }
+
+        private async Task TestListAgentCheckTargets(IMonitoringService provider, Entity entity, AgentCheckType agentCheckType, CancellationToken cancellationToken)
+        {
+            string[] agentCheckTargets = await provider.ListAgentCheckTargetsAsync(entity.Id, agentCheckType, cancellationToken);
+            Console.WriteLine("Agent check targets for entity '{0}' ({1}) with agent check type '{2}'", entity.Label, entity.Id, agentCheckType);
+            foreach (string agentCheckTarget in agentCheckTargets)
+                Console.WriteLine("    {0}", agentCheckTarget);
         }
 
         protected static IEnumerable<AlarmChangelog> ListAllAlarmChangelogs(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
@@ -1740,6 +1825,23 @@
             } while (marker != null);
 
             return result.ToArray();
+        }
+
+        protected static IEnumerable<Audit> ListAllAudits(IMonitoringService service, int? blockSize, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            AuditId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Audit, AuditId> page = service.ListAuditsAsync(marker, blockSize, from, to, cancellationToken).Result;
+                foreach (Audit audit in page)
+                    yield return audit;
+
+                marker = page.NextMarker;
+            } while (marker != null);
         }
 
         protected static IEnumerable<Entity> ListAllEntities(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
