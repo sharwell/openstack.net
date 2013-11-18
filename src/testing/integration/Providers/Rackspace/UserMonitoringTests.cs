@@ -712,7 +712,31 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestTraceRouteFromMonitoringZone()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                MonitoringZone[] monitoringZones = ListAllMonitoringZones(provider, null, cancellationTokenSource.Token).ToArray();
+                if (monitoringZones.Length == 0)
+                    Assert.Inconclusive("The provider did not return any monitoring zones.");
+
+                string target = "docs.rackspace.com";
+                TraceRouteConfiguration configuration = new TraceRouteConfiguration(target, TargetResolverType.IPv4);
+                foreach (MonitoringZone monitoringZone in monitoringZones)
+                {
+                    Console.WriteLine("Performing traceroute from monitoring zone '{0}' to {1}", monitoringZone.Label, target);
+                    TraceRoute traceRoute = await provider.PerformTraceRouteFromMonitoringZoneAsync(monitoringZone.Id, configuration, cancellationTokenSource.Token);
+                    Console.WriteLine("  Total Hops: {0}", traceRoute.Hops.Count);
+                    for (int i = 0; i < traceRoute.Hops.Count; i++)
+                    {
+                        Assert.AreEqual(i + 1, traceRoute.Hops[i].Number);
+                        Console.WriteLine("  {0}. {1}", traceRoute.Hops[i].Number, traceRoute.Hops[i].IPAddress);
+                        foreach (TimeSpan responseTime in traceRoute.Hops[i].ResponseTimes)
+                            Console.WriteLine("    {0}", responseTime.TotalSeconds);
+                    }
+
+                    break;
+                }
+            }
         }
 
         [TestMethod]
