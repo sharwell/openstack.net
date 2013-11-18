@@ -25,12 +25,31 @@
             }
         }
 
+        /// <summary>
+        /// Gets the marker for the current page.
+        /// </summary>
         public TMarker Marker
         {
             get
             {
                 object marker;
                 if (!_metadata.TryGetValue("marker", out marker) || marker == null)
+                    return null;
+
+                JToken token = JToken.FromObject(marker);
+                return token.ToObject<TMarker>();
+            }
+        }
+
+        /// <summary>
+        /// Gets the marker for the next page.
+        /// </summary>
+        public TMarker NextMarker
+        {
+            get
+            {
+                object marker;
+                if (!_metadata.TryGetValue("next_marker", out marker) || marker == null)
                     return null;
 
                 JToken token = JToken.FromObject(marker);

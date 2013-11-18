@@ -1674,7 +1674,7 @@
                 foreach (AlarmChangelog alarmChangelog in page)
                     yield return alarmChangelog;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1691,7 +1691,7 @@
                 foreach (AlarmExample example in page)
                     yield return example;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1714,7 +1714,7 @@
                 foreach (AlarmNotificationHistoryItem example in page)
                     yield return example;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1736,7 +1736,7 @@
             {
                 ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId> page = await service.ListAlarmNotificationHistoryAsync(entityId, alarmId, checkId, marker, blockSize, cancellationToken);
                 result.AddRange(page);
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
 
             return result.ToArray();
@@ -1755,7 +1755,7 @@
                 foreach (Entity entity in page)
                     yield return entity;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1771,7 +1771,7 @@
             {
                 ReadOnlyCollectionPage<Entity, EntityId> page = await service.ListEntitiesAsync(marker, blockSize, cancellationToken);
                 result.AddRange(page);
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
 
             return result.ToArray();
@@ -1792,7 +1792,7 @@
                 foreach (Alarm alarm in page)
                     yield return alarm;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1810,7 +1810,7 @@
             {
                 ReadOnlyCollectionPage<Alarm, AlarmId> page = await service.ListAlarmsAsync(entityId, marker, blockSize, cancellationToken);
                 result.AddRange(page);
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
 
             return result.ToArray();
@@ -1831,7 +1831,7 @@
                 foreach (Check check in page)
                     yield return check;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1848,7 +1848,7 @@
                 foreach (CheckType checkType in page)
                     yield return checkType;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1865,7 +1865,7 @@
                 foreach (MonitoringZone monitoringZone in page)
                     yield return monitoringZone;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1882,7 +1882,7 @@
                 foreach (NotificationPlan plan in page)
                     yield return plan;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1899,7 +1899,7 @@
                 foreach (Notification notification in page)
                     yield return notification;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1916,7 +1916,7 @@
                 foreach (NotificationType notificationType in page)
                     yield return notificationType;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1933,7 +1933,7 @@
                 foreach (Agent agent in page)
                     yield return agent;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1950,7 +1950,7 @@
                 foreach (AgentConnection connection in page)
                     yield return connection;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
@@ -1967,7 +1967,7 @@
                 foreach (AgentToken agentToken in page)
                     yield return agentToken;
 
-                marker = page.Marker;
+                marker = page.NextMarker;
             } while (marker != null);
         }
 
