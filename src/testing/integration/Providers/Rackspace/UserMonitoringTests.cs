@@ -339,9 +339,22 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestListCheckTypes()
+        public void TestListCheckTypes()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                CheckType[] checkTypes = ListAllCheckTypes(provider, null, cancellationTokenSource.Token).ToArray();
+                if (checkTypes.Length == 0)
+                    Assert.Inconclusive("The service did not report any check types.");
+
+                foreach (CheckType checkType in checkTypes)
+                {
+                    Console.WriteLine("Check Type '{0}' ({1})", checkType.Id, checkType.Type);
+                    foreach (NotificationTypeField field in checkType.Fields)
+                        Console.WriteLine("    {0}{1} // {2}", field.Name, (field.Optional ?? false) ? " (optional)" : string.Empty, field.Description);
+                }
+            }
         }
 
         [TestMethod]
@@ -349,7 +362,35 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetCheckType()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                CheckType[] checkTypes = ListAllCheckTypes(provider, null, cancellationTokenSource.Token).ToArray();
+                if (checkTypes.Length == 0)
+                    Assert.Inconclusive("The service did not report any check types.");
+
+                foreach (CheckType checkType in checkTypes)
+                {
+                    CheckType singleNotificationType = await provider.GetCheckTypeAsync(checkType.Id, cancellationTokenSource.Token);
+                    Assert.IsNotNull(singleNotificationType);
+                    Assert.AreEqual(checkType.Id, singleNotificationType.Id);
+                    Assert.AreEqual(checkType.Type, singleNotificationType.Type);
+                    if (checkType.Fields == null)
+                    {
+                        Assert.IsNull(singleNotificationType.Fields);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(checkType.Fields.Count, singleNotificationType.Fields.Count);
+                        for (int i = 0; i < checkType.Fields.Count; i++)
+                        {
+                            Assert.AreEqual(checkType.Fields[i].Name, singleNotificationType.Fields[i].Name);
+                            Assert.AreEqual(checkType.Fields[i].Optional, singleNotificationType.Fields[i].Optional);
+                            Assert.AreEqual(checkType.Fields[i].Description, singleNotificationType.Fields[i].Description);
+                        }
+                    }
+                }
+            }
         }
 
         [TestMethod]
@@ -1341,6 +1382,23 @@
                 ReadOnlyCollectionPage<Check, CheckId> page = service.ListChecksAsync(entityId, marker, blockSize, cancellationToken).Result;
                 foreach (Check check in page)
                     yield return check;
+
+                marker = page.Marker;
+            } while (marker != null);
+        }
+
+        protected static IEnumerable<CheckType> ListAllCheckTypes(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            CheckTypeId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<CheckType, CheckTypeId> page = service.ListCheckTypesAsync(marker, blockSize, cancellationToken).Result;
+                foreach (CheckType checkType in page)
+                    yield return checkType;
 
                 marker = page.Marker;
             } while (marker != null);
