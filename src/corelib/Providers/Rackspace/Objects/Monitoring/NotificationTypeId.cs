@@ -14,6 +14,21 @@
     public sealed class NotificationTypeId : ResourceIdentifier<NotificationTypeId>
     {
         /// <summary>
+        /// This is the backing field for the <see cref="Webhook"/> property.
+        /// </summary>
+        private static readonly NotificationTypeId _webhook = new NotificationTypeId("webhook");
+
+        /// <summary>
+        /// This is the backing field for the <see cref="Email"/> property.
+        /// </summary>
+        private static readonly NotificationTypeId _email = new NotificationTypeId("email");
+
+        /// <summary>
+        /// This is the backing field for the <see cref="PagerDuty"/> property.
+        /// </summary>
+        private static readonly NotificationTypeId _pagerduty = new NotificationTypeId("pagerduty");
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NotificationTypeId"/> class
         /// with the specified identifier value.
         /// </summary>
@@ -23,6 +38,30 @@
         public NotificationTypeId(string id)
             : base(id)
         {
+        }
+
+        public static NotificationTypeId Webhook
+        {
+            get
+            {
+                return _webhook;
+            }
+        }
+
+        public static NotificationTypeId Email
+        {
+            get
+            {
+                return _email;
+            }
+        }
+
+        public static NotificationTypeId PagerDuty
+        {
+            get
+            {
+                return _pagerduty;
+            }
         }
 
         /// <summary>

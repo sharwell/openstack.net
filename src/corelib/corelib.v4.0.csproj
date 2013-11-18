@@ -379,11 +379,13 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\DataPointStatistic.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\DateTimeOffsetExtensions.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\DiskInformation.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\EmailNotificationDetails.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\Entity.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\EntityConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\EntityId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\EntityOverview.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\FilesystemInformation.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\GenericNotificationDetails.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\HostInformationType.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\HostInformation`1.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\LoginInformation.cs" />
@@ -409,6 +411,7 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NotificationType.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NotificationTypeField.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NotificationTypeId.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\PagerDutyNotificationDetails.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\ProcessInformation.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\ReadOnlyCollectionPage`1.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\SystemInformation.cs" />
@@ -423,6 +426,7 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\UpdateEntityConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\UpdateNotificationConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\UpdateNotificationPlanConfiguration.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\WebhookNotificationDetails.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\WebhookToken.cs" />
     <Compile Include="Providers\Rackspace\Objects\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Queues\NamespaceDoc.cs" />

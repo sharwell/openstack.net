@@ -2,6 +2,7 @@
 {
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     [JsonObject(MemberSerialization.OptIn)]
     public class NotificationResult
@@ -14,7 +15,7 @@
         private NotificationTypeId _notificationTypeId;
 
         [JsonProperty("notification_details")]
-        private NotificationDetails _notificationDetails;
+        private JObject _notificationDetails;
 
         [JsonProperty("in_progress")]
         private bool? _inProgress;
@@ -58,7 +59,7 @@
         {
             get
             {
-                return _notificationDetails;
+                return NotificationDetails.FromJObject(NotificationTypeId, _notificationDetails);
             }
         }
 

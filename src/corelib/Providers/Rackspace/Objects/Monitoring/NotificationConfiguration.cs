@@ -1,6 +1,8 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
+    using System;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     [JsonObject(MemberSerialization.OptIn)]
     public class NotificationConfiguration
@@ -12,7 +14,7 @@
         private NotificationTypeId _type;
 
         [JsonProperty("details")]
-        private NotificationDetails _details;
+        private JObject _details;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NotificationConfiguration"/> class
@@ -27,7 +29,13 @@
         {
             _label = label;
             _type = notificationTypeId;
-            _details = details;
+            if (details != null)
+            {
+                if (!details.SupportsNotificationType(notificationTypeId))
+                    throw new ArgumentException(string.Format("The notification details object does not support '{0}' notifications.", notificationTypeId), "details");
+
+                _details = JObject.FromObject(details);
+            }
         }
 
         public string Label
@@ -50,7 +58,7 @@
         {
             get
             {
-                return _details;
+                return NotificationDetails.FromJObject(Type, _details);
             }
         }
     }
