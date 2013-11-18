@@ -2008,6 +2008,13 @@
             {
             }
 
+            protected override byte[] EncodeRequestBodyImpl<TBody>(HttpWebRequest request, TBody body)
+            {
+                byte[] encoded = base.EncodeRequestBodyImpl<TBody>(request, body);
+                Console.Error.WriteLine("<== " + Encoding.UTF8.GetString(encoded));
+                return encoded;
+            }
+
             protected override Tuple<HttpWebResponse, string> ReadResultImpl(Task<WebResponse> task, CancellationToken cancellationToken)
             {
                 try
@@ -2020,7 +2027,7 @@
                 }
                 catch (WebException ex)
                 {
-                    if (task.Result.ContentLength > 0)
+                    if (ex.Response != null && ex.Response.ContentLength != 0)
                         Console.Error.WriteLine("==> " + ex.Message);
 
                     throw;
