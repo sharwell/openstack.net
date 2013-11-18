@@ -862,7 +862,7 @@
         }
 
         /// <inheritdoc/>
-        public Task UpdateNotificationPlansAsync(NotificationPlanId notificationPlanId, UpdateNotificationPlanConfiguration configuration, CancellationToken cancellationToken)
+        public Task UpdateNotificationPlanAsync(NotificationPlanId notificationPlanId, UpdateNotificationPlanConfiguration configuration, CancellationToken cancellationToken)
         {
             if (notificationPlanId == null)
                 throw new ArgumentNullException("notificationPlanId");
@@ -884,7 +884,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveNotificationPlansAsync(NotificationPlanId notificationPlanId, CancellationToken cancellationToken)
+        public Task RemoveNotificationPlanAsync(NotificationPlanId notificationPlanId, CancellationToken cancellationToken)
         {
             if (notificationPlanId == null)
                 throw new ArgumentNullException("notificationPlanId");

@@ -108,9 +108,9 @@
 
         Task<NotificationPlan> GetNotificationPlanAsync(NotificationPlanId notificationPlanId, CancellationToken cancellationToken);
 
-        Task UpdateNotificationPlansAsync(NotificationPlanId notificationPlanId, UpdateNotificationPlanConfiguration configuration, CancellationToken cancellationToken);
+        Task UpdateNotificationPlanAsync(NotificationPlanId notificationPlanId, UpdateNotificationPlanConfiguration configuration, CancellationToken cancellationToken);
 
-        Task RemoveNotificationPlansAsync(NotificationPlanId notificationPlanId, CancellationToken cancellationToken);
+        Task RemoveNotificationPlanAsync(NotificationPlanId notificationPlanId, CancellationToken cancellationToken);
 
         #endregion Notification Plans
 
