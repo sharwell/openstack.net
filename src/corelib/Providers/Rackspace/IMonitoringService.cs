@@ -181,9 +181,9 @@
 
         #region Views
 
-        Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> GetOverviewViewAsync(EntityId marker, int? limit, CancellationToken cancellationToken);
+        Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> ListEntityOverviewsAsync(EntityId marker, int? limit, CancellationToken cancellationToken);
 
-        Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> GetOverviewViewAsync(EntityId marker, int? limit, IEnumerable<EntityId> entityIdFilter, CancellationToken cancellationToken);
+        Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> ListEntityOverviewsAsync(EntityId marker, int? limit, IEnumerable<EntityId> entityIdFilter, CancellationToken cancellationToken);
 
         #endregion Views
 

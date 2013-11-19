@@ -1390,14 +1390,14 @@
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> GetOverviewViewAsync(EntityId marker, int? limit, CancellationToken cancellationToken)
+        public Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> ListEntityOverviewsAsync(EntityId marker, int? limit, CancellationToken cancellationToken)
         {
             IEnumerable<EntityId> entityIdFilter = null;
-            return GetOverviewViewAsync(marker, limit, entityIdFilter, cancellationToken);
+            return ListEntityOverviewsAsync(marker, limit, entityIdFilter, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> GetOverviewViewAsync(EntityId marker, int? limit, IEnumerable<EntityId> entityIdFilter, CancellationToken cancellationToken)
+        public Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> ListEntityOverviewsAsync(EntityId marker, int? limit, IEnumerable<EntityId> entityIdFilter, CancellationToken cancellationToken)
         {
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
