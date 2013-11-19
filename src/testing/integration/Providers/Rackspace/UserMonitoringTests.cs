@@ -166,7 +166,17 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestUpdateAccount()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                MonitoringAccount account = await provider.GetAccountAsync(cancellationTokenSource.Token);
+                Assert.IsNotNull(account);
+                Assert.IsNotNull(account.Id);
+                Assert.IsNotNull(account.WebhookToken);
+
+                // since changes are account-wide, we have to set the webhook token to the original value
+                await provider.UpdateAccountAsync(account.Id, new AccountConfiguration(account.WebhookToken), cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -190,7 +200,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestListAudits()
+        public void TestListAudits()
         {
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
@@ -304,7 +314,29 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestUpdateEntity()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                Entity entity = await provider.GetEntityAsync(entityId, cancellationTokenSource.Token);
+                Assert.IsNotNull(entity);
+                Assert.AreEqual(entityId, entity.Id);
+                Assert.AreEqual(entityName, entity.Label);
+
+                string updatedEntityName = CreateRandomEntityName();
+                UpdateEntityConfiguration updateConfiguration = new UpdateEntityConfiguration(updatedEntityName);
+                await provider.UpdateEntityAsync(entityId, updateConfiguration, cancellationTokenSource.Token);
+                Entity updatedEntity = await provider.GetEntityAsync(entityId, cancellationTokenSource.Token);
+                Assert.IsNotNull(updatedEntity);
+                Assert.AreEqual(entityId, updatedEntity.Id);
+                Assert.AreEqual(updatedEntityName, updatedEntity.Label);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]

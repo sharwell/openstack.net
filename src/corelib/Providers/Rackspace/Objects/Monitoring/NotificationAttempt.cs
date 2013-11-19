@@ -21,5 +21,21 @@
         protected NotificationAttempt()
         {
         }
+
+        public string Message
+        {
+            get
+            {
+                return _message;
+            }
+        }
+
+        public string From
+        {
+            get
+            {
+                return _from;
+            }
+        }
     }
 }
