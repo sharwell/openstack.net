@@ -1813,11 +1813,12 @@
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
-                Entity[] entities = await ListAllEntitiesAsync(provider, null, cancellationTokenSource.Token);
-                if (entities.Length == 0)
+                ReadOnlyCollection<Entity> entities = await provider.ListEntitiesAsync(null, 7, cancellationTokenSource.Token);
+                if (entities.Count == 0)
                     Assert.Inconclusive("The service did not report any entities");
+                Assert.IsTrue(entities.Count <= 7);
 
-                Entity[] filteredEntities = entities.Skip(Math.Min(4, entities.Length - 1)).Take(3).ToArray();
+                Entity[] filteredEntities = entities.Skip(Math.Min(4, entities.Count - 1)).Take(3).ToArray();
                 Console.WriteLine("Filtering result to the following {0} entities:", filteredEntities.Length);
                 foreach (Entity entity in filteredEntities)
                     Console.WriteLine("    {0} ({1})", entity.Label, entity.Id);
