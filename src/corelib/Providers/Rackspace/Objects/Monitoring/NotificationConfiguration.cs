@@ -43,17 +43,12 @@
                 throw new ArgumentNullException("details");
             if (string.IsNullOrEmpty(label))
                 throw new ArgumentException("label cannot be empty");
+            if (!details.SupportsNotificationType(notificationTypeId))
+                throw new ArgumentException(string.Format("The notification details object does not support '{0}' notifications.", notificationTypeId), "details");
 
             _label = label;
             _type = notificationTypeId;
-            if (details != null)
-            {
-                if (!details.SupportsNotificationType(notificationTypeId))
-                    throw new ArgumentException(string.Format("The notification details object does not support '{0}' notifications.", notificationTypeId), "details");
-
-                _details = JObject.FromObject(details);
-            }
-
+            _details = JObject.FromObject(details);
             _metadata = metadata;
         }
 
@@ -77,6 +72,9 @@
         {
             get
             {
+                if (_details == null)
+                    return null;
+
                 return NotificationDetails.FromJObject(Type, _details);
             }
         }

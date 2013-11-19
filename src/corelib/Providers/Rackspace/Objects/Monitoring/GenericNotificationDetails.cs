@@ -25,7 +25,7 @@
             _properties = properties;
         }
 
-        public ReadOnlyDictionary<string, JToken> AdditionalProperties
+        public ReadOnlyDictionary<string, JToken> Properties
         {
             get
             {

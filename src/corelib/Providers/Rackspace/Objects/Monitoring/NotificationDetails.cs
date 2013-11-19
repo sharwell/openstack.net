@@ -8,18 +8,22 @@
     public abstract class NotificationDetails
     {
         /// <summary>
-        /// Deserializes a JSON object to a <see cref="HealthMonitor"/> instance of the proper type.
+        /// Deserializes a JSON object to a <see cref="NotificationDetails"/> instance of the proper type.
         /// </summary>
-        /// <param name="jsonObject">The JSON object representing the health monitor.</param>
-        /// <returns>A <see cref="HealthMonitor"/> object corresponding to the JSON object.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="jsonObject"/> is <c>null</c>.</exception>
+        /// <param name="notificationTypeId">The notification type ID.</param>
+        /// <param name="obj">The JSON object representing the notification details.</param>
+        /// <returns>A <see cref="NotificationDetails"/> object corresponding to the JSON object.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="notificationTypeId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="obj"/> is <c>null</c>.</para>
+        /// </exception>
         public static NotificationDetails FromJObject(NotificationTypeId notificationTypeId, JObject obj)
         {
             if (notificationTypeId == null)
                 throw new ArgumentNullException("notificationTypeId");
-
             if (obj == null)
-                return null;
+                throw new ArgumentNullException("obj");
 
             if (notificationTypeId == NotificationTypeId.Webhook)
                 return obj.ToObject<WebhookNotificationDetails>();

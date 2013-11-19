@@ -59,6 +59,9 @@
         {
             get
             {
+                if (_notificationDetails == null)
+                    return null;
+
                 return NotificationDetails.FromJObject(NotificationTypeId, _notificationDetails);
             }
         }

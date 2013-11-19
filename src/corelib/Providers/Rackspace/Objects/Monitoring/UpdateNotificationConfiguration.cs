@@ -68,6 +68,9 @@
         {
             get
             {
+                if (_details == null)
+                    return null;
+
                 return NotificationDetails.FromJObject(Type, _details);
             }
         }
