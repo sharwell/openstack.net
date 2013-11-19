@@ -2548,7 +2548,7 @@
             HostInformation<ReadOnlyCollection<NetworkInterfaceInformation>> information = await provider.GetNetworkInterfaceInformationAsync(agentId, cancellationToken);
             Assert.IsNotNull(information);
             foreach (NetworkInterfaceInformation networkInterfaceInformation in information.Info)
-                builder.AppendLine(string.Format("    {0}", networkInterfaceInformation));
+                builder.AppendLine(string.Format("    {0}", networkInterfaceInformation.Name));
 
             return builder.ToString();
         }
@@ -2592,7 +2592,7 @@
             HostInformation<ReadOnlyCollection<ProcessInformation>> information = await provider.GetProcessInformationAsync(agentId, cancellationToken);
             Assert.IsNotNull(information);
             foreach (ProcessInformation processInformation in information.Info)
-                builder.AppendLine(string.Format("    {0}", processInformation));
+                builder.AppendLine(string.Format("    {0}", processInformation.Name));
 
             return builder.ToString();
         }
