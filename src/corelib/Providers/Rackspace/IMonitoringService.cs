@@ -2,12 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
+    using System.Collections.ObjectModel;
     using System.Threading.Tasks;
     using net.openstack.Providers.Rackspace.Objects.Monitoring;
+    using Newtonsoft.Json.Linq;
     using CancellationToken = System.Threading.CancellationToken;
-    using JObject = Newtonsoft.Json.Linq.JObject;
 
     /// <summary>
     /// Represents a provider for the Rackspace Cloud Monitoring service.
@@ -230,23 +229,23 @@
 
         #region Agent Host Information
 
-        Task<HostInformation<JObject>> GetAgentHostInformationAsync(AgentId agentId, HostInformationType hostInformation, CancellationToken cancellationToken);
+        Task<HostInformation<JToken>> GetAgentHostInformationAsync(AgentId agentId, HostInformationType hostInformation, CancellationToken cancellationToken);
 
-        Task<HostInformation<CpuInformation>> GetCpuInformationAsync(AgentId agentId, CancellationToken cancellationToken);
+        Task<HostInformation<ReadOnlyCollection<CpuInformation>>> GetCpuInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
-        Task<HostInformation<DiskInformation>> GetDiskInformationAsync(AgentId agentId, CancellationToken cancellationToken);
+        Task<HostInformation<ReadOnlyCollection<DiskInformation>>> GetDiskInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
-        Task<HostInformation<FilesystemInformation>> GetFilesystemInformationAsync(AgentId agentId, CancellationToken cancellationToken);
+        Task<HostInformation<ReadOnlyCollection<FilesystemInformation>>> GetFilesystemInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         Task<HostInformation<MemoryInformation>> GetMemoryInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
-        Task<HostInformation<NetworkInterfaceInformation>> GetNetworkInterfaceInformationAsync(AgentId agentId, CancellationToken cancellationToken);
+        Task<HostInformation<ReadOnlyCollection<NetworkInterfaceInformation>>> GetNetworkInterfaceInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
-        Task<HostInformation<ProcessInformation>> GetProcessInformationAsync(AgentId agentId, CancellationToken cancellationToken);
+        Task<HostInformation<ReadOnlyCollection<ProcessInformation>>> GetProcessInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         Task<HostInformation<SystemInformation>> GetSystemInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
-        Task<HostInformation<LoginInformation>> GetLoginInformationAsync(AgentId agentId, CancellationToken cancellationToken);
+        Task<HostInformation<ReadOnlyCollection<LoginInformation>>> GetLoginInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         #endregion Agent Host Information
 

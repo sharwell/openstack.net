@@ -1,7 +1,6 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
     using System;
-    using System.Collections.ObjectModel;
     using Newtonsoft.Json;
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -12,7 +11,7 @@
         private long? _timestamp;
 
         [JsonProperty("info")]
-        private T[] _info;
+        private T _info;
 #pragma warning restore 649
 
         /// <summary>
@@ -32,14 +31,11 @@
             }
         }
 
-        public ReadOnlyCollection<T> Info
+        public T Info
         {
             get
             {
-                if (_info == null)
-                    return null;
-
-                return new ReadOnlyCollection<T>(_info);
+                return _info;
             }
         }
     }

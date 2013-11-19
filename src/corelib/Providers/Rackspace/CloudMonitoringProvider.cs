@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
@@ -1801,41 +1802,41 @@
         }
 
         /// <inheritdoc/>
-        public Task<HostInformation<JObject>> GetAgentHostInformationAsync(AgentId agentId, HostInformationType hostInformation, CancellationToken cancellationToken)
+        public Task<HostInformation<JToken>> GetAgentHostInformationAsync(AgentId agentId, HostInformationType hostInformation, CancellationToken cancellationToken)
         {
             if (agentId == null)
                 throw new ArgumentNullException("agentId");
             if (hostInformation == null)
                 throw new ArgumentNullException("hostInformation");
 
-            return GetAgentHostInformationAsync<JObject>(agentId, hostInformation, cancellationToken);
+            return GetAgentHostInformationAsync<JToken>(agentId, hostInformation, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<HostInformation<CpuInformation>> GetCpuInformationAsync(AgentId agentId, CancellationToken cancellationToken)
+        public Task<HostInformation<ReadOnlyCollection<CpuInformation>>> GetCpuInformationAsync(AgentId agentId, CancellationToken cancellationToken)
         {
             if (agentId == null)
                 throw new ArgumentNullException("agentId");
 
-            return GetAgentHostInformationAsync<CpuInformation>(agentId, HostInformationType.Cpus, cancellationToken);
+            return GetAgentHostInformationAsync<ReadOnlyCollection<CpuInformation>>(agentId, HostInformationType.Cpus, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<HostInformation<DiskInformation>> GetDiskInformationAsync(AgentId agentId, CancellationToken cancellationToken)
+        public Task<HostInformation<ReadOnlyCollection<DiskInformation>>> GetDiskInformationAsync(AgentId agentId, CancellationToken cancellationToken)
         {
             if (agentId == null)
                 throw new ArgumentNullException("agentId");
 
-            return GetAgentHostInformationAsync<DiskInformation>(agentId, HostInformationType.Disks, cancellationToken);
+            return GetAgentHostInformationAsync<ReadOnlyCollection<DiskInformation>>(agentId, HostInformationType.Disks, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<HostInformation<FilesystemInformation>> GetFilesystemInformationAsync(AgentId agentId, CancellationToken cancellationToken)
+        public Task<HostInformation<ReadOnlyCollection<FilesystemInformation>>> GetFilesystemInformationAsync(AgentId agentId, CancellationToken cancellationToken)
         {
             if (agentId == null)
                 throw new ArgumentNullException("agentId");
 
-            return GetAgentHostInformationAsync<FilesystemInformation>(agentId, HostInformationType.Filesystems, cancellationToken);
+            return GetAgentHostInformationAsync<ReadOnlyCollection<FilesystemInformation>>(agentId, HostInformationType.Filesystems, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -1848,21 +1849,21 @@
         }
 
         /// <inheritdoc/>
-        public Task<HostInformation<NetworkInterfaceInformation>> GetNetworkInterfaceInformationAsync(AgentId agentId, CancellationToken cancellationToken)
+        public Task<HostInformation<ReadOnlyCollection<NetworkInterfaceInformation>>> GetNetworkInterfaceInformationAsync(AgentId agentId, CancellationToken cancellationToken)
         {
             if (agentId == null)
                 throw new ArgumentNullException("agentId");
 
-            return GetAgentHostInformationAsync<NetworkInterfaceInformation>(agentId, HostInformationType.NetworkInterfaces, cancellationToken);
+            return GetAgentHostInformationAsync<ReadOnlyCollection<NetworkInterfaceInformation>>(agentId, HostInformationType.NetworkInterfaces, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<HostInformation<ProcessInformation>> GetProcessInformationAsync(AgentId agentId, CancellationToken cancellationToken)
+        public Task<HostInformation<ReadOnlyCollection<ProcessInformation>>> GetProcessInformationAsync(AgentId agentId, CancellationToken cancellationToken)
         {
             if (agentId == null)
                 throw new ArgumentNullException("agentId");
 
-            return GetAgentHostInformationAsync<ProcessInformation>(agentId, HostInformationType.Processes, cancellationToken);
+            return GetAgentHostInformationAsync<ReadOnlyCollection<ProcessInformation>>(agentId, HostInformationType.Processes, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -1875,12 +1876,12 @@
         }
 
         /// <inheritdoc/>
-        public Task<HostInformation<LoginInformation>> GetLoginInformationAsync(AgentId agentId, CancellationToken cancellationToken)
+        public Task<HostInformation<ReadOnlyCollection<LoginInformation>>> GetLoginInformationAsync(AgentId agentId, CancellationToken cancellationToken)
         {
             if (agentId == null)
                 throw new ArgumentNullException("agentId");
 
-            return GetAgentHostInformationAsync<LoginInformation>(agentId, HostInformationType.Who, cancellationToken);
+            return GetAgentHostInformationAsync<ReadOnlyCollection<LoginInformation>>(agentId, HostInformationType.Who, cancellationToken);
         }
 
         /// <inheritdoc/>

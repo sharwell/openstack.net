@@ -2101,20 +2101,29 @@
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
-                    tasks.Add(TestGetCpuInformation(provider, agent, cancellationTokenSource.Token));
+                    tasks.Add(TestGetCpuInformation(provider, agent.Id, cancellationTokenSource.Token));
 
                 await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
 
                 foreach (Task<string> task in tasks)
+                {
+                    if (string.IsNullOrEmpty(task.Result))
+                        continue;
+
                     Console.WriteLine(task.Result);
+                }
             }
         }
 
-        private async Task<string> TestGetCpuInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        private async Task<string> TestGetCpuInformation(IMonitoringService provider, AgentId agentId, CancellationToken cancellationToken)
         {
+            ReadOnlyCollection<AgentConnection> connectionCheck = await provider.ListAgentConnectionsAsync(agentId, null, 1, cancellationToken);
+            if (connectionCheck.Count == 0)
+                return string.Empty;
+
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine(string.Format("CPU information for agent {0}", agent.Id));
-            HostInformation<CpuInformation> information = await provider.GetCpuInformationAsync(agent.Id, cancellationToken);
+            builder.AppendLine(string.Format("CPU information for agent {0}", agentId));
+            HostInformation<ReadOnlyCollection<CpuInformation>> information = await provider.GetCpuInformationAsync(agentId, cancellationToken);
             Assert.IsNotNull(information);
             foreach (CpuInformation cpuInformation in information.Info)
                 builder.AppendLine(string.Format("    {0} ({1} MHz)", cpuInformation.Model, cpuInformation.Frequency));
@@ -2136,20 +2145,29 @@
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
-                    tasks.Add(TestGetDiskInformation(provider, agent, cancellationTokenSource.Token));
+                    tasks.Add(TestGetDiskInformation(provider, agent.Id, cancellationTokenSource.Token));
 
                 await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
 
                 foreach (Task<string> task in tasks)
+                {
+                    if (string.IsNullOrEmpty(task.Result))
+                        continue;
+
                     Console.WriteLine(task.Result);
+                }
             }
         }
 
-        private async Task<string> TestGetDiskInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        private async Task<string> TestGetDiskInformation(IMonitoringService provider, AgentId agentId, CancellationToken cancellationToken)
         {
+            ReadOnlyCollection<AgentConnection> connectionCheck = await provider.ListAgentConnectionsAsync(agentId, null, 1, cancellationToken);
+            if (connectionCheck.Count == 0)
+                return string.Empty;
+
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine(string.Format("Disk information for agent {0}", agent.Id));
-            HostInformation<DiskInformation> information = await provider.GetDiskInformationAsync(agent.Id, cancellationToken);
+            builder.AppendLine(string.Format("Disk information for agent {0}", agentId));
+            HostInformation<ReadOnlyCollection<DiskInformation>> information = await provider.GetDiskInformationAsync(agentId, cancellationToken);
             Assert.IsNotNull(information);
             foreach (DiskInformation diskInformation in information.Info)
                 builder.AppendLine(string.Format("    {0}", diskInformation.Name));
@@ -2171,20 +2189,29 @@
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
-                    tasks.Add(TestGetFilesystemInformation(provider, agent, cancellationTokenSource.Token));
+                    tasks.Add(TestGetFilesystemInformation(provider, agent.Id, cancellationTokenSource.Token));
 
                 await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
 
                 foreach (Task<string> task in tasks)
+                {
+                    if (string.IsNullOrEmpty(task.Result))
+                        continue;
+
                     Console.WriteLine(task.Result);
+                }
             }
         }
 
-        private async Task<string> TestGetFilesystemInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        private async Task<string> TestGetFilesystemInformation(IMonitoringService provider, AgentId agentId, CancellationToken cancellationToken)
         {
+            ReadOnlyCollection<AgentConnection> connectionCheck = await provider.ListAgentConnectionsAsync(agentId, null, 1, cancellationToken);
+            if (connectionCheck.Count == 0)
+                return string.Empty;
+
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine(string.Format("Filesystem information for agent {0}", agent.Id));
-            HostInformation<FilesystemInformation> information = await provider.GetFilesystemInformationAsync(agent.Id, cancellationToken);
+            builder.AppendLine(string.Format("Filesystem information for agent {0}", agentId));
+            HostInformation<ReadOnlyCollection<FilesystemInformation>> information = await provider.GetFilesystemInformationAsync(agentId, cancellationToken);
             Assert.IsNotNull(information);
             foreach (FilesystemInformation filesystemInformation in information.Info)
                 builder.AppendLine(string.Format("    {0}", filesystemInformation));
@@ -2206,23 +2233,31 @@
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
-                    tasks.Add(TestGetMemoryInformation(provider, agent, cancellationTokenSource.Token));
+                    tasks.Add(TestGetMemoryInformation(provider, agent.Id, cancellationTokenSource.Token));
 
                 await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
 
                 foreach (Task<string> task in tasks)
+                {
+                    if (string.IsNullOrEmpty(task.Result))
+                        continue;
+
                     Console.WriteLine(task.Result);
+                }
             }
         }
 
-        private async Task<string> TestGetMemoryInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        private async Task<string> TestGetMemoryInformation(IMonitoringService provider, AgentId agentId, CancellationToken cancellationToken)
         {
+            ReadOnlyCollection<AgentConnection> connectionCheck = await provider.ListAgentConnectionsAsync(agentId, null, 1, cancellationToken);
+            if (connectionCheck.Count == 0)
+                return string.Empty;
+
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine(string.Format("Memory information for agent {0}", agent.Id));
-            HostInformation<MemoryInformation> information = await provider.GetMemoryInformationAsync(agent.Id, cancellationToken);
+            builder.AppendLine(string.Format("Memory information for agent {0}", agentId));
+            HostInformation<MemoryInformation> information = await provider.GetMemoryInformationAsync(agentId, cancellationToken);
             Assert.IsNotNull(information);
-            foreach (MemoryInformation memoryInformation in information.Info)
-                builder.AppendLine(string.Format("    {0}", memoryInformation));
+            builder.AppendLine(string.Format("    {0}", information.Info));
 
             return builder.ToString();
         }
@@ -2241,20 +2276,29 @@
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
-                    tasks.Add(TestGetNetworkInterfaceInformation(provider, agent, cancellationTokenSource.Token));
+                    tasks.Add(TestGetNetworkInterfaceInformation(provider, agent.Id, cancellationTokenSource.Token));
 
                 await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
 
                 foreach (Task<string> task in tasks)
+                {
+                    if (string.IsNullOrEmpty(task.Result))
+                        continue;
+
                     Console.WriteLine(task.Result);
+                }
             }
         }
 
-        private async Task<string> TestGetNetworkInterfaceInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        private async Task<string> TestGetNetworkInterfaceInformation(IMonitoringService provider, AgentId agentId, CancellationToken cancellationToken)
         {
+            ReadOnlyCollection<AgentConnection> connectionCheck = await provider.ListAgentConnectionsAsync(agentId, null, 1, cancellationToken);
+            if (connectionCheck.Count == 0)
+                return string.Empty;
+
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine(string.Format("Network interface information for agent {0}", agent.Id));
-            HostInformation<NetworkInterfaceInformation> information = await provider.GetNetworkInterfaceInformationAsync(agent.Id, cancellationToken);
+            builder.AppendLine(string.Format("Network interface information for agent {0}", agentId));
+            HostInformation<ReadOnlyCollection<NetworkInterfaceInformation>> information = await provider.GetNetworkInterfaceInformationAsync(agentId, cancellationToken);
             Assert.IsNotNull(information);
             foreach (NetworkInterfaceInformation networkInterfaceInformation in information.Info)
                 builder.AppendLine(string.Format("    {0}", networkInterfaceInformation));
@@ -2276,20 +2320,29 @@
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
-                    tasks.Add(TestGetProcessInformation(provider, agent, cancellationTokenSource.Token));
+                    tasks.Add(TestGetProcessInformation(provider, agent.Id, cancellationTokenSource.Token));
 
                 await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
 
                 foreach (Task<string> task in tasks)
+                {
+                    if (string.IsNullOrEmpty(task.Result))
+                        continue;
+
                     Console.WriteLine(task.Result);
+                }
             }
         }
 
-        private async Task<string> TestGetProcessInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        private async Task<string> TestGetProcessInformation(IMonitoringService provider, AgentId agentId, CancellationToken cancellationToken)
         {
+            ReadOnlyCollection<AgentConnection> connectionCheck = await provider.ListAgentConnectionsAsync(agentId, null, 1, cancellationToken);
+            if (connectionCheck.Count == 0)
+                return string.Empty;
+
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine(string.Format("Process information for agent {0}", agent.Id));
-            HostInformation<ProcessInformation> information = await provider.GetProcessInformationAsync(agent.Id, cancellationToken);
+            builder.AppendLine(string.Format("Process information for agent {0}", agentId));
+            HostInformation<ReadOnlyCollection<ProcessInformation>> information = await provider.GetProcessInformationAsync(agentId, cancellationToken);
             Assert.IsNotNull(information);
             foreach (ProcessInformation processInformation in information.Info)
                 builder.AppendLine(string.Format("    {0}", processInformation));
@@ -2311,23 +2364,31 @@
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
-                    tasks.Add(TestGetSystemInformation(provider, agent, cancellationTokenSource.Token));
+                    tasks.Add(TestGetSystemInformation(provider, agent.Id, cancellationTokenSource.Token));
 
                 await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
 
                 foreach (Task<string> task in tasks)
+                {
+                    if (string.IsNullOrEmpty(task.Result))
+                        continue;
+
                     Console.WriteLine(task.Result);
+                }
             }
         }
 
-        private async Task<string> TestGetSystemInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        private async Task<string> TestGetSystemInformation(IMonitoringService provider, AgentId agentId, CancellationToken cancellationToken)
         {
+            ReadOnlyCollection<AgentConnection> connectionCheck = await provider.ListAgentConnectionsAsync(agentId, null, 1, cancellationToken);
+            if (connectionCheck.Count == 0)
+                return string.Empty;
+
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine(string.Format("System information for agent {0}", agent.Id));
-            HostInformation<SystemInformation> information = await provider.GetSystemInformationAsync(agent.Id, cancellationToken);
+            builder.AppendLine(string.Format("System information for agent {0}", agentId));
+            HostInformation<SystemInformation> information = await provider.GetSystemInformationAsync(agentId, cancellationToken);
             Assert.IsNotNull(information);
-            foreach (SystemInformation systemInformation in information.Info)
-                builder.AppendLine(string.Format("    {0}", systemInformation.Name));
+            builder.AppendLine(string.Format("    {0}", information.Info.Name));
 
             return builder.ToString();
         }
@@ -2346,20 +2407,29 @@
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
-                    tasks.Add(TestGetLoginInformation(provider, agent, cancellationTokenSource.Token));
+                    tasks.Add(TestGetLoginInformation(provider, agent.Id, cancellationTokenSource.Token));
 
                 await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
 
                 foreach (Task<string> task in tasks)
+                {
+                    if (string.IsNullOrEmpty(task.Result))
+                        continue;
+
                     Console.WriteLine(task.Result);
+                }
             }
         }
 
-        private async Task<string> TestGetLoginInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        private async Task<string> TestGetLoginInformation(IMonitoringService provider, AgentId agentId, CancellationToken cancellationToken)
         {
+            ReadOnlyCollection<AgentConnection> connectionCheck = await provider.ListAgentConnectionsAsync(agentId, null, 1, cancellationToken);
+            if (connectionCheck.Count == 0)
+                return string.Empty;
+
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine(string.Format("Login information for agent {0}", agent.Id));
-            HostInformation<LoginInformation> information = await provider.GetLoginInformationAsync(agent.Id, cancellationToken);
+            builder.AppendLine(string.Format("Login information for agent {0}", agentId));
+            HostInformation<ReadOnlyCollection<LoginInformation>> information = await provider.GetLoginInformationAsync(agentId, cancellationToken);
             Assert.IsNotNull(information);
             foreach (LoginInformation loginInformation in information.Info)
                 builder.AppendLine(string.Format("    {0}@{1}", loginInformation.User, loginInformation.Host));
