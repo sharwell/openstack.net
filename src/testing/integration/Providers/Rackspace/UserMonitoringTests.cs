@@ -527,7 +527,52 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestListChecks()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
+                Assert.AreEqual(1, monitoringZones.Count);
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkId);
+
+                string checkLabel2 = CreateRandomCheckName();
+                TargetResolverType resolverType2 = TargetResolverType.IPv6;
+                CheckConfiguration checkConfiguration2 = new CheckConfiguration(checkLabel2, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckId checkId2 = await provider.CreateCheckAsync(entityId, checkConfiguration2, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkId2);
+
+                Check[] checks = await ListAllChecksAsync(provider, entityId, null, cancellationTokenSource.Token);
+                Assert.AreEqual(2, checks.Length);
+                foreach (Check check in checks)
+                    Console.WriteLine("Check {0} ({1})", check.Label, check.Id);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -535,7 +580,60 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestUpdateCheck()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
+                Assert.AreEqual(1, monitoringZones.Count);
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkId);
+
+                Check check = await provider.GetCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+                Assert.IsNotNull(check);
+                Assert.AreEqual(checkId, check.Id);
+                Assert.AreEqual(checkLabel, check.Label);
+                Assert.AreEqual(resolverType, check.ResolverType);
+                Assert.IsInstanceOfType(check.Details, typeof(HttpCheckDetails));
+
+                string checkLabel2 = CreateRandomCheckName();
+                TargetResolverType resolverType2 = TargetResolverType.IPv6;
+                UpdateCheckConfiguration updateCheckConfiguration = new UpdateCheckConfiguration(label: checkLabel2, resolverType: resolverType2);
+                await provider.UpdateCheckAsync(entityId, checkId, updateCheckConfiguration, cancellationTokenSource.Token);
+
+                Check updatedCheck = await provider.GetCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+                Assert.IsNotNull(updatedCheck);
+                Assert.AreEqual(checkId, updatedCheck.Id);
+                Assert.AreEqual(checkLabel2, updatedCheck.Label);
+                Assert.AreEqual(resolverType2, updatedCheck.ResolverType);
+                Assert.IsInstanceOfType(updatedCheck.Details, typeof(HttpCheckDetails));
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
