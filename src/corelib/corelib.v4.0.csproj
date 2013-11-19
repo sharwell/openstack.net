@@ -368,6 +368,8 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\CheckDetails.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\CheckId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\CheckMetricType.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\CheckTarget.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\CheckTargetId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\CheckType.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\CheckTypeId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\CheckTypeType.cs" />

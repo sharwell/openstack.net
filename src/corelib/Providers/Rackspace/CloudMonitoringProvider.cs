@@ -1884,7 +1884,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<string[]> ListAgentCheckTargetsAsync(EntityId entityId, CheckTypeId agentCheckType, CancellationToken cancellationToken)
+        public Task<ReadOnlyCollectionPage<CheckTarget, CheckTargetId>> ListAgentCheckTargetsAsync(EntityId entityId, CheckTypeId agentCheckType, CheckTargetId marker, int? limit, CancellationToken cancellationToken)
         {
             if (entityId == null)
                 throw new ArgumentNullException("entityId");
@@ -1892,9 +1892,15 @@
                 throw new ArgumentNullException("agentCheckType");
             if (!agentCheckType.IsAgent)
                 throw new ArgumentException(string.Format("The specified check type '{0}' is not an agent check.", agentCheckType), "agentCheckType");
+            if (limit <= 0)
+                throw new ArgumentOutOfRangeException("limit");
 
             UriTemplate template = new UriTemplate("/entities/{entityId}/agent/check_types/{agentCheckType}/targets");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "agentCheckType", agentCheckType.ToString() } };
+            if (marker != null)
+                parameters.Add("marker", marker.Value);
+            if (limit != null)
+                parameters.Add("limit", limit.ToString());
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
@@ -1902,18 +1908,22 @@
             Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
-            Func<Task<JObject>, string[]> resultSelector =
+            Func<Task<JObject>, ReadOnlyCollectionPage<CheckTarget, CheckTargetId>> resultSelector =
                 task =>
                 {
                     JObject result = task.Result;
                     if (result == null)
                         return null;
 
-                    JToken targetsToken = result["targets"];
-                    if (targetsToken == null)
+                    JToken valuesToken = result["values"];
+                    if (valuesToken == null)
                         return null;
 
-                    return targetsToken.ToObject<string[]>();
+                    JToken metadataToken = result["metadata"];
+
+                    CheckTarget[] values = valuesToken.ToObject<CheckTarget[]>();
+                    IDictionary<string, object> metadata = metadataToken != null ? metadataToken.ToObject<IDictionary<string, object>>() : null;
+                    return new ReadOnlyCollectionPage<CheckTarget, CheckTargetId>(values, metadata);
                 };
 
             return AuthenticateServiceAsync(cancellationToken)

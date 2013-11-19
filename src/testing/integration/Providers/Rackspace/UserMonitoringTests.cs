@@ -2375,31 +2375,47 @@
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                Task<ReadOnlyCollectionPage<AgentConnection, AgentConnectionId>>[] agentConnectionTasks = Array.ConvertAll(agents, agent => provider.ListAgentConnectionsAsync(agent.Id, null, 1, cancellationTokenSource.Token));
+                await Task.Factory.ContinueWhenAll((Task[])agentConnectionTasks, TaskExtrasExtensions.PropagateExceptions);
+
+                ISet<AgentId> connectedAgents = new HashSet<AgentId>();
+                foreach (Task<ReadOnlyCollectionPage<AgentConnection, AgentConnectionId>> task in agentConnectionTasks)
+                {
+                    if (task.Result.Count == 0)
+                        continue;
+
+                    connectedAgents.Add(task.Result[0].AgentId);
+                }
+
+                CheckType[] checkTypes = ListAllCheckTypes(provider, null, cancellationTokenSource.Token).ToArray();
+                CheckType[] agentCheckTypes = checkTypes.Where(i => i.Id.IsAgent).ToArray();
+                CheckType[] targetableAgentCheckTypes = agentCheckTypes.Where(i => i.Fields.Any(j => j.Name.Equals("target", StringComparison.OrdinalIgnoreCase))).ToArray();
+                if (targetableAgentCheckTypes.Length == 0)
+                    Assert.Inconclusive("The service did not report any targetable agent check types.");
+
                 Entity[] entities = ListAllEntities(provider, null, cancellationTokenSource.Token).ToArray();
                 if (entities.Length == 0)
                     Assert.Inconclusive("The service did not report any entities.");
 
                 List<Task> tasks = new List<Task>();
                 foreach (Entity entity in entities)
-                    tasks.Add(TestListAgentCheckTargets(provider, entity, cancellationTokenSource.Token));
+                {
+                    if (entity.AgentId == null || !connectedAgents.Contains(entity.AgentId))
+                        continue;
+
+                    tasks.Add(TestListAgentCheckTargets(provider, entity, targetableAgentCheckTypes.Select(i => i.Id), cancellationTokenSource.Token));
+                }
+
+                if (tasks.Count == 0)
+                    Assert.Inconclusive("The service did not report any entities with connected agents.");
 
                 await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
             }
         }
 
-        private async Task TestListAgentCheckTargets(IMonitoringService provider, Entity entity, CancellationToken cancellationToken)
+        private async Task TestListAgentCheckTargets(IMonitoringService provider, Entity entity, IEnumerable<CheckTypeId> agentCheckTypes, CancellationToken cancellationToken)
         {
-            CheckTypeId[] agentCheckTypes =
-                {
-                    CheckTypeId.AgentFilesystem,
-                    CheckTypeId.AgentMemory,
-                    CheckTypeId.AgentLoadAverage,
-                    CheckTypeId.AgentCpu,
-                    CheckTypeId.AgentDisk,
-                    CheckTypeId.AgentNetwork,
-                    CheckTypeId.AgentPlugin,
-                };
-
             List<Task> tasks = new List<Task>();
             foreach (CheckTypeId agentCheckType in agentCheckTypes)
                 tasks.Add(TestListAgentCheckTargets(provider, entity, agentCheckType, cancellationToken));
@@ -2409,10 +2425,10 @@
 
         private async Task TestListAgentCheckTargets(IMonitoringService provider, Entity entity, CheckTypeId agentCheckType, CancellationToken cancellationToken)
         {
-            string[] agentCheckTargets = await provider.ListAgentCheckTargetsAsync(entity.Id, agentCheckType, cancellationToken);
+            CheckTarget[] agentCheckTargets = await ListAllAgentCheckTargetsAsync(provider, entity.Id, agentCheckType, null, cancellationToken);
             Console.WriteLine("Agent check targets for entity '{0}' ({1}) with agent check type '{2}'", entity.Label, entity.Id, agentCheckType);
-            foreach (string agentCheckTarget in agentCheckTargets)
-                Console.WriteLine("    {0}", agentCheckTarget);
+            foreach (CheckTarget agentCheckTarget in agentCheckTargets)
+                Console.WriteLine("    {0}: {1}", agentCheckTarget.Id, agentCheckTarget.Label);
         }
 
         protected static IEnumerable<AlarmChangelog> ListAllAlarmChangelogs(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
@@ -2792,6 +2808,41 @@
 
                 marker = page.NextMarker;
             } while (marker != null);
+        }
+
+        protected static IEnumerable<CheckTarget> ListAllAgentCheckTargets(IMonitoringService service, EntityId entityId, CheckTypeId agentCheckType, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            CheckTargetId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<CheckTarget, CheckTargetId> page = service.ListAgentCheckTargetsAsync(entityId, agentCheckType, marker, blockSize, cancellationToken).Result;
+                foreach (CheckTarget checkTarget in page)
+                    yield return checkTarget;
+
+                marker = page.NextMarker;
+            } while (marker != null);
+        }
+
+        protected static async Task<CheckTarget[]> ListAllAgentCheckTargetsAsync(IMonitoringService service, EntityId entityId, CheckTypeId agentCheckType, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<CheckTarget> result = new List<CheckTarget>();
+            CheckTargetId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<CheckTarget, CheckTargetId> page = await service.ListAgentCheckTargetsAsync(entityId, agentCheckType, marker, blockSize, cancellationToken);
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
         }
 
         private TimeSpan TestTimeout(TimeSpan timeout)
