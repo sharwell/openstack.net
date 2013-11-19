@@ -5,6 +5,7 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     [JsonObject(MemberSerialization.OptIn)]
     public class CheckConfiguration
@@ -16,7 +17,7 @@
         private CheckTypeId _type;
 
         [JsonProperty("details")]
-        private CheckDetails _details;
+        private JObject _details;
 
         [JsonProperty("monitoring_zones_poll")]
         private MonitoringZoneId[] _monitoringZonesPoll;
@@ -41,9 +42,20 @@
 
         public CheckConfiguration(string label, CheckTypeId checkTypeId, CheckDetails details, IEnumerable<MonitoringZoneId> monitoringZonesPoll, TimeSpan? timeout, int? period, string targetAlias)
         {
+            if (label == null)
+                throw new ArgumentNullException("label");
+            if (checkTypeId == null)
+                throw new ArgumentNullException("checkTypeId");
+            if (details == null)
+                throw new ArgumentNullException("details");
+            if (string.IsNullOrEmpty(label))
+                throw new ArgumentException("label cannot be empty");
+            if (!details.SupportsCheckType(checkTypeId))
+                throw new ArgumentException(string.Format("The check details object does not support '{0}' checks.", checkTypeId), "details");
+
             _label = label;
             _type = checkTypeId;
-            _details = details;
+            _details = JObject.FromObject(details);
             _monitoringZonesPoll = monitoringZonesPoll != null ? monitoringZonesPoll.ToArray() : null;
             _timeout = timeout.HasValue ? (int?)timeout.Value.TotalSeconds : null;
             _period = period;
@@ -70,7 +82,10 @@
         {
             get
             {
-                return _details;
+                if (_details == null)
+                    return null;
+
+                return CheckDetails.FromJObject(CheckTypeId, _details);
             }
         }
 
