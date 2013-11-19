@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Net;
@@ -9,15 +10,14 @@
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Providers.Rackspace;
-    using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
-    using Path = System.IO.Path;
+    using net.openstack.Providers.Rackspace.Objects.Monitoring;
+    using Newtonsoft.Json.Linq;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
-    using net.openstack.Providers.Rackspace.Objects.Monitoring;
-    using Newtonsoft.Json;
+    using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
-    using System.Collections.ObjectModel;
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
+    using Path = System.IO.Path;
 
     [TestClass]
     public class UserMonitoringTests
@@ -877,7 +877,55 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestTestAlarm()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
+                Assert.AreEqual(1, monitoringZones.Count);
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+
+                CheckData[] checkData = await provider.TestCheckAsync(entityId, checkConfiguration, null, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkData);
+                Assert.IsTrue(checkData.Length > 0);
+
+                string criteria = "if (metric[\"code\"] == \"404\") { return new AlarmStatus(CRITICAL, \"not found\"); } return new AlarmStatus(OK);";
+                TestAlarmConfiguration testAlarmConfiguration = new TestAlarmConfiguration(criteria, checkData);
+                AlarmData[] alarmData = await provider.TestAlarmAsync(entityId, testAlarmConfiguration, cancellationTokenSource.Token);
+
+                foreach (AlarmData data in alarmData)
+                {
+                    Assert.AreEqual("OK", data.State);
+                    Assert.AreEqual("Matched default return statement", data.Status);
+                    Assert.IsTrue(data.Timestamp >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
+                    Assert.IsTrue(data.Timestamp <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
+                }
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -1800,7 +1848,33 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestUpdateNotification()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string label = CreateRandomNotificationName();
+                NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
+                NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
+                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
+
+                Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
+                Assert.IsNotNull(notification);
+                Assert.AreEqual(notificationId, notification.Id);
+                Assert.AreEqual(label, notification.Label);
+                Assert.AreEqual(configuration.Type, notification.Type);
+
+                string updatedLabel = CreateRandomNotificationName();
+                UpdateNotificationConfiguration updateConfiguration = new UpdateNotificationConfiguration(label: updatedLabel);
+                await provider.UpdateNotificationAsync(notificationId, updateConfiguration, cancellationTokenSource.Token);
+
+                Notification updateNotification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
+                Assert.IsNotNull(updateNotification);
+                Assert.AreEqual(notificationId, updateNotification.Id);
+                Assert.AreEqual(updatedLabel, updateNotification.Label);
+                Assert.AreEqual(configuration.Type, updateNotification.Type);
+
+                await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -1881,7 +1955,21 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestListAlarmChangelogsWithEntityFilter()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                AlarmChangelog[] alarmChangelogs = await ListAllAlarmChangelogsAsync(provider, null, cancellationTokenSource.Token);
+                if (alarmChangelogs.Length == 0)
+                    Assert.Inconclusive("The service did not report any alarm changelogs.");
+
+                ILookup<EntityId, AlarmChangelog> lookup = alarmChangelogs.ToLookup(i => i.EntityId);
+                foreach (IGrouping<EntityId, AlarmChangelog> group in lookup)
+                {
+                    AlarmChangelog[] groupAlarmChangelogs = group.ToArray();
+                    AlarmChangelog[] entityAlarmChangelogs = await ListAllAlarmChangelogsAsync(provider, group.Key, null, cancellationTokenSource.Token);
+                    Assert.AreEqual(groupAlarmChangelogs.Length, entityAlarmChangelogs.Length);
+                }
+            }
         }
 
         [TestMethod]
@@ -2207,7 +2295,43 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetAgentHostInformation()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                List<Task<string>> tasks = new List<Task<string>>();
+                foreach (Agent agent in agents)
+                    tasks.Add(TestGetAgentHostInformation(provider, agent.Id, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+                foreach (Task<string> task in tasks)
+                {
+                    if (string.IsNullOrEmpty(task.Result))
+                        continue;
+
+                    Console.WriteLine(task.Result);
+                }
+            }
+        }
+
+        private async Task<string> TestGetAgentHostInformation(IMonitoringService provider, AgentId agentId, CancellationToken cancellationToken)
+        {
+            ReadOnlyCollection<AgentConnection> connectionCheck = await provider.ListAgentConnectionsAsync(agentId, null, 1, cancellationToken);
+            if (connectionCheck.Count == 0)
+                return string.Empty;
+
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(string.Format("Agent host '{0}' information for agent {1}", HostInformationType.Cpus, agentId));
+            HostInformation<JToken> information = await provider.GetAgentHostInformationAsync(agentId, HostInformationType.Cpus, cancellationToken);
+            Assert.IsNotNull(information);
+            foreach (CpuInformation cpuInformation in information.Info.ToObject<CpuInformation[]>())
+                builder.AppendLine(string.Format("    {0} ({1} MHz)", cpuInformation.Model, cpuInformation.Frequency));
+
+            return builder.ToString();
         }
 
         [TestMethod]
@@ -2635,6 +2759,27 @@
             do
             {
                 ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId> page = await service.ListAlarmChangelogsAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
+        protected static async Task<AlarmChangelog[]> ListAllAlarmChangelogsAsync(IMonitoringService service, EntityId entityId, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<AlarmChangelog> result = new List<AlarmChangelog>();
+            AlarmChangelogId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId> page = await service.ListAlarmChangelogsAsync(entityId, marker, blockSize, cancellationToken);
                 if (progress != null)
                     progress.Report(page);
 
