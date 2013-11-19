@@ -2543,6 +2543,27 @@
             } while (marker != null);
         }
 
+        protected static async Task<AlarmChangelog[]> ListAllAlarmChangelogsAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<AlarmChangelog> result = new List<AlarmChangelog>();
+            AlarmChangelogId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId> page = await service.ListAlarmChangelogsAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
         protected static IEnumerable<AlarmExample> ListAllAlarmExamples(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
         {
             if (service == null)
@@ -2558,6 +2579,27 @@
 
                 marker = page.NextMarker;
             } while (marker != null);
+        }
+
+        protected static async Task<AlarmExample[]> ListAllAlarmExamplesAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AlarmExample, AlarmExampleId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<AlarmExample> result = new List<AlarmExample>();
+            AlarmExampleId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<AlarmExample, AlarmExampleId> page = await service.ListAlarmExamplesAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
         }
 
         protected static IEnumerable<AlarmNotificationHistoryItem> ListAllAlarmNotificationHistory(IMonitoringService service, EntityId entityId, AlarmId alarmId, CheckId checkId, int? blockSize, CancellationToken cancellationToken)
@@ -2583,16 +2625,10 @@
             } while (marker != null);
         }
 
-        protected static async Task<AlarmNotificationHistoryItem[]> ListAllAlarmNotificationHistoryAsync(IMonitoringService service, EntityId entityId, AlarmId alarmId, CheckId checkId, int? blockSize, CancellationToken cancellationToken)
+        protected static async Task<AlarmNotificationHistoryItem[]> ListAllAlarmNotificationHistoryAsync(IMonitoringService service, EntityId entityId, AlarmId alarmId, CheckId checkId, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
-            if (entityId == null)
-                throw new ArgumentNullException("entityId");
-            if (alarmId == null)
-                throw new ArgumentNullException("alarmId");
-            if (checkId == null)
-                throw new ArgumentNullException("checkId");
 
             List<AlarmNotificationHistoryItem> result = new List<AlarmNotificationHistoryItem>();
             AlarmNotificationHistoryItemId marker = null;
@@ -2600,6 +2636,9 @@
             do
             {
                 ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId> page = await service.ListAlarmNotificationHistoryAsync(entityId, alarmId, checkId, marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
                 result.AddRange(page);
                 marker = page.NextMarker;
             } while (marker != null);
@@ -2624,6 +2663,27 @@
             } while (marker != null);
         }
 
+        protected static async Task<Audit[]> ListAllAuditsAsync(IMonitoringService service, int? blockSize, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Audit, AuditId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<Audit> result = new List<Audit>();
+            AuditId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Audit, AuditId> page = await service.ListAuditsAsync(marker, blockSize, from, to, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
         protected static IEnumerable<Entity> ListAllEntities(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
         {
             if (service == null)
@@ -2641,7 +2701,7 @@
             } while (marker != null);
         }
 
-        protected static async Task<Entity[]> ListAllEntitiesAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
+        protected static async Task<Entity[]> ListAllEntitiesAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Entity, EntityId>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -2652,6 +2712,9 @@
             do
             {
                 ReadOnlyCollectionPage<Entity, EntityId> page = await service.ListEntitiesAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
                 result.AddRange(page);
                 marker = page.NextMarker;
             } while (marker != null);
@@ -2676,7 +2739,7 @@
             } while (marker != null);
         }
 
-        protected static async Task<EntityOverview[]> ListAllEntityOverviewsAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
+        protected static async Task<EntityOverview[]> ListAllEntityOverviewsAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<EntityOverview, EntityId>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -2687,6 +2750,9 @@
             do
             {
                 ReadOnlyCollectionPage<EntityOverview, EntityId> page = await service.ListEntityOverviewsAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
                 result.AddRange(page);
                 marker = page.NextMarker;
             } while (marker != null);
@@ -2711,7 +2777,7 @@
             } while (marker != null);
         }
 
-        protected static async Task<EntityOverview[]> ListAllEntityOverviewsAsync(IMonitoringService service, int? blockSize, IEnumerable<EntityId> entityIdFilter, CancellationToken cancellationToken)
+        protected static async Task<EntityOverview[]> ListAllEntityOverviewsAsync(IMonitoringService service, int? blockSize, IEnumerable<EntityId> entityIdFilter, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<EntityOverview, EntityId>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -2722,6 +2788,9 @@
             do
             {
                 ReadOnlyCollectionPage<EntityOverview, EntityId> page = await service.ListEntityOverviewsAsync(marker, blockSize, entityIdFilter, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
                 result.AddRange(page);
                 marker = page.NextMarker;
             } while (marker != null);
@@ -2748,12 +2817,10 @@
             } while (marker != null);
         }
 
-        protected static async Task<Alarm[]> ListAllAlarmsAsync(IMonitoringService service, EntityId entityId, int? blockSize, CancellationToken cancellationToken)
+        protected static async Task<Alarm[]> ListAllAlarmsAsync(IMonitoringService service, EntityId entityId, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Alarm, AlarmId>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
-            if (entityId == null)
-                throw new ArgumentNullException("entityId");
 
             List<Alarm> result = new List<Alarm>();
             AlarmId marker = null;
@@ -2761,6 +2828,9 @@
             do
             {
                 ReadOnlyCollectionPage<Alarm, AlarmId> page = await service.ListAlarmsAsync(entityId, marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
                 result.AddRange(page);
                 marker = page.NextMarker;
             } while (marker != null);
@@ -2787,6 +2857,26 @@
             } while (marker != null);
         }
 
+        protected static async Task<Check[]> ListAllChecksAsync(IMonitoringService service, EntityId entityId, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+            if (entityId == null)
+                throw new ArgumentNullException("entityId");
+
+            List<Check> result = new List<Check>();
+            CheckId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Check, CheckId> page = await service.ListChecksAsync(entityId, marker, blockSize, cancellationToken);
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
         protected static IEnumerable<CheckType> ListAllCheckTypes(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
         {
             if (service == null)
@@ -2802,6 +2892,27 @@
 
                 marker = page.NextMarker;
             } while (marker != null);
+        }
+
+        protected static async Task<CheckType[]> ListAllCheckTypesAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<CheckType, CheckTypeId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<CheckType> result = new List<CheckType>();
+            CheckTypeId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<CheckType, CheckTypeId> page = await service.ListCheckTypesAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
         }
 
         protected static IEnumerable<Metric> ListAllMetrics(IMonitoringService service, EntityId entityId, CheckId checkId, int? blockSize, CancellationToken cancellationToken)
@@ -2821,6 +2932,27 @@
             } while (marker != null);
         }
 
+        protected static async Task<Metric[]> ListAllMetricsAsync(IMonitoringService service, EntityId entityId, CheckId checkId, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Metric, MetricName>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<Metric> result = new List<Metric>();
+            MetricName marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Metric, MetricName> page = await service.ListMetricsAsync(entityId, checkId, marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
         protected static IEnumerable<MonitoringZone> ListAllMonitoringZones(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
         {
             if (service == null)
@@ -2836,6 +2968,27 @@
 
                 marker = page.NextMarker;
             } while (marker != null);
+        }
+
+        protected static async Task<MonitoringZone[]> ListAllMonitoringZonesAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<MonitoringZone, MonitoringZoneId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<MonitoringZone> result = new List<MonitoringZone>();
+            MonitoringZoneId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<MonitoringZone, MonitoringZoneId> page = await service.ListMonitoringZonesAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
         }
 
         protected static IEnumerable<NotificationPlan> ListAllNotificationPlans(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
@@ -2855,6 +3008,27 @@
             } while (marker != null);
         }
 
+        protected static async Task<NotificationPlan[]> ListAllNotificationPlansAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<NotificationPlan, NotificationPlanId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<NotificationPlan> result = new List<NotificationPlan>();
+            NotificationPlanId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<NotificationPlan, NotificationPlanId> page = await service.ListNotificationPlansAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
         protected static IEnumerable<Notification> ListAllNotifications(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
         {
             if (service == null)
@@ -2870,6 +3044,27 @@
 
                 marker = page.NextMarker;
             } while (marker != null);
+        }
+
+        protected static async Task<Notification[]> ListAllNotificationsAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Notification, NotificationId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<Notification> result = new List<Notification>();
+            NotificationId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Notification, NotificationId> page = await service.ListNotificationsAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
         }
 
         protected static IEnumerable<NotificationType> ListAllNotificationTypes(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
@@ -2889,6 +3084,27 @@
             } while (marker != null);
         }
 
+        protected static async Task<NotificationType[]> ListAllNotificationTypesAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<NotificationType, NotificationTypeId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<NotificationType> result = new List<NotificationType>();
+            NotificationTypeId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<NotificationType, NotificationTypeId> page = await service.ListNotificationTypesAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
         protected static IEnumerable<Agent> ListAllAgents(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
         {
             if (service == null)
@@ -2904,6 +3120,27 @@
 
                 marker = page.NextMarker;
             } while (marker != null);
+        }
+
+        protected static async Task<Agent[]> ListAllAgentsAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Agent, AgentId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<Agent> result = new List<Agent>();
+            AgentId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Agent, AgentId> page = await service.ListAgentsAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
         }
 
         protected static IEnumerable<AgentConnection> ListAllAgentConnections(IMonitoringService service, AgentId agentId, int? blockSize, CancellationToken cancellationToken)
@@ -2923,6 +3160,27 @@
             } while (marker != null);
         }
 
+        protected static async Task<AgentConnection[]> ListAllAgentConnectionsAsync(IMonitoringService service, AgentId agentId, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AgentConnection, AgentConnectionId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<AgentConnection> result = new List<AgentConnection>();
+            AgentConnectionId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<AgentConnection, AgentConnectionId> page = await service.ListAgentConnectionsAsync(agentId, marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
         protected static IEnumerable<AgentToken> ListAllAgentTokens(IMonitoringService service, int? blockSize, CancellationToken cancellationToken)
         {
             if (service == null)
@@ -2938,6 +3196,27 @@
 
                 marker = page.NextMarker;
             } while (marker != null);
+        }
+
+        protected static async Task<AgentToken[]> ListAllAgentTokensAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AgentToken, AgentTokenId>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<AgentToken> result = new List<AgentToken>();
+            AgentTokenId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<AgentToken, AgentTokenId> page = await service.ListAgentTokensAsync(marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
         }
 
         protected static IEnumerable<CheckTarget> ListAllAgentCheckTargets(IMonitoringService service, EntityId entityId, CheckTypeId agentCheckType, int? blockSize, CancellationToken cancellationToken)
@@ -2957,7 +3236,7 @@
             } while (marker != null);
         }
 
-        protected static async Task<CheckTarget[]> ListAllAgentCheckTargetsAsync(IMonitoringService service, EntityId entityId, CheckTypeId agentCheckType, int? blockSize, CancellationToken cancellationToken)
+        protected static async Task<CheckTarget[]> ListAllAgentCheckTargetsAsync(IMonitoringService service, EntityId entityId, CheckTypeId agentCheckType, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<CheckTarget, CheckTargetId>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -2968,6 +3247,9 @@
             do
             {
                 ReadOnlyCollectionPage<CheckTarget, CheckTargetId> page = await service.ListAgentCheckTargetsAsync(entityId, agentCheckType, marker, blockSize, cancellationToken);
+                if (progress != null)
+                    progress.Report(page);
+
                 result.AddRange(page);
                 marker = page.NextMarker;
             } while (marker != null);
