@@ -6,6 +6,7 @@
     using System.Net;
     using System.Text;
     using net.openstack.Core.Collections;
+    using net.openstack.Core.Domain;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
@@ -43,7 +44,7 @@
         private HttpMethod _method;
 
         [JsonProperty("account_id")]
-        private string _accountId;
+        private ProjectId _accountId;
 
         [JsonProperty("who")]
         private string _who;
@@ -148,7 +149,7 @@
             }
         }
 
-        public string AccountId
+        public ProjectId AccountId
         {
             get
             {
