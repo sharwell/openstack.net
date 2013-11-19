@@ -1,9 +1,6 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using net.openstack.Core.Collections;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

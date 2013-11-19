@@ -97,6 +97,9 @@
 
             [JsonProperty("data")]
             private string _data;
+
+            [JsonProperty("unit")]
+            private string _unit;
 #pragma warning restore 649
 
             /// <summary>
@@ -121,6 +124,14 @@
                 get
                 {
                     return _data;
+                }
+            }
+
+            public string Unit
+            {
+                get
+                {
+                    return _unit;
                 }
             }
         }

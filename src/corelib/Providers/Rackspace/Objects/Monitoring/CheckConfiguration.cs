@@ -10,26 +10,32 @@
     [JsonObject(MemberSerialization.OptIn)]
     public class CheckConfiguration
     {
-        [JsonProperty("label")]
+        [JsonProperty("label", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _label;
 
         [JsonProperty("type")]
         private CheckTypeId _type;
 
-        [JsonProperty("details")]
+        [JsonProperty("details", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private JObject _details;
 
-        [JsonProperty("monitoring_zones_poll")]
+        [JsonProperty("monitoring_zones_poll", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private MonitoringZoneId[] _monitoringZonesPoll;
 
-        [JsonProperty("timeout")]
+        [JsonProperty("timeout", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? _timeout;
 
-        [JsonProperty("period")]
+        [JsonProperty("period", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? _period;
 
-        [JsonProperty("target_alias")]
+        [JsonProperty("target_alias", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _targetAlias;
+
+        [JsonProperty("target_hostname", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private string _targetHostname;
+
+        [JsonProperty("target_resolver", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private TargetResolverType _resolverType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckConfiguration"/> class
@@ -40,7 +46,7 @@
         {
         }
 
-        public CheckConfiguration(string label, CheckTypeId checkTypeId, CheckDetails details, IEnumerable<MonitoringZoneId> monitoringZonesPoll, TimeSpan? timeout, int? period, string targetAlias)
+        public CheckConfiguration(string label, CheckTypeId checkTypeId, CheckDetails details, IEnumerable<MonitoringZoneId> monitoringZonesPoll, TimeSpan? timeout, TimeSpan? period, string targetAlias, string targetHostname, TargetResolverType resolverType)
         {
             if (label == null)
                 throw new ArgumentNullException("label");
@@ -58,8 +64,10 @@
             _details = JObject.FromObject(details);
             _monitoringZonesPoll = monitoringZonesPoll != null ? monitoringZonesPoll.ToArray() : null;
             _timeout = timeout.HasValue ? (int?)timeout.Value.TotalSeconds : null;
-            _period = period;
+            _period = period.HasValue ? (int?)period.Value.TotalSeconds : null;
             _targetAlias = targetAlias;
+            _targetHostname = targetHostname;
+            _resolverType = resolverType;
         }
 
         public string Label
@@ -89,6 +97,10 @@
             }
         }
 
+        /// <summary>
+        /// Gets a collection of <see cref="MonitoringZoneId"/> objects identifying the monitoring
+        /// zones to poll from.
+        /// </summary>
         public ReadOnlyCollection<MonitoringZoneId> MonitoringZonesPoll
         {
             get
@@ -127,6 +139,22 @@
             get
             {
                 return _targetAlias;
+            }
+        }
+
+        public string TargetHostname
+        {
+            get
+            {
+                return _targetHostname;
+            }
+        }
+
+        public TargetResolverType ResolverType
+        {
+            get
+            {
+                return _resolverType;
             }
         }
     }

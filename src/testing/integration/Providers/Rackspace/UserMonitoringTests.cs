@@ -16,6 +16,8 @@
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using net.openstack.Providers.Rackspace.Objects.Monitoring;
     using Newtonsoft.Json;
+    using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
+    using System.Collections.ObjectModel;
 
     [TestClass]
     public class UserMonitoringTests
@@ -344,7 +346,56 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestCreateCheck()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                MonitoringZone[] monitoringZones = ListAllMonitoringZones(provider, null, cancellationTokenSource.Token).ToArray();
+                MonitoringZone zone = monitoringZones.FirstOrDefault(x => x.Label.IndexOf("DFW", StringComparison.OrdinalIgnoreCase) >= 0);
+                zone = zone ?? monitoringZones.First();
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = new[] { zone.Id };
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkId);
+
+                Entity entity = await provider.GetEntityAsync(entityId, cancellationTokenSource.Token);
+                Assert.IsNotNull(entity);
+                Assert.AreEqual(entityId, entity.Id);
+                Assert.AreEqual(entityName, entity.Label);
+
+                Check check = await provider.GetCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+                Assert.IsNotNull(check);
+                Assert.AreEqual(checkId, check.Id);
+                Assert.AreEqual(checkLabel, check.Label);
+                Assert.AreEqual(checkTypeId, check.CheckTypeId);
+                Assert.IsInstanceOfType(check.Details, typeof(HttpCheckDetails));
+
+                await provider.RemoveCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -352,7 +403,59 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestTestCheck()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
+                Assert.AreEqual(1, monitoringZones.Count);
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+
+                CheckData[] checkData = await provider.TestCheckAsync(entityId, checkConfiguration, null, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkData);
+                Assert.IsTrue(checkData.Length > 0);
+                foreach (CheckData data in checkData)
+                {
+                    Assert.AreEqual(true, data.Available);
+                    Assert.AreEqual(monitoringZones[0].Id, data.MonitoringZoneId);
+                    Assert.IsTrue(data.Timestamp >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
+                    Assert.IsTrue(data.Timestamp <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
+                    foreach (KeyValuePair<string, CheckData.CheckMetric> checkMetric in data.Metrics)
+                    {
+                        Assert.IsNotNull(checkMetric.Key);
+                        Assert.IsFalse(string.IsNullOrEmpty(checkMetric.Key));
+                        Assert.IsNotNull(checkMetric.Value);
+                        Assert.IsNotNull(checkMetric.Value.Data);
+                        Assert.IsNotNull(checkMetric.Value.Type);
+                        Assert.IsNotNull(checkMetric.Value.Unit);
+                    }
+                }
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -360,7 +463,63 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestTestExistingCheck()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
+                Assert.AreEqual(1, monitoringZones.Count);
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkId);
+
+                CheckData[] checkData = await provider.TestExistingCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkData);
+                Assert.IsTrue(checkData.Length > 0);
+                foreach (CheckData data in checkData)
+                {
+                    Assert.AreEqual(true, data.Available);
+                    Assert.AreEqual(monitoringZones[0].Id, data.MonitoringZoneId);
+                    Assert.IsTrue(data.Timestamp >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
+                    Assert.IsTrue(data.Timestamp <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
+                    foreach (KeyValuePair<string, CheckData.CheckMetric> checkMetric in data.Metrics)
+                    {
+                        Assert.IsNotNull(checkMetric.Key);
+                        Assert.IsFalse(string.IsNullOrEmpty(checkMetric.Key));
+                        Assert.IsNotNull(checkMetric.Value);
+                        Assert.IsNotNull(checkMetric.Value.Data);
+                        Assert.IsNotNull(checkMetric.Value.Type);
+                        Assert.IsNotNull(checkMetric.Value.Unit);
+                    }
+                }
+
+                await provider.RemoveCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -374,23 +533,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Monitoring)]
-        public async Task TestGetCheck()
-        {
-            Assert.Inconclusive("Not yet implemented.");
-        }
-
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
         public async Task TestUpdateCheck()
-        {
-            Assert.Inconclusive("Not yet implemented.");
-        }
-
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
-        public async Task TestRemoveCheck()
         {
             Assert.Inconclusive("Not yet implemented.");
         }
@@ -457,7 +600,54 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestListMetrics()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
+                Assert.AreEqual(1, monitoringZones.Count);
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkId);
+
+                CheckData[] checkData = await provider.TestExistingCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+
+                Metric[] metrics = ListAllMetrics(provider, entityId, checkId, null, cancellationTokenSource.Token).ToArray();
+                if (metrics.Length == 0)
+                    Assert.Inconclusive("The service did not report any metrics.");
+
+                foreach (Metric metric in metrics)
+                {
+                    Console.WriteLine("Metric '{0}'", metric.Name);
+                }
+
+                await provider.RemoveCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -465,7 +655,56 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetDataPoints()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
+                Assert.AreEqual(1, monitoringZones.Count);
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkId);
+
+                CheckData[] checkData = await provider.TestExistingCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+
+                Metric[] metrics = ListAllMetrics(provider, entityId, checkId, null, cancellationTokenSource.Token).ToArray();
+                if (metrics.Length == 0)
+                    Assert.Inconclusive("The service did not report any metrics.");
+
+                foreach (Metric metric in metrics)
+                {
+                    //await provider.GetDataPointsAsync(entityId, checkId, metric.Name, points, resolution, select, cancellationTokenSource.Token);
+                    //Console.WriteLine("Metric '{0}'", metric.Name);
+                    throw new NotImplementedException();
+                }
+
+                await provider.RemoveCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -473,7 +712,66 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestCreateAlarm()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
+
+                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
+                Assert.AreEqual(1, monitoringZones.Count);
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkId);
+
+                string notificationPlanLabel = CreateRandomNotificationPlanName();
+                NotificationPlanConfiguration notificationPlanConfiguration = new NotificationPlanConfiguration(notificationPlanLabel);
+                NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(notificationPlanConfiguration, cancellationTokenSource.Token);
+
+                string alarmName = CreateRandomAlarmName();
+                string criteria = null;
+                bool? enabled = null;
+                IDictionary<string, string> metadata = null;
+                AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, metadata);
+                AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
+
+                Alarm alarm = await provider.GetAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
+                Assert.IsNotNull(alarm);
+                Assert.AreEqual(alarmId, alarm.Id);
+                Assert.AreEqual(notificationPlanId, alarm.NotificationPlanId);
+                Assert.AreEqual(alarmName, alarm.Label);
+                Assert.AreEqual(true, alarm.Enabled);
+                Assert.AreEqual(checkId, alarm.CheckId);
+
+                await provider.RemoveAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
+
+                await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+
+                await provider.RemoveCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -489,15 +787,91 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestListAlarms()
         {
-            Assert.Inconclusive("Not yet implemented.");
-        }
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
-        public async Task TestGetAlarm()
-        {
-            Assert.Inconclusive("Not yet implemented.");
+                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
+                Assert.AreEqual(1, monitoringZones.Count);
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkId);
+
+                string notificationPlanLabel = CreateRandomNotificationPlanName();
+                NotificationPlanConfiguration notificationPlanConfiguration = new NotificationPlanConfiguration(notificationPlanLabel);
+                NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(notificationPlanConfiguration, cancellationTokenSource.Token);
+
+                string[] alarmNames = { CreateRandomAlarmName(), CreateRandomAlarmName(), CreateRandomAlarmName() };
+                string criteria = null;
+                bool? enabled = null;
+                IDictionary<string, string> metadata = null;
+
+                List<AlarmId> alarmIds = new List<AlarmId>();
+                foreach (string alarmName in alarmNames)
+                {
+                    AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, metadata);
+                    AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
+                    alarmIds.Add(alarmId);
+                }
+
+                Alarm[] alarms = await ListAllAlarmsAsync(provider, entityId, null, cancellationTokenSource.Token);
+                Assert.IsTrue(alarms.Length >= 3);
+                foreach (string alarmName in alarmNames)
+                {
+                    Alarm alarm = alarms.Single(i => i.Label.Equals(alarmName));
+                    Assert.IsTrue(alarm.Created >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
+                    Assert.IsTrue(alarm.Created <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
+                    Assert.IsTrue(alarm.LastModified >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
+                    Assert.IsTrue(alarm.LastModified <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
+                    Assert.AreEqual(notificationPlanId, alarm.NotificationPlanId);
+                    Assert.AreEqual(true, alarm.Enabled);
+                    Assert.AreEqual(checkId, alarm.CheckId);
+
+                    Alarm singleAlarm = await provider.GetAlarmAsync(entityId, alarm.Id, cancellationTokenSource.Token);
+                    Assert.IsNotNull(singleAlarm);
+                    Assert.AreEqual(alarmName, singleAlarm.Label);
+                    Assert.AreEqual(alarm.CheckId, singleAlarm.CheckId);
+                    Assert.AreEqual(alarm.Created, singleAlarm.Created);
+                    Assert.AreEqual(alarm.Criteria, singleAlarm.Criteria);
+                    Assert.AreEqual(alarm.Enabled, singleAlarm.Enabled);
+                    Assert.AreEqual(alarm.Id, singleAlarm.Id);
+                    Assert.AreEqual(alarm.Label, singleAlarm.Label);
+                    Assert.IsTrue(alarm.LastModified <= singleAlarm.LastModified);
+                    Assert.AreEqual(alarm.NotificationPlanId, singleAlarm.NotificationPlanId);
+                }
+
+                foreach (AlarmId alarmId in alarmIds)
+                    await provider.RemoveAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
+
+                await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+
+                await provider.RemoveCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -505,15 +879,78 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestUpdateAlarm()
         {
-            Assert.Inconclusive("Not yet implemented.");
-        }
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                string entityName = CreateRandomEntityName();
+                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
+                Assert.IsNotNull(entityId);
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
-        public async Task TestRemoveAlarm()
-        {
-            Assert.Inconclusive("Not yet implemented.");
+                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
+                Assert.AreEqual(1, monitoringZones.Count);
+
+                string checkLabel = CreateRandomCheckName();
+                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
+                CheckDetails details = new HttpCheckDetails(
+                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
+                    authUser: default(string),
+                    authPassword: default(string),
+                    body: default(string),
+                    bodyMatches: default(object),
+                    followRedirects: default(bool?),
+                    headers: default(IDictionary<string, string>),
+                    method: default(HttpMethod?),
+                    payload: default(string));
+                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
+                TimeSpan? timeout = null;
+                TimeSpan? period = null;
+                string targetAlias = null;
+                string targetHostname = "docs.rackspace.com";
+                TargetResolverType resolverType = TargetResolverType.IPv4;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
+                Assert.IsNotNull(checkId);
+
+                string notificationPlanLabel = CreateRandomNotificationPlanName();
+                NotificationPlanConfiguration notificationPlanConfiguration = new NotificationPlanConfiguration(notificationPlanLabel);
+                NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(notificationPlanConfiguration, cancellationTokenSource.Token);
+
+                string alarmName = CreateRandomAlarmName();
+                string criteria = null;
+                bool? enabled = null;
+                IDictionary<string, string> metadata = null;
+                AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, metadata);
+                AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
+
+                Alarm alarm = await provider.GetAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
+                Assert.IsNotNull(alarm);
+                Assert.AreEqual(alarmId, alarm.Id);
+                Assert.AreEqual(notificationPlanId, alarm.NotificationPlanId);
+                Assert.AreEqual(alarmName, alarm.Label);
+                Assert.AreEqual(true, alarm.Enabled);
+                Assert.AreEqual(checkId, alarm.CheckId);
+
+                string updatedAlarmName = CreateRandomAlarmName();
+                UpdateAlarmConfiguration updateAlarmConfiguration = new UpdateAlarmConfiguration(label: updatedAlarmName);
+                await provider.UpdateAlarmAsync(entityId, alarmId, updateAlarmConfiguration, cancellationTokenSource.Token);
+
+                Alarm updatedAlarm = await provider.GetAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
+                Assert.IsNotNull(updatedAlarm);
+                Assert.AreEqual(alarmId, updatedAlarm.Id);
+                Assert.AreEqual(notificationPlanId, updatedAlarm.NotificationPlanId);
+                Assert.AreEqual(updatedAlarmName, updatedAlarm.Label);
+                Assert.AreEqual(true, updatedAlarm.Enabled);
+                Assert.AreEqual(checkId, updatedAlarm.CheckId);
+
+                await provider.RemoveAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
+
+                await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
+
+                await provider.RemoveCheckAsync(entityId, checkId, cancellationTokenSource.Token);
+
+                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -1679,7 +2116,34 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetDiskInformation()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                List<Task<string>> tasks = new List<Task<string>>();
+                foreach (Agent agent in agents)
+                    tasks.Add(TestGetDiskInformation(provider, agent, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+                foreach (Task<string> task in tasks)
+                    Console.WriteLine(task.Result);
+            }
+        }
+
+        private async Task<string> TestGetDiskInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(string.Format("Disk information for agent {0}", agent.Id));
+            HostInformation<DiskInformation> information = await provider.GetDiskInformationAsync(agent.Id, cancellationToken);
+            Assert.IsNotNull(information);
+            foreach (DiskInformation diskInformation in information.Info)
+                builder.AppendLine(string.Format("    {0}", diskInformation.Name));
+
+            return builder.ToString();
         }
 
         [TestMethod]
@@ -1687,7 +2151,34 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetFilesystemInformation()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                List<Task<string>> tasks = new List<Task<string>>();
+                foreach (Agent agent in agents)
+                    tasks.Add(TestGetFilesystemInformation(provider, agent, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+                foreach (Task<string> task in tasks)
+                    Console.WriteLine(task.Result);
+            }
+        }
+
+        private async Task<string> TestGetFilesystemInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(string.Format("Filesystem information for agent {0}", agent.Id));
+            HostInformation<FilesystemInformation> information = await provider.GetFilesystemInformationAsync(agent.Id, cancellationToken);
+            Assert.IsNotNull(information);
+            foreach (FilesystemInformation filesystemInformation in information.Info)
+                builder.AppendLine(string.Format("    {0}", filesystemInformation));
+
+            return builder.ToString();
         }
 
         [TestMethod]
@@ -1695,7 +2186,34 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetMemoryInformation()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                List<Task<string>> tasks = new List<Task<string>>();
+                foreach (Agent agent in agents)
+                    tasks.Add(TestGetMemoryInformation(provider, agent, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+                foreach (Task<string> task in tasks)
+                    Console.WriteLine(task.Result);
+            }
+        }
+
+        private async Task<string> TestGetMemoryInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(string.Format("Memory information for agent {0}", agent.Id));
+            HostInformation<MemoryInformation> information = await provider.GetMemoryInformationAsync(agent.Id, cancellationToken);
+            Assert.IsNotNull(information);
+            foreach (MemoryInformation memoryInformation in information.Info)
+                builder.AppendLine(string.Format("    {0}", memoryInformation));
+
+            return builder.ToString();
         }
 
         [TestMethod]
@@ -1703,7 +2221,34 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetNetworkInterfaceInformation()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                List<Task<string>> tasks = new List<Task<string>>();
+                foreach (Agent agent in agents)
+                    tasks.Add(TestGetNetworkInterfaceInformation(provider, agent, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+                foreach (Task<string> task in tasks)
+                    Console.WriteLine(task.Result);
+            }
+        }
+
+        private async Task<string> TestGetNetworkInterfaceInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(string.Format("Network interface information for agent {0}", agent.Id));
+            HostInformation<NetworkInterfaceInformation> information = await provider.GetNetworkInterfaceInformationAsync(agent.Id, cancellationToken);
+            Assert.IsNotNull(information);
+            foreach (NetworkInterfaceInformation networkInterfaceInformation in information.Info)
+                builder.AppendLine(string.Format("    {0}", networkInterfaceInformation));
+
+            return builder.ToString();
         }
 
         [TestMethod]
@@ -1711,7 +2256,34 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetProcessInformation()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                List<Task<string>> tasks = new List<Task<string>>();
+                foreach (Agent agent in agents)
+                    tasks.Add(TestGetProcessInformation(provider, agent, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+                foreach (Task<string> task in tasks)
+                    Console.WriteLine(task.Result);
+            }
+        }
+
+        private async Task<string> TestGetProcessInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(string.Format("Process information for agent {0}", agent.Id));
+            HostInformation<ProcessInformation> information = await provider.GetProcessInformationAsync(agent.Id, cancellationToken);
+            Assert.IsNotNull(information);
+            foreach (ProcessInformation processInformation in information.Info)
+                builder.AppendLine(string.Format("    {0}", processInformation));
+
+            return builder.ToString();
         }
 
         [TestMethod]
@@ -1719,7 +2291,34 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetSystemInformation()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                List<Task<string>> tasks = new List<Task<string>>();
+                foreach (Agent agent in agents)
+                    tasks.Add(TestGetSystemInformation(provider, agent, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+                foreach (Task<string> task in tasks)
+                    Console.WriteLine(task.Result);
+            }
+        }
+
+        private async Task<string> TestGetSystemInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(string.Format("System information for agent {0}", agent.Id));
+            HostInformation<SystemInformation> information = await provider.GetSystemInformationAsync(agent.Id, cancellationToken);
+            Assert.IsNotNull(information);
+            foreach (SystemInformation systemInformation in information.Info)
+                builder.AppendLine(string.Format("    {0}", systemInformation.Name));
+
+            return builder.ToString();
         }
 
         [TestMethod]
@@ -1727,7 +2326,34 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetLoginInformation()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Agent[] agents = ListAllAgents(provider, null, cancellationTokenSource.Token).ToArray();
+                if (agents.Length == 0)
+                    Assert.Inconclusive("The service did not report any agents.");
+
+                List<Task<string>> tasks = new List<Task<string>>();
+                foreach (Agent agent in agents)
+                    tasks.Add(TestGetLoginInformation(provider, agent, cancellationTokenSource.Token));
+
+                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+
+                foreach (Task<string> task in tasks)
+                    Console.WriteLine(task.Result);
+            }
+        }
+
+        private async Task<string> TestGetLoginInformation(IMonitoringService provider, Agent agent, CancellationToken cancellationToken)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(string.Format("Login information for agent {0}", agent.Id));
+            HostInformation<LoginInformation> information = await provider.GetLoginInformationAsync(agent.Id, cancellationToken);
+            Assert.IsNotNull(information);
+            foreach (LoginInformation loginInformation in information.Info)
+                builder.AppendLine(string.Format("    {0}@{1}", loginInformation.User, loginInformation.Host));
+
+            return builder.ToString();
         }
 
         [TestMethod]
@@ -1752,25 +2378,25 @@
 
         private async Task TestListAgentCheckTargets(IMonitoringService provider, Entity entity, CancellationToken cancellationToken)
         {
-            AgentCheckType[] agentCheckTypes =
+            CheckTypeId[] agentCheckTypes =
                 {
-                    AgentCheckType.AgentFilesystem,
-                    AgentCheckType.AgentMemory,
-                    AgentCheckType.AgentLoadAverage,
-                    AgentCheckType.AgentCpu,
-                    AgentCheckType.AgentDisk,
-                    AgentCheckType.AgentNetwork,
-                    AgentCheckType.AgentPlugin,
+                    CheckTypeId.AgentFilesystem,
+                    CheckTypeId.AgentMemory,
+                    CheckTypeId.AgentLoadAverage,
+                    CheckTypeId.AgentCpu,
+                    CheckTypeId.AgentDisk,
+                    CheckTypeId.AgentNetwork,
+                    CheckTypeId.AgentPlugin,
                 };
 
             List<Task> tasks = new List<Task>();
-            foreach (AgentCheckType agentCheckType in agentCheckTypes)
+            foreach (CheckTypeId agentCheckType in agentCheckTypes)
                 tasks.Add(TestListAgentCheckTargets(provider, entity, agentCheckType, cancellationToken));
 
             await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
         }
 
-        private async Task TestListAgentCheckTargets(IMonitoringService provider, Entity entity, AgentCheckType agentCheckType, CancellationToken cancellationToken)
+        private async Task TestListAgentCheckTargets(IMonitoringService provider, Entity entity, CheckTypeId agentCheckType, CancellationToken cancellationToken)
         {
             string[] agentCheckTargets = await provider.ListAgentCheckTargetsAsync(entity.Id, agentCheckType, cancellationToken);
             Console.WriteLine("Agent check targets for entity '{0}' ({1}) with agent check type '{2}'", entity.Label, entity.Id, agentCheckType);
@@ -1981,6 +2607,23 @@
                 ReadOnlyCollectionPage<CheckType, CheckTypeId> page = service.ListCheckTypesAsync(marker, blockSize, cancellationToken).Result;
                 foreach (CheckType checkType in page)
                     yield return checkType;
+
+                marker = page.NextMarker;
+            } while (marker != null);
+        }
+
+        protected static IEnumerable<Metric> ListAllMetrics(IMonitoringService service, EntityId entityId, CheckId checkId, int? blockSize, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            MetricName marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<Metric, MetricName> page = service.ListMetricsAsync(entityId, checkId, marker, blockSize, cancellationToken).Result;
+                foreach (Metric metric in page)
+                    yield return metric;
 
                 marker = page.NextMarker;
             } while (marker != null);

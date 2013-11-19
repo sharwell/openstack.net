@@ -341,7 +341,6 @@
     <Compile Include="Providers\Rackspace\Objects\Mapping\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AccountConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\Agent.cs" />
-    <Compile Include="Providers\Rackspace\Objects\Monitoring\AgentCheckType.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AgentConnection.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AgentConnectionId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AgentId.cs" />

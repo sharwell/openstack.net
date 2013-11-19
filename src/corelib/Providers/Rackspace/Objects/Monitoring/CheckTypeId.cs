@@ -28,6 +28,14 @@
         private static readonly CheckTypeId _remoteTcp = new CheckTypeId("remote.tcp");
         private static readonly CheckTypeId _remoteTelnetBanner = new CheckTypeId("remote.telnet-banner");
 
+        private static readonly CheckTypeId _agentFilesystem = new CheckTypeId("agent.filesystem");
+        private static readonly CheckTypeId _agentMemory = new CheckTypeId("agent.memory");
+        private static readonly CheckTypeId _agentLoadAverage = new CheckTypeId("agent.load_average");
+        private static readonly CheckTypeId _agentCpu = new CheckTypeId("agent.cpu");
+        private static readonly CheckTypeId _agentDisk = new CheckTypeId("agent.disk");
+        private static readonly CheckTypeId _agentNetwork = new CheckTypeId("agent.network");
+        private static readonly CheckTypeId _agentPlugin = new CheckTypeId("agent.plugin");
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckTypeId"/> class
         /// with the specified identifier value.
@@ -149,6 +157,78 @@
             get
             {
                 return _remoteTelnetBanner;
+            }
+        }
+
+        public static CheckTypeId AgentFilesystem
+        {
+            get
+            {
+                return _agentFilesystem;
+            }
+        }
+
+        public static CheckTypeId AgentMemory
+        {
+            get
+            {
+                return _agentMemory;
+            }
+        }
+
+        public static CheckTypeId AgentLoadAverage
+        {
+            get
+            {
+                return _agentLoadAverage;
+            }
+        }
+
+        public static CheckTypeId AgentCpu
+        {
+            get
+            {
+                return _agentCpu;
+            }
+        }
+
+        public static CheckTypeId AgentDisk
+        {
+            get
+            {
+                return _agentDisk;
+            }
+        }
+
+        public static CheckTypeId AgentNetwork
+        {
+            get
+            {
+                return _agentNetwork;
+            }
+        }
+
+        public static CheckTypeId AgentPlugin
+        {
+            get
+            {
+                return _agentPlugin;
+            }
+        }
+
+        public bool IsAgent
+        {
+            get
+            {
+                return Value.StartsWith("agent.", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        public bool IsRemote
+        {
+            get
+            {
+                return Value.StartsWith("remote.", StringComparison.OrdinalIgnoreCase);
             }
         }
 

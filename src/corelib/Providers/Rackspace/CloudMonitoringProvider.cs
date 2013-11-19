@@ -1884,12 +1884,14 @@
         }
 
         /// <inheritdoc/>
-        public Task<string[]> ListAgentCheckTargetsAsync(EntityId entityId, AgentCheckType agentCheckType, CancellationToken cancellationToken)
+        public Task<string[]> ListAgentCheckTargetsAsync(EntityId entityId, CheckTypeId agentCheckType, CancellationToken cancellationToken)
         {
             if (entityId == null)
                 throw new ArgumentNullException("entityId");
             if (agentCheckType == null)
                 throw new ArgumentNullException("agentCheckType");
+            if (!agentCheckType.IsAgent)
+                throw new ArgumentException(string.Format("The specified check type '{0}' is not an agent check.", agentCheckType), "agentCheckType");
 
             UriTemplate template = new UriTemplate("/entities/{entityId}/agent/check_types/{agentCheckType}/targets");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "agentCheckType", agentCheckType.ToString() } };

@@ -1,5 +1,6 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
+    using System;
     using System.Collections.Generic;
     using net.openstack.Core.Collections;
     using Newtonsoft.Json;
@@ -34,8 +35,13 @@
         {
         }
 
-        public AlarmConfiguration(CheckId checkId, NotificationPlanId notificationPlanId, string criteria, bool? enabled, string label, IDictionary<string, string> metadata)
+        public AlarmConfiguration(CheckId checkId, NotificationPlanId notificationPlanId, string criteria = null, bool? enabled = null, string label = null, IDictionary<string, string> metadata = null)
         {
+            if (checkId == null)
+                throw new ArgumentNullException("checkId");
+            if (notificationPlanId == null)
+                throw new ArgumentNullException("notificationPlanId");
+
             _checkId = checkId;
             _notificationPlanId = notificationPlanId;
             _criteria = criteria;

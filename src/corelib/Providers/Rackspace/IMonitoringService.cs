@@ -252,7 +252,7 @@
 
         #region Agent Targets
 
-        Task<string[]> ListAgentCheckTargetsAsync(EntityId entityId, AgentCheckType agentCheckType, CancellationToken cancellationToken);
+        Task<string[]> ListAgentCheckTargetsAsync(EntityId entityId, CheckTypeId agentCheckType, CancellationToken cancellationToken);
 
         #endregion Agent Targets
 
