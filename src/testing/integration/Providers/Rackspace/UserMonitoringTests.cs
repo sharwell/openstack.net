@@ -1810,7 +1810,31 @@
         [TestCategory(TestCategories.Monitoring)]
         public async Task TestGetOverviewWithEntityFilter()
         {
-            Assert.Inconclusive("Not yet implemented.");
+            IMonitoringService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                Entity[] entities = await ListAllEntitiesAsync(provider, null, cancellationTokenSource.Token);
+                if (entities.Length == 0)
+                    Assert.Inconclusive("The service did not report any entities");
+
+                Entity[] filteredEntities = entities.Skip(Math.Min(4, entities.Length - 1)).Take(3).ToArray();
+                Console.WriteLine("Filtering result to the following {0} entities:", filteredEntities.Length);
+                foreach (Entity entity in filteredEntities)
+                    Console.WriteLine("    {0} ({1})", entity.Label, entity.Id);
+
+                EntityOverview[] entityOverviews = await ListAllOverviewViewsAsync(provider, null, filteredEntities.Select(i => i.Id), cancellationTokenSource.Token);
+                if (entityOverviews.Length == 0)
+                    Assert.Inconclusive("The service did not report any overview views.");
+
+                Console.WriteLine();
+                Console.WriteLine("Results:");
+                foreach (EntityOverview entity in entityOverviews)
+                {
+                    Assert.IsNotNull(entity);
+                    Assert.AreEqual(1, filteredEntities.Count(i => i.Id == entity.Entity.Id));
+                    Console.WriteLine("    Entity {0} ({1})", entity.Entity.Label, entity.Entity.Id);
+                }
+            }
         }
 
         [TestMethod]
@@ -2662,6 +2686,41 @@
             do
             {
                 ReadOnlyCollectionPage<EntityOverview, EntityId> page = await service.GetOverviewViewAsync(marker, blockSize, cancellationToken);
+                result.AddRange(page);
+                marker = page.NextMarker;
+            } while (marker != null);
+
+            return result.ToArray();
+        }
+
+        protected static IEnumerable<EntityOverview> ListAllOverviewViews(IMonitoringService service, int? blockSize, IEnumerable<EntityId> entityIdFilter, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            EntityId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<EntityOverview, EntityId> page = service.GetOverviewViewAsync(marker, blockSize, entityIdFilter, cancellationToken).Result;
+                foreach (EntityOverview entityOverview in page)
+                    yield return entityOverview;
+
+                marker = page.NextMarker;
+            } while (marker != null);
+        }
+
+        protected static async Task<EntityOverview[]> ListAllOverviewViewsAsync(IMonitoringService service, int? blockSize, IEnumerable<EntityId> entityIdFilter, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            List<EntityOverview> result = new List<EntityOverview>();
+            EntityId marker = null;
+
+            do
+            {
+                ReadOnlyCollectionPage<EntityOverview, EntityId> page = await service.GetOverviewViewAsync(marker, blockSize, entityIdFilter, cancellationToken);
                 result.AddRange(page);
                 marker = page.NextMarker;
             } while (marker != null);

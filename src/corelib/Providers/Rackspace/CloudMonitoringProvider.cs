@@ -1416,7 +1416,7 @@
                 {
                     UriBuilder builder = new UriBuilder(uri);
                     if (builder.Query != null && entityIdFilter != null)
-                        builder.Query = builder.Query.Replace("ENTITYID=entityIdFilter", string.Join("&", entityIdFilter.Select(i => "ENTITYID=" + i.Value).ToArray()));
+                        builder.Query = builder.Query.Substring(1).Replace("ENTITYID=entityIdFilter", string.Join("&", entityIdFilter.Select(i => "entityId=" + i.Value).ToArray()));
 
                     return builder.Uri;
                 };
