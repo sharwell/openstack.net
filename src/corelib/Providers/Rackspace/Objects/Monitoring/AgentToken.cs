@@ -1,15 +1,14 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using Newtonsoft.Json;
 
     /// <summary>
     /// Agent tokens are used to authenticate monitoring agents to the monitoring
     /// service. Multiple agents can share a single token.
     /// </summary>
+    /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html">Agent Token (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class AgentToken : AgentTokenConfiguration
     {
@@ -36,6 +35,9 @@
         {
         }
 
+        /// <summary>
+        /// Gets the unique identifier of the agent token.
+        /// </summary>
         public AgentTokenId Id
         {
             get

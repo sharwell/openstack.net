@@ -7,45 +7,87 @@
     public class CpuInformation
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
+        /// <summary>
+        /// This is the backing field for the <see cref="Name"/> property.
+        /// </summary>
         [JsonProperty("name")]
         private string _name;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Vendor"/> property.
+        /// </summary>
         [JsonProperty("vendor")]
         private string _vendor;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Model"/> property.
+        /// </summary>
         [JsonProperty("model")]
         private string _model;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Frequency"/> property.
+        /// </summary>
         [JsonProperty("mhz")]
         private int? _mhz;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Idle"/> property.
+        /// </summary>
         [JsonProperty("idle")]
         private long? _idle;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="HardInterrupt"/> property.
+        /// </summary>
         [JsonProperty("irq")]
         private long? _irq;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="SoftInterrupt"/> property.
+        /// </summary>
         [JsonProperty("soft_irq")]
         private long? _softIrq;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Nice"/> property.
+        /// </summary>
         [JsonProperty("nice")]
         private long? _nice;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="System"/> property.
+        /// </summary>
         [JsonProperty("sys")]
         private long? _sys;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="User"/> property.
+        /// </summary>
         [JsonProperty("user")]
         private long? _user;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Wait"/> property.
+        /// </summary>
         [JsonProperty("wait")]
         private long? _wait;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Total"/> property.
+        /// </summary>
         [JsonProperty("total")]
         private long? _total;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="TotalCores"/> property.
+        /// </summary>
         [JsonProperty("total_cores")]
         private int? _totalCores;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="TotalSockets"/> property.
+        /// </summary>
         [JsonProperty("total_sockets")]
         private int? _totalSockets;
 #pragma warning restore 649

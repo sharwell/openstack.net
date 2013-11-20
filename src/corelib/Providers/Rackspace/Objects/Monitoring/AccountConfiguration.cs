@@ -9,6 +9,9 @@
     /// This class models the JSON representation of the configurable properties of a monitoring account.
     /// </summary>
     /// <seealso cref="IMonitoringService.UpdateAccountAsync"/>
+    /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html">Account (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class AccountConfiguration
     {
@@ -33,6 +36,13 @@
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountConfiguration"/> class
+        /// with the specified metadata.
+        /// </summary>
+        /// <param name="metadata">The metadata to associate with the monitoring account.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="metadata"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="metadata"/> contains any <c>null</c> or empty keys.</exception>
         public AccountConfiguration(IDictionary<string, string> metadata)
         {
             if (metadata == null)
@@ -43,6 +53,12 @@
             _metadata = new Dictionary<string,string>(metadata);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountConfiguration"/> class
+        /// with the specified webhook token.
+        /// </summary>
+        /// <param name="webhookToken">The webhook token to associate with the account.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="webhookToken"/> is <c>null</c>.</exception>
         public AccountConfiguration(WebhookToken webhookToken)
         {
             if (webhookToken == null)
@@ -51,6 +67,13 @@
             _webhookToken = webhookToken;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountConfiguration"/> class
+        /// with the specified metadata and webhook token.
+        /// </summary>
+        /// <param name="metadata">The metadata to associate with the monitoring account. If this value is <c>null</c>, the metadata associated with the account is not changed.</param>
+        /// <param name="webhookToken">The webhook token to associate with the account. If this value is <c>null</c>, the webhook token associated with the account is not changed.</param>
+        /// <exception cref="ArgumentException">If <paramref name="metadata"/> contains any <c>null</c> or empty keys.</exception>
         public AccountConfiguration(IDictionary<string, string> metadata, WebhookToken webhookToken)
         {
             if (metadata != null)
@@ -64,6 +87,9 @@
             _webhookToken = webhookToken;
         }
 
+        /// <summary>
+        /// Gets the collection of metadata associated with the monitoring account.
+        /// </summary>
         public ReadOnlyDictionary<string, string> Metadata
         {
             get
@@ -72,6 +98,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the webhook token associated with the monitoring account.
+        /// </summary>
         public WebhookToken WebhookToken
         {
             get

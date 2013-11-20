@@ -3251,7 +3251,7 @@
                     Console.Error.WriteLine("{0} (Result {1}) {2}", DateTime.Now, e.Response.StatusCode, e.Response.ResponseUri);
                 };
 
-            //provider.ConnectionLimit = 8;
+            provider.ConnectionLimit = 20;
             return provider;
         }
 

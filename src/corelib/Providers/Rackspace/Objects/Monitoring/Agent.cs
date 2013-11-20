@@ -3,6 +3,12 @@
     using System;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of a monitoring agent.
+    /// </summary>
+    /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html">Agents (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class Agent
     {

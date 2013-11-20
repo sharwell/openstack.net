@@ -24,10 +24,10 @@
         private string _status;
 
         [JsonProperty("state")]
-        private string _state;
+        private AlarmState _state;
 
         [JsonProperty("previous_state")]
-        private string _previousState;
+        private AlarmState _previousState;
 
         [JsonProperty("notification_results")]
         private NotificationResult[] _results;
@@ -82,8 +82,7 @@
             }
         }
 
-#warning this should be an extensible enumeration
-        public string State
+        public AlarmState State
         {
             get
             {
@@ -91,8 +90,7 @@
             }
         }
 
-#warning this should be an extensible enumeration
-        public string PreviousState
+        public AlarmState PreviousState
         {
             get
             {
