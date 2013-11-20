@@ -123,7 +123,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/audits?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("/audits?marker={marker}&limit={limit}&from={from}&to={to}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -1027,7 +1027,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId>> ListAlarmNotificationHistoryAsync(EntityId entityId, AlarmId alarmId, CheckId checkId, AlarmNotificationHistoryItemId marker, int? limit, CancellationToken cancellationToken)
+        public Task<ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId>> ListAlarmNotificationHistoryAsync(EntityId entityId, AlarmId alarmId, CheckId checkId, AlarmNotificationHistoryItemId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken)
         {
             if (entityId == null)
                 throw new ArgumentNullException("entityId");
@@ -1038,12 +1038,16 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/alarms/{alarmId}/notification_history/{checkId}?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("/entities/{entityId}/alarms/{alarmId}/notification_history/{checkId}?marker={marker}&limit={limit}&from={from}&to={to}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "alarmId", alarmId.Value }, { "checkId", checkId.Value } };
             if (marker != null)
                 parameters.Add("marker", marker.Value);
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
+            if (from != null)
+                parameters.Add("from", from.Value.ToTimestamp().ToString());
+            if (to != null)
+                parameters.Add("to", to.Value.ToTimestamp().ToString());
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
@@ -1339,18 +1343,18 @@
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> ListAlarmChangelogsAsync(AlarmChangelogId marker, int? limit, CancellationToken cancellationToken)
+        public Task<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> ListAlarmChangelogsAsync(AlarmChangelogId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken)
         {
-            return ListAlarmChangelogsAsync(null, marker, limit, cancellationToken);
+            return ListAlarmChangelogsAsync(null, marker, limit, from, to, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> ListAlarmChangelogsAsync(EntityId entityId, AlarmChangelogId marker, int? limit, CancellationToken cancellationToken)
+        public Task<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> ListAlarmChangelogsAsync(EntityId entityId, AlarmChangelogId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken)
         {
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/changelogs/alarms?entityId={entityId}&marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("/changelogs/alarms?entityId={entityId}&marker={marker}&limit={limit}&from={from}&to={to}");
             var parameters = new Dictionary<string, string>();
             if (entityId != null)
                 parameters.Add("entityId", entityId.Value);
@@ -1358,6 +1362,10 @@
                 parameters.Add("marker", marker.Value);
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
+            if (from != null)
+                parameters.Add("from", from.Value.ToTimestamp().ToString());
+            if (to != null)
+                parameters.Add("to", to.Value.ToTimestamp().ToString());
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);

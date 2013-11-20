@@ -1411,7 +1411,7 @@
                     {
                         foreach (CheckId checkId in await provider.DiscoverAlarmNotificationHistoryAsync(entity.Id, alarm.Id, cancellationTokenSource.Token))
                         {
-                            AlarmNotificationHistoryItem[] alarmNotificationHistory = await ListAllAlarmNotificationHistoryAsync(provider, entity.Id, alarm.Id, checkId, null, cancellationTokenSource.Token);
+                            AlarmNotificationHistoryItem[] alarmNotificationHistory = await ListAllAlarmNotificationHistoryAsync(provider, entity.Id, alarm.Id, checkId, null, null, null, cancellationTokenSource.Token);
                             foundHistoryItem |= alarmNotificationHistory.Any();
                             foreach (AlarmNotificationHistoryItem item in alarmNotificationHistory)
                                 Console.WriteLine("Alarm notification history item '{0}'", item.Id);
@@ -1439,7 +1439,7 @@
                     {
                         foreach (CheckId checkId in await provider.DiscoverAlarmNotificationHistoryAsync(entity.Id, alarm.Id, cancellationTokenSource.Token))
                         {
-                            AlarmNotificationHistoryItem[] alarmNotificationHistory = await ListAllAlarmNotificationHistoryAsync(provider, entity.Id, alarm.Id, checkId, null, cancellationTokenSource.Token);
+                            AlarmNotificationHistoryItem[] alarmNotificationHistory = await ListAllAlarmNotificationHistoryAsync(provider, entity.Id, alarm.Id, checkId, null, null, null, cancellationTokenSource.Token);
                             foundHistoryItem |= alarmNotificationHistory.Any();
                             foreach (AlarmNotificationHistoryItem item in alarmNotificationHistory)
                             {
@@ -1540,7 +1540,7 @@
         private async Task<bool> TestGetAlarmNotificationHistory(IMonitoringService provider, Entity entity, Alarm alarm, CheckId checkId, CancellationToken cancellationToken)
         {
             List<Task<bool>> tasks = new List<Task<bool>>();
-            AlarmNotificationHistoryItem[] alarmNotificationHistory = await ListAllAlarmNotificationHistoryAsync(provider, entity.Id, alarm.Id, checkId, null, cancellationToken);
+            AlarmNotificationHistoryItem[] alarmNotificationHistory = await ListAllAlarmNotificationHistoryAsync(provider, entity.Id, alarm.Id, checkId, null, null, null, cancellationToken);
             foreach (AlarmNotificationHistoryItem item in alarmNotificationHistory)
             {
                 tasks.Add(TestGetAlarmNotificationHistory(provider, entity, alarm, checkId, item, cancellationToken));
@@ -1941,7 +1941,7 @@
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
-                AlarmChangelog[] alarmChangelogs = await ListAllAlarmChangelogsAsync(provider, null, cancellationTokenSource.Token);
+                AlarmChangelog[] alarmChangelogs = await ListAllAlarmChangelogsAsync(provider, null, null, null, cancellationTokenSource.Token);
                 if (alarmChangelogs.Length == 0)
                     Assert.Inconclusive("The service did not report any alarm changelogs.");
 
@@ -1958,7 +1958,7 @@
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
-                AlarmChangelog[] alarmChangelogs = await ListAllAlarmChangelogsAsync(provider, null, cancellationTokenSource.Token);
+                AlarmChangelog[] alarmChangelogs = await ListAllAlarmChangelogsAsync(provider, null, null, null, cancellationTokenSource.Token);
                 if (alarmChangelogs.Length == 0)
                     Assert.Inconclusive("The service did not report any alarm changelogs.");
 
@@ -1966,7 +1966,7 @@
                 foreach (IGrouping<EntityId, AlarmChangelog> group in lookup)
                 {
                     AlarmChangelog[] groupAlarmChangelogs = group.ToArray();
-                    AlarmChangelog[] entityAlarmChangelogs = await ListAllAlarmChangelogsAsync(provider, group.Key, null, cancellationTokenSource.Token);
+                    AlarmChangelog[] entityAlarmChangelogs = await ListAllAlarmChangelogsAsync(provider, group.Key, null, null, null, cancellationTokenSource.Token);
                     Assert.AreEqual(groupAlarmChangelogs.Length, entityAlarmChangelogs.Length);
                 }
             }
@@ -2748,7 +2748,7 @@
                 Console.WriteLine("    {0}: {1}", agentCheckTarget.Id, agentCheckTarget.Label);
         }
 
-        protected static async Task<AlarmChangelog[]> ListAllAlarmChangelogsAsync(IMonitoringService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> progress = null)
+        protected static async Task<AlarmChangelog[]> ListAllAlarmChangelogsAsync(IMonitoringService service, int? blockSize, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -2758,7 +2758,7 @@
 
             do
             {
-                ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId> page = await service.ListAlarmChangelogsAsync(marker, blockSize, cancellationToken);
+                ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId> page = await service.ListAlarmChangelogsAsync(marker, blockSize, from, to, cancellationToken);
                 if (progress != null)
                     progress.Report(page);
 
@@ -2769,7 +2769,7 @@
             return result.ToArray();
         }
 
-        protected static async Task<AlarmChangelog[]> ListAllAlarmChangelogsAsync(IMonitoringService service, EntityId entityId, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> progress = null)
+        protected static async Task<AlarmChangelog[]> ListAllAlarmChangelogsAsync(IMonitoringService service, EntityId entityId, int? blockSize, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -2779,7 +2779,7 @@
 
             do
             {
-                ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId> page = await service.ListAlarmChangelogsAsync(entityId, marker, blockSize, cancellationToken);
+                ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId> page = await service.ListAlarmChangelogsAsync(entityId, marker, blockSize, from, to, cancellationToken);
                 if (progress != null)
                     progress.Report(page);
 
@@ -2811,7 +2811,7 @@
             return result.ToArray();
         }
 
-        protected static async Task<AlarmNotificationHistoryItem[]> ListAllAlarmNotificationHistoryAsync(IMonitoringService service, EntityId entityId, AlarmId alarmId, CheckId checkId, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId>> progress = null)
+        protected static async Task<AlarmNotificationHistoryItem[]> ListAllAlarmNotificationHistoryAsync(IMonitoringService service, EntityId entityId, AlarmId alarmId, CheckId checkId, int? blockSize, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -2821,7 +2821,7 @@
 
             do
             {
-                ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId> page = await service.ListAlarmNotificationHistoryAsync(entityId, alarmId, checkId, marker, blockSize, cancellationToken);
+                ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId> page = await service.ListAlarmNotificationHistoryAsync(entityId, alarmId, checkId, marker, blockSize, from, to, cancellationToken);
                 if (progress != null)
                     progress.Report(page);
 
