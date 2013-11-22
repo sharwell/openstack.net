@@ -555,7 +555,7 @@
         /// <summary>
         /// Gets a monitoring zone by ID.
         /// </summary>
-        /// <param name="entityId">The monitoring zone ID. This is obtained from <see cref="MonitoringZone.Id">MonitoringZone.Id</see>.</param>
+        /// <param name="monitoringZoneId">The monitoring zone ID. This is obtained from <see cref="MonitoringZone.Id">MonitoringZone.Id</see>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
         /// A <see cref="Task"/> object representing the asynchronous operation. When
