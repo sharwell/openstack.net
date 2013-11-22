@@ -64,7 +64,32 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-get-limits">Get Limits (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<MonitoringLimits> GetLimitsAsync(CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring audits.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="from">The beginning timestamp of the items to include in the collection. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">time series collections</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="to">The ending timestamp of the items to include in the collection. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">time series collections</see>. If the value is <c>null</c>, the current time is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentException">If <paramref name="to"/> occurs before <paramref name="from"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="limit"/> is less than or equal to 0.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="from"/> represents a date before January 1, 1970 UTC.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="to"/> represents a date before January 1, 1970 UTC.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-list-audits">List Audits (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Audit, AuditId>> ListAuditsAsync(AuditId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken);
 
         #endregion Account
@@ -86,7 +111,22 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-create">Create Entities (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<EntityId> CreateEntityAsync(EntityConfiguration configuration, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring entities.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-list">List Entities (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Entity, EntityId>> ListEntitiesAsync(EntityId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -162,7 +202,24 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test-existing">Test Existing Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckData[]> TestExistingCheckAsync(EntityId entityId, CheckId checkId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring checks.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="entityId"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-list">List Checks (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Check, CheckId>> ListChecksAsync(EntityId entityId, CheckId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -224,7 +281,22 @@
 
         #region Check Types
 
+        /// <summary>
+        /// Gets a collection of monitoring check types.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-check-types.html#service-check-types-list">List Check Types (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<CheckType, CheckTypeId>> ListCheckTypesAsync(CheckTypeId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -247,7 +319,29 @@
 
         #region Metrics
 
+        /// <summary>
+        /// Gets a collection of monitoring metrics.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="checkId">The check ID. This is obtained from <see cref="Check.Id">Check.Id</see>.</param>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="checkId"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/metrics-api.html#list-metrics">List Metrics (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Metric, MetricName>> ListMetricsAsync(EntityId entityId, CheckId checkId, MetricName marker, int? limit, CancellationToken cancellationToken);
 
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/metrics-api.html#fetch-data-points">Fetch Data Points (Cloud Monitoring Developer Guide - API v1.0)</seealso>
@@ -280,7 +374,24 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-test">Test Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AlarmData[]> TestAlarmAsync(EntityId entityId, TestAlarmConfiguration configuration, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring entities.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="entityId"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-list">List Alarms (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Alarm, AlarmId>> ListAlarmsAsync(EntityId entityId, AlarmId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -358,7 +469,22 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-create">Create Notification Plan (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationPlanId> CreateNotificationPlanAsync(NotificationPlanConfiguration configuration, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring notification plans.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-list">List Notification Plans (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<NotificationPlan, NotificationPlanId>> ListNotificationPlansAsync(NotificationPlanId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -408,7 +534,22 @@
 
         #region Monitoring Zones
 
+        /// <summary>
+        /// Gets a collection of monitoring zones.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-monitoring-zones.html#service-monitoring-zones-list">List Monitoring Zones (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<MonitoringZone, MonitoringZoneId>> ListMonitoringZonesAsync(MonitoringZoneId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -437,7 +578,42 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-notification-history.html#service-alarm-notification-history-discover">Discover Alarm Notification History (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckId[]> DiscoverAlarmNotificationHistoryAsync(EntityId entityId, AlarmId alarmId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring alarm notification history items.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="alarmId">The alarm ID. This is obtained from <see cref="Alarm.Id">Alarm.Id</see>.</param>
+        /// <param name="checkId">The check ID. This is obtained from <see cref="Check.Id">Check.Id</see>.</param>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="from">The beginning timestamp of the items to include in the collection. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">time series collections</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="to">The ending timestamp of the items to include in the collection. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">time series collections</see>. If the value is <c>null</c>, the current time is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="alarmId"/> is <c>null</c>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="checkId"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="to"/> occurs before <paramref name="from"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="limit"/> is less than or equal to 0.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="from"/> represents a date before January 1, 1970 UTC.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="to"/> represents a date before January 1, 1970 UTC.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-notification-history.html#service-alarm-notification-history-list">List Alarm Notification History (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId>> ListAlarmNotificationHistoryAsync(EntityId entityId, AlarmId alarmId, CheckId checkId, AlarmNotificationHistoryItemId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken);
 
         /// <summary>
@@ -493,7 +669,22 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-test-existing">Test Existing Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationData> TestExistingNotificationAsync(NotificationId notificationId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring notifications.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-list">List Notifications (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Notification, NotificationId>> ListNotificationsAsync(NotificationId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -543,7 +734,22 @@
 
         #region Notification Types
 
+        /// <summary>
+        /// Gets a collection of monitoring notification types.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-types-crud.html#Service-Notification-Types-List">List Notification Types (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<NotificationType, NotificationTypeId>> ListNotificationTypesAsync(NotificationTypeId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -566,33 +772,131 @@
 
         #region Changelogs
 
+        /// <summary>
+        /// Gets a collection of monitoring alarm changelogs.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="from">The beginning timestamp of the items to include in the collection. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">time series collections</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="to">The ending timestamp of the items to include in the collection. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">time series collections</see>. If the value is <c>null</c>, the current time is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentException">If <paramref name="to"/> occurs before <paramref name="from"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="limit"/> is less than or equal to 0.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="from"/> represents a date before January 1, 1970 UTC.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="to"/> represents a date before January 1, 1970 UTC.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-changelogs.html#service-changelogs-alarms-list">List Alarm Changelogs (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> ListAlarmChangelogsAsync(AlarmChangelogId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring alarm changelogs.
+        /// </summary>
+        /// <param name="entityId">The entity ID to filter alarm changelogs. This is obtained from <see cref="Entity.Id">Entity.Id</see>. If the value is <c>null</c>, changelogs for all entities are returned.</param>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="from">The beginning timestamp of the items to include in the collection. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">time series collections</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="to">The ending timestamp of the items to include in the collection. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">time series collections</see>. If the value is <c>null</c>, the current time is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentException">If <paramref name="to"/> occurs before <paramref name="from"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="limit"/> is less than or equal to 0.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="from"/> represents a date before January 1, 1970 UTC.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="to"/> represents a date before January 1, 1970 UTC.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-changelogs.html#service-changelogs-alarms-list">List Alarm Changelogs (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> ListAlarmChangelogsAsync(EntityId entityId, AlarmChangelogId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken);
 
         #endregion Changelogs
 
         #region Views
 
+        /// <summary>
+        /// Gets a collection of monitoring entity overviews.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-views.html#service-views-overview">Get Overview (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> ListEntityOverviewsAsync(EntityId marker, int? limit, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring entity overviews, filtered by entity ID.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="entityIdFilter">A collection of entity IDs for filter the results. If the value is <c>null</c>, overviews for all entities are returned.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentException">If <paramref name="entityIdFilter"/> is non-<c>null</c> and contains any <c>null</c> values.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-views.html#service-views-overview">Get Overview (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> ListEntityOverviewsAsync(EntityId marker, int? limit, IEnumerable<EntityId> entityIdFilter, CancellationToken cancellationToken);
 
         #endregion Views
 
         #region Alarm Examples
 
+        /// <summary>
+        /// Gets a collection of monitoring alarm examples.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-examples.html#service-alarm-examples-list">List Alarm Examples (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AlarmExample, AlarmExampleId>> ListAlarmExamplesAsync(AlarmExampleId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets a monitoring alarm example by ID.
         /// </summary>
-        /// <param name="entityId">The alarm example ID. This is obtained from <see cref="AlarmExample.Id">AlarmExample.Id</see>.</param>
+        /// <param name="alarmExampleId">The alarm example ID. This is obtained from <see cref="AlarmExample.Id">AlarmExample.Id</see>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
         /// A <see cref="Task"/> object representing the asynchronous operation. When
@@ -616,7 +920,22 @@
 
         #region Agents
 
+        /// <summary>
+        /// Gets a collection of monitoring agents.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agents">List Agents (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Agent, AgentId>> ListAgentsAsync(AgentId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -634,7 +953,24 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agent">Get Agent (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<Agent> GetAgentAsync(AgentId agentId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring agent connections.
+        /// </summary>
+        /// <param name="agentId">The agent ID. This is obtained from <see cref="Agent.Id">Agent.Id</see>.</param>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agent-connections">List Agent Connections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AgentConnection, AgentConnectionId>> ListAgentConnectionsAsync(AgentId agentId, AgentConnectionId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -678,7 +1014,22 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-create-token">Create Agent Token (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AgentTokenId> CreateAgentTokenAsync(AgentTokenConfiguration configuration, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of monitoring agent tokens.
+        /// </summary>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-list">List Agent Tokens (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AgentToken, AgentTokenId>> ListAgentTokensAsync(AgentTokenId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -701,7 +1052,7 @@
         /// Updates a monitoring agent token.
         /// </summary>
         /// <param name="agentTokenId">The agent token ID. This is obtained from <see cref="AgentToken.Id">AgentToken.Id</see>.</param>
-        /// <param name="configuration">An <see cref="UpdateAgentTokenConfiguration"/> object describing the changes to apply to the agent token.</param>
+        /// <param name="configuration">An <see cref="AgentTokenConfiguration"/> object describing the changes to apply to the agent token.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">
@@ -863,7 +1214,30 @@
 
         #region Agent Targets
 
+        /// <summary>
+        /// Gets a collection of monitoring agent check targets.
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <param name="agentCheckType">The agent check type ID. This is obtained from <see cref="CheckType.Id">CheckType.Id</see>, or from the predefined values in <see cref="CheckTypeId"/>.</param>
+        /// <param name="marker">A marker identifying the next page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>, and is obtained from <see cref="ReadOnlyCollectionPage{T, TMarker}.NextMarker"/>. If the value is <c>null</c>, the list starts at the beginning.</param>
+        /// <param name="limit">The maximum number of items to include in a single page of results. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">pagination</see>. If the value is <c>null</c>, a provider-specific default value is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="ReadOnlyCollectionPage{T, TMarker}"/>
+        /// object containing the page of results and its associated pagination metadata.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="agentCheckType"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="agentCheckType"/> is not an agent check type (i.e. the <see cref="CheckTypeId.IsAgent"/> property is <c>false</c>).</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-targets.html#service-agent-list-check-targets">List Agent Check Targets (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<CheckTarget, CheckTargetId>> ListAgentCheckTargetsAsync(EntityId entityId, CheckTypeId agentCheckType, CheckTargetId marker, int? limit, CancellationToken cancellationToken);
 
         #endregion Agent Targets
