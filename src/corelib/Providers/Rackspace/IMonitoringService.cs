@@ -40,6 +40,18 @@
 
         #region Entities
 
+        /// <summary>
+        /// Creates a new monitoring entity.
+        /// </summary>
+        /// <param name="configuration">An <see cref="EntityConfiguration"/> object describing the new entity.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain the <see cref="EntityId"/> identifying the new entity.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-create">Create Entities (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<EntityId> CreateEntityAsync(EntityConfiguration configuration, CancellationToken cancellationToken);
 
@@ -59,6 +71,23 @@
 
         #region Checks
 
+        /// <summary>
+        /// Creates a new check.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="configuration">A <see cref="CheckConfiguration"/> object describing the new check.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain the <see cref="CheckId"/> identifying the new check.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-create">Create Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckId> CreateCheckAsync(EntityId entityId, CheckConfiguration configuration, CancellationToken cancellationToken);
 
@@ -105,6 +134,23 @@
 
         #region Alarms
 
+        /// <summary>
+        /// Creates a new alarm.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="configuration">An <see cref="AlarmConfiguration"/> object describing the new alarm.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain the <see cref="AlarmId"/> identifying the new alarm.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-create">Create Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AlarmId> CreateAlarmAsync(EntityId entityId, AlarmConfiguration configuration, CancellationToken cancellationToken);
 
@@ -127,6 +173,19 @@
 
         #region Notification Plans
 
+        /// <summary>
+        /// Creates a new notification plan.
+        /// </summary>
+        /// <param name="configuration">A <see cref="NotificationPlanConfiguration"/> object describing the new notification plan.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain the <see cref="NotificationPlanId"/> identifying the
+        /// new notification plan.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-create">Create Notification Plan (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationPlanId> CreateNotificationPlanAsync(NotificationPlanConfiguration configuration, CancellationToken cancellationToken);
 
@@ -172,6 +231,19 @@
 
         #region Notifications
 
+        /// <summary>
+        /// Creates a new notification.
+        /// </summary>
+        /// <param name="configuration">A <see cref="NotificationConfiguration"/> object describing the new notification.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain the <see cref="NotificationId"/> identifying the
+        /// new notification.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-create">Create Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationId> CreateNotificationAsync(NotificationConfiguration configuration, CancellationToken cancellationToken);
 
@@ -260,6 +332,19 @@
 
         #region Agent Token
 
+        /// <summary>
+        /// Creates a new agent token.
+        /// </summary>
+        /// <param name="configuration">An <see cref="AgentTokenConfiguration"/> object describing the new agent token.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain the <see cref="AgentTokenId"/> identifying the
+        /// new agent token.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-create-token">Create Agent Token (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AgentTokenId> CreateAgentTokenAsync(AgentTokenConfiguration configuration, CancellationToken cancellationToken);
 
