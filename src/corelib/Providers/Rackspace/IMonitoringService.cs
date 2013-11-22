@@ -195,10 +195,41 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-create">Create Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckId> CreateCheckAsync(EntityId entityId, CheckConfiguration configuration, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Test a monitoring check.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="configuration">A <see cref="CheckConfiguration"/> object describing the check to test.</param>
+        /// <param name="debug"><c>true</c> to include debug information in the result; otherwise, <c>false</c>. If the value is <c>null</c>, a provider-specific default is used.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a collection <see cref="CheckData"/> objects describing
+        /// the test results.
+        /// </returns>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test">Test Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test-debug">Test Check and Include Debug Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckData[]> TestCheckAsync(EntityId entityId, CheckConfiguration configuration, bool? debug, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Test an existing check by ID.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="checkId">The check ID. This is obtained from <see cref="Check.Id">Check.Id</see>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a collection <see cref="CheckData"/> objects describing
+        /// the test results.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="checkId"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test-existing">Test Existing Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckData[]> TestExistingCheckAsync(EntityId entityId, CheckId checkId, CancellationToken cancellationToken);
 
@@ -371,6 +402,24 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-create">Create Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AlarmId> CreateAlarmAsync(EntityId entityId, AlarmConfiguration configuration, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Test a monitoring alarm.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="configuration">A <see cref="TestAlarmConfiguration"/> object describing the alarm test configuration.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a collection <see cref="AlarmData"/> objects describing
+        /// the test results.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-test">Test Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AlarmData[]> TestAlarmAsync(EntityId entityId, TestAlarmConfiguration configuration, CancellationToken cancellationToken);
 
@@ -568,6 +617,24 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-monitoring-zones.html#service-monitoring-zones-get">Get Monitoring Zone (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<MonitoringZone> GetMonitoringZoneAsync(MonitoringZoneId monitoringZoneId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Perform a traceroute operation from a monitoring zone to a particular target.
+        /// </summary>
+        /// <param name="monitoringZoneId">The monitoring zone ID. This is obtained from <see cref="MonitoringZone.Id">MonitoringZone.Id</see>.</param>
+        /// <param name="configuration">A <see cref="TraceRouteConfiguration"/> object containing the traceroute parameters.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="TraceRoute"/> object describing the
+        /// results of the traceroute operation.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="monitoringZoneId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-monitoring-zones.html#service-monitoring-zones-traceroute">Perform a "traceroute" from a Monitoring Zone (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<TraceRoute> PerformTraceRouteFromMonitoringZoneAsync(MonitoringZoneId monitoringZoneId, TraceRouteConfiguration configuration, CancellationToken cancellationToken);
 
@@ -575,6 +642,26 @@
 
         #region Alarm Notification History
 
+        /// <summary>
+        /// Gets a collection of <see cref="CheckId"/> objects identifying the particular checks
+        /// for which an alarm notification history is present for a particular entity/alarm
+        /// combination.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="alarmId">The alarm ID. This is obtained from <see cref="Alarm.Id">Alarm.Id</see>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a collection of <see cref="CheckId"/> objects
+        /// identifying the checks for which an alarm notification history is present.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="alarmId"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-notification-history.html#service-alarm-notification-history-discover">Discover Alarm Notification History (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckId[]> DiscoverAlarmNotificationHistoryAsync(EntityId entityId, AlarmId alarmId, CancellationToken cancellationToken);
 
@@ -663,9 +750,35 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-create">Create Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationId> CreateNotificationAsync(NotificationConfiguration configuration, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Test a monitoring notification.
+        /// </summary>
+        /// <param name="configuration">A <see cref="NotificationConfiguration"/> object describing the notification to test.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="NotificationData"/> object describing
+        /// the test results.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-test-new">Test Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationData> TestNotificationAsync(NotificationConfiguration configuration, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Test an existing notification by ID.
+        /// </summary>
+        /// <param name="notificationId">The notification ID. This is obtained from <see cref="Notification.Id">Notification.Id</see>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="NotificationData"/> object describing
+        /// the test results.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="notificationId"/> is <c>null</c>.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-test-existing">Test Existing Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationData> TestExistingNotificationAsync(NotificationId notificationId, CancellationToken cancellationToken);
 
@@ -909,6 +1022,25 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-examples.html#service-alarm-examples-get">Get Alarm Example (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AlarmExample> GetAlarmExampleAsync(AlarmExampleId alarmExampleId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Evaluate the template of a single alarm example.
+        /// </summary>
+        /// <param name="alarmExampleId">The alarm example ID. This is obtained from <see cref="AlarmExample.Id">AlarmExample.Id</see>.</param>
+        /// <param name="exampleParameters">A dictionary containing the values to insert in the alarm example. The dictionary should contain a key/value pair for each field described in <see cref="AlarmExample.Fields"/> for the alarm example.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="BoundAlarmExample"/> object containing
+        /// the evaluated alarm example.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="alarmExampleId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="exampleParameters"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="exampleParameters"/> contains any <c>null</c> or empty keys.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-examples.html#service-alarm-examples-post">Evaluate Alarm Example (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<BoundAlarmExample> EvaluateAlarmExampleAsync(AlarmExampleId alarmExampleId, IDictionary<string, object> exampleParameters, CancellationToken cancellationToken);
 
@@ -1079,7 +1211,25 @@
 
         #region Agent Host Information
 
-        /// <seealso href=""> (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <summary>
+        /// Gets agent host information reported by a monitoring agent.
+        /// </summary>
+        /// <param name="agentId">The agent ID. This is obtained from <see cref="Agent.Id">Agent.Id</see>.</param>
+        /// <param name="hostInformation">The host information type.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="HostInformation{T}"/>
+        /// object containing the host information.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="agentId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="hostInformation"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html">Agent Host Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<HostInformation<JToken>> GetAgentHostInformationAsync(AgentId agentId, HostInformationType hostInformation, CancellationToken cancellationToken);
 
         /// <summary>
