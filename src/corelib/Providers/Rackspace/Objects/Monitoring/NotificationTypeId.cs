@@ -32,7 +32,7 @@
         /// Initializes a new instance of the <see cref="NotificationTypeId"/> class
         /// with the specified identifier value.
         /// </summary>
-        /// <param name="id">The identifier value.</param>
+        /// <param name="id">The notification type identifier value.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="id"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="id"/> is empty.</exception>
         public NotificationTypeId(string id)
@@ -40,6 +40,9 @@
         {
         }
 
+        /// <summary>
+        /// Gets a <see cref="NotificationTypeId"/> instance representing a webhook notification.
+        /// </summary>
         public static NotificationTypeId Webhook
         {
             get
@@ -48,6 +51,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a <see cref="NotificationTypeId"/> instance representing an email notification.
+        /// </summary>
         public static NotificationTypeId Email
         {
             get
@@ -56,6 +62,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a <see cref="NotificationTypeId"/> instance representing a PagerDuty notification.
+        /// </summary>
         public static NotificationTypeId PagerDuty
         {
             get

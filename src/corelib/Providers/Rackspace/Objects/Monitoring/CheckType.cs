@@ -3,16 +3,31 @@
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Represents the type of a check in the monitoring service.
+    /// </summary>
+    /// <seealso cref="CheckConfiguration.CheckTypeId"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class CheckType
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
+        /// <summary>
+        /// This is the backing field for the <see cref="Id"/> property.
+        /// </summary>
         [JsonProperty("id")]
         private CheckTypeId _id;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Type"/> property.
+        /// </summary>
         [JsonProperty("type")]
         private CheckTypeType _type;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Fields"/> property.
+        /// </summary>
         [JsonProperty("fields")]
         private NotificationTypeField[] _fields;
 #pragma warning restore 649
@@ -26,6 +41,9 @@
         {
         }
 
+        /// <summary>
+        /// Gets the unique identifier of the check type.
+        /// </summary>
         public CheckTypeId Id
         {
             get
@@ -34,6 +52,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the type of check type.
+        /// </summary>
         public CheckTypeType Type
         {
             get
@@ -42,6 +63,10 @@
             }
         }
 
+        /// <summary>
+        /// Gets a collection of <see cref="NotificationTypeField"/> objects describing the
+        /// configurable properties of checks of this type.
+        /// </summary>
         public ReadOnlyCollection<NotificationTypeField> Fields
         {
             get

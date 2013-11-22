@@ -6,15 +6,32 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    /// <summary>
+    /// This class models the configurable properties of the JSON representation of
+    /// a notification resource in the <see cref="IMonitoringService"/>.
+    /// </summary>
+    /// <seealso cref="IMonitoringService.CreateNotificationAsync"/>
+    /// <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html">Notifications (Rackspace Cloud Monitoring Developer Guide - API v1.0)</see>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class NotificationConfiguration
     {
+        /// <summary>
+        /// This is the backing field for the <see cref="Label"/> property.
+        /// </summary>
         [JsonProperty("label")]
         private string _label;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Type"/> property.
+        /// </summary>
         [JsonProperty("type")]
         private NotificationTypeId _type;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Details"/> property.
+        /// </summary>
         [JsonProperty("details")]
         private JObject _details;
 
@@ -33,6 +50,28 @@
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NotificationConfiguration"/> class
+        /// with the specified properties.
+        /// </summary>
+        /// <param name="label">The friendly name of the notification.</param>
+        /// <param name="notificationTypeId">The notification type ID. This is obtained from <see cref="NotificationType.Id">NotificationType.Id</see>, or from the predefined values in <see cref="NotificationTypeId"/>.</param>
+        /// <param name="details">A <see cref="NotificationDetails"/> object containing the detailed configuration properties for the specified notification type.</param>
+        /// <param name="metadata">A collection of metadata to associate with the notification. If the value is <c>null</c>, no custom metadata is associated with the notification.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="label"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="notificationTypeId"/> is <c>null</c>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="details"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If <paramref name="label"/> is empty.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="details"/> does not support notifications of type <paramref name="notificationTypeId"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="metadata"/> contains any <c>null</c> or empty keys.</para>
+        /// </exception>
         public NotificationConfiguration(string label, NotificationTypeId notificationTypeId, NotificationDetails details, IDictionary<string, string> metadata = null)
         {
             if (label == null)
@@ -52,6 +91,9 @@
             _metadata = metadata;
         }
 
+        /// <summary>
+        /// Gets the friendly name of the notification.
+        /// </summary>
         public string Label
         {
             get
@@ -60,6 +102,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the ID of the notification type to send.
+        /// </summary>
         public NotificationTypeId Type
         {
             get
@@ -68,6 +113,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the detailed configuration properties for the notification.
+        /// </summary>
         public NotificationDetails Details
         {
             get
@@ -80,7 +128,7 @@
         }
 
         /// <summary>
-        /// Gets a collection of metadata associated with the notification plan.
+        /// Gets a collection of metadata associated with the notification.
         /// </summary>
         public ReadOnlyDictionary<string, string> Metadata
         {

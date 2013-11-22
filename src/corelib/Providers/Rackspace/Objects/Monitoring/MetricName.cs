@@ -5,7 +5,7 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents the unique identifier of a <placeholder>item placeholder</placeholder> in the <see cref="IMonitoringService"/>.
+    /// Represents the unique identifier of a metric in the <see cref="IMonitoringService"/>.
     /// </summary>
     /// <seealso cref="Metric.Name"/>
     /// <threadsafety static="true" instance="false"/>
@@ -17,7 +17,7 @@
         /// Initializes a new instance of the <see cref="MetricName"/> class
         /// with the specified identifier value.
         /// </summary>
-        /// <param name="id">The identifier value.</param>
+        /// <param name="id">The metric identifier value.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="id"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="id"/> is empty.</exception>
         public MetricName(string id)

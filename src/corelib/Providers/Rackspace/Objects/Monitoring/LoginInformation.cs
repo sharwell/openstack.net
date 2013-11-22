@@ -3,19 +3,38 @@
     using System;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of the login data reported agents for
+    /// the <see cref="HostInformationType.Who"/> information type.
+    /// </summary>
+    /// <see cref="IMonitoringService.GetLoginInformationAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class LoginInformation
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
+        /// <summary>
+        /// This is the backing field for the <see cref="User"/> property.
+        /// </summary>
         [JsonProperty("user")]
         private string _user;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Device"/> property.
+        /// </summary>
         [JsonProperty("device")]
         private string _device;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Time"/> property.
+        /// </summary>
         [JsonProperty("time")]
         private long? _time;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Host"/> property.
+        /// </summary>
         [JsonProperty("host")]
         private string _host;
 #pragma warning restore 649

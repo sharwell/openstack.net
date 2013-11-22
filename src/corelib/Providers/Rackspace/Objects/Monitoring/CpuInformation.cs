@@ -3,6 +3,13 @@
     using System;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of the CPU data reported agents for
+    /// the <see cref="HostInformationType.Cpus"/> information type.
+    /// </summary>
+    /// <see cref="IMonitoringService.GetCpuInformationAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class CpuInformation
     {
@@ -32,25 +39,25 @@
         private int? _mhz;
 
         /// <summary>
-        /// This is the backing field for the <see cref="Idle"/> property.
+        /// This is the backing field for the <see cref="IdleTime"/> property.
         /// </summary>
         [JsonProperty("idle")]
         private long? _idle;
 
         /// <summary>
-        /// This is the backing field for the <see cref="HardInterrupt"/> property.
+        /// This is the backing field for the <see cref="InterruptTime"/> property.
         /// </summary>
         [JsonProperty("irq")]
         private long? _irq;
 
         /// <summary>
-        /// This is the backing field for the <see cref="SoftInterrupt"/> property.
+        /// This is the backing field for the <see cref="SoftInterruptTime"/> property.
         /// </summary>
         [JsonProperty("soft_irq")]
         private long? _softIrq;
 
         /// <summary>
-        /// This is the backing field for the <see cref="Nice"/> property.
+        /// This is the backing field for the <see cref="LowPriorityTime"/> property.
         /// </summary>
         [JsonProperty("nice")]
         private long? _nice;
@@ -62,31 +69,31 @@
         private long? _sys;
 
         /// <summary>
-        /// This is the backing field for the <see cref="User"/> property.
+        /// This is the backing field for the <see cref="UserTime"/> property.
         /// </summary>
         [JsonProperty("user")]
         private long? _user;
 
         /// <summary>
-        /// This is the backing field for the <see cref="Wait"/> property.
+        /// This is the backing field for the <see cref="WaitTime"/> property.
         /// </summary>
         [JsonProperty("wait")]
         private long? _wait;
 
         /// <summary>
-        /// This is the backing field for the <see cref="Total"/> property.
+        /// This is the backing field for the <see cref="TotalTime"/> property.
         /// </summary>
         [JsonProperty("total")]
         private long? _total;
 
         /// <summary>
-        /// This is the backing field for the <see cref="TotalCores"/> property.
+        /// This is the backing field for the <see cref="ProcessorCount"/> property.
         /// </summary>
         [JsonProperty("total_cores")]
         private int? _totalCores;
 
         /// <summary>
-        /// This is the backing field for the <see cref="TotalSockets"/> property.
+        /// This is the backing field for the <see cref="SocketCount"/> property.
         /// </summary>
         [JsonProperty("total_sockets")]
         private int? _totalSockets;

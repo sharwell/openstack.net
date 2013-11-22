@@ -3,31 +3,62 @@
     using System;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of the disk data reported agents for
+    /// the <see cref="HostInformationType.Disks"/> information type.
+    /// </summary>
+    /// <see cref="IMonitoringService.GetDiskInformationAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class DiskInformation
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
+        /// <summary>
+        /// This is the backing field for the <see cref="ReadBytes"/> property.
+        /// </summary>
         [JsonProperty("read_bytes")]
         private long? _readBytes;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="ReadCount"/> property.
+        /// </summary>
         [JsonProperty("reads")]
         private long? _readCount;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="ReadTime"/> property.
+        /// </summary>
         [JsonProperty("rtime")]
         private long? _readTime;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="WriteBytes"/> property.
+        /// </summary>
         [JsonProperty("write_bytes")]
         private long? _writeBytes;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="WriteCount"/> property.
+        /// </summary>
         [JsonProperty("writes")]
         private long? _writeCount;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="WriteTime"/> property.
+        /// </summary>
         [JsonProperty("wtime")]
         private long? _writeTime;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="IOTime"/> property.
+        /// </summary>
         [JsonProperty("time")]
         private long? _time;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Name"/> property.
+        /// </summary>
         [JsonProperty("name")]
         private string _name;
 #pragma warning restore 649

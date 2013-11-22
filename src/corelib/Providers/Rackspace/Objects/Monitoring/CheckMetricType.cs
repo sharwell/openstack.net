@@ -6,7 +6,7 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents <placeholder/> in the monitoring service.
+    /// Represents a metric type in the monitoring service.
     /// </summary>
     /// <remarks>
     /// This class functions as a strongly-typed enumeration of known metric types,
@@ -49,7 +49,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="CheckMetricType"/> representing <placeholder/>.
+        /// Gets a <see cref="CheckMetricType"/> representing a 32-bit integer.
         /// </summary>
         public static CheckMetricType Int32
         {
@@ -60,7 +60,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="CheckMetricType"/> representing <placeholder/>.
+        /// Gets a <see cref="CheckMetricType"/> representing a 64-bit integer.
         /// </summary>
         public static CheckMetricType Int64
         {
@@ -71,7 +71,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="CheckMetricType"/> representing <placeholder/>.
+        /// Gets a <see cref="CheckMetricType"/> representing a string.
         /// </summary>
         public static CheckMetricType String
         {

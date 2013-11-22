@@ -6,7 +6,7 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents <placeholder/> in the monitoring service.
+    /// Represents a target resolver type in the monitoring service.
     /// </summary>
     /// <remarks>
     /// This class functions as a strongly-typed enumeration of known target resolver types,
@@ -48,7 +48,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="TargetResolverType"/> representing <placeholder/>.
+        /// Gets a <see cref="TargetResolverType"/> representing a resolver that resolves hostnames to IP V4 addresses.
         /// </summary>
         public static TargetResolverType IPv4
         {
@@ -59,7 +59,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="TargetResolverType"/> representing <placeholder/>.
+        /// Gets a <see cref="TargetResolverType"/> representing a resolver that resolves hostnames to IP V6 addresses.
         /// </summary>
         public static TargetResolverType IPv6
         {

@@ -4,6 +4,12 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    /// <summary>
+    /// This is the base class for classes modeling the detailed configuration parameters
+    /// of various types of notifications.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public abstract class NotificationDetails
     {
@@ -35,6 +41,13 @@
                 return obj.ToObject<GenericNotificationDetails>();
         }
 
+        /// <summary>
+        /// Determines whether the current <see cref="NotificationDetails"/> object is compatible
+        /// with notifications of a particular type.
+        /// </summary>
+        /// <param name="notificationTypeId">The notification type ID.</param>
+        /// <returns><c>true</c> if the current <see cref="NotificationDetails"/> object is compatible with <paramref name="notificationTypeId"/>; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="notificationTypeId"/> is <c>null</c>.</exception>
         protected internal abstract bool SupportsNotificationType(NotificationTypeId notificationTypeId);
     }
 }

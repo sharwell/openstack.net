@@ -2,10 +2,14 @@
 {
     using System;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Linq;
-    using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
 
+    /// <summary>
+    /// This is the base class for classes modeling the detailed configuration parameters
+    /// of various types of checks.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public abstract class CheckDetails
     {
@@ -59,6 +63,13 @@
                 return obj.ToObject<GenericCheckDetails>();
         }
 
+        /// <summary>
+        /// Determines whether the current <see cref="CheckDetails"/> object is compatible
+        /// with checks of a particular type.
+        /// </summary>
+        /// <param name="checkTypeId">The check type ID.</param>
+        /// <returns><c>true</c> if the current <see cref="CheckDetails"/> object is compatible with <paramref name="checkTypeId"/>; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="checkTypeId"/> is <c>null</c>.</exception>
         protected internal abstract bool SupportsCheckType(CheckTypeId checkTypeId);
     }
 }

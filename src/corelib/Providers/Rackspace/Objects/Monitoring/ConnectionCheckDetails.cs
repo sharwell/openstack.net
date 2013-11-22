@@ -3,11 +3,17 @@
     using System;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class provides a base class for configuring checks that connect to a
+    /// service on a configurable port.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public abstract class ConnectionCheckDetails : CheckDetails
     {
         /// <summary>
-        /// This is the backing field for the <see cref="port"/> property.
+        /// This is the backing field for the <see cref="Port"/> property.
         /// </summary>
         [JsonProperty("port", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? _port;

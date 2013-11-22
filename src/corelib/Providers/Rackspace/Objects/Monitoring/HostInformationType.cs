@@ -6,7 +6,7 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents <placeholder/> in the monitoring service.
+    /// Represents a host information type in the monitoring service.
     /// </summary>
     /// <remarks>
     /// This class functions as a strongly-typed enumeration of known host information types,

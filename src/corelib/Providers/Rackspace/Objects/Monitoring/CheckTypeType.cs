@@ -6,7 +6,7 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents <placeholder/> in the monitoring service.
+    /// Represents the type of a check type in the monitoring service.
     /// </summary>
     /// <remarks>
     /// This class functions as a strongly-typed enumeration of known check type types,
@@ -48,7 +48,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="CheckTypeType"/> representing <placeholder/>.
+        /// Gets a <see cref="CheckTypeType"/> representing a remote check type.
         /// </summary>
         public static CheckTypeType Remote
         {
@@ -59,7 +59,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="CheckTypeType"/> representing <placeholder/>.
+        /// Gets a <see cref="CheckTypeType"/> representing an agent check type.
         /// </summary>
         public static CheckTypeType Agent
         {

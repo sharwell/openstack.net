@@ -7,6 +7,12 @@
     using net.openstack.Core.Collections;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of a request to update the properties
+    /// of a <see cref="NotificationPlan"/> resource in the <see cref="IMonitoringService"/>.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class UpdateNotificationPlanConfiguration
     {
@@ -49,10 +55,34 @@
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateNotificationPlanConfiguration"/> class
+        /// with the specified properties.
+        /// </summary>
+        /// <param name="label">The label for the notification plan. If this value is <c>null</c>, the existing value for the notification plan is not changed.</param>
+        /// <param name="criticalState">The notification list to send to when the state is <see cref="AlarmState.Critical"/>. If this value is <c>null</c>, the existing value for the notification plan is not changed.</param>
+        /// <param name="warningState">The notification list to send to when the state is <see cref="AlarmState.Warning"/>. If this value is <c>null</c>, the existing value for the notification plan is not changed.</param>
+        /// <param name="okState">The notification list to send to when the state is <see cref="AlarmState.OK"/>. If this value is <c>null</c>, the existing value for the notification plan is not changed.</param>
+        /// <param name="metadata">The metadata to associate with the notification plan. If this value is <c>null</c>, the existing value for the notification plan is not changed.</param>
+        /// <exception cref="ArgumentException">
+        /// If <paramref name="label"/> is non-<c>null</c> but empty.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="criticalState"/> contains any <c>null</c> values.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="warningState"/> contains any <c>null</c> values.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="okState"/> contains any <c>null</c> values.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="metadata"/> contains any <c>null</c> or empty keys.</para>
+        /// </exception>
         public UpdateNotificationPlanConfiguration(string label = null, IEnumerable<NotificationId> criticalState = null, IEnumerable<NotificationId> warningState = null, IEnumerable<NotificationId> okState = null, IDictionary<string, string> metadata = null)
         {
-            _label = label;
-            _metadata = metadata;
+            if (label != null)
+            {
+                _label = label;
+                if (label == string.Empty)
+                    throw new ArgumentException("label cannot be empty", label);
+            }
 
             if (criticalState != null)
             {
@@ -74,6 +104,13 @@
                 if (_okState.Contains(null))
                     throw new ArgumentException("okState cannot contain any null values", "okState");
             }
+
+            if (metadata != null)
+            {
+                _metadata = metadata;
+                if (metadata.ContainsKey(null) || metadata.ContainsKey(string.Empty))
+                    throw new ArgumentException("metadata cannot contain any null or empty keys", "metadata");
+            }
         }
 
         /// <summary>
@@ -88,7 +125,7 @@
         }
 
         /// <summary>
-        /// The notification list to send to when the state is CRITICAL.
+        /// The notification list to send to when the state is <see cref="AlarmState.Critical"/>.
         /// </summary>
         public ReadOnlyCollection<NotificationId> CriticalState
         {
@@ -102,7 +139,7 @@
         }
 
         /// <summary>
-        /// The notification list to send to when the state is WARNING.
+        /// The notification list to send to when the state is <see cref="AlarmState.Warning"/>.
         /// </summary>
         public ReadOnlyCollection<NotificationId> WarningState
         {
@@ -116,7 +153,7 @@
         }
 
         /// <summary>
-        /// The notification list to send to when the state is OK.
+        /// The notification list to send to when the state is <see cref="AlarmState.OK"/>.
         /// </summary>
         public ReadOnlyCollection<NotificationId> OkState
         {

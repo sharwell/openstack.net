@@ -2,22 +2,44 @@
 {
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of the system data reported agents for
+    /// the <see cref="HostInformationType.System"/> information type.
+    /// </summary>
+    /// <see cref="IMonitoringService.GetSystemInformationAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class SystemInformation
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
+        /// <summary>
+        /// This is the backing field for the <see cref="Architecture"/> property.
+        /// </summary>
         [JsonProperty("arch")]
         private string _arch;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Name"/> property.
+        /// </summary>
         [JsonProperty("name")]
         private string _name;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Vendor"/> property.
+        /// </summary>
         [JsonProperty("vendor")]
         private string _vendor;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="VendorVersion"/> property.
+        /// </summary>
         [JsonProperty("vendor_version")]
         private string _vendorVersion;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Version"/> property.
+        /// </summary>
         [JsonProperty("version")]
         private string _version;
 #pragma warning restore 649

@@ -5,7 +5,7 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents the unique identifier of a <placeholder>item placeholder</placeholder> in the <see cref="IMonitoringService"/>.
+    /// Represents the unique identifier of a monitoring account in the <see cref="IMonitoringService"/>.
     /// </summary>
     /// <seealso cref="MonitoringAccount.Id"/>
     /// <threadsafety static="true" instance="false"/>
@@ -17,7 +17,7 @@
         /// Initializes a new instance of the <see cref="MonitoringAccountId"/> class
         /// with the specified identifier value.
         /// </summary>
-        /// <param name="id">The identifier value.</param>
+        /// <param name="id">The monitoring account identifier value.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="id"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="id"/> is empty.</exception>
         public MonitoringAccountId(string id)

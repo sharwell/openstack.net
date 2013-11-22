@@ -7,6 +7,15 @@
     using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the configurable properties of the JSON representation of
+    /// an entity resource in the <see cref="IMonitoringService"/>.
+    /// </summary>
+    /// <seealso cref="IMonitoringService.CreateEntityAsync"/>
+    /// <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html">Entities (Rackspace Cloud Monitoring Developer Guide - API v1.0)</see>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
+    [JsonObject(MemberSerialization.OptIn)]
     public class EntityConfiguration
     {
         /// <summary>
@@ -71,6 +80,9 @@
             _metadata = metadata;
         }
 
+        /// <summary>
+        /// Gets the ID of the agent which reports information from this entity.
+        /// </summary>
         public AgentId AgentId
         {
             get
@@ -79,6 +91,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the name of the entity.
+        /// </summary>
         public string Label
         {
             get
@@ -87,6 +102,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a dictionary which maps target aliases to IP addresses associated with the entity.
+        /// </summary>
         public ReadOnlyDictionary<string, IPAddress> IPAddresses
         {
             get
@@ -98,6 +116,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a collection of custom metadata associated with the entity.
+        /// </summary>
         public ReadOnlyDictionary<string, string> Metadata
         {
             get

@@ -2,13 +2,17 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Net;
-    using System.Text;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of a request to update the properties
+    /// of an <see cref="Entity"/> resource in the <see cref="IMonitoringService"/>.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class UpdateEntityConfiguration
     {
@@ -71,6 +75,9 @@
             _metadata = metadata;
         }
 
+        /// <summary>
+        /// Gets the ID of the agent associated with the monitoring entity.
+        /// </summary>
         public AgentId AgentId
         {
             get
@@ -79,6 +86,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the label for the entity.
+        /// </summary>
         public string Label
         {
             get
@@ -87,6 +97,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a collection of IP addresses which can be referenced by checks on this entity.
+        /// </summary>
         public ReadOnlyDictionary<string, IPAddress> IPAddresses
         {
             get
@@ -98,6 +111,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a collection of custom metadata to associate with the entity.
+        /// </summary>
         public ReadOnlyDictionary<string, string> Metadata
         {
             get

@@ -3,6 +3,12 @@
     using System;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class extends <see cref="NotificationDetails"/> with properties specific to
+    /// <see cref="NotificationTypeId.Email"/> notifications.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class EmailNotificationDetails : NotificationDetails
     {
@@ -21,6 +27,13 @@
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EmailNotificationDetails"/> class
+        /// with the specified email address.
+        /// </summary>
+        /// <param name="address">The email address that should be notified.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="address"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="address"/> is empty.</exception>
         public EmailNotificationDetails(string address)
         {
             if (address == null)
@@ -43,6 +56,9 @@
         }
 
         /// <inheritdoc/>
+        /// <remarks>
+        /// This class only supports <see cref="NotificationTypeId.Email"/> notifications.
+        /// </remarks>
         protected internal override bool SupportsNotificationType(NotificationTypeId notificationTypeId)
         {
             return notificationTypeId == NotificationTypeId.Email;

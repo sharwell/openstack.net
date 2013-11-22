@@ -5,7 +5,7 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents the unique identifier of a <placeholder>item placeholder</placeholder> in the <see cref="IMonitoringService"/>.
+    /// Represents the unique identifier of a transaction in the <see cref="IMonitoringService"/>.
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
@@ -16,7 +16,7 @@
         /// Initializes a new instance of the <see cref="TransactionId"/> class
         /// with the specified identifier value.
         /// </summary>
-        /// <param name="id">The identifier value.</param>
+        /// <param name="id">The transaction identifier value.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="id"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="id"/> is empty.</exception>
         public TransactionId(string id)

@@ -70,6 +70,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a timestamp indicating when the alarm was triggered.
+        /// </summary>
         public DateTimeOffset? Timestamp
         {
             get
@@ -78,6 +81,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the ID of the entity associated with the alarm.
+        /// </summary>
         public EntityId EntityId
         {
             get
@@ -86,6 +92,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the ID of the alarm which was triggered.
+        /// </summary>
         public AlarmId AlarmId
         {
             get
@@ -94,6 +103,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the ID of the check which triggered the alarm.
+        /// </summary>
         public CheckId CheckId
         {
             get
@@ -102,6 +114,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the ID of the monitoring zone which analyzed the check and triggered the alarm.
+        /// </summary>
         public MonitoringZoneId AnalyzedByMonitoringZoneId
         {
             get

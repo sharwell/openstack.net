@@ -1943,6 +1943,26 @@
 
         #endregion
 
+        /// <summary>
+        /// Get generic agent host information.
+        /// </summary>
+        /// <typeparam name="T">The type of the object modeling the JSON representation of the host information reported by the agent.</typeparam>
+        /// <param name="agentId">The agent ID. This is obtained from <see cref="Agent.Id">Agent.Id</see>.</param>
+        /// <param name="hostInformation">The type of information to check.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a <see cref="HostInformation{T}"/>
+        /// object containing the host information.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="agentId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="hostInformation"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html">Agent Host Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         protected Task<HostInformation<T>> GetAgentHostInformationAsync<T>(AgentId agentId, HostInformationType hostInformation, CancellationToken cancellationToken)
         {
             if (agentId == null)

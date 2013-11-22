@@ -3,70 +3,140 @@
     using System;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of the process data reported agents for
+    /// the <see cref="HostInformationType.Processes"/> information type.
+    /// </summary>
+    /// <see cref="IMonitoringService.GetProcessInformationAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class ProcessInformation
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
+        /// <summary>
+        /// This is the backing field for the <see cref="ProcessId"/> property.
+        /// </summary>
         [JsonProperty("pid")]
         private int? _pid;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="ExecutableName"/> property.
+        /// </summary>
         [JsonProperty("exe_name")]
         private string _exeName;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="ExecutableRoot"/> property.
+        /// </summary>
         [JsonProperty("exe_root")]
         private string _exeRoot;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="CurrentDirectory"/> property.
+        /// </summary>
         [JsonProperty("exe_cwd")]
         private string _exeCwd;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="OwnerGroup"/> property.
+        /// </summary>
         [JsonProperty("cred_group")]
         private string _credGroup;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="OwnerUser"/> property.
+        /// </summary>
         [JsonProperty("cred_user")]
         private string _credUser;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="MemorySize"/> property.
+        /// </summary>
         [JsonProperty("memory_size")]
         private long? _memorySize;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="MemoryResident"/> property.
+        /// </summary>
         [JsonProperty("memory_resident")]
         private long? _memoryResident;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="MemoryPageFaults"/> property.
+        /// </summary>
         [JsonProperty("memory_page_faults")]
         private long? _memoryPageFaults;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="MemoryMinorFaults"/> property.
+        /// </summary>
         [JsonProperty("memory_minor_faults")]
         private long? _memoryMinorFaults;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="MemoryMajorFaults"/> property.
+        /// </summary>
         [JsonProperty("memory_major_faults")]
         private long? _memoryMajorFaults;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="MemoryShare"/> property.
+        /// </summary>
         [JsonProperty("memory_share")]
         private long? _memoryShare;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Name"/> property.
+        /// </summary>
         [JsonProperty("state_name")]
         private string _stateName;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="ThreadCount"/> property.
+        /// </summary>
         [JsonProperty("state_threads")]
         private int? _stateThreads;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="ParentProcessId"/> property.
+        /// </summary>
         [JsonProperty("state_ppid")]
         private int? _stateParentPid;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Priority"/> property.
+        /// </summary>
         [JsonProperty("state_priority")]
         private int? _statePriority;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Nice"/> property.
+        /// </summary>
         [JsonProperty("state_nice")]
         private int? _stateNice;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="StartTime"/> property.
+        /// </summary>
         [JsonProperty("time_start_time")]
         private long? _timeStartTime;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="SystemTime"/> property.
+        /// </summary>
         [JsonProperty("time_sys")]
         private long? _timeSys;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="TotalTime"/> property.
+        /// </summary>
         [JsonProperty("time_total")]
         private long? _timeTotal;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="UserTime"/> property.
+        /// </summary>
         [JsonProperty("time_user")]
         private long? _timeUser;
 #pragma warning restore 649
@@ -257,7 +327,7 @@
         /// <remarks>
         /// Higher numbers indicate lower priority.
         /// </remarks>
-        public int? StatePriority
+        public int? Priority
         {
             get
             {
@@ -274,7 +344,7 @@
         /// <value>
         /// The nice value set on the process, or <c>null</c> if nice is not set on the process.
         /// </value>
-        public int? StateNice
+        public int? Nice
         {
             get
             {

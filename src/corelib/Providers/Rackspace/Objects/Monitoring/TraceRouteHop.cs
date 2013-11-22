@@ -6,20 +6,40 @@
     using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of a single hop in the
+    /// result of a traceroute operation in the <see cref="IMonitoringService"/>.
+    /// </summary>
+    /// <seealso cref="TraceRoute.Hops"/>
+    /// <seealso cref="IMonitoringService.PerformTraceRouteFromMonitoringZoneAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class TraceRouteHop
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
+        /// <summary>
+        /// This is the backing field for the <see cref="Number"/> property.
+        /// </summary>
         [JsonProperty("number")]
         private int? _number;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="IPAddress"/> property.
+        /// </summary>
         [JsonProperty("ip")]
         [JsonConverter(typeof(IPAddressConverter))]
         private IPAddress _ip;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Hostname"/> property.
+        /// </summary>
         [JsonProperty("hostname")]
         private string _hostname;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="ResponseTimes"/> property.
+        /// </summary>
         [JsonProperty("rtts")]
         private double[] _responseTimes;
 #pragma warning restore 649
@@ -33,6 +53,12 @@
         {
         }
 
+        /// <summary>
+        /// Gets the index of this hop in the trace.
+        /// </summary>
+        /// <remarks>
+        /// The first hop in the trace has <see cref="Number"/>=1.
+        /// </remarks>
         public int? Number
         {
             get
@@ -41,6 +67,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the IP address for this hop in the trace.
+        /// </summary>
         public IPAddress IPAddress
         {
             get
@@ -49,6 +78,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the hostname associated in reverse DNS of this hop in the trace.
+        /// </summary>
         public string Hostname
         {
             get
@@ -57,6 +89,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the response times for ping operations to this hop in the trace.
+        /// </summary>
         public ReadOnlyCollection<TimeSpan> ResponseTimes
         {
             get
@@ -71,8 +106,8 @@
         /// <summary>
         /// This implementation of <see cref="JsonConverter"/> allows for JSON serialization
         /// and deserialization of <see cref="IPAddress"/> objects using a simple string
-        /// representation. Serialization is performed using <see cref="IPAddress.ToString"/>,
-        /// and deserialization is performed using <see cref="IPAddress.Parse"/>.
+        /// representation. Serialization is performed using <see cref="System.Net.IPAddress.ToString"/>,
+        /// and deserialization is performed using <see cref="System.Net.IPAddress.Parse"/>.
         /// </summary>
         /// <threadsafety static="true" instance="false"/>
         /// <preliminary/>
@@ -80,7 +115,7 @@
         {
             /// <remarks>
             /// If <paramref name="str"/> is an empty string or equal to <c>*</c>, this method returns <c>null</c>.
-            /// Otherwise, this method uses <see cref="IPAddress.Parse"/> for deserialization.
+            /// Otherwise, this method uses <see cref="System.Net.IPAddress.Parse"/> for deserialization.
             /// </remarks>
             /// <inheritdoc/>
             protected override IPAddress ConvertToObject(string str)
