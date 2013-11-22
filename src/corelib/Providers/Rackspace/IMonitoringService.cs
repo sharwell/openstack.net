@@ -7,6 +7,7 @@
     using net.openstack.Providers.Rackspace.Objects.Monitoring;
     using Newtonsoft.Json.Linq;
     using CancellationToken = System.Threading.CancellationToken;
+    using WebException = System.Net.WebException;
 
     /// <summary>
     /// Represents a provider for the Rackspace Cloud Monitoring service.
@@ -33,6 +34,19 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-root">Get Account (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<MonitoringAccount> GetAccountAsync(CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Updates a monitoring account.
+        /// </summary>
+        /// <param name="accountId">The account ID. This is obtained from <see cref="MonitoringAccount.Id">MonitoringAccount.Id</see>.</param>
+        /// <param name="configuration">An <see cref="AccountConfiguration"/> object describing the changes to apply to the account.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="accountId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-put-account">Update Account (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateAccountAsync(MonitoringAccountId accountId, AccountConfiguration configuration, CancellationToken cancellationToken);
 
@@ -90,6 +104,19 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-get">Get Entity (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<Entity> GetEntityAsync(EntityId entityId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Updates a monitoring entity.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="configuration">An <see cref="UpdateEntityConfiguration"/> object describing the changes to apply to the entity.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-update">Update Entity (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateEntityAsync(EntityId entityId, UpdateEntityConfiguration configuration, CancellationToken cancellationToken);
 
@@ -150,6 +177,22 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-get">Get Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<Check> GetCheckAsync(EntityId entityId, CheckId checkId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Updates a monitoring check.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="checkId">The check ID. This is obtained from <see cref="Check.Id">Check.Id</see>.</param>
+        /// <param name="configuration">An <see cref="UpdateCheckConfiguration"/> object describing the changes to apply to the check.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="checkId"/> is <c>null</c>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-update">Update Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateCheckAsync(EntityId entityId, CheckId checkId, UpdateCheckConfiguration configuration, CancellationToken cancellationToken);
 
@@ -239,6 +282,22 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-get">Get Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<Alarm> GetAlarmAsync(EntityId entityId, AlarmId alarmId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Updates a monitoring alarm.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="alarmId">The alarm ID. This is obtained from <see cref="Alarm.Id">Alarm.Id</see>.</param>
+        /// <param name="configuration">An <see cref="UpdateAlarmConfiguration"/> object describing the changes to apply to the alarm.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="alarmId"/> is <c>null</c>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-update">Update Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateAlarmAsync(EntityId entityId, AlarmId alarmId, UpdateAlarmConfiguration configuration, CancellationToken cancellationToken);
 
@@ -284,6 +343,19 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-get">Get Notification Plan (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationPlan> GetNotificationPlanAsync(NotificationPlanId notificationPlanId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Updates a monitoring notification plan.
+        /// </summary>
+        /// <param name="notificationPlanId">The notification plan ID. This is obtained from <see cref="NotificationPlan.Id">NotificationPlan.Id</see>.</param>
+        /// <param name="configuration">An <see cref="UpdateNotificationPlanConfiguration"/> object describing the changes to apply to the notification plan.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="notificationPlanId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-update">Update Notification Plans (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateNotificationPlanAsync(NotificationPlanId notificationPlanId, UpdateNotificationPlanConfiguration configuration, CancellationToken cancellationToken);
 
@@ -398,6 +470,19 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-get">Get Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<Notification> GetNotificationAsync(NotificationId notificationId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Updates a monitoring notification.
+        /// </summary>
+        /// <param name="notificationId">The notification ID. This is obtained from <see cref="Notification.Id">Notification.Id</see>.</param>
+        /// <param name="configuration">An <see cref="UpdateNotificationConfiguration"/> object describing the changes to apply to the notification.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="notificationId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-update">Update Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateNotificationAsync(NotificationId notificationId, UpdateNotificationConfiguration configuration, CancellationToken cancellationToken);
 
@@ -562,6 +647,19 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-get">Get Agent Token (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AgentToken> GetAgentTokenAsync(AgentTokenId agentTokenId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Updates a monitoring agent token.
+        /// </summary>
+        /// <param name="agentTokenId">The agent token ID. This is obtained from <see cref="AgentToken.Id">AgentToken.Id</see>.</param>
+        /// <param name="configuration">An <see cref="UpdateAgentTokenConfiguration"/> object describing the changes to apply to the agent token.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="agentTokenId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-update">Update Agent Token (Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateAgentTokenAsync(AgentTokenId agentTokenId, AgentTokenConfiguration configuration, CancellationToken cancellationToken);
 
