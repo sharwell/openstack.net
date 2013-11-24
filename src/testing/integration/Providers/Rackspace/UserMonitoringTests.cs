@@ -365,7 +365,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -376,7 +376,8 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -421,7 +422,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -432,7 +433,8 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
 
                 CheckData[] checkData = await provider.TestCheckAsync(entityId, checkConfiguration, null, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkData);
@@ -481,7 +483,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -492,7 +494,8 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -545,7 +548,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -556,13 +559,14 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
                 string checkLabel2 = CreateRandomCheckName();
                 TargetResolverType resolverType2 = TargetResolverType.IPv6;
-                CheckConfiguration checkConfiguration2 = new CheckConfiguration(checkLabel2, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                CheckConfiguration checkConfiguration2 = new CheckConfiguration(checkLabel2, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId2 = await provider.CreateCheckAsync(entityId, checkConfiguration2, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId2);
 
@@ -598,7 +602,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -609,7 +613,8 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -716,7 +721,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -727,7 +732,8 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -771,7 +777,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -782,7 +788,8 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -828,7 +835,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -839,7 +846,8 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -850,8 +858,8 @@
                 string alarmName = CreateRandomAlarmName();
                 string criteria = null;
                 bool? enabled = null;
-                IDictionary<string, string> metadata = null;
-                AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, metadata);
+                IDictionary<string, string> alarmMetadata = null;
+                AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, alarmMetadata);
                 AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
 
                 Alarm alarm = await provider.GetAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
@@ -895,7 +903,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -906,7 +914,8 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
 
                 CheckData[] checkData = await provider.TestCheckAsync(entityId, checkConfiguration, null, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkData);
@@ -918,7 +927,7 @@
 
                 foreach (AlarmData data in alarmData)
                 {
-                    Assert.AreEqual("OK", data.State);
+                    Assert.AreEqual(AlarmState.OK, data.State);
                     Assert.AreEqual("Matched default return statement", data.Status);
                     Assert.IsTrue(data.Timestamp >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
                     Assert.IsTrue(data.Timestamp <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
@@ -951,7 +960,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -962,7 +971,8 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -973,12 +983,12 @@
                 string[] alarmNames = { CreateRandomAlarmName(), CreateRandomAlarmName(), CreateRandomAlarmName() };
                 string criteria = null;
                 bool? enabled = null;
-                IDictionary<string, string> metadata = null;
+                IDictionary<string, string> alarmMetadata = null;
 
                 List<AlarmId> alarmIds = new List<AlarmId>();
                 foreach (string alarmName in alarmNames)
                 {
-                    AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, metadata);
+                    AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, alarmMetadata);
                     AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
                     alarmIds.Add(alarmId);
                 }
@@ -1043,7 +1053,7 @@
                     authUser: default(string),
                     authPassword: default(string),
                     body: default(string),
-                    bodyMatches: default(object),
+                    bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
                     method: default(HttpMethod?),
@@ -1054,7 +1064,8 @@
                 string targetAlias = null;
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType);
+                IDictionary<string, string> metadata = null;
+                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -1065,8 +1076,8 @@
                 string alarmName = CreateRandomAlarmName();
                 string criteria = null;
                 bool? enabled = null;
-                IDictionary<string, string> metadata = null;
-                AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, metadata);
+                IDictionary<string, string> alarmMetadata = null;
+                AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, alarmMetadata);
                 AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
 
                 Alarm alarm = await provider.GetAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
