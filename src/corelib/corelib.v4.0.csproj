@@ -359,6 +359,7 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmNotificationHistoryItem.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmNotificationHistoryItemId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmState.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\AlarmStateHistory.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\Audit.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AuditId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\BoundAlarmExample.cs" />

@@ -3,21 +3,39 @@
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of a monitoring entity overview.
+    /// </summary>
+    /// <seealso cref="O:IMonitoringService.ListEntityOverviewsAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class EntityOverview
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
+        /// <summary>
+        /// This is the backing field for the <see cref="Entity"/> property.
+        /// </summary>
         [JsonProperty("entity")]
         private Entity _entity;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Checks"/> property.
+        /// </summary>
         [JsonProperty("checks")]
         private Check[] _checks;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Alarms"/> property.
+        /// </summary>
         [JsonProperty("alarms")]
         private Alarm[] _alarms;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="LatestAlarmStates"/> property.
+        /// </summary>
         [JsonProperty("latest_alarm_states")]
-        private AlarmState[] _latestAlarmStates;
+        private AlarmStateHistory[] _latestAlarmStates;
 #pragma warning restore 649
 
         /// <summary>
@@ -29,6 +47,9 @@
         {
         }
 
+        /// <summary>
+        /// Gets an <see cref="Entity"/> object describing the monitoring entity.
+        /// </summary>
         public Entity Entity
         {
             get
@@ -37,6 +58,10 @@
             }
         }
 
+        /// <summary>
+        /// Gets a collection of <see cref="Check"/> objects describing the checks associated
+        /// with the entity.
+        /// </summary>
         public ReadOnlyCollection<Check> Checks
         {
             get
@@ -48,6 +73,10 @@
             }
         }
 
+        /// <summary>
+        /// Gets a collection of <see cref="Alarm"/> objects describing the alarms associated
+        /// with the entity.
+        /// </summary>
         public ReadOnlyCollection<Alarm> Alarms
         {
             get
@@ -59,14 +88,18 @@
             }
         }
 
-        public ReadOnlyCollection<AlarmState> LatestAlarmStates
+        /// <summary>
+        /// Gets a collection of <see cref="AlarmStateHistory"/> objects describing recent
+        /// changes to the state of alarms associated with the entity.
+        /// </summary>
+        public ReadOnlyCollection<AlarmStateHistory> LatestAlarmStates
         {
             get
             {
                 if (_latestAlarmStates == null)
                     return null;
 
-                return new ReadOnlyCollection<AlarmState>(_latestAlarmStates);
+                return new ReadOnlyCollection<AlarmStateHistory>(_latestAlarmStates);
             }
         }
     }

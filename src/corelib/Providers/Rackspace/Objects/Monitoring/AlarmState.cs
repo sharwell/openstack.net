@@ -6,11 +6,11 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents <placeholder/> in the monitoring service.
+    /// Represents an alarm state in the monitoring service.
     /// </summary>
     /// <remarks>
-    /// This class functions as a strongly-typed enumeration of known check type types,
-    /// with added support for unknown types returned by a server extension.
+    /// This class functions as a strongly-typed enumeration of known alarm states,
+    /// with added support for unknown states returned by a server extension.
     /// </remarks>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
@@ -49,7 +49,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="AlarmState"/> representing <placeholder/>.
+        /// Gets a <see cref="AlarmState"/> representing the <c>OK</c> alarm state.
         /// </summary>
         public static AlarmState OK
         {
@@ -60,7 +60,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="AlarmState"/> representing <placeholder/>.
+        /// Gets a <see cref="AlarmState"/> representing the <c>WARNING</c> alarm state.
         /// </summary>
         public static AlarmState Warning
         {
@@ -71,7 +71,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="AlarmState"/> representing <placeholder/>.
+        /// Gets a <see cref="AlarmState"/> representing the <c>CRITICAL</c> alarm state.
         /// </summary>
         public static AlarmState Critical
         {

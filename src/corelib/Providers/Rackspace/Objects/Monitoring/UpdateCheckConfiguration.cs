@@ -4,38 +4,79 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using net.openstack.Core.Collections;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    /// <summary>
+    /// This class models the JSON representation of a request to update the properties
+    /// of a <see cref="Check"/> resource in the <see cref="IMonitoringService"/>.
+    /// </summary>
+    /// <seealso cref="IMonitoringService.UpdateCheckAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class UpdateCheckConfiguration
     {
+        /// <summary>
+        /// This is the backing field for the <see cref="Label"/> property.
+        /// </summary>
         [JsonProperty("label", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _label;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Type"/> property.
+        /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private CheckTypeId _type;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Details"/> property.
+        /// </summary>
         [JsonProperty("details", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private JObject _details;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="MonitoringZonesPoll"/> property.
+        /// </summary>
         [JsonProperty("monitoring_zones_poll", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private MonitoringZoneId[] _monitoringZonesPoll;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Timeout"/> property.
+        /// </summary>
         [JsonProperty("timeout", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? _timeout;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Period"/> property.
+        /// </summary>
         [JsonProperty("period", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? _period;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="TargetAlias"/> property.
+        /// </summary>
         [JsonProperty("target_alias", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _targetAlias;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="TargetHostname"/> property.
+        /// </summary>
         [JsonProperty("target_hostname", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _targetHostname;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="ResolverType"/> property.
+        /// </summary>
         [JsonProperty("target_resolver", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private TargetResolverType _resolverType;
+
+        /// <summary>
+        /// This is the backing field for the <see cref="Metadata"/> property.
+        /// </summary>
+        [JsonProperty("metadata")]
+        private IDictionary<string, string> _metadata;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateCheckConfiguration"/> class
@@ -46,7 +87,44 @@
         {
         }
 
-        public UpdateCheckConfiguration(string label = null, CheckTypeId checkTypeId = null, CheckDetails details = null, IEnumerable<MonitoringZoneId> monitoringZonesPoll = null, TimeSpan? timeout = null, TimeSpan? period = null, string targetAlias = null, string targetHostname = null, TargetResolverType resolverType = null)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CheckConfiguration"/> class
+        /// with the specified properties.
+        /// </summary>
+        /// <param name="label">The friendly name of the check. If this value is <c>null</c>, the existing value for the check is not changed.</param>
+        /// <param name="checkTypeId">The check type ID. This is obtained from <see cref="CheckType.Id">CheckType.Id</see>, or from the predefined values in <see cref="CheckTypeId"/>. If this value is <c>null</c>, the existing value for the check is not changed.</param>
+        /// <param name="details">A <see cref="CheckDetails"/> object containing detailed configuration information for the specific check type. If this value is <c>null</c>, the existing value for the check is not changed.</param>
+        /// <param name="monitoringZonesPoll">A collection of <see cref="MonitoringZoneId"/> objects identifying the monitoring zones to poll from. If this value is <c>null</c>, the existing value for the check is not changed.</param>
+        /// <param name="timeout">The timeout of a check operation. If this value is <c>null</c>, the existing value for the check is not changed.</param>
+        /// <param name="period">The period between check operations. If this value is <c>null</c>, the existing value for the check is not changed.</param>
+        /// <param name="targetAlias">The alias of the target for this check in the associated entity's <see cref="EntityConfiguration.IPAddresses"/> map. If this value is <c>null</c>, the existing value for the check is not changed.</param>
+        /// <param name="targetHostname">The hostname this check should target. If this value is <c>null</c>, the existing value for the check is not changed.</param>
+        /// <param name="resolverType">The type of resolver to use for converting <paramref name="targetHostname"/> to an IP address. If this value is <c>null</c>, the existing value for the check is not changed.</param>
+        /// <param name="metadata">A collection of metadata to associate with the check. If this value is <c>null</c>, the existing value for the check is not changed.</param>
+        /// <exception cref="ArgumentException">
+        /// If <paramref name="label"/> is non-<c>null</c> but empty.
+        /// <para>-or-</para>
+        /// <para>If the specified <paramref name="details"/> object does support checks of type <paramref name="checkTypeId"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="monitoringZonesPoll"/> contains any <c>null</c> values.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="period"/> is less than or equal to <paramref name="timeout"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="targetAlias"/> is non-<c>null</c> but empty.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="targetHostname"/> is non-<c>null</c> but empty.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="metadata"/> contains any <c>null</c> or empty keys.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="timeout"/> is less than or equal to <see cref="TimeSpan.Zero"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="period"/> is less than or equal to <see cref="TimeSpan.Zero"/>.</para>
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="targetAlias"/> and <paramref name="targetHostname"/> are both non-<c>null</c>.
+        /// </exception>
+        public UpdateCheckConfiguration(string label = null, CheckTypeId checkTypeId = null, CheckDetails details = null, IEnumerable<MonitoringZoneId> monitoringZonesPoll = null, TimeSpan? timeout = null, TimeSpan? period = null, string targetAlias = null, string targetHostname = null, TargetResolverType resolverType = null, IDictionary<string, string> metadata = null)
         {
             if (details != null && !details.SupportsCheckType(checkTypeId))
                 throw new ArgumentException(string.Format("The check details object does not support '{0}' checks.", checkTypeId), "details");
@@ -60,8 +138,17 @@
             _targetAlias = targetAlias;
             _targetHostname = targetHostname;
             _resolverType = resolverType;
+            _metadata = metadata;
+            if (_metadata != null)
+            {
+                if (_metadata.ContainsKey(null) || _metadata.ContainsKey(string.Empty))
+                    throw new ArgumentException("metadata cannot contain any null or empty keys", "metadata");
+            }
         }
 
+        /// <summary>
+        /// Gets the friendly name of the check.
+        /// </summary>
         public string Label
         {
             get
@@ -70,6 +157,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the ID of the check type.
+        /// </summary>
         public CheckTypeId CheckTypeId
         {
             get
@@ -78,6 +168,10 @@
             }
         }
 
+        /// <summary>
+        /// Gets a <see cref="CheckDetails"/> object describing the detailed properties specific
+        /// to this type of check.
+        /// </summary>
         public CheckDetails Details
         {
             get
@@ -104,6 +198,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the timeout for the check.
+        /// </summary>
         public TimeSpan? Timeout
         {
             get
@@ -115,6 +212,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the delay between check operations.
+        /// </summary>
         public TimeSpan? Period
         {
             get
@@ -126,6 +226,10 @@
             }
         }
 
+        /// <summary>
+        /// Gets the key for looking up the target for this check in the associated
+        /// entity's <see cref="EntityConfiguration.IPAddresses"/> map.
+        /// </summary>
         public string TargetAlias
         {
             get
@@ -134,6 +238,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the target hostname this check should target.
+        /// </summary>
         public string TargetHostname
         {
             get
@@ -142,11 +249,29 @@
             }
         }
 
+        /// <summary>
+        /// Gets the type of resolver that should be used to convert the <see cref="TargetHostname"/>
+        /// to an IP address.
+        /// </summary>
         public TargetResolverType ResolverType
         {
             get
             {
                 return _resolverType;
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of custom metadata associated with the check.
+        /// </summary>
+        public ReadOnlyDictionary<string, string> Metadata
+        {
+            get
+            {
+                if (_metadata == null)
+                    return null;
+
+                return new ReadOnlyDictionary<string, string>(_metadata);
             }
         }
     }

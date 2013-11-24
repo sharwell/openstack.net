@@ -31,7 +31,7 @@
         /// the account.
         /// </returns>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-root">Get Account (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-root">Get Account (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<MonitoringAccount> GetAccountAsync(CancellationToken cancellationToken);
 
         /// <summary>
@@ -47,7 +47,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-put-account">Update Account (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-put-account">Update Account (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateAccountAsync(MonitoringAccountId accountId, AccountConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -61,7 +61,7 @@
         /// the resource and rate limits of the monitoring service.
         /// </returns>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-get-limits">Get Limits (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-get-limits">Get Limits (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<MonitoringLimits> GetLimitsAsync(CancellationToken cancellationToken);
 
         /// <summary>
@@ -87,9 +87,9 @@
         /// <para>If <paramref name="to"/> represents a date before January 1, 1970 UTC.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-list-audits">List Audits (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-account.html#service-account-list-audits">List Audits (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Audit, AuditId>> ListAuditsAsync(AuditId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken);
 
         #endregion Account
@@ -108,7 +108,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-create">Create Entities (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-create">Create Entities (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<EntityId> CreateEntityAsync(EntityConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -125,8 +125,8 @@
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-list">List Entities (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-list">List Entities (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Entity, EntityId>> ListEntitiesAsync(EntityId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -141,7 +141,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="entityId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-get">Get Entity (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-get">Get Entity (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<Entity> GetEntityAsync(EntityId entityId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -157,7 +157,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-update">Update Entity (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-update">Update Entity (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateEntityAsync(EntityId entityId, UpdateEntityConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -168,7 +168,7 @@
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="entityId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-delete">Delete Entity (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html#service-entities-delete">Delete Entity (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task RemoveEntityAsync(EntityId entityId, CancellationToken cancellationToken);
 
         #endregion Entities
@@ -192,7 +192,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-create">Create Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-create">Create Check (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckId> CreateCheckAsync(EntityId entityId, CheckConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -208,8 +208,8 @@
         /// property will contain a collection <see cref="CheckData"/> objects describing
         /// the test results.
         /// </returns>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test">Test Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test-debug">Test Check and Include Debug Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test">Test Check (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test-debug">Test Check and Include Debug Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckData[]> TestCheckAsync(EntityId entityId, CheckConfiguration configuration, bool? debug, CancellationToken cancellationToken);
 
         /// <summary>
@@ -230,7 +230,7 @@
         /// <para>If <paramref name="checkId"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test-existing">Test Existing Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test-existing">Test Existing Check (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckData[]> TestExistingCheckAsync(EntityId entityId, CheckId checkId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -249,8 +249,8 @@
         /// <exception cref="ArgumentNullException">If <paramref name="entityId"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-list">List Checks (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-list">List Checks (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Check, CheckId>> ListChecksAsync(EntityId entityId, CheckId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -270,7 +270,7 @@
         /// <para>If <paramref name="checkId"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-get">Get Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-get">Get Check (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<Check> GetCheckAsync(EntityId entityId, CheckId checkId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -289,7 +289,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-update">Update Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-update">Update Check (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateCheckAsync(EntityId entityId, CheckId checkId, UpdateCheckConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -305,7 +305,7 @@
         /// <para>If <paramref name="checkId"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-delete">Delete Check (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-delete">Delete Check (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task RemoveCheckAsync(EntityId entityId, CheckId checkId, CancellationToken cancellationToken);
 
         #endregion Checks
@@ -326,8 +326,8 @@
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-check-types.html#service-check-types-list">List Check Types (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-check-types.html#service-check-types-list">List Check Types (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<CheckType, CheckTypeId>> ListCheckTypesAsync(CheckTypeId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -343,7 +343,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="checkTypeId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-check-types.html#service-check-types-get">Get Check Type (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-check-types.html#service-check-types-get">Get Check Type (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckType> GetCheckTypeAsync(CheckTypeId checkTypeId, CancellationToken cancellationToken);
 
         #endregion Check Types
@@ -371,11 +371,11 @@
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/metrics-api.html#list-metrics">List Metrics (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/metrics-api.html#list-metrics">List Metrics (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Metric, MetricName>> ListMetricsAsync(EntityId entityId, CheckId checkId, MetricName marker, int? limit, CancellationToken cancellationToken);
 
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/metrics-api.html#fetch-data-points">Fetch Data Points (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/metrics-api.html#fetch-data-points">Fetch Data Points (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<DataPoint, EntityId>> GetDataPointsAsync(EntityId entityId, CheckId checkId, MetricName metricName, int? points, DataPointGranularity resolution, IEnumerable<DataPointStatistic> select, CancellationToken cancellationToken);
 
         #endregion Metrics
@@ -399,7 +399,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-create">Create Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-create">Create Alarm (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AlarmId> CreateAlarmAsync(EntityId entityId, AlarmConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -420,7 +420,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-test">Test Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-test">Test Alarm (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AlarmData[]> TestAlarmAsync(EntityId entityId, TestAlarmConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -439,8 +439,8 @@
         /// <exception cref="ArgumentNullException">If <paramref name="entityId"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-list">List Alarms (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-list">List Alarms (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Alarm, AlarmId>> ListAlarmsAsync(EntityId entityId, AlarmId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -460,7 +460,7 @@
         /// <para>If <paramref name="alarmId"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-get">Get Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-get">Get Alarm (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<Alarm> GetAlarmAsync(EntityId entityId, AlarmId alarmId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -479,7 +479,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-update">Update Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-update">Update Alarm (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateAlarmAsync(EntityId entityId, AlarmId alarmId, UpdateAlarmConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -495,7 +495,7 @@
         /// <para>If <paramref name="alarmId"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-delete">Remove Alarm (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html#service-alarms-delete">Remove Alarm (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task RemoveAlarmAsync(EntityId entityId, AlarmId alarmId, CancellationToken cancellationToken);
 
         #endregion Alarms
@@ -515,7 +515,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-create">Create Notification Plan (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-create">Create Notification Plan (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationPlanId> CreateNotificationPlanAsync(NotificationPlanConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -532,8 +532,8 @@
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-list">List Notification Plans (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-list">List Notification Plans (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<NotificationPlan, NotificationPlanId>> ListNotificationPlansAsync(NotificationPlanId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -549,7 +549,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="notificationPlanId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-get">Get Notification Plan (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-get">Get Notification Plan (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationPlan> GetNotificationPlanAsync(NotificationPlanId notificationPlanId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -565,7 +565,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-update">Update Notification Plans (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-update">Update Notification Plans (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateNotificationPlanAsync(NotificationPlanId notificationPlanId, UpdateNotificationPlanConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -576,7 +576,7 @@
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="notificationPlanId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-delete">Delete Notification Plans (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-delete">Delete Notification Plans (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task RemoveNotificationPlanAsync(NotificationPlanId notificationPlanId, CancellationToken cancellationToken);
 
         #endregion Notification Plans
@@ -597,8 +597,8 @@
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-monitoring-zones.html#service-monitoring-zones-list">List Monitoring Zones (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-monitoring-zones.html#service-monitoring-zones-list">List Monitoring Zones (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<MonitoringZone, MonitoringZoneId>> ListMonitoringZonesAsync(MonitoringZoneId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -614,7 +614,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="monitoringZoneId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-monitoring-zones.html#service-monitoring-zones-get">Get Monitoring Zone (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-monitoring-zones.html#service-monitoring-zones-get">Get Monitoring Zone (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<MonitoringZone> GetMonitoringZoneAsync(MonitoringZoneId monitoringZoneId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -635,7 +635,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-monitoring-zones.html#service-monitoring-zones-traceroute">Perform a "traceroute" from a Monitoring Zone (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-monitoring-zones.html#service-monitoring-zones-traceroute">Perform a "traceroute" from a Monitoring Zone (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<TraceRoute> PerformTraceRouteFromMonitoringZoneAsync(MonitoringZoneId monitoringZoneId, TraceRouteConfiguration configuration, CancellationToken cancellationToken);
 
         #endregion Monitoring Zones
@@ -662,7 +662,7 @@
         /// <para>If <paramref name="alarmId"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-notification-history.html#service-alarm-notification-history-discover">Discover Alarm Notification History (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-notification-history.html#service-alarm-notification-history-discover">Discover Alarm Notification History (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<CheckId[]> DiscoverAlarmNotificationHistoryAsync(EntityId entityId, AlarmId alarmId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -698,9 +698,9 @@
         /// <para>If <paramref name="to"/> represents a date before January 1, 1970 UTC.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-notification-history.html#service-alarm-notification-history-list">List Alarm Notification History (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-notification-history.html#service-alarm-notification-history-list">List Alarm Notification History (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AlarmNotificationHistoryItem, AlarmNotificationHistoryItemId>> ListAlarmNotificationHistoryAsync(EntityId entityId, AlarmId alarmId, CheckId checkId, AlarmNotificationHistoryItemId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken);
 
         /// <summary>
@@ -727,7 +727,7 @@
         /// <para>If <paramref name="alarmNotificationHistoryItemId"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-notification-history.html#service-alarm-notification-history-get">Get Alarm Notification History (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-notification-history.html#service-alarm-notification-history-get">Get Alarm Notification History (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AlarmNotificationHistoryItem> GetAlarmNotificationHistoryAsync(EntityId entityId, AlarmId alarmId, CheckId checkId, AlarmNotificationHistoryItemId alarmNotificationHistoryItemId, CancellationToken cancellationToken);
 
         #endregion Alarm Notification History
@@ -747,7 +747,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-create">Create Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-create">Create Notification (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationId> CreateNotificationAsync(NotificationConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -763,7 +763,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-test-new">Test Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-test-new">Test Notification (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationData> TestNotificationAsync(NotificationConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -779,7 +779,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="notificationId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-test-existing">Test Existing Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-test-existing">Test Existing Notification (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationData> TestExistingNotificationAsync(NotificationId notificationId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -796,8 +796,8 @@
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-list">List Notifications (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-list">List Notifications (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Notification, NotificationId>> ListNotificationsAsync(NotificationId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -813,7 +813,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="notificationId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-get">Get Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-get">Get Notification (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<Notification> GetNotificationAsync(NotificationId notificationId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -829,7 +829,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-update">Update Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-update">Update Notification (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateNotificationAsync(NotificationId notificationId, UpdateNotificationConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -840,7 +840,7 @@
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="notificationId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-delete">Delete Notification (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-delete">Delete Notification (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task RemoveNotificationAsync(NotificationId notificationId, CancellationToken cancellationToken);
 
         #endregion Notifications
@@ -861,8 +861,8 @@
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-types-crud.html#Service-Notification-Types-List">List Notification Types (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-types-crud.html#Service-Notification-Types-List">List Notification Types (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<NotificationType, NotificationTypeId>> ListNotificationTypesAsync(NotificationTypeId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -878,7 +878,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="notificationTypeId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-types-crud.html#Service-Notification-Types-get">Get Notification Type (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-types-crud.html#Service-Notification-Types-get">Get Notification Type (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<NotificationType> GetNotificationTypeAsync(NotificationTypeId notificationTypeId, CancellationToken cancellationToken);
 
         #endregion Notification Types
@@ -908,9 +908,9 @@
         /// <para>If <paramref name="to"/> represents a date before January 1, 1970 UTC.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-changelogs.html#service-changelogs-alarms-list">List Alarm Changelogs (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-changelogs.html#service-changelogs-alarms-list">List Alarm Changelogs (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> ListAlarmChangelogsAsync(AlarmChangelogId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken);
 
         /// <summary>
@@ -937,9 +937,9 @@
         /// <para>If <paramref name="to"/> represents a date before January 1, 1970 UTC.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-changelogs.html#service-changelogs-alarms-list">List Alarm Changelogs (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-changelogs.html#service-changelogs-alarms-list">List Alarm Changelogs (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">Time Series Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AlarmChangelog, AlarmChangelogId>> ListAlarmChangelogsAsync(EntityId entityId, AlarmChangelogId marker, int? limit, DateTimeOffset? from, DateTimeOffset? to, CancellationToken cancellationToken);
 
         #endregion Changelogs
@@ -960,8 +960,8 @@
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-views.html#service-views-overview">Get Overview (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-views.html#service-views-overview">Get Overview (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> ListEntityOverviewsAsync(EntityId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -980,8 +980,8 @@
         /// <exception cref="ArgumentException">If <paramref name="entityIdFilter"/> is non-<c>null</c> and contains any <c>null</c> values.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-views.html#service-views-overview">Get Overview (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-views.html#service-views-overview">Get Overview (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<EntityOverview, EntityId>> ListEntityOverviewsAsync(EntityId marker, int? limit, IEnumerable<EntityId> entityIdFilter, CancellationToken cancellationToken);
 
         #endregion Views
@@ -1002,8 +1002,8 @@
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-examples.html#service-alarm-examples-list">List Alarm Examples (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-examples.html#service-alarm-examples-list">List Alarm Examples (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AlarmExample, AlarmExampleId>> ListAlarmExamplesAsync(AlarmExampleId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1019,7 +1019,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="alarmExampleId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-examples.html#service-alarm-examples-get">Get Alarm Example (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-examples.html#service-alarm-examples-get">Get Alarm Example (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AlarmExample> GetAlarmExampleAsync(AlarmExampleId alarmExampleId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1041,7 +1041,7 @@
         /// </exception>
         /// <exception cref="ArgumentException">If <paramref name="exampleParameters"/> contains any <c>null</c> or empty keys.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-examples.html#service-alarm-examples-post">Evaluate Alarm Example (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-examples.html#service-alarm-examples-post">Evaluate Alarm Example (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<BoundAlarmExample> EvaluateAlarmExampleAsync(AlarmExampleId alarmExampleId, IDictionary<string, object> exampleParameters, CancellationToken cancellationToken);
 
         #endregion Alarm Examples
@@ -1066,8 +1066,8 @@
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agents">List Agents (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agents">List Agents (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Agent, AgentId>> ListAgentsAsync(AgentId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1082,7 +1082,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agent">Get Agent (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agent">Get Agent (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<Agent> GetAgentAsync(AgentId agentId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1101,8 +1101,8 @@
         /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agent-connections">List Agent Connections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agent-connections">List Agent Connections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AgentConnection, AgentConnectionId>> ListAgentConnectionsAsync(AgentId agentId, AgentConnectionId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1123,7 +1123,7 @@
         /// <para>If <paramref name="agentConnectionId"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agent-connection">Get Agent Connection (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent.html#service-agent-list-agent-connection">Get Agent Connection (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AgentConnection> GetAgentConnectionAsync(AgentId agentId, AgentConnectionId agentConnectionId, CancellationToken cancellationToken);
 
         #endregion Agents
@@ -1143,7 +1143,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-create-token">Create Agent Token (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-create-token">Create Agent Token (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AgentTokenId> CreateAgentTokenAsync(AgentTokenConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1160,8 +1160,8 @@
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-list">List Agent Tokens (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-list">List Agent Tokens (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<AgentToken, AgentTokenId>> ListAgentTokensAsync(AgentTokenId marker, int? limit, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1177,7 +1177,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentTokenId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-get">Get Agent Token (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-get">Get Agent Token (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<AgentToken> GetAgentTokenAsync(AgentTokenId agentTokenId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1193,7 +1193,7 @@
         /// <para>If <paramref name="configuration"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-update">Update Agent Token (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-update">Update Agent Token (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task UpdateAgentTokenAsync(AgentTokenId agentTokenId, AgentTokenConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1204,7 +1204,7 @@
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentTokenId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-delete">Delete Agent Token (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-tokens.html#service-agent-token-delete">Delete Agent Token (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task RemoveAgentTokenAsync(AgentTokenId agentTokenId, CancellationToken cancellationToken);
 
         #endregion Agent Token
@@ -1229,7 +1229,7 @@
         /// <para>If <paramref name="hostInformation"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html">Agent Host Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html">Agent Host Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<HostInformation<JToken>> GetAgentHostInformationAsync(AgentId agentId, HostInformationType hostInformation, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1245,7 +1245,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-cpus">Get CPUs Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-cpus">Get CPUs Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<HostInformation<ReadOnlyCollection<CpuInformation>>> GetCpuInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1261,7 +1261,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-disks">Get Disks Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-disks">Get Disks Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<HostInformation<ReadOnlyCollection<DiskInformation>>> GetDiskInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1277,7 +1277,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-filesystems">Get Filesystems Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-filesystems">Get Filesystems Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<HostInformation<ReadOnlyCollection<FilesystemInformation>>> GetFilesystemInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1293,7 +1293,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-memory">Get Memory Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-memory">Get Memory Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<HostInformation<MemoryInformation>> GetMemoryInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1309,7 +1309,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-network_interfaces">Get Network Interfaces Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-network_interfaces">Get Network Interfaces Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<HostInformation<ReadOnlyCollection<NetworkInterfaceInformation>>> GetNetworkInterfaceInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1325,7 +1325,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-processes">Get Processes Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-processes">Get Processes Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<HostInformation<ReadOnlyCollection<ProcessInformation>>> GetProcessInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1341,7 +1341,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-system">Get System Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-system">Get System Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<HostInformation<SystemInformation>> GetSystemInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         /// <summary>
@@ -1357,7 +1357,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="agentId"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-who">Get Logged-in User Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html#service-agent-host_info-who">Get Logged-in User Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<HostInformation<ReadOnlyCollection<LoginInformation>>> GetLoginInformationAsync(AgentId agentId, CancellationToken cancellationToken);
 
         #endregion Agent Host Information
@@ -1386,8 +1386,8 @@
         /// <exception cref="ArgumentException">If <paramref name="agentCheckType"/> is not an agent check type (i.e. the <see cref="CheckTypeId.IsAgent"/> property is <c>false</c>).</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-targets.html#service-agent-list-check-targets">List Agent Check Targets (Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-targets.html#service-agent-list-check-targets">List Agent Check Targets (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<CheckTarget, CheckTargetId>> ListAgentCheckTargetsAsync(EntityId entityId, CheckTypeId agentCheckType, CheckTargetId marker, int? limit, CancellationToken cancellationToken);
 
         #endregion Agent Targets

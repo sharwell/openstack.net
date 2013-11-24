@@ -63,9 +63,9 @@
         /// <exception cref="ArgumentException">
         /// If <paramref name="label"/> is empty.
         /// <para>-or-</para>
-        /// <para>If <paramref name="ipAddresses"/> contains any <c>null</c> or empty keys, or any <c>null</c> values.</para>
+        /// <para>If <paramref name="ipAddresses"/> contains any <c>null</c> or empty keys.</para>
         /// <para>-or-</para>
-        /// <para>If <paramref name="metadata"/> contains any <c>null</c> or empty keys, or any <c>null</c> values.</para>
+        /// <para>If <paramref name="metadata"/> contains any <c>null</c> or empty keys.</para>
         /// </exception>
         public EntityConfiguration(string label, AgentId agentId, IDictionary<string, IPAddress> ipAddresses, IDictionary<string, string> metadata)
         {
@@ -77,7 +77,18 @@
             _label = label;
             _agentId = agentId;
             _ipAddresses = ipAddresses;
+            if (_ipAddresses != null)
+            {
+                if (_ipAddresses.ContainsKey(null) || _ipAddresses.ContainsKey(string.Empty))
+                    throw new ArgumentException("ipAddresses cannot contain any null or empty keys", "ipAddresses");
+            }
+
             _metadata = metadata;
+            if (_metadata != null)
+            {
+                if (_metadata.ContainsKey(null) || _metadata.ContainsKey(string.Empty))
+                    throw new ArgumentException("metadata cannot contain any null or empty keys", "metadata");
+            }
         }
 
         /// <summary>

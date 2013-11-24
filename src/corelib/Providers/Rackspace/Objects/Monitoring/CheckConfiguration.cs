@@ -172,6 +172,11 @@
             _targetHostname = targetHostname;
             _resolverType = resolverType;
             _metadata = metadata;
+            if (_metadata != null)
+            {
+                if (_metadata.ContainsKey(null) || _metadata.ContainsKey(string.Empty))
+                    throw new ArgumentException("metadata cannot contain any null or empty keys", "metadata");
+            }
         }
 
         /// <summary>

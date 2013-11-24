@@ -3,6 +3,12 @@
     using System;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of the data produced by testing a monitoring alarm.
+    /// </summary>
+    /// <seealso cref="IMonitoringService.TestAlarmAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class AlarmData
     {
@@ -35,6 +41,9 @@
         {
         }
 
+        /// <summary>
+        /// Gets a timestamp indicating when this alarm data occurred.
+        /// </summary>
         public DateTimeOffset? Timestamp
         {
             get
@@ -43,6 +52,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the state of the alarm.
+        /// </summary>
         public AlarmState State
         {
             get
@@ -51,6 +63,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the status of the alarm.
+        /// </summary>
         public string Status
         {
             get

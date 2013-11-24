@@ -11,6 +11,7 @@
     /// This class models the JSON representation of a request to update the properties
     /// of a <see cref="NotificationPlan"/> resource in the <see cref="IMonitoringService"/>.
     /// </summary>
+    /// <seealso cref="IMonitoringService.UpdateNotificationPlanAsync"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]

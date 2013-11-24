@@ -1962,7 +1962,7 @@
         /// <para>If <paramref name="hostInformation"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html">Agent Host Information (Cloud Monitoring Developer Guide - API v1.0)</seealso>
+        /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-agent-host_info.html">Agent Host Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         protected Task<HostInformation<T>> GetAgentHostInformationAsync<T>(AgentId agentId, HostInformationType hostInformation, CancellationToken cancellationToken)
         {
             if (agentId == null)

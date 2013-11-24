@@ -1,27 +1,53 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
+    using System;
     using System.Collections.Generic;
     using net.openstack.Core.Collections;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of a request to update the properties
+    /// of an <see cref="Alarm"/> resource in the <see cref="IMonitoringService"/>.
+    /// </summary>
+    /// <seealso cref="IMonitoringService.UpdateAlarmAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class UpdateAlarmConfiguration
     {
+        /// <summary>
+        /// This is the backing field for the <see cref="CheckId"/> property.
+        /// </summary>
         [JsonProperty("check_id", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private CheckId _checkId;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="NotificationPlanId"/> property.
+        /// </summary>
         [JsonProperty("notification_plan_id", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private NotificationPlanId _notificationPlanId;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Criteria"/> property.
+        /// </summary>
         [JsonProperty("criteria", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _criteria;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Enabled"/> property.
+        /// </summary>
         [JsonProperty("disabled", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private bool? _disabled;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Label"/> property.
+        /// </summary>
         [JsonProperty("label", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _label;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Metadata"/> property.
+        /// </summary>
         [JsonProperty("metadata", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private IDictionary<string, string> _metadata;
 
@@ -34,6 +60,19 @@
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateAlarmConfiguration"/> class with the specified
+        /// values.
+        /// </summary>
+        /// <param name="checkId">The ID of the check to alert on. This is obtained from <see cref="Check.Id">Check.Id</see>. If this value is <c>null</c>, the existing value for the alarm is not changed.</param>
+        /// <param name="notificationPlanId">The ID of the notification plan to execute when the state changes. This is obtained from <see cref="NotificationPlan.Id">NotificationPlan.Id</see>. If this value is <c>null</c>, the existing value for the alarm is not changed.</param>
+        /// <param name="criteria">The <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/alerts-language.html">alarm DSL</see> for describing alerting conditions and their output states. If this value is <c>null</c>, the existing value for the alarm is not changed.</param>
+        /// <param name="enabled"><c>true</c> to enable processing and alerts on this alarm; otherwise, <c>false</c>. If this value is <c>null</c>, the existing value for the alarm is not changed.</param>
+        /// <param name="label">A friendly label for the alarm. If this value is <c>null</c>, the existing value for the alarm is not changed.</param>
+        /// <param name="metadata">A collection of metadata to associate with the alarm. If this value is <c>null</c>, the existing value for the alarm is not changed.</param>
+        /// <exception cref="ArgumentException">
+        /// If <paramref name="metadata"/> contains any values with <c>null</c> or empty keys.
+        /// </exception>
         public UpdateAlarmConfiguration(CheckId checkId = null, NotificationPlanId notificationPlanId = null, string criteria = null, bool? enabled = null, string label = null, IDictionary<string, string> metadata = null)
         {
             _checkId = checkId;
@@ -42,6 +81,11 @@
             _disabled = !enabled;
             _label = label;
             _metadata = metadata;
+            if (_metadata != null)
+            {
+                if (_metadata.ContainsKey(null) || _metadata.ContainsKey(string.Empty))
+                    throw new ArgumentException("metadata cannot contain any null or empty keys", "metadata");
+            }
         }
 
         /// <summary>
@@ -59,7 +103,7 @@
         /// <summary>
         /// Gets the ID of the notification plan to execute when the state changes.
         /// </summary>
-        /// <seealso cref="NotificationPlan.Label"/>
+        /// <seealso cref="NotificationPlan.Id"/>
         public NotificationPlanId NotificationPlanId
         {
             get
@@ -79,17 +123,20 @@
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether processing and alerts are enabled on the alarm.
+        /// </summary>
         public bool? Enabled
         {
             get
             {
-                if (!_disabled.HasValue)
-                    return null;
-
-                return !_disabled.Value;
+                return !_disabled;
             }
         }
 
+        /// <summary>
+        /// Gets the friendly label for the alarm.
+        /// </summary>
         public string Label
         {
             get
@@ -98,6 +145,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a collection of metadata associated with the alarm.
+        /// </summary>
         public ReadOnlyDictionary<string, string> Metadata
         {
             get

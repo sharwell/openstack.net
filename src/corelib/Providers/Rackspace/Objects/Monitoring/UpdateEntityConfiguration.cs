@@ -11,6 +11,7 @@
     /// This class models the JSON representation of a request to update the properties
     /// of an <see cref="Entity"/> resource in the <see cref="IMonitoringService"/>.
     /// </summary>
+    /// <seealso cref="IMonitoringService.UpdateEntityAsync"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
@@ -73,6 +74,11 @@
             _agentId = agentId;
             _ipAddresses = ipAddresses;
             _metadata = metadata;
+            if (_metadata != null)
+            {
+                if (_metadata.ContainsKey(null) || _metadata.ContainsKey(string.Empty))
+                    throw new ArgumentException("metadata cannot contain any null or empty keys", "metadata");
+            }
         }
 
         /// <summary>
