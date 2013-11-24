@@ -375,8 +375,46 @@
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-paginated-collections.html">Paginated Collections (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<ReadOnlyCollectionPage<Metric, MetricName>> ListMetricsAsync(EntityId entityId, CheckId checkId, MetricName marker, int? limit, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Gets a collection of data points collected for a metric by the monitoring service.
+        /// </summary>
+        /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
+        /// <param name="checkId">The check ID. This is obtained from <see cref="Check.Id">Check.Id</see>.</param>
+        /// <param name="metricName">The metric name. This is obtained from <see cref="Metric.Name">Metric.Name</see>.</param>
+        /// <param name="points">The number of data points to return.</param>
+        /// <param name="resolution">The granularity of the returned data points.</param>
+        /// <param name="select">A collection of <see cref="DataPointStatistic"/> objects identifying the statistics to compute for the data.</param>
+        /// <param name="from">The beginning timestamp of the items to include in the collection. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">time series collections</see>.</param>
+        /// <param name="to">The ending timestamp of the items to include in the collection. This parameter is used for <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/api-time-series-collections.html">time series collections</see>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When
+        /// the task completes successfully, the <see cref="Task{TResult}.Result"/>
+        /// property will contain a collection of <see cref="DataPoint"/> objects
+        /// describing the data points collected for the metric.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="entityId"/> is <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="checkId"/> is <c>null</c>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="metricName"/> is <c>null</c>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If both <paramref name="points"/> and <paramref name="resolution"/> are <c>null</c>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="to"/> occurs before <paramref name="from"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="points"/> is less than or equal to 0.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="from"/> represents a date before January 1, 1970 UTC.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="to"/> represents a date before January 1, 1970 UTC.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/metrics-api.html#fetch-data-points">Fetch Data Points (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        Task<ReadOnlyCollectionPage<DataPoint, EntityId>> GetDataPointsAsync(EntityId entityId, CheckId checkId, MetricName metricName, int? points, DataPointGranularity resolution, IEnumerable<DataPointStatistic> select, CancellationToken cancellationToken);
+        Task<DataPoint[]> GetDataPointsAsync(EntityId entityId, CheckId checkId, MetricName metricName, int? points, DataPointGranularity resolution, IEnumerable<DataPointStatistic> select, DateTimeOffset from, DateTimeOffset to, CancellationToken cancellationToken);
 
         #endregion Metrics
 

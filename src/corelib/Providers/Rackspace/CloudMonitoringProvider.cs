@@ -599,9 +599,64 @@
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollectionPage<DataPoint, EntityId>> GetDataPointsAsync(EntityId entityId, CheckId checkId, MetricName metricName, int? points, DataPointGranularity resolution, IEnumerable<DataPointStatistic> select, CancellationToken cancellationToken)
+        public Task<DataPoint[]> GetDataPointsAsync(EntityId entityId, CheckId checkId, MetricName metricName, int? points, DataPointGranularity resolution, IEnumerable<DataPointStatistic> select, DateTimeOffset from, DateTimeOffset to, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (entityId == null)
+                throw new ArgumentNullException("entityId");
+            if (checkId == null)
+                throw new ArgumentNullException("checkId");
+            if (metricName == null)
+                throw new ArgumentNullException("metricName");
+            if (points <= 0)
+                throw new ArgumentOutOfRangeException("points");
+
+            UriTemplate template = new UriTemplate("/entities/{entityId}/checks/{checkId}/metrics/{metricName}/plot?points={points}&resolution={resolution}&SELECT={select}&from={from}&to={to}");
+            var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "checkId", checkId.Value }, { "metricName", metricName.Value } };
+            if (points != null)
+                parameters.Add("points", points.ToString());
+            if (resolution != null)
+                parameters.Add("resolution", resolution.Name);
+            if (select != null)
+                parameters.Add("select", "select");
+            if (from != null)
+                parameters.Add("from", from.ToTimestamp().ToString());
+            if (to != null)
+                parameters.Add("to", to.ToTimestamp().ToString());
+
+            Func<Uri, Uri> transform =
+                uri =>
+                {
+                    UriBuilder builder = new UriBuilder(uri);
+                    if (builder.Query != null && select != null)
+                        builder.Query = builder.Query.Substring(1).Replace("SELECT=select", string.Join("&", select.Select(i => "select=" + i.Name).ToArray()));
+
+                    return builder.Uri;
+                };
+
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters, transform);
+
+            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+                GetResponseAsyncFunc<JObject>(cancellationToken);
+
+            Func<Task<JObject>, DataPoint[]> resultSelector =
+                task =>
+                {
+                    JObject result = task.Result;
+                    if (result == null)
+                        return null;
+
+                    JToken valuesToken = result["values"];
+                    if (valuesToken == null)
+                        return null;
+
+                    return valuesToken.ToObject<DataPoint[]>();
+                };
+
+            return AuthenticateServiceAsync(cancellationToken)
+                .ContinueWith(prepareRequest)
+                .ContinueWith(requestResource).Unwrap()
+                .ContinueWith(resultSelector);
         }
 
         /// <inheritdoc/>

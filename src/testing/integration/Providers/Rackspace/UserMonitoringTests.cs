@@ -706,51 +706,28 @@
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
-                string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
-                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
-
-                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
-                Assert.AreEqual(1, monitoringZones.Count);
-
-                string checkLabel = CreateRandomCheckName();
-                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
-                CheckDetails details = new HttpCheckDetails(
-                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
-                    authUser: default(string),
-                    authPassword: default(string),
-                    body: default(string),
-                    bodyMatches: default(IDictionary<string, string>),
-                    followRedirects: default(bool?),
-                    headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
-                    payload: default(string));
-                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
-                TimeSpan? timeout = null;
-                TimeSpan? period = null;
-                string targetAlias = null;
-                string targetHostname = "docs.rackspace.com";
-                TargetResolverType resolverType = TargetResolverType.IPv4;
-                IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
-                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkId);
-
-                CheckData[] checkData = await provider.TestExistingCheckAsync(entityId, checkId, cancellationTokenSource.Token);
-
-                Metric[] metrics = await ListAllMetricsAsync(provider, entityId, checkId, null, cancellationTokenSource.Token);
-                if (metrics.Length == 0)
-                    Assert.Inconclusive("The service did not report any metrics.");
-
-                foreach (Metric metric in metrics)
+                bool foundMetrics = false;
+                Entity[] entities = await ListAllEntitiesAsync(provider, null, cancellationTokenSource.Token);
+                foreach (Entity entity in entities)
                 {
-                    Console.WriteLine("Metric '{0}'", metric.Name);
+                    Console.WriteLine("Entity '{0}'", entity.Label);
+
+                    Check[] checks = await ListAllChecksAsync(provider, entity.Id, null, cancellationTokenSource.Token);
+                    foreach (Check check in checks)
+                    {
+                        Console.WriteLine("  Check '{0}'", check.Label);
+
+                        Metric[] metrics = await ListAllMetricsAsync(provider, entity.Id, check.Id, null, cancellationTokenSource.Token);
+                        foundMetrics |= metrics.Any();
+                        foreach (Metric metric in metrics)
+                        {
+                            Console.WriteLine("    Metric '{0}'", metric.Name);
+                        }
+                    }
                 }
 
-                await provider.RemoveCheckAsync(entityId, checkId, cancellationTokenSource.Token);
-
-                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+                if (!foundMetrics)
+                    Assert.Inconclusive("The service did not report any metrics.");
             }
         }
 
@@ -762,53 +739,43 @@
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
-                string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
-                EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
-
-                ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
-                Assert.AreEqual(1, monitoringZones.Count);
-
-                string checkLabel = CreateRandomCheckName();
-                CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
-                CheckDetails details = new HttpCheckDetails(
-                    url: new Uri("http://docs.rackspace.com", UriKind.Absolute),
-                    authUser: default(string),
-                    authPassword: default(string),
-                    body: default(string),
-                    bodyMatches: default(IDictionary<string, string>),
-                    followRedirects: default(bool?),
-                    headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
-                    payload: default(string));
-                IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
-                TimeSpan? timeout = null;
-                TimeSpan? period = null;
-                string targetAlias = null;
-                string targetHostname = "docs.rackspace.com";
-                TargetResolverType resolverType = TargetResolverType.IPv4;
-                IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
-                CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkId);
-
-                CheckData[] checkData = await provider.TestExistingCheckAsync(entityId, checkId, cancellationTokenSource.Token);
-
-                Metric[] metrics = await ListAllMetricsAsync(provider, entityId, checkId, null, cancellationTokenSource.Token);
-                if (metrics.Length == 0)
-                    Assert.Inconclusive("The service did not report any metrics.");
-
-                foreach (Metric metric in metrics)
+                bool foundMetrics = false;
+                bool foundData = false;
+                Entity[] entities = await ListAllEntitiesAsync(provider, null, cancellationTokenSource.Token);
+                foreach (Entity entity in entities)
                 {
-                    //await provider.GetDataPointsAsync(entityId, checkId, metric.Name, points, resolution, select, cancellationTokenSource.Token);
-                    //Console.WriteLine("Metric '{0}'", metric.Name);
-                    throw new NotImplementedException();
+                    Console.WriteLine("Entity '{0}'", entity.Label);
+
+                    Check[] checks = await ListAllChecksAsync(provider, entity.Id, null, cancellationTokenSource.Token);
+                    foreach (Check check in checks)
+                    {
+                        Console.WriteLine("  Check '{0}'", check.Label);
+
+                        Metric[] metrics = await ListAllMetricsAsync(provider, entity.Id, check.Id, null, cancellationTokenSource.Token);
+                        foundMetrics |= metrics.Any();
+                        foreach (Metric metric in metrics)
+                        {
+                            int? points = null;
+                            DataPointGranularity resolution = DataPointGranularity.Min240;
+                            IEnumerable<DataPointStatistic> select = new[] { DataPointStatistic.NumPoints, DataPointStatistic.Average, DataPointStatistic.Variance, DataPointStatistic.Max };
+                            DateTimeOffset from = DateTimeOffset.Now - TimeSpan.FromDays(1);
+                            DateTimeOffset to = DateTimeOffset.Now;
+                            DataPoint[] dataPoints = await provider.GetDataPointsAsync(entity.Id, check.Id, metric.Name, points, resolution, select, from, to, cancellationTokenSource.Token);
+                            foundData |= dataPoints.Any();
+                        }
+
+                        if (foundData)
+                            break;
+                    }
+
+                    if (foundData)
+                        break;
                 }
 
-                await provider.RemoveCheckAsync(entityId, checkId, cancellationTokenSource.Token);
-
-                await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
+                if (!foundMetrics)
+                    Assert.Inconclusive("The service did not report any metrics.");
+                if (!foundData)
+                    Assert.Inconclusive("The service did not report any data points for metrics within the past day.");
             }
         }
 
