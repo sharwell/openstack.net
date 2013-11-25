@@ -96,18 +96,18 @@
         /// <param name="payload">The body to include with the HTTP request.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="url"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">
-        /// If <paramref name="bodyMatches"/> contains any <c>null</c> or empty keys.
+        /// If <paramref name="bodyMatches"/> contains any empty keys.
         /// <para>-or-</para>
-        /// <para>If <paramref name="headers"/> contains any <c>null</c> or empty keys.</para>
+        /// <para>If <paramref name="headers"/> contains any empty keys.</para>
         /// </exception>
         public HttpCheckDetails(Uri url, string authUser, string authPassword, string body, IDictionary<string, string> bodyMatches, bool? followRedirects, IDictionary<string, string> headers, HttpMethod? method, string payload)
         {
             if (url == null)
                 throw new ArgumentNullException("url");
-            if (bodyMatches != null && (bodyMatches.ContainsKey(null) || bodyMatches.ContainsKey(string.Empty)))
-                throw new ArgumentException("bodyMatches cannot contain any null or empty keys", "bodyMatches");
-            if (headers != null && (headers.ContainsKey(null) || headers.ContainsKey(string.Empty)))
-                throw new ArgumentException("headers cannot contain any null or empty keys", "headers");
+            if (bodyMatches != null && bodyMatches.ContainsKey(string.Empty))
+                throw new ArgumentException("bodyMatches cannot contain any empty keys", "bodyMatches");
+            if (headers != null && headers.ContainsKey(string.Empty))
+                throw new ArgumentException("headers cannot contain any empty keys", "headers");
 
             _url = url.ToString();
             _authUser = authUser;

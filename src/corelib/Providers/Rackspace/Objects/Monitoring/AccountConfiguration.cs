@@ -42,13 +42,13 @@
         /// </summary>
         /// <param name="metadata">The metadata to associate with the monitoring account.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="metadata"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">If <paramref name="metadata"/> contains any <c>null</c> or empty keys.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="metadata"/> contains any empty keys.</exception>
         public AccountConfiguration(IDictionary<string, string> metadata)
         {
             if (metadata == null)
                 throw new ArgumentNullException("metadata");
-            if (metadata.ContainsKey(null) || metadata.ContainsKey(string.Empty))
-                throw new ArgumentException("metadata cannot contain any null or empty keys", "metadata");
+            if (metadata.ContainsKey(string.Empty))
+                throw new ArgumentException("metadata cannot contain any empty keys", "metadata");
 
             _metadata = new Dictionary<string,string>(metadata);
         }
@@ -73,13 +73,13 @@
         /// </summary>
         /// <param name="metadata">The metadata to associate with the monitoring account. If this value is <c>null</c>, the metadata associated with the account is not changed.</param>
         /// <param name="webhookToken">The webhook token to associate with the account. If this value is <c>null</c>, the webhook token associated with the account is not changed.</param>
-        /// <exception cref="ArgumentException">If <paramref name="metadata"/> contains any <c>null</c> or empty keys.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="metadata"/> contains any empty keys.</exception>
         public AccountConfiguration(IDictionary<string, string> metadata, WebhookToken webhookToken)
         {
             if (metadata != null)
             {
-                if (metadata.ContainsKey(null) || metadata.ContainsKey(string.Empty))
-                    throw new ArgumentException("metadata cannot contain any null or empty keys", "metadata");
+                if (metadata.ContainsKey(string.Empty))
+                    throw new ArgumentException("metadata cannot contain any empty keys", "metadata");
 
                 _metadata = new Dictionary<string,string>(metadata);
             }

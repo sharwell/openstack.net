@@ -74,7 +74,7 @@
         /// <para>-or-</para>
         /// <para>If <paramref name="okState"/> contains any <c>null</c> values.</para>
         /// <para>-or-</para>
-        /// <para>If <paramref name="metadata"/> contains any <c>null</c> or empty keys.</para>
+        /// <para>If <paramref name="metadata"/> contains any empty keys.</para>
         /// </exception>
         public UpdateNotificationPlanConfiguration(string label = null, IEnumerable<NotificationId> criticalState = null, IEnumerable<NotificationId> warningState = null, IEnumerable<NotificationId> okState = null, IDictionary<string, string> metadata = null)
         {
@@ -109,8 +109,8 @@
             if (metadata != null)
             {
                 _metadata = metadata;
-                if (metadata.ContainsKey(null) || metadata.ContainsKey(string.Empty))
-                    throw new ArgumentException("metadata cannot contain any null or empty keys", "metadata");
+                if (metadata.ContainsKey(string.Empty))
+                    throw new ArgumentException("metadata cannot contain any empty keys", "metadata");
             }
         }
 

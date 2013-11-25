@@ -76,7 +76,7 @@
         /// <para>If <paramref name="notificationPlanId"/> is <c>null</c>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// If <paramref name="metadata"/> contains any values with <c>null</c> or empty keys.
+        /// If <paramref name="metadata"/> contains any values with empty keys.
         /// </exception>
         public AlarmConfiguration(CheckId checkId, NotificationPlanId notificationPlanId, string criteria = null, bool? enabled = null, string label = null, IDictionary<string, string> metadata = null)
         {

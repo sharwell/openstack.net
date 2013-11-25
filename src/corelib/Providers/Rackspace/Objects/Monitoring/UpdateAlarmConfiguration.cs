@@ -71,7 +71,7 @@
         /// <param name="label">A friendly label for the alarm. If this value is <c>null</c>, the existing value for the alarm is not changed.</param>
         /// <param name="metadata">A collection of metadata to associate with the alarm. If this value is <c>null</c>, the existing value for the alarm is not changed.</param>
         /// <exception cref="ArgumentException">
-        /// If <paramref name="metadata"/> contains any values with <c>null</c> or empty keys.
+        /// If <paramref name="metadata"/> contains any values with empty keys.
         /// </exception>
         public UpdateAlarmConfiguration(CheckId checkId = null, NotificationPlanId notificationPlanId = null, string criteria = null, bool? enabled = null, string label = null, IDictionary<string, string> metadata = null)
         {
@@ -83,8 +83,8 @@
             _metadata = metadata;
             if (_metadata != null)
             {
-                if (_metadata.ContainsKey(null) || _metadata.ContainsKey(string.Empty))
-                    throw new ArgumentException("metadata cannot contain any null or empty keys", "metadata");
+                if (_metadata.ContainsKey(string.Empty))
+                    throw new ArgumentException("metadata cannot contain any empty keys", "metadata");
             }
         }
 

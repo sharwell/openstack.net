@@ -1077,7 +1077,7 @@
         /// <para>-or-</para>
         /// <para>If <paramref name="exampleParameters"/> is <c>null</c>.</para>
         /// </exception>
-        /// <exception cref="ArgumentException">If <paramref name="exampleParameters"/> contains any <c>null</c> or empty keys.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="exampleParameters"/> contains any empty keys.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarm-examples.html#service-alarm-examples-post">Evaluate Alarm Example (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         Task<BoundAlarmExample> EvaluateAlarmExampleAsync(AlarmExampleId alarmExampleId, IDictionary<string, object> exampleParameters, CancellationToken cancellationToken);

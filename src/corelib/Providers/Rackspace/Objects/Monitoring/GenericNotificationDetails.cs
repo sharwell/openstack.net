@@ -41,8 +41,8 @@
         {
             if (properties == null)
                 throw new ArgumentNullException("properties");
-            if (properties.ContainsKey(null) || properties.ContainsKey(string.Empty))
-                throw new ArgumentException("properties cannot contain any null or empty keys", "properties");
+            if (properties.ContainsKey(string.Empty))
+                throw new ArgumentException("properties cannot contain any empty keys", "properties");
 
             _properties = properties;
         }
