@@ -86,7 +86,7 @@
         {
             get
             {
-                return Guid.Parse(_guid);
+                return new Guid(_guid);
             }
         }
 
