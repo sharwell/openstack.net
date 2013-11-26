@@ -826,7 +826,7 @@
                 string criteria = null;
                 bool? enabled = null;
                 IDictionary<string, string> alarmMetadata = null;
-                AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, alarmMetadata);
+                NewAlarmConfiguration alarmConfiguration = new NewAlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, alarmMetadata);
                 AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
 
                 Alarm alarm = await provider.GetAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
@@ -955,7 +955,7 @@
                 List<AlarmId> alarmIds = new List<AlarmId>();
                 foreach (string alarmName in alarmNames)
                 {
-                    AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, alarmMetadata);
+                    NewAlarmConfiguration alarmConfiguration = new NewAlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, alarmMetadata);
                     AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
                     alarmIds.Add(alarmId);
                 }
@@ -1044,7 +1044,7 @@
                 string criteria = null;
                 bool? enabled = null;
                 IDictionary<string, string> alarmMetadata = null;
-                AlarmConfiguration alarmConfiguration = new AlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, alarmMetadata);
+                NewAlarmConfiguration alarmConfiguration = new NewAlarmConfiguration(checkId, notificationPlanId, criteria, enabled, alarmName, alarmMetadata);
                 AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
 
                 Alarm alarm = await provider.GetAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);

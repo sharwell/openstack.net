@@ -408,6 +408,7 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\MysqlBannerCheckDetails.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NetworkInterfaceInformation.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\NewAlarmConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\Notification.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NotificationAttempt.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NotificationConfiguration.cs" />

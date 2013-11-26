@@ -53,7 +53,7 @@
         }
 
         /// <summary>
-        /// Gets a timestamp indicating when the check was first created.
+        /// Gets a timestamp indicating when the alarm was first created.
         /// </summary>
         public DateTimeOffset? Created
         {
@@ -64,7 +64,7 @@
         }
 
         /// <summary>
-        /// Gets a timestamp indicating when the check was last modified.
+        /// Gets a timestamp indicating when the alarm was last modified.
         /// </summary>
         public DateTimeOffset? LastModified
         {

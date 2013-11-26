@@ -660,7 +660,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<AlarmId> CreateAlarmAsync(EntityId entityId, AlarmConfiguration configuration, CancellationToken cancellationToken)
+        public Task<AlarmId> CreateAlarmAsync(EntityId entityId, NewAlarmConfiguration configuration, CancellationToken cancellationToken)
         {
             if (entityId == null)
                 throw new ArgumentNullException("entityId");

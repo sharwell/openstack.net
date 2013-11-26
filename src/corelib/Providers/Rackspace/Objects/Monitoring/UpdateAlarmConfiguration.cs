@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using net.openstack.Core.Collections;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -13,44 +12,8 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class UpdateAlarmConfiguration
+    public class UpdateAlarmConfiguration : AlarmConfiguration
     {
-        /// <summary>
-        /// This is the backing field for the <see cref="CheckId"/> property.
-        /// </summary>
-        [JsonProperty("check_id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private CheckId _checkId;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="NotificationPlanId"/> property.
-        /// </summary>
-        [JsonProperty("notification_plan_id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private NotificationPlanId _notificationPlanId;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="Criteria"/> property.
-        /// </summary>
-        [JsonProperty("criteria", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _criteria;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="Enabled"/> property.
-        /// </summary>
-        [JsonProperty("disabled", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private bool? _disabled;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="Label"/> property.
-        /// </summary>
-        [JsonProperty("label", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _label;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="Metadata"/> property.
-        /// </summary>
-        [JsonProperty("metadata", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private IDictionary<string, string> _metadata;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateAlarmConfiguration"/> class
         /// during JSON deserialization.
@@ -74,89 +37,8 @@
         /// If <paramref name="metadata"/> contains any values with empty keys.
         /// </exception>
         public UpdateAlarmConfiguration(CheckId checkId = null, NotificationPlanId notificationPlanId = null, string criteria = null, bool? enabled = null, string label = null, IDictionary<string, string> metadata = null)
+            : base(checkId, notificationPlanId, criteria, enabled, label, metadata)
         {
-            _checkId = checkId;
-            _notificationPlanId = notificationPlanId;
-            _criteria = criteria;
-            _disabled = !enabled;
-            _label = label;
-            _metadata = metadata;
-            if (_metadata != null)
-            {
-                if (_metadata.ContainsKey(string.Empty))
-                    throw new ArgumentException("metadata cannot contain any empty keys", "metadata");
-            }
-        }
-
-        /// <summary>
-        /// Gets the ID of the check to alert on.
-        /// </summary>
-        /// <seealso cref="Check.Id"/>
-        public CheckId CheckId
-        {
-            get
-            {
-                return _checkId;
-            }
-        }
-
-        /// <summary>
-        /// Gets the ID of the notification plan to execute when the state changes.
-        /// </summary>
-        /// <seealso cref="NotificationPlan.Id"/>
-        public NotificationPlanId NotificationPlanId
-        {
-            get
-            {
-                return _notificationPlanId;
-            }
-        }
-
-        /// <summary>
-        /// Gets the alarm DSL for describing alerting conditions and their output states.
-        /// </summary>
-        public string Criteria
-        {
-            get
-            {
-                return _criteria;
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether processing and alerts are enabled on the alarm.
-        /// </summary>
-        public bool? Enabled
-        {
-            get
-            {
-                return !_disabled;
-            }
-        }
-
-        /// <summary>
-        /// Gets the friendly label for the alarm.
-        /// </summary>
-        public string Label
-        {
-            get
-            {
-                return _label;
-            }
-        }
-
-        /// <summary>
-        /// Gets a collection of metadata associated with the alarm.
-        /// </summary>
-        public ReadOnlyDictionary<string, string> Metadata
-        {
-            get
-            {
-                if (_metadata == null)
-                    return null;
-
-                return new ReadOnlyDictionary<string, string>(_metadata);
-            }
         }
     }
 }

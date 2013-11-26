@@ -9,11 +9,14 @@
     /// This class models the JSON representation of the basic properties of an Alarm resource
     /// in the <see cref="IMonitoringService"/>.
     /// </summary>
+    /// <seealso cref="Alarm"/>
+    /// <seealso cref="NewAlarmConfiguration"/>
+    /// <seealso cref="UpdateAlarmConfiguration"/>
     /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-alarms.html">Alarms (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class AlarmConfiguration
+    public abstract class AlarmConfiguration
     {
         /// <summary>
         /// This is the backing field for the <see cref="CheckId"/> property.
@@ -64,26 +67,19 @@
         /// Initializes a new instance of the <see cref="AlarmConfiguration"/> class with the specified
         /// values.
         /// </summary>
-        /// <param name="checkId">The ID of the check to alert on. This is obtained from <see cref="Check.Id">Check.Id</see>.</param>
-        /// <param name="notificationPlanId">The ID of the notification plan to execute when the state changes. This is obtained from <see cref="NotificationPlan.Id">NotificationPlan.Id</see>.</param>
-        /// <param name="criteria">The <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/alerts-language.html">alarm DSL</see> for describing alerting conditions and their output states.</param>
-        /// <param name="enabled"><c>true</c> to enable processing and alerts on this alarm; otherwise, <c>false</c>. If this value is <c>null</c>, <placeholder/>.</param>
-        /// <param name="label">A friendly label for the alarm.</param>
-        /// <param name="metadata">A collection of metadata to associate with the alarm.</param>
-        /// <exception cref="ArgumentNullException">
-        /// If <paramref name="checkId"/> is <c>null</c>.
-        /// <para>-or-</para>
-        /// <para>If <paramref name="notificationPlanId"/> is <c>null</c>.</para>
-        /// </exception>
+        /// <param name="checkId">The ID of the check to alert on. This is obtained from <see cref="Check.Id">Check.Id</see>. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="notificationPlanId">The ID of the notification plan to execute when the state changes. This is obtained from <see cref="NotificationPlan.Id">NotificationPlan.Id</see>. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="criteria">The <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/alerts-language.html">alarm DSL</see> for describing alerting conditions and their output states. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="enabled"><c>true</c> to enable processing and alerts on this alarm; otherwise, <c>false</c>. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="label">A friendly label for the alarm. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="metadata">A collection of metadata to associate with the alarm. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
         /// <exception cref="ArgumentException">
         /// If <paramref name="metadata"/> contains any values with empty keys.
         /// </exception>
-        public AlarmConfiguration(CheckId checkId, NotificationPlanId notificationPlanId, string criteria = null, bool? enabled = null, string label = null, IDictionary<string, string> metadata = null)
+        protected AlarmConfiguration(CheckId checkId, NotificationPlanId notificationPlanId, string criteria, bool? enabled, string label, IDictionary<string, string> metadata)
         {
-            if (checkId == null)
-                throw new ArgumentNullException("checkId");
-            if (notificationPlanId == null)
-                throw new ArgumentNullException("notificationPlanId");
+            if (metadata != null && metadata.ContainsKey(string.Empty))
+                throw new ArgumentException("metadata cannot contain any empty keys", "metadata");
 
             _checkId = checkId;
             _notificationPlanId = notificationPlanId;
