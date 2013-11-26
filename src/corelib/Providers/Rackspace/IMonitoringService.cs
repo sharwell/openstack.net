@@ -775,7 +775,7 @@
         /// <summary>
         /// Creates a new notification.
         /// </summary>
-        /// <param name="configuration">A <see cref="NotificationConfiguration"/> object describing the new notification.</param>
+        /// <param name="configuration">A <see cref="NewNotificationConfiguration"/> object describing the new notification.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
         /// A <see cref="Task"/> object representing the asynchronous operation. When
@@ -786,12 +786,12 @@
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-create">Create Notification (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        Task<NotificationId> CreateNotificationAsync(NotificationConfiguration configuration, CancellationToken cancellationToken);
+        Task<NotificationId> CreateNotificationAsync(NewNotificationConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
         /// Test a monitoring notification.
         /// </summary>
-        /// <param name="configuration">A <see cref="NotificationConfiguration"/> object describing the notification to test.</param>
+        /// <param name="configuration">A <see cref="NewNotificationConfiguration"/> object describing the notification to test.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
         /// A <see cref="Task"/> object representing the asynchronous operation. When
@@ -802,7 +802,7 @@
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html#service-notifications-test-new">Test Notification (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        Task<NotificationData> TestNotificationAsync(NotificationConfiguration configuration, CancellationToken cancellationToken);
+        Task<NotificationData> TestNotificationAsync(NewNotificationConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
         /// Test an existing notification by ID.

@@ -1161,7 +1161,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<NotificationId> CreateNotificationAsync(NotificationConfiguration configuration, CancellationToken cancellationToken)
+        public Task<NotificationId> CreateNotificationAsync(NewNotificationConfiguration configuration, CancellationToken cancellationToken)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
@@ -1190,7 +1190,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<NotificationData> TestNotificationAsync(NotificationConfiguration configuration, CancellationToken cancellationToken)
+        public Task<NotificationData> TestNotificationAsync(NewNotificationConfiguration configuration, CancellationToken cancellationToken)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");

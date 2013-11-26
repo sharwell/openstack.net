@@ -1572,7 +1572,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
                 NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
@@ -1596,7 +1596,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.Email;
                 NotificationDetails notificationDetails = new EmailNotificationDetails("sample@example.com");
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
@@ -1620,7 +1620,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.PagerDuty;
                 NotificationDetails notificationDetails = new PagerDutyNotificationDetails("XXXXX");
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
@@ -1644,7 +1644,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
                 NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationData notificationData = await provider.TestNotificationAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(notificationData);
                 Assert.AreEqual("success", notificationData.Status);
@@ -1663,7 +1663,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.Email;
                 NotificationDetails notificationDetails = new EmailNotificationDetails("sample@example.com");
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationData notificationData = await provider.TestNotificationAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(notificationData);
                 Assert.AreEqual("success", notificationData.Status);
@@ -1682,7 +1682,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.PagerDuty;
                 NotificationDetails notificationDetails = new PagerDutyNotificationDetails("XXXXX");
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationData notificationData = await provider.TestNotificationAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(notificationData);
                 Assert.AreEqual("error", notificationData.Status);
@@ -1701,7 +1701,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
                 NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 NotificationData notificationData = await provider.TestExistingNotificationAsync(notificationId, cancellationTokenSource.Token);
@@ -1724,7 +1724,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.Email;
                 NotificationDetails notificationDetails = new EmailNotificationDetails("sample@example.com");
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 NotificationData notificationData = await provider.TestExistingNotificationAsync(notificationId, cancellationTokenSource.Token);
@@ -1747,7 +1747,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.PagerDuty;
                 NotificationDetails notificationDetails = new PagerDutyNotificationDetails("XXXXX");
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 NotificationData notificationData = await provider.TestExistingNotificationAsync(notificationId, cancellationTokenSource.Token);
@@ -1770,7 +1770,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
                 NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 Notification[] notifications = await ListAllNotificationsAsync(provider, null, cancellationTokenSource.Token);
@@ -1795,7 +1795,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
                 NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 Notification[] notifications = await ListAllNotificationsAsync(provider, null, cancellationTokenSource.Token);
@@ -1832,7 +1832,7 @@
                 string label = CreateRandomNotificationName();
                 NotificationTypeId notificationTypeId = NotificationTypeId.Webhook;
                 NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
-                NotificationConfiguration configuration = new NotificationConfiguration(label, notificationTypeId, notificationDetails);
+                NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);

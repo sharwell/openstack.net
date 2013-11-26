@@ -410,6 +410,7 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NetworkInterfaceInformation.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NewAlarmConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NewCheckConfiguration.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Monitoring\NewNotificationConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\Notification.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NotificationAttempt.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\NotificationConfiguration.cs" />

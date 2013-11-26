@@ -10,29 +10,32 @@
     /// This class models the configurable properties of the JSON representation of
     /// a notification resource in the <see cref="IMonitoringService"/>.
     /// </summary>
+    /// <seealso cref="Notification"/>
+    /// <seealso cref="NewNotificationConfiguration"/>
+    /// <seealso cref="UpdateNotificationConfiguration"/>
     /// <seealso cref="IMonitoringService.CreateNotificationAsync"/>
     /// <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notifications.html">Notifications (Rackspace Cloud Monitoring Developer Guide - API v1.0)</see>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class NotificationConfiguration
+    public abstract class NotificationConfiguration
     {
         /// <summary>
         /// This is the backing field for the <see cref="Label"/> property.
         /// </summary>
-        [JsonProperty("label")]
+        [JsonProperty("label", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _label;
 
         /// <summary>
         /// This is the backing field for the <see cref="Type"/> property.
         /// </summary>
-        [JsonProperty("type")]
+        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private NotificationTypeId _type;
 
         /// <summary>
         /// This is the backing field for the <see cref="Details"/> property.
         /// </summary>
-        [JsonProperty("details")]
+        [JsonProperty("details", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private JObject _details;
 
         /// <summary>
@@ -54,46 +57,34 @@
         /// Initializes a new instance of the <see cref="NotificationConfiguration"/> class
         /// with the specified properties.
         /// </summary>
-        /// <param name="label">The friendly name of the notification.</param>
-        /// <param name="notificationTypeId">The notification type ID. This is obtained from <see cref="NotificationType.Id">NotificationType.Id</see>, or from the predefined values in <see cref="NotificationTypeId"/>.</param>
-        /// <param name="details">A <see cref="NotificationDetails"/> object containing the detailed configuration properties for the specified notification type.</param>
-        /// <param name="metadata">A collection of metadata to associate with the notification. If the value is <c>null</c>, no custom metadata is associated with the notification.</param>
-        /// <exception cref="ArgumentNullException">
-        /// If <paramref name="label"/> is <c>null</c>.
-        /// <para>-or-</para>
-        /// <para>If <paramref name="notificationTypeId"/> is <c>null</c>.</para>
-        /// <para>-or-</para>
-        /// <para>If <paramref name="details"/> is <c>null</c>.</para>
-        /// </exception>
+        /// <param name="label">The friendly name of the notification. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="notificationTypeId">The notification type ID. This is obtained from <see cref="NotificationType.Id">NotificationType.Id</see>, or from the predefined values in <see cref="NotificationTypeId"/>. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="details">A <see cref="NotificationDetails"/> object containing the detailed configuration properties for the specified notification type. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="metadata">A collection of metadata to associate with the notification. If the value is <c>null</c>, no custom metadata is associated with the notification. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
         /// <exception cref="ArgumentException">
         /// If <paramref name="label"/> is empty.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="details"/> is non-<c>null</c> and <paramref name="notificationTypeId"/> is <c>null</c>.</para>
         /// <para>-or-</para>
         /// <para>If <paramref name="details"/> does not support notifications of type <paramref name="notificationTypeId"/>.</para>
         /// <para>-or-</para>
         /// <para>If <paramref name="metadata"/> contains any empty keys.</para>
         /// </exception>
-        public NotificationConfiguration(string label, NotificationTypeId notificationTypeId, NotificationDetails details, IDictionary<string, string> metadata = null)
+        protected NotificationConfiguration(string label, NotificationTypeId notificationTypeId, NotificationDetails details, IDictionary<string, string> metadata)
         {
-            if (label == null)
-                throw new ArgumentNullException("label");
-            if (notificationTypeId == null)
-                throw new ArgumentNullException("notificationTypeId");
-            if (details == null)
-                throw new ArgumentNullException("details");
-            if (string.IsNullOrEmpty(label))
+            if (label == string.Empty)
                 throw new ArgumentException("label cannot be empty");
-            if (!details.SupportsNotificationType(notificationTypeId))
+            if (details != null && notificationTypeId == null)
+                throw new ArgumentException("notificationTypeId must be specified if details is specified", "notificationTypeId");
+            if (details != null && !details.SupportsNotificationType(notificationTypeId))
                 throw new ArgumentException(string.Format("The notification details object does not support '{0}' notifications.", notificationTypeId), "details");
+            if (metadata != null && metadata.ContainsKey(string.Empty))
+                throw new ArgumentException("metadata cannot contain any empty keys", "metadata");
 
             _label = label;
             _type = notificationTypeId;
             _details = JObject.FromObject(details);
             _metadata = metadata;
-            if (_metadata != null)
-            {
-                if (_metadata.ContainsKey(string.Empty))
-                    throw new ArgumentException("metadata cannot contain any empty keys", "metadata");
-            }
         }
 
         /// <summary>
