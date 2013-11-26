@@ -826,7 +826,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<NotificationPlanId> CreateNotificationPlanAsync(NotificationPlanConfiguration configuration, CancellationToken cancellationToken)
+        public Task<NotificationPlanId> CreateNotificationPlanAsync(NewNotificationPlanConfiguration configuration, CancellationToken cancellationToken)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");

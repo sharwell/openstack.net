@@ -543,7 +543,7 @@
         /// <summary>
         /// Creates a new notification plan.
         /// </summary>
-        /// <param name="configuration">A <see cref="NotificationPlanConfiguration"/> object describing the new notification plan.</param>
+        /// <param name="configuration">A <see cref="NewNotificationPlanConfiguration"/> object describing the new notification plan.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
         /// A <see cref="Task"/> object representing the asynchronous operation. When
@@ -554,7 +554,7 @@
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <c>null</c>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html#service-notification-plans-create">Create Notification Plan (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        Task<NotificationPlanId> CreateNotificationPlanAsync(NotificationPlanConfiguration configuration, CancellationToken cancellationToken);
+        Task<NotificationPlanId> CreateNotificationPlanAsync(NewNotificationPlanConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets a collection of monitoring notification plans.

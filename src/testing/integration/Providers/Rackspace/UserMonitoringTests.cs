@@ -819,7 +819,7 @@
                 Assert.IsNotNull(checkId);
 
                 string notificationPlanLabel = CreateRandomNotificationPlanName();
-                NotificationPlanConfiguration notificationPlanConfiguration = new NotificationPlanConfiguration(notificationPlanLabel);
+                NewNotificationPlanConfiguration notificationPlanConfiguration = new NewNotificationPlanConfiguration(notificationPlanLabel);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(notificationPlanConfiguration, cancellationTokenSource.Token);
 
                 string alarmName = CreateRandomAlarmName();
@@ -944,7 +944,7 @@
                 Assert.IsNotNull(checkId);
 
                 string notificationPlanLabel = CreateRandomNotificationPlanName();
-                NotificationPlanConfiguration notificationPlanConfiguration = new NotificationPlanConfiguration(notificationPlanLabel);
+                NewNotificationPlanConfiguration notificationPlanConfiguration = new NewNotificationPlanConfiguration(notificationPlanLabel);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(notificationPlanConfiguration, cancellationTokenSource.Token);
 
                 string[] alarmNames = { CreateRandomAlarmName(), CreateRandomAlarmName(), CreateRandomAlarmName() };
@@ -1037,7 +1037,7 @@
                 Assert.IsNotNull(checkId);
 
                 string notificationPlanLabel = CreateRandomNotificationPlanName();
-                NotificationPlanConfiguration notificationPlanConfiguration = new NotificationPlanConfiguration(notificationPlanLabel);
+                NewNotificationPlanConfiguration notificationPlanConfiguration = new NewNotificationPlanConfiguration(notificationPlanLabel);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(notificationPlanConfiguration, cancellationTokenSource.Token);
 
                 string alarmName = CreateRandomAlarmName();
@@ -1086,7 +1086,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string label = CreateRandomNotificationPlanName();
-                NotificationPlanConfiguration configuration = new NotificationPlanConfiguration(label);
+                NewNotificationPlanConfiguration configuration = new NewNotificationPlanConfiguration(label);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(notificationPlanId);
 
@@ -1109,7 +1109,7 @@
             {
                 string label = CreateRandomNotificationPlanName();
                 IEnumerable<NotificationId> emptyNotifications = Enumerable.Empty<NotificationId>();
-                NotificationPlanConfiguration configuration = new NotificationPlanConfiguration(label, emptyNotifications, emptyNotifications, emptyNotifications);
+                NewNotificationPlanConfiguration configuration = new NewNotificationPlanConfiguration(label, emptyNotifications, emptyNotifications, emptyNotifications);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(notificationPlanId);
 
@@ -1141,7 +1141,7 @@
                         { "key 1", "value 1" },
                         { "Key ²", "Value ²" },
                     };
-                NotificationPlanConfiguration configuration = new NotificationPlanConfiguration(label, metadata: metadata);
+                NewNotificationPlanConfiguration configuration = new NewNotificationPlanConfiguration(label, metadata: metadata);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(notificationPlanId);
 
@@ -1213,7 +1213,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string label = CreateRandomNotificationPlanName();
-                NotificationPlanConfiguration configuration = new NotificationPlanConfiguration(label);
+                NewNotificationPlanConfiguration configuration = new NewNotificationPlanConfiguration(label);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(notificationPlanId);
 
@@ -1251,7 +1251,7 @@
                         { "key 1", "value 1" },
                         { "Key ²", "Value ²" },
                     };
-                NotificationPlanConfiguration configuration = new NotificationPlanConfiguration(label, metadata: metadata);
+                NewNotificationPlanConfiguration configuration = new NewNotificationPlanConfiguration(label, metadata: metadata);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(notificationPlanId);
 

@@ -11,17 +11,20 @@
     /// This class models the configurable properties of the JSON representation of
     /// a notification plan resource in the <see cref="IMonitoringService"/>.
     /// </summary>
+    /// <seealso cref="NotificationPlan"/>
+    /// <seealso cref="NewNotificationPlanConfiguration"/>
+    /// <seealso cref="UpdateNotificationPlanConfiguration"/>
     /// <seealso cref="IMonitoringService.CreateNotificationPlanAsync"/>
     /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-notification-plans.html">Notification Plans (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class NotificationPlanConfiguration
+    public abstract class NotificationPlanConfiguration
     {
         /// <summary>
         /// This is the backing field for the <see cref="Label"/> property.
         /// </summary>
-        [JsonProperty("label")]
+        [JsonProperty("label", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _label;
 
         /// <summary>
@@ -61,12 +64,11 @@
         /// Initializes a new instance of the <see cref="NotificationPlanConfiguration"/> class
         /// with the specified properties.
         /// </summary>
-        /// <param name="label">The label for the notification plan.</param>
-        /// <param name="criticalState">The notification list to send to when the state is <see cref="AlarmState.Critical"/>. If this value is <c>null</c>, notifications are not sent for this state.</param>
-        /// <param name="warningState">The notification list to send to when the state is <see cref="AlarmState.Warning"/>. If this value is <c>null</c>, notifications are not sent for this state.</param>
-        /// <param name="okState">The notification list to send to when the state is <see cref="AlarmState.OK"/>. If this value is <c>null</c>, notifications are not sent for this state.</param>
-        /// <param name="metadata">The metadata to associate with the notification plan. If this value is <c>null</c>, no custom metadata is associated with the notification plan.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="label"/> is <c>null</c>.</exception>
+        /// <param name="label">The label for the notification plan. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="criticalState">The notification list to send to when the state is <see cref="AlarmState.Critical"/>. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="warningState">The notification list to send to when the state is <see cref="AlarmState.Warning"/>. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="okState">The notification list to send to when the state is <see cref="AlarmState.OK"/>. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="metadata">The metadata to associate with the notification plan. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
         /// <exception cref="ArgumentException">
         /// If <paramref name="label"/> is empty.
         /// <para>-or-</para>
@@ -78,11 +80,9 @@
         /// <para>-or-</para>
         /// <para>If <paramref name="metadata"/> contains any empty keys.</para>
         /// </exception>
-        public NotificationPlanConfiguration(string label, IEnumerable<NotificationId> criticalState = null, IEnumerable<NotificationId> warningState = null, IEnumerable<NotificationId> okState = null, IDictionary<string, string> metadata = null)
+        protected NotificationPlanConfiguration(string label, IEnumerable<NotificationId> criticalState, IEnumerable<NotificationId> warningState, IEnumerable<NotificationId> okState, IDictionary<string, string> metadata)
         {
-            if (label == null)
-                throw new ArgumentNullException("label");
-            if (string.IsNullOrEmpty(label))
+            if (label == string.Empty)
                 throw new ArgumentException("label cannot be empty");
 
             _label = label;
