@@ -46,6 +46,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the value of the agent token.
+        /// </summary>
         public string Token
         {
             get
