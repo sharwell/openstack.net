@@ -9,8 +9,11 @@
 
     /// <summary>
     /// This class models the configurable properties of the JSON representation of
-    /// an entity resource in the <see cref="IMonitoringService"/>.
+    /// an Entity resource in the <see cref="IMonitoringService"/>.
     /// </summary>
+    /// <seealso cref="Entity"/>
+    /// <seealso cref="NewEntityConfiguration"/>
+    /// <seealso cref="UpdateEntityConfiguration"/>
     /// <seealso cref="IMonitoringService.CreateEntityAsync"/>
     /// <see href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-entities.html">Entities (Rackspace Cloud Monitoring Developer Guide - API v1.0)</see>
     /// <threadsafety static="true" instance="false"/>
@@ -21,25 +24,25 @@
         /// <summary>
         /// This is the backing field for the <see cref="AgentId"/> property.
         /// </summary>
-        [JsonProperty("agent_id")]
+        [JsonProperty("agent_id", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private AgentId _agentId;
 
         /// <summary>
         /// This is the backing field for the <see cref="Label"/> property.
         /// </summary>
-        [JsonProperty("label")]
+        [JsonProperty("label", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _label;
 
         /// <summary>
         /// This is the backing field for the <see cref="IPAddresses"/> property.
         /// </summary>
-        [JsonProperty("ip_addresses", ItemConverterType = typeof(IPAddressSimpleConverter))]
+        [JsonProperty("ip_addresses", ItemConverterType = typeof(IPAddressSimpleConverter), DefaultValueHandling = DefaultValueHandling.Ignore)]
         private IDictionary<string, IPAddress> _ipAddresses;
 
         /// <summary>
         /// This is the backing field for the <see cref="Metadata"/> property.
         /// </summary>
-        [JsonProperty("metadata")]
+        [JsonProperty("metadata", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private IDictionary<string, string> _metadata;
 
         /// <summary>
@@ -55,11 +58,10 @@
         /// Initializes a new instance of the <see cref="EntityConfiguration"/> class
         /// with the specified values.
         /// </summary>
-        /// <param name="label">The name for the entity.</param>
-        /// <param name="agentId">The agent which this entity is bound to. If this parameter is <c>null</c>, <placeholder>placeholder</placeholder>.</param>
-        /// <param name="ipAddresses">The IP addresses which can be referenced by checks on this entity. If this parameter is <c>null</c>, <placeholder>placeholder</placeholder>.</param>
-        /// <param name="metadata">A collection of metadata to associate with the entity. If this parameter is <c>null</c>, the entity is created without any custom metadata.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="label"/> is <c>null</c>.</exception>
+        /// <param name="label">The name for the entity. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="agentId">The agent which this entity is bound to. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="ipAddresses">The IP addresses which can be referenced by checks on this entity. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
+        /// <param name="metadata">A collection of metadata to associate with the entity. If this value is <c>null</c>, the underlying property will be omitted from the JSON representation of the object.</param>
         /// <exception cref="ArgumentException">
         /// If <paramref name="label"/> is empty.
         /// <para>-or-</para>
@@ -67,11 +69,9 @@
         /// <para>-or-</para>
         /// <para>If <paramref name="metadata"/> contains any empty keys.</para>
         /// </exception>
-        public EntityConfiguration(string label, AgentId agentId, IDictionary<string, IPAddress> ipAddresses, IDictionary<string, string> metadata)
+        protected EntityConfiguration(string label, AgentId agentId, IDictionary<string, IPAddress> ipAddresses, IDictionary<string, string> metadata)
         {
-            if (label == null)
-                throw new ArgumentNullException("label");
-            if (string.IsNullOrEmpty(label))
+            if (label == string.Empty)
                 throw new ArgumentException("label cannot be empty");
 
             _label = label;

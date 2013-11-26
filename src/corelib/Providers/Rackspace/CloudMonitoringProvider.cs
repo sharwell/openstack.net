@@ -165,7 +165,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<EntityId> CreateEntityAsync(EntityConfiguration configuration, CancellationToken cancellationToken)
+        public Task<EntityId> CreateEntityAsync(NewEntityConfiguration configuration, CancellationToken cancellationToken)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");

@@ -225,7 +225,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -255,7 +255,7 @@
                         { "Key ²", "Value ²" },
                     };
 
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, metadata);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, metadata);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -320,7 +320,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -350,7 +350,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -408,7 +408,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -469,7 +469,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -534,7 +534,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -588,7 +588,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -788,7 +788,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -856,7 +856,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -913,7 +913,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 
@@ -1006,7 +1006,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 string entityName = CreateRandomEntityName();
-                EntityConfiguration configuration = new EntityConfiguration(entityName, null, null, null);
+                NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
                 Assert.IsNotNull(entityId);
 

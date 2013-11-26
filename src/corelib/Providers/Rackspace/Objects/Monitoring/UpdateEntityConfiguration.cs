@@ -2,10 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Net;
-    using net.openstack.Core.Collections;
-    using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
+    using IPAddress = System.Net.IPAddress;
 
     /// <summary>
     /// This class models the JSON representation of a request to update the properties
@@ -15,32 +13,8 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class UpdateEntityConfiguration
+    public class UpdateEntityConfiguration : EntityConfiguration
     {
-        /// <summary>
-        /// This is the backing field for the <see cref="AgentId"/> property.
-        /// </summary>
-        [JsonProperty("agent_id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private AgentId _agentId;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="Label"/> property.
-        /// </summary>
-        [JsonProperty("label", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _label;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="IPAddresses"/> property.
-        /// </summary>
-        [JsonProperty("ip_addresses", ItemConverterType = typeof(IPAddressSimpleConverter), DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private IDictionary<string, IPAddress> _ipAddresses;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="Metadata"/> property.
-        /// </summary>
-        [JsonProperty("metadata", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private IDictionary<string, string> _metadata;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateEntityConfiguration"/> class
         /// during JSON deserialization.
@@ -66,69 +40,8 @@
         /// <para>If <paramref name="metadata"/> contains any empty keys, or any <c>null</c> values.</para>
         /// </exception>
         public UpdateEntityConfiguration(string label = null, AgentId agentId = null, IDictionary<string, IPAddress> ipAddresses = null, IDictionary<string, string> metadata = null)
+            : base(label, agentId, ipAddresses, metadata)
         {
-            if (label == string.Empty)
-                throw new ArgumentException("label cannot be empty", "label");
-
-            _label = label;
-            _agentId = agentId;
-            _ipAddresses = ipAddresses;
-            _metadata = metadata;
-            if (_metadata != null)
-            {
-                if (_metadata.ContainsKey(string.Empty))
-                    throw new ArgumentException("metadata cannot contain any empty keys", "metadata");
-            }
-        }
-
-        /// <summary>
-        /// Gets the ID of the agent associated with the monitoring entity.
-        /// </summary>
-        public AgentId AgentId
-        {
-            get
-            {
-                return _agentId;
-            }
-        }
-
-        /// <summary>
-        /// Gets the label for the entity.
-        /// </summary>
-        public string Label
-        {
-            get
-            {
-                return _label;
-            }
-        }
-
-        /// <summary>
-        /// Gets a collection of IP addresses which can be referenced by checks on this entity.
-        /// </summary>
-        public ReadOnlyDictionary<string, IPAddress> IPAddresses
-        {
-            get
-            {
-                if (_ipAddresses == null)
-                    return null;
-
-                return new ReadOnlyDictionary<string, IPAddress>(_ipAddresses);
-            }
-        }
-
-        /// <summary>
-        /// Gets a collection of custom metadata to associate with the entity.
-        /// </summary>
-        public ReadOnlyDictionary<string, string> Metadata
-        {
-            get
-            {
-                if (_metadata == null)
-                    return null;
-
-                return new ReadOnlyDictionary<string, string>(_metadata);
-            }
         }
     }
 }
