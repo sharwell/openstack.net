@@ -299,7 +299,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<CheckId> CreateCheckAsync(EntityId entityId, CheckConfiguration configuration, CancellationToken cancellationToken)
+        public Task<CheckId> CreateCheckAsync(EntityId entityId, NewCheckConfiguration configuration, CancellationToken cancellationToken)
         {
             if (entityId == null)
                 throw new ArgumentNullException("entityId");
@@ -330,7 +330,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<CheckData[]> TestCheckAsync(EntityId entityId, CheckConfiguration configuration, bool? debug, CancellationToken cancellationToken)
+        public Task<CheckData[]> TestCheckAsync(EntityId entityId, NewCheckConfiguration configuration, bool? debug, CancellationToken cancellationToken)
         {
             if (entityId == null)
                 throw new ArgumentNullException("entityId");

@@ -377,7 +377,7 @@
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
                 IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
+                NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -434,7 +434,7 @@
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
                 IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
+                NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
 
                 CheckData[] checkData = await provider.TestCheckAsync(entityId, checkConfiguration, null, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkData);
@@ -495,7 +495,7 @@
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
                 IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
+                NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -560,13 +560,13 @@
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
                 IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
+                NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
                 string checkLabel2 = CreateRandomCheckName();
                 TargetResolverType resolverType2 = TargetResolverType.IPv6;
-                CheckConfiguration checkConfiguration2 = new CheckConfiguration(checkLabel2, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
+                NewCheckConfiguration checkConfiguration2 = new NewCheckConfiguration(checkLabel2, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId2 = await provider.CreateCheckAsync(entityId, checkConfiguration2, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId2);
 
@@ -614,7 +614,7 @@
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
                 IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
+                NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -814,7 +814,7 @@
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
                 IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
+                NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -882,7 +882,7 @@
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
                 IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
+                NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
 
                 CheckData[] checkData = await provider.TestCheckAsync(entityId, checkConfiguration, null, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkData);
@@ -939,7 +939,7 @@
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
                 IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
+                NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 
@@ -1032,7 +1032,7 @@
                 string targetHostname = "docs.rackspace.com";
                 TargetResolverType resolverType = TargetResolverType.IPv4;
                 IDictionary<string, string> metadata = null;
-                CheckConfiguration checkConfiguration = new CheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
+                NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
                 Assert.IsNotNull(checkId);
 

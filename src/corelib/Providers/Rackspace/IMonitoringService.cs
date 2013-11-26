@@ -179,7 +179,7 @@
         /// Creates a new check.
         /// </summary>
         /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
-        /// <param name="configuration">A <see cref="CheckConfiguration"/> object describing the new check.</param>
+        /// <param name="configuration">A <see cref="NewCheckConfiguration"/> object describing the new check.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
         /// A <see cref="Task"/> object representing the asynchronous operation. When
@@ -193,13 +193,13 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-create">Create Check (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        Task<CheckId> CreateCheckAsync(EntityId entityId, CheckConfiguration configuration, CancellationToken cancellationToken);
+        Task<CheckId> CreateCheckAsync(EntityId entityId, NewCheckConfiguration configuration, CancellationToken cancellationToken);
 
         /// <summary>
         /// Test a monitoring check.
         /// </summary>
         /// <param name="entityId">The entity ID. This is obtained from <see cref="Entity.Id">Entity.Id</see>.</param>
-        /// <param name="configuration">A <see cref="CheckConfiguration"/> object describing the check to test.</param>
+        /// <param name="configuration">A <see cref="NewCheckConfiguration"/> object describing the check to test.</param>
         /// <param name="debug"><c>true</c> to include debug information in the result; otherwise, <c>false</c>. If the value is <c>null</c>, a provider-specific default is used.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
@@ -210,7 +210,7 @@
         /// </returns>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test">Test Check (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
         /// <seealso href="http://docs.rackspace.com/cm/api/v1.0/cm-devguide/content/service-checks.html#service-checks-test-debug">Test Check and Include Debug Information (Rackspace Cloud Monitoring Developer Guide - API v1.0)</seealso>
-        Task<CheckData[]> TestCheckAsync(EntityId entityId, CheckConfiguration configuration, bool? debug, CancellationToken cancellationToken);
+        Task<CheckData[]> TestCheckAsync(EntityId entityId, NewCheckConfiguration configuration, bool? debug, CancellationToken cancellationToken);
 
         /// <summary>
         /// Test an existing check by ID.
