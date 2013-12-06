@@ -1,40 +1,41 @@
-﻿namespace net.openstack.Core.Domain
+﻿namespace net.openstack.Core.Domain.Networking
 {
     using System;
+    using net.openstack.Core;
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents the unique identifier of a network.
+    /// Represents the unique identifier of a <placeholder>item placeholder</placeholder> in the <see cref="PlaceholderService"/>.
     /// </summary>
-    /// <seealso cref="CloudNetwork.Id"/>
+    /// <seealso cref="SomeItem.Id"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    [JsonConverter(typeof(NetworkId.Converter))]
-    public sealed class NetworkId : ResourceIdentifier<NetworkId>
+    [JsonConverter(typeof(SubnetId.Converter))]
+    public sealed class SubnetId : ResourceIdentifier<SubnetId>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NetworkId"/> class
+        /// Initializes a new instance of the <see cref="SubnetId"/> class
         /// with the specified identifier value.
         /// </summary>
-        /// <param name="id">The network identifier value.</param>
+        /// <param name="id">The identifier value.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="id"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="id"/> is empty.</exception>
-        public NetworkId(string id)
+        public SubnetId(string id)
             : base(id)
         {
         }
 
         /// <summary>
-        /// Provides support for serializing and deserializing <see cref="NetworkId"/>
+        /// Provides support for serializing and deserializing <see cref="SubnetId"/>
         /// objects to JSON string values.
         /// </summary>
         /// <threadsafety static="true" instance="false"/>
         private sealed class Converter : ConverterBase
         {
             /// <inheritdoc/>
-            protected override NetworkId FromValue(string id)
+            protected override SubnetId FromValue(string id)
             {
-                return new NetworkId(id);
+                return new SubnetId(id);
             }
         }
     }

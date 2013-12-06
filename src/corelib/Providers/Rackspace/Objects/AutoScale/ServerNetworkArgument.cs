@@ -2,6 +2,7 @@
 {
     using System;
     using net.openstack.Core.Domain;
+    using net.openstack.Core.Domain.Networking;
     using Newtonsoft.Json;
 
     [JsonObject(MemberSerialization.OptIn)]

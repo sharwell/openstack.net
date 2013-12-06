@@ -1,18 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using JSIStudios.SimpleRESTServices.Client;
-using JSIStudios.SimpleRESTServices.Client.Json;
-using net.openstack.Core.Domain;
-using net.openstack.Core.Exceptions;
-using net.openstack.Core.Exceptions.Response;
-using net.openstack.Core.Providers;
-using net.openstack.Providers.Rackspace.Objects.Request;
-using net.openstack.Providers.Rackspace.Objects.Response;
-
-namespace net.openstack.Providers.Rackspace
+﻿namespace net.openstack.Providers.Rackspace
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using System.Net;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using JSIStudios.SimpleRESTServices.Client;
+    using JSIStudios.SimpleRESTServices.Client.Json;
+    using net.openstack.Core;
+    using net.openstack.Core.Domain;
+    using net.openstack.Core.Domain.Networking;
+    using net.openstack.Core.Exceptions;
+    using net.openstack.Core.Exceptions.Response;
+    using net.openstack.Core.Providers;
+    using net.openstack.Providers.Rackspace.Objects.Request;
+    using net.openstack.Providers.Rackspace.Objects.Response;
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// <para>The Cloud Networks Provider enable simple access to the Rackspace Cloud Network Services.
     /// Cloud Networks lets you create a virtual Layer 2 network, known as an isolated network, 
@@ -23,8 +29,14 @@ namespace net.openstack.Providers.Rackspace
     /// <see cref="INetworksProvider"/>
     /// <inheritdoc />
     /// <threadsafety static="true" instance="false"/>
-    public class CloudNetworksProvider : ProviderBase<INetworksProvider>, INetworksProvider
+    public class CloudNetworksProvider : ProviderBase<INetworksProvider>, INetworksProvider, INetworkingService
     {
+        /// <summary>
+        /// This field caches the base URI used for accessing the Auto Scale service.
+        /// </summary>
+        /// <seealso cref="GetBaseUriAsync"/>
+        private Uri _baseUri;
+
         private readonly HttpStatusCode[] _validResponseCode = new[] { HttpStatusCode.OK, HttpStatusCode.Created, HttpStatusCode.Accepted };
 
         #region Constructors
@@ -225,5 +237,163 @@ namespace net.openstack.Providers.Rackspace
         }
 
         #endregion
+
+        #region INetworkingService Members
+
+        public Task<ReadOnlyCollection<Network>> ListNetworksAsync(NetworkId marker, int? limit, CancellationToken cancellationToken)
+        {
+            if (limit < 0)
+                throw new ArgumentOutOfRangeException("limit");
+
+            UriTemplate template = new UriTemplate("/networks?marker={marker}&limit={limit}");
+            var parameters = new Dictionary<string, string>();
+            if (marker != null)
+                parameters.Add("marker", marker.Value);
+            if (limit != null)
+                parameters.Add("limit", limit.ToString());
+
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+
+            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+                GetResponseAsyncFunc<JObject>(cancellationToken);
+
+            Func<Task<JObject>, ReadOnlyCollection<Network>> resultSelector =
+                task =>
+                {
+                    JObject result = task.Result;
+                    if (result == null)
+                        return null;
+
+                    JToken valuesToken = result["networks"];
+                    if (valuesToken == null)
+                        return null;
+
+                    JToken linksToken = result["networks_links"];
+                    Link[] links = linksToken != null ? linksToken.ToObject<Link[]>() : null;
+
+                    Network[] values = valuesToken.ToObject<Network[]>();
+                    return new ReadOnlyCollection<Network>(values);
+                };
+
+            return AuthenticateServiceAsync(cancellationToken)
+                .ContinueWith(prepareRequest)
+                .ContinueWith(requestResource).Unwrap()
+                .ContinueWith(resultSelector);
+        }
+
+        public Task<Network> GetNetworkAsync(NetworkId subnetId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Network> CreateNetworkAsync(NewNetworkConfiguration configuration, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ReadOnlyCollection<Network>> CreateNetworkRangeAsync(IEnumerable<NewNetworkConfiguration> configuration, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateNetworkAsync(NetworkId subnetId, UpdateNetworkConfiguration configuration, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteNetworkAsync(NetworkId subnetId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ReadOnlyCollection<Subnet>> ListSubnetsAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Subnet> GetSubnetAsync(SubnetId subnetId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Subnet> CreateSubnetAsync(NewSubnetConfiguration configuration, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ReadOnlyCollection<Subnet>> CreateSubnetRangeAsync(IEnumerable<NewSubnetConfiguration> configuration, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateSubnetAsync(SubnetId subnetId, UpdateSubnetConfiguration configuration, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteSubnetAsync(SubnetId subnetId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ReadOnlyCollection<Port>> ListPortsAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Port> GetPortAsync(PortId subnetId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Port> CreatePortAsync(NewPortConfiguration configuration, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ReadOnlyCollection<Port>> CreatePortRangeAsync(IEnumerable<NewPortConfiguration> configuration, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdatePortAsync(PortId subnetId, UpdatePortConfiguration configuration, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeletePortAsync(PortId subnetId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ReadOnlyCollection<NetworkingExtension>> ListExtensionsAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        /// <inheritdoc/>
+        /// <remarks>
+        /// This method returns a cached base address if one is available. If no cached address is
+        /// available, <see cref="ProviderBase{TProvider}.GetServiceEndpoint"/> is called to obtain
+        /// an <see cref="Endpoint"/> with the type <c>compute</c> and preferred name <c>cloudServersOpenStack</c>.
+        /// </remarks>
+        protected override Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken)
+        {
+            if (_baseUri != null)
+            {
+                return InternalTaskExtensions.CompletedTask(_baseUri);
+            }
+
+            return Task.Factory.StartNew(
+                () =>
+                {
+                    Endpoint endpoint = GetServiceEndpoint(null, "compute", "cloudServersOpenStack", null);
+                    _baseUri = new Uri(endpoint.PublicURL);
+                    return _baseUri;
+                });
+        }
     }
 }
