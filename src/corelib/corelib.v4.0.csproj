@@ -168,6 +168,7 @@
     <Compile Include="Providers\Hp\NamespaceDoc.cs" />
     <Compile Include="Providers\Hp\PredefinedHpIdentityEndpoints.cs" />
     <Compile Include="Providers\Rackspace\CloudAutoScaleProvider.cs" />
+    <Compile Include="Providers\Rackspace\CloudBigDataProvider.cs" />
     <Compile Include="Providers\Rackspace\CloudDatabasesProvider.cs" />
     <Compile Include="Providers\Rackspace\CloudDnsProvider.cs" />
     <Compile Include="Providers\Rackspace\CloudLoadBalancerProvider.cs" />
@@ -220,6 +221,8 @@
     <Compile Include="Providers\Rackspace\IAutoScaleService.cs" />
     <Compile Include="Providers\Rackspace\IDatabaseService.cs" />
     <Compile Include="Providers\Rackspace\IDnsService.cs" />
+    <Compile Include="Providers\Rackspace\IHadoopAdminService.cs" />
+    <Compile Include="Providers\Rackspace\IHadoopService.cs" />
     <Compile Include="Providers\Rackspace\ILoadBalancerService.cs" />
     <Compile Include="Providers\Rackspace\IMonitoringService.cs" />
     <Compile Include="Providers\Rackspace\NamespaceDoc.cs" />
@@ -309,6 +312,16 @@
     <Compile Include="Providers\Rackspace\Objects\Dns\RecordId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\SerializedDomain.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\SerializedDomainFormat.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Hadoop\Cluster.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Hadoop\ClusterConfiguration.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Hadoop\ClusterId.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Hadoop\ClusterStatus.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Hadoop\ClusterType.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Hadoop\ClusterTypeId.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Hadoop\HadoopFlavor.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Hadoop\HadoopNode.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Hadoop\HadoopNodeId.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Hadoop\ResizeClusterConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\AccessType.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\ConnectionHealthMonitor.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\ConnectionThrottles.cs" />

@@ -45,6 +45,12 @@
         public const string AutoScale = "Auto Scale";
 
         /// <summary>
+        /// Big Data service tests.
+        /// </summary>
+        /// <seealso cref="IHadoopService"/>
+        public const string BigData = "Big Data (Hadoop)";
+
+        /// <summary>
         /// DNS service tests.
         /// </summary>
         /// <seealso cref="IDnsService"/>
