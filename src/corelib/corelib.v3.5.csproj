@@ -180,6 +180,7 @@
     <Compile Include="Providers\Rackspace\CloudAutoScaleProvider.cs" />
     <Compile Include="Providers\Rackspace\CloudDatabasesProvider.cs" />
     <Compile Include="Providers\Rackspace\CloudDnsProvider.cs" />
+    <Compile Include="Providers\Rackspace\CloudImagesProvider.cs" />
     <Compile Include="Providers\Rackspace\CloudLoadBalancerProvider.cs" />
     <Compile Include="Providers\Rackspace\CloudMonitoringProvider.cs" />
     <Compile Include="Providers\Rackspace\CloudQueuesProvider.cs" />
@@ -229,6 +230,7 @@
     <Compile Include="Providers\Rackspace\IAutoScaleService.cs" />
     <Compile Include="Providers\Rackspace\IDatabaseService.cs" />
     <Compile Include="Providers\Rackspace\IDnsService.cs" />
+    <Compile Include="Providers\Rackspace\IImageService.cs" />
     <Compile Include="Providers\Rackspace\ILoadBalancerService.cs" />
     <Compile Include="Providers\Rackspace\IMonitoringService.cs" />
     <Compile Include="Providers\Rackspace\NamespaceDoc.cs" />
@@ -319,6 +321,16 @@
     <Compile Include="Providers\Rackspace\Objects\Dns\SerializedDomain.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\SerializedDomainFormat.cs" />
     <Compile Include="Providers\Rackspace\Objects\Domain.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\Image.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageFilter.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageId.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageMember.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageSortDirection.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageSortKey.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageStatus.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageTag.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageVisibility.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\MemberStatus.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\AccessType.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\ConnectionHealthMonitor.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\ConnectionThrottles.cs" />

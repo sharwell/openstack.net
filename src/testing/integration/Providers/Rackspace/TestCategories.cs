@@ -57,6 +57,13 @@
         public const string Database = "Database";
 
         /// <summary>
+        /// Image service tests.
+        /// </summary>
+        /// <seealso cref="IImageService"/>
+        /// <preliminary/>
+        public const string Images = "Images";
+
+        /// <summary>
         /// Load balancer service tests.
         /// </summary>
         /// <seealso cref="ILoadBalancerProvider"/>
