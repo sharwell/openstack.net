@@ -93,6 +93,16 @@
     <Compile Include="Core\Domain\ImageState.cs" />
     <Compile Include="Core\Domain\IPAddressList.cs" />
     <Compile Include="Core\Domain\NetworkId.cs" />
+    <Compile Include="Core\Domain\Orchestration\BuildInfo.cs" />
+    <Compile Include="Core\Domain\Orchestration\EventId.cs" />
+    <Compile Include="Core\Domain\Orchestration\NewStackConfiguration.cs" />
+    <Compile Include="Core\Domain\Orchestration\ResourceName.cs" />
+    <Compile Include="Core\Domain\Orchestration\Stack.cs" />
+    <Compile Include="Core\Domain\Orchestration\StackConfiguration.cs" />
+    <Compile Include="Core\Domain\Orchestration\StackFilters.cs" />
+    <Compile Include="Core\Domain\Orchestration\StackId.cs" />
+    <Compile Include="Core\Domain\Orchestration\StackName.cs" />
+    <Compile Include="Core\Domain\Orchestration\UpdateStackConfiguration.cs" />
     <Compile Include="Core\Domain\PowerState.cs" />
     <Compile Include="Core\Domain\ProjectId.cs" />
     <Compile Include="Core\Domain\Queues\Claim.cs" />
@@ -154,6 +164,7 @@
     <Compile Include="Core\ParallelExtensionsExtras\TaskFactoryExtensions_Delayed.cs" />
     <Compile Include="Core\ParallelExtensionsExtras\TaskFactoryExtensions_From.cs" />
     <Compile Include="Core\Providers\IIdentityService.cs" />
+    <Compile Include="Core\Providers\IOrchestrationService.cs" />
     <Compile Include="Core\Providers\IQueueingService.cs" />
     <Compile Include="Core\Providers\NamespaceDoc.cs" />
     <Compile Include="Core\Providers\OpenStackIdentityProvider.cs" />
