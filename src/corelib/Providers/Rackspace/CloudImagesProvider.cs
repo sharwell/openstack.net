@@ -102,9 +102,9 @@
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap()
-                .ContinueWith(resultSelector);
+                .Select(prepareRequest)
+                .Then(requestResource)
+                .Select(resultSelector);
         }
 
         /// <inheritdoc/>
@@ -120,8 +120,8 @@
                 GetResponseAsyncFunc<Image>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+                .Select(prepareRequest)
+                .Then(requestResource);
         }
 
         /// <inheritdoc/>
@@ -143,8 +143,8 @@
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+                .Select(prepareRequest)
+                .Then(requestResource);
         }
 
         /// <inheritdoc/>
@@ -174,9 +174,9 @@
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap()
-                .ContinueWith(selector);
+                .Select(prepareRequest)
+                .Then(requestResource)
+                .Select(selector);
         }
 
         /// <inheritdoc/>
@@ -200,8 +200,8 @@
                 GetResponseAsyncFunc<ImageMember>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest).Unwrap()
-                .ContinueWith(requestResource).Unwrap();
+                .Then(prepareRequest)
+                .Then(requestResource);
         }
 
         /// <inheritdoc/>
@@ -222,8 +222,8 @@
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+                .Select(prepareRequest)
+                .Then(requestResource);
         }
 
         /// <inheritdoc/>
@@ -249,8 +249,8 @@
                 GetResponseAsyncFunc<ImageMember>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest).Unwrap()
-                .ContinueWith(requestResource).Unwrap();
+                .Then(prepareRequest)
+                .Then(requestResource);
         }
 
         /// <inheritdoc/>
@@ -271,8 +271,8 @@
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+                .Select(prepareRequest)
+                .Then(requestResource);
         }
 
         /// <inheritdoc/>
@@ -293,8 +293,26 @@
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+                .Select(prepareRequest)
+                .Then(requestResource);
+        }
+
+        /// <inheritdoc/>
+        public Task CreateImportTaskAsync(ImportDescriptor descriptor, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public Task CreateExportTaskAsync(ExportDescriptor descriptor, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public Task GetTaskAsync(ImageTaskId taskId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
@@ -302,16 +320,7 @@
         {
             UriTemplate template = new UriTemplate("/schemas/images");
             var parameters = new Dictionary<string, string>();
-
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
-
-            Func<Task<HttpWebRequest>, Task<JsonSchema>> requestResource =
-                GetResponseAsyncFunc<JsonSchema>(cancellationToken);
-
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            return GetSchemaAsync(template, parameters, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -319,16 +328,7 @@
         {
             UriTemplate template = new UriTemplate("/schemas/image");
             var parameters = new Dictionary<string, string>();
-
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
-
-            Func<Task<HttpWebRequest>, Task<JsonSchema>> requestResource =
-                GetResponseAsyncFunc<JsonSchema>(cancellationToken);
-
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            return GetSchemaAsync(template, parameters, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -336,16 +336,7 @@
         {
             UriTemplate template = new UriTemplate("/schemas/members");
             var parameters = new Dictionary<string, string>();
-
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
-
-            Func<Task<HttpWebRequest>, Task<JsonSchema>> requestResource =
-                GetResponseAsyncFunc<JsonSchema>(cancellationToken);
-
-            return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+            return GetSchemaAsync(template, parameters, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -353,7 +344,27 @@
         {
             UriTemplate template = new UriTemplate("/schemas/member");
             var parameters = new Dictionary<string, string>();
+            return GetSchemaAsync(template, parameters, cancellationToken);
+        }
 
+        /// <inheritdoc/>
+        public Task<JsonSchema> GetTasksSchemaAsync(CancellationToken cancellationToken)
+        {
+            UriTemplate template = new UriTemplate("/schemas/tasks");
+            var parameters = new Dictionary<string, string>();
+            return GetSchemaAsync(template, parameters, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<JsonSchema> GetTaskSchemaAsync(CancellationToken cancellationToken)
+        {
+            UriTemplate template = new UriTemplate("/schemas/task");
+            var parameters = new Dictionary<string, string>();
+            return GetSchemaAsync(template, parameters, cancellationToken);
+        }
+
+        protected virtual Task<JsonSchema> GetSchemaAsync(UriTemplate template, IDictionary<string, string> parameters, CancellationToken cancellationToken)
+        {
             Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
 
@@ -361,8 +372,8 @@
                 GetResponseAsyncFunc<JsonSchema>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
-                .ContinueWith(prepareRequest)
-                .ContinueWith(requestResource).Unwrap();
+                .Select(prepareRequest)
+                .Then(requestResource);
         }
 
         #endregion

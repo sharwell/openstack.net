@@ -47,6 +47,16 @@
 
         #endregion Image Tag Operations
 
+        #region Image Task Operations
+
+        Task CreateImportTaskAsync(ImportDescriptor descriptor, CancellationToken cancellationToken);
+
+        Task CreateExportTaskAsync(ExportDescriptor descriptor, CancellationToken cancellationToken);
+
+        Task GetTaskAsync(ImageTaskId taskId, CancellationToken cancellationToken);
+
+        #endregion Image Task Operations
+
         #region JSON Schema Operations
 
         /// <summary>
@@ -100,6 +110,32 @@
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/images/api/v2/ci-devguide/content/GET_getImageMemberSchema_v2_schemas_member_Schema_Calls.html">Get Image Member Schema (Rackspace Cloud Images Developer Guide - API v2.2)</seealso>
         Task<JsonSchema> GetImageMemberSchemaAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Gets a json-schema document that represents a collection of <see cref="ImageTask"/> entities.
+        /// </summary>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When the operation
+        /// completes, the <see cref="Task{TResult}.Result"/> property will contain a <see cref="JsonSchema"/>
+        /// object describing the JSON schema.
+        /// </returns>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <seealso href="http://docs.rackspace.com/images/api/v2/ci-devguide/content/GET_getTasksSchemas_v2_schemas_members_Schema_Calls.html">Get Tasks Schema (Rackspace Cloud Images Developer Guide - API v2.2)</seealso>
+        Task<JsonSchema> GetTasksSchemaAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Gets a json-schema document that represents a single <see cref="ImageTask"/> entity.
+        /// </summary>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When the operation
+        /// completes, the <see cref="Task{TResult}.Result"/> property will contain a <see cref="JsonSchema"/>
+        /// object describing the JSON schema.
+        /// </returns>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <seealso href="http://docs.rackspace.com/images/api/v2/ci-devguide/content/GET_getTaskSchema_v2_schemas_member_Schema_Calls.html">Get Task Schema (Rackspace Cloud Images Developer Guide - API v2.2)</seealso>
+        Task<JsonSchema> GetTaskSchemaAsync(CancellationToken cancellationToken);
 
         #endregion JSON Schema Operations
     }

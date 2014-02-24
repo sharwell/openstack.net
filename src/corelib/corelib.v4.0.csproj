@@ -311,6 +311,7 @@
     <Compile Include="Providers\Rackspace\Objects\Dns\RecordId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\SerializedDomain.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\SerializedDomainFormat.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ExportDescriptor.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\Image.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageFilter.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageId.cs" />
@@ -319,7 +320,9 @@
     <Compile Include="Providers\Rackspace\Objects\Images\ImageSortKey.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageStatus.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageTag.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageTaskId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageVisibility.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImportDescriptor.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\MemberStatus.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\AccessType.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\ConnectionHealthMonitor.cs" />

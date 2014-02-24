@@ -217,6 +217,32 @@
             }
         }
 
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestGetTasksSchema()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                JsonSchema schema = await provider.GetTasksSchemaAsync(cancellationTokenSource.Token);
+                Assert.IsNotNull(schema);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestGetTaskSchema()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                JsonSchema schema = await provider.GetTaskSchemaAsync(cancellationTokenSource.Token);
+                Assert.IsNotNull(schema);
+            }
+        }
+
         protected static async Task<ReadOnlyCollection<Image>> ListAllImagesAsync(IImageService service, int? blockSize, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<Image>> progress = null)
         {
             if (service == null)
