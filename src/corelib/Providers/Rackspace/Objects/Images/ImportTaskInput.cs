@@ -27,17 +27,32 @@
         {
         }
 
-        public ImportTaskInput(string name, string importFrom)
-            : this(new ImageProperties(name), importFrom)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="importFrom">The container and object name of the image in Object Storage.</param>
+        /// <param name="imageName">The desired name assigned to the imported image.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="importFrom"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="imageName"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If <paramref name="importFrom"/> is empty.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="imageName"/> is empty.</para>
+        /// </exception>
+        public ImportTaskInput(string importFrom, string imageName)
+            : this(importFrom, new ImageProperties(imageName))
         {
         }
 
-        public ImportTaskInput(ImageProperties properties, string importFrom)
+        public ImportTaskInput(string importFrom, ImageProperties properties)
         {
-            if (properties == null)
-                throw new ArgumentNullException("properties");
             if (importFrom == null)
                 throw new ArgumentNullException("importFrom");
+            if (properties == null)
+                throw new ArgumentNullException("properties");
             if (string.IsNullOrEmpty(importFrom))
                 throw new ArgumentException("importFrom cannot be empty");
 
@@ -76,14 +91,14 @@
             {
             }
 
-            public ImageProperties(string name)
+            public ImageProperties(string imageName)
             {
-                if (name == null)
-                    throw new ArgumentNullException("name");
-                if (string.IsNullOrEmpty(name))
-                    throw new ArgumentException("name cannot be empty");
+                if (imageName == null)
+                    throw new ArgumentNullException("imageName");
+                if (string.IsNullOrEmpty(imageName))
+                    throw new ArgumentException("imageName cannot be empty");
 
-                _name = name;
+                _name = imageName;
             }
 
             public string Name

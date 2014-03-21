@@ -321,8 +321,11 @@
     <Compile Include="Providers\Rackspace\Objects\Dns\SerializedDomain.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\SerializedDomainFormat.cs" />
     <Compile Include="Providers\Rackspace\Objects\Domain.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ExportImageTask.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ExportTaskDescriptor.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ExportTaskInput.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ExportTaskResult.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\GenericImageTask.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\Image.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageFilter.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageId.cs" />
@@ -336,9 +339,12 @@
     <Compile Include="Providers\Rackspace\Objects\Images\ImageTaskId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageTaskStatus.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageTaskType.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageTask`2.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageVisibility.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImportImageTask.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImportTaskDescriptor.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImportTaskInput.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImportTaskResult.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\MemberStatus.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\AccessType.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\ConnectionHealthMonitor.cs" />

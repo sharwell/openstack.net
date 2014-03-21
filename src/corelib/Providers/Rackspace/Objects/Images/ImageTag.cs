@@ -5,9 +5,11 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents the unique identifier of a <placeholder>item placeholder</placeholder> in the <see cref="PlaceholderService"/>.
+    /// Represents an image tag in the <see cref="IImageService"/>.
     /// </summary>
-    /// <seealso cref="SomeItem.Id"/>
+    /// <seealso cref="Image.Tags"/>
+    /// <seealso cref="IImageService.AddImageTagAsync"/>
+    /// <seealso cref="IImageService.RemoveImageTagAsync"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonConverter(typeof(ImageTag.Converter))]
@@ -15,9 +17,9 @@
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageTag"/> class
-        /// with the specified identifier value.
+        /// with the specified tag value.
         /// </summary>
-        /// <param name="id">The identifier value.</param>
+        /// <param name="id">The tag value.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="id"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="id"/> is empty.</exception>
         public ImageTag(string id)

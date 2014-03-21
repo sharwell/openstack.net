@@ -120,18 +120,18 @@
                 Image imageToExport = images.FirstOrDefault(i => string.Equals(i.Name, "UnitTestSourceImage", StringComparison.OrdinalIgnoreCase));
                 Assert.IsNotNull(imageToExport, "Could not find source image to export.");
 
-                ImageTask exportTask = await provider.ExportImageAsync(new ExportTaskDescriptor(new ExportTaskInput(imageToExport.Id, containerName)), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
+                ExportImageTask exportTask = await provider.ExportImageAsync(new ExportTaskDescriptor(new ExportTaskInput(imageToExport.Id, containerName)), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.IsNotNull(exportTask);
                 Assert.AreEqual(ImageTaskStatus.Success, exportTask.Status);
-                string exportLocation = exportTask.Result.Value<string>("export_location");
+                string exportLocation = exportTask.Result.ExportLocation;
                 Assert.IsNotNull(exportLocation);
 
                 string imageName = TestImagePrefix + Path.GetRandomFileName().Replace('.', '_');
                 string importFrom = exportLocation;
-                ImageTask importTask = await provider.ImportImageAsync(new ImportTaskDescriptor(new ImportTaskInput(imageName, importFrom)), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
+                ImportImageTask importTask = await provider.ImportImageAsync(new ImportTaskDescriptor(new ImportTaskInput(imageName, importFrom)), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.IsNotNull(importTask);
                 Assert.AreEqual(ImageTaskStatus.Success, importTask.Status);
-                ImageId importedImageId = importTask.Result["image_id"].ToObject<ImageId>();
+                ImageId importedImageId = importTask.Result.ImageId;
                 Assert.IsNotNull(importedImageId);
 
                 await provider.RemoveImageAsync(importedImageId, cancellationTokenSource.Token);
@@ -230,7 +230,7 @@
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
             {
-                ReadOnlyCollection<ImageTask> images = await ListAllTasksAsync(provider, cancellationTokenSource.Token);
+                ReadOnlyCollection<GenericImageTask> images = await ListAllTasksAsync(provider, cancellationTokenSource.Token);
                 if (images.Count == 0)
                     Assert.Inconclusive("The service did not report any tasks");
 
@@ -336,7 +336,7 @@
             return await (await service.ListImagesAsync(null, blockSize, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
         }
 
-        protected static async Task<ReadOnlyCollection<ImageTask>> ListAllTasksAsync(IImageService service, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<ImageTask>> progress = null)
+        protected static async Task<ReadOnlyCollection<GenericImageTask>> ListAllTasksAsync(IImageService service, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<GenericImageTask>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");

@@ -58,9 +58,9 @@
 
         Task RemoveImageAsync(ImageId imageId, CancellationToken cancellationToken);
 
-        Task<ImageTask> ImportImageAsync(ImportTaskDescriptor descriptor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<ImageTask> progress);
+        Task<ImportImageTask> ImportImageAsync(ImportTaskDescriptor descriptor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<ImportImageTask> progress);
 
-        Task<ImageTask> ExportImageAsync(ExportTaskDescriptor descriptor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<ImageTask> progress);
+        Task<ExportImageTask> ExportImageAsync(ExportTaskDescriptor descriptor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<ExportImageTask> progress);
 
         #endregion Image Operations
 
@@ -86,9 +86,10 @@
 
         #region Image Task Operations
 
-        Task<ReadOnlyCollectionPage<ImageTask>> ListTasksAsync(CancellationToken cancellationToken);
+        Task<ReadOnlyCollectionPage<GenericImageTask>> ListTasksAsync(CancellationToken cancellationToken);
 
-        Task<ImageTask> GetTaskAsync(ImageTaskId taskId, CancellationToken cancellationToken);
+        Task<TTask> GetTaskAsync<TTask>(ImageTaskId taskId, CancellationToken cancellationToken)
+            where TTask : ImageTask;
 
         #endregion Image Task Operations
 

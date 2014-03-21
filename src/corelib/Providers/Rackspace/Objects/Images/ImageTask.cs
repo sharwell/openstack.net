@@ -2,10 +2,9 @@
 {
     using System;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
 
-    [JsonObject(MemberSerialization.OptIn)]
-    public class ImageTask
+    [JsonObject]
+    public abstract class ImageTask
     {
         /// <summary>
         /// This is the backing field for the <see cref="Id"/> property.
@@ -32,12 +31,6 @@
         private DateTimeOffset? _expiresAt;
 
         /// <summary>
-        /// This is the backing field for the <see cref="Input"/> property.
-        /// </summary>
-        [JsonProperty("input")]
-        private JObject _input;
-
-        /// <summary>
         /// This is the backing field for the <see cref="Message"/> property.
         /// </summary>
         [JsonProperty("message")]
@@ -48,12 +41,6 @@
         /// </summary>
         [JsonProperty("owner")]
         private string _owner;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="Result"/> property.
-        /// </summary>
-        [JsonProperty("result")]
-        private JObject _result;
 
         /// <summary>
         /// This is the backing field for the <see cref="Schema"/> property.
@@ -120,14 +107,6 @@
             }
         }
 
-        public JObject Input
-        {
-            get
-            {
-                return _input;
-            }
-        }
-
         public string Message
         {
             get
@@ -141,14 +120,6 @@
             get
             {
                 return _owner;
-            }
-        }
-
-        public JObject Result
-        {
-            get
-            {
-                return _result;
             }
         }
 

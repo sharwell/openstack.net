@@ -27,6 +27,18 @@
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExportTaskInput"/> class for the specified
+        /// image ID and target container where the image will be saved.
+        /// </summary>
+        /// <param name="imageId">The ID of the image to export. This is obtained from <see cref="Image.Id"/>.</param>
+        /// <param name="receivingContainer">The name of the container where the image will be saved.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="imageId"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="receivingContainer"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="receivingContainer"/> is empty.</exception>
         public ExportTaskInput(ImageId imageId, string receivingContainer)
         {
             if (imageId == null)
@@ -40,6 +52,10 @@
             _receivingSwiftContainer = receivingContainer;
         }
 
+        /// <summary>
+        /// Gets the ID of the image to export.
+        /// </summary>
+        /// <seealso cref="Image.Id"/>
         public ImageId ImageId
         {
             get
@@ -48,6 +64,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the name of the Object Storage container where the image will be saved.
+        /// </summary>
         public string ReceivingContainer
         {
             get

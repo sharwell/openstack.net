@@ -145,18 +145,18 @@
                 .Then(requestResource);
         }
 
-        public virtual Task<ImageTask> ImportImageAsync(ImportTaskDescriptor descriptor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<ImageTask> progress)
+        public virtual Task<ImportImageTask> ImportImageAsync(ImportTaskDescriptor descriptor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<ImportImageTask> progress)
         {
-            Task<ImageTask> initialTask = CreateImportTaskAsync(descriptor, cancellationToken);
+            Task<ImportImageTask> initialTask = CreateImportTaskAsync(descriptor, cancellationToken);
             if (completionOption != AsyncCompletionOption.RequestCompleted)
                 return initialTask;
 
-            Func<Task<ImageTask>, Task<ImageTask>> resultSelector =
+            Func<Task<ImportImageTask>, Task<ImportImageTask>> resultSelector =
                 task =>
                 {
-                    ImageTask imageTask = task.Result;
+                    ImportImageTask imageTask = task.Result;
                     if (imageTask != null)
-                        return WaitForTaskCompletionAsync(imageTask.Id, cancellationToken, progress);
+                        return WaitForTaskCompletionAsync<ImportImageTask>(imageTask.Id, cancellationToken, progress);
 
                     return task;
                 };
@@ -164,16 +164,16 @@
             return initialTask.Then(resultSelector);
         }
 
-        public virtual Task<ImageTask> ExportImageAsync(ExportTaskDescriptor descriptor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<ImageTask> progress)
+        public virtual Task<ExportImageTask> ExportImageAsync(ExportTaskDescriptor descriptor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<ExportImageTask> progress)
         {
-            Task<ImageTask> initialTask = CreateExportTaskAsync(descriptor, cancellationToken);
+            Task<ExportImageTask> initialTask = CreateExportTaskAsync(descriptor, cancellationToken);
             if (completionOption != AsyncCompletionOption.RequestCompleted)
                 return initialTask;
 
-            Func<Task<ImageTask>, Task<ImageTask>> resultSelector =
+            Func<Task<ExportImageTask>, Task<ExportImageTask>> resultSelector =
                 task =>
                 {
-                    ImageTask imageTask = task.Result;
+                    ExportImageTask imageTask = task.Result;
                     if (imageTask != null)
                         return WaitForTaskCompletionAsync(imageTask.Id, cancellationToken, progress);
 
@@ -334,7 +334,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollectionPage<ImageTask>> ListTasksAsync(CancellationToken cancellationToken)
+        public Task<ReadOnlyCollectionPage<GenericImageTask>> ListTasksAsync(CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate("/tasks");
             var parameters = new Dictionary<string, string>();
@@ -345,15 +345,15 @@
             Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
-            Func<Task<JObject>, ReadOnlyCollectionPage<ImageTask>> selector =
+            Func<Task<JObject>, ReadOnlyCollectionPage<GenericImageTask>> selector =
                 task =>
                 {
                     JToken tasksArray = task.Result["tasks"];
-                    ImageTask[] tasks = null;
+                    GenericImageTask[] tasks = null;
                     if (tasksArray != null)
-                        tasks = tasksArray.ToObject<ImageTask[]>();
+                        tasks = tasksArray.ToObject<GenericImageTask[]>();
 
-                    return new BasicReadOnlyCollectionPage<ImageTask>(tasks, null);
+                    return new BasicReadOnlyCollectionPage<GenericImageTask>(tasks, null);
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -363,7 +363,8 @@
         }
 
         /// <inheritdoc/>
-        public Task<ImageTask> GetTaskAsync(ImageTaskId taskId, CancellationToken cancellationToken)
+        public Task<TTask> GetTaskAsync<TTask>(ImageTaskId taskId, CancellationToken cancellationToken)
+            where TTask : ImageTask
         {
             UriTemplate template = new UriTemplate("/tasks/{taskId}");
             var parameters = new Dictionary<string, string>() { { "taskId", taskId.Value } };
@@ -371,8 +372,8 @@
             Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ImageTask>> requestResource =
-                GetResponseAsyncFunc<ImageTask>(cancellationToken);
+            Func<Task<HttpWebRequest>, Task<TTask>> requestResource =
+                GetResponseAsyncFunc<TTask>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
                 .Select(prepareRequest)
@@ -442,23 +443,24 @@
 
         #endregion
 
-        protected virtual Task<ImageTask> CreateImportTaskAsync(ImportTaskDescriptor descriptor, CancellationToken cancellationToken)
+        protected virtual Task<ImportImageTask> CreateImportTaskAsync(ImportTaskDescriptor descriptor, CancellationToken cancellationToken)
         {
             if (descriptor == null)
                 throw new ArgumentNullException("descriptor");
 
-            return CreateTaskAsync(descriptor, cancellationToken);
+            return CreateTaskAsync<ImportImageTask>(descriptor, cancellationToken);
         }
 
-        protected virtual Task<ImageTask> CreateExportTaskAsync(ExportTaskDescriptor descriptor, CancellationToken cancellationToken)
+        protected virtual Task<ExportImageTask> CreateExportTaskAsync(ExportTaskDescriptor descriptor, CancellationToken cancellationToken)
         {
             if (descriptor == null)
                 throw new ArgumentNullException("descriptor");
 
-            return CreateTaskAsync(descriptor, cancellationToken);
+            return CreateTaskAsync<ExportImageTask>(descriptor, cancellationToken);
         }
 
-        protected virtual Task<ImageTask> CreateTaskAsync<TDescriptor>(TDescriptor descriptor, CancellationToken cancellationToken)
+        protected virtual Task<TTask> CreateTaskAsync<TTask>(object descriptor, CancellationToken cancellationToken)
+            where TTask : ImageTask
         {
             if (descriptor == null)
                 throw new ArgumentNullException("descriptor");
@@ -469,24 +471,25 @@
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, descriptor);
 
-            Func<Task<HttpWebRequest>, Task<ImageTask>> requestResource =
-                GetResponseAsyncFunc<ImageTask>(cancellationToken);
+            Func<Task<HttpWebRequest>, Task<TTask>> requestResource =
+                GetResponseAsyncFunc<TTask>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
                 .Then(prepareRequest)
                 .Then(requestResource);
         }
 
-        protected Task<ImageTask> WaitForTaskCompletionAsync(ImageTaskId taskId, CancellationToken cancellationToken, IProgress<ImageTask> progress)
+        protected Task<TTask> WaitForTaskCompletionAsync<TTask>(ImageTaskId taskId, CancellationToken cancellationToken, IProgress<TTask> progress)
+            where TTask : ImageTask
         {
             if (taskId == null)
                 throw new ArgumentNullException("taskId");
 
-            TaskCompletionSource<ImageTask> taskCompletionSource = new TaskCompletionSource<ImageTask>();
-            Func<Task<ImageTask>> pollImageTask = () => PollImageTaskAsync(taskId, cancellationToken, progress);
+            TaskCompletionSource<TTask> taskCompletionSource = new TaskCompletionSource<TTask>();
+            Func<Task<TTask>> pollImageTask = () => PollImageTaskAsync(taskId, cancellationToken, progress);
 
             IEnumerator<TimeSpan> backoffPolicy = BackoffPolicy.GetBackoffIntervals().GetEnumerator();
-            Func<Task<ImageTask>> moveNext =
+            Func<Task<TTask>> moveNext =
                 () =>
                 {
                     if (!backoffPolicy.MoveNext())
@@ -507,8 +510,8 @@
                     }
                 };
 
-            Task<ImageTask> currentTask = moveNext();
-            Action<Task<ImageTask>> continuation = null;
+            Task<TTask> currentTask = moveNext();
+            Action<Task<TTask>> continuation = null;
             continuation =
                 previousTask =>
                 {
@@ -518,7 +521,7 @@
                         return;
                     }
 
-                    ImageTask result = previousTask.Result;
+                    TTask result = previousTask.Result;
                     if (result == null || result.Status == ImageTaskStatus.Failure || result.Status == ImageTaskStatus.Success)
                     {
                         // finished waiting
@@ -535,9 +538,10 @@
             return taskCompletionSource.Task;
         }
 
-        private Task<ImageTask> PollImageTaskAsync(ImageTaskId taskId, CancellationToken cancellationToken, IProgress<ImageTask> progress)
+        private Task<TTask> PollImageTaskAsync<TTask>(ImageTaskId taskId, CancellationToken cancellationToken, IProgress<TTask> progress)
+            where TTask : ImageTask
         {
-            Task<ImageTask> chain = GetTaskAsync(taskId, cancellationToken);
+            Task<TTask> chain = GetTaskAsync<TTask>(taskId, cancellationToken);
             chain = chain.ContinueWith(
                 task =>
                 {
