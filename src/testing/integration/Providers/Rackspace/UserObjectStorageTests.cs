@@ -41,13 +41,13 @@
         /// This prefix is used for metadata keys created by unit tests, to avoid
         /// overwriting metadata created by other applications.
         /// </summary>
-        private const string TestKeyPrefix = "UnitTestMetadataKey-";
+        internal const string TestKeyPrefix = "UnitTestMetadataKey-";
 
         /// <summary>
         /// This prefix is used for containers created by unit tests, to avoid
         /// overwriting containers created by other applications.
         /// </summary>
-        private const string TestContainerPrefix = "UnitTestContainer-";
+        internal const string TestContainerPrefix = "UnitTestContainer-";
 
         /// <summary>
         /// The minimum character allowed in metadata keys. This is drawn from

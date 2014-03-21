@@ -1,26 +1,34 @@
 ﻿namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
-    using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using System;
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
-    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
+    using System.Net;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Providers.Rackspace;
-    using System.Net;
-    using System.Threading;
-    using Newtonsoft.Json;
-    using net.openstack.Core.Schema;
-    using System.Collections.ObjectModel;
-    using net.openstack.Providers.Rackspace.Objects.Images;
     using net.openstack.Core;
+    using net.openstack.Core.Providers;
+    using net.openstack.Core.Schema;
+    using net.openstack.Providers.Rackspace;
+    using net.openstack.Providers.Rackspace.Objects.Images;
+    using Newtonsoft.Json;
+    using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
+    using ObjectStore = net.openstack.Core.Domain.ObjectStore;
+    using Path = System.IO.Path;
 
     [TestClass]
     public class UserImagesTests
     {
+        /// <summary>
+        /// This prefix is used for images created by unit tests, to avoid
+        /// overwriting images created by other applications.
+        /// </summary>
+        internal const string TestImagePrefix = "UnitTestImage-";
+
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
@@ -34,9 +42,10 @@
                     Assert.Inconclusive("The service did not report any images");
 
                 Console.WriteLine("Images");
-                foreach (Image image in images)
+                foreach (Image image in images.OrderBy(i => i.Size))
                 {
                     Console.WriteLine("    {0} ({1})", image.Name, image.Id);
+                    Console.WriteLine("        Size: {0}", image.Size);
                 }
             }
         }
@@ -93,9 +102,42 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestRemoveImage()
+        public async Task TestExportImportImage()
         {
-            Assert.Inconclusive("Not yet implemented");
+            IImageService provider = CreateProvider();
+            IObjectStorageProvider objectStorageProvider = Bootstrapper.CreateObjectStorageProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(600))))
+            {
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any images");
+
+                string containerName = UserObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName();
+                containerName = containerName.Replace('.', '_');
+                ObjectStore objectStore = objectStorageProvider.CreateContainer(containerName);
+                Assert.AreEqual(ObjectStore.ContainerCreated, objectStore);
+
+                Image imageToExport = images.FirstOrDefault(i => string.Equals(i.Name, "UnitTestSourceImage", StringComparison.OrdinalIgnoreCase));
+                Assert.IsNotNull(imageToExport, "Could not find source image to export.");
+
+                ImageTask exportTask = await provider.ExportImageAsync(new ExportTaskDescriptor(new ExportTaskInput(imageToExport.Id, containerName)), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
+                Assert.IsNotNull(exportTask);
+                Assert.AreEqual(ImageTaskStatus.Success, exportTask.Status);
+                string exportLocation = exportTask.Result.Value<string>("export_location");
+                Assert.IsNotNull(exportLocation);
+
+                string imageName = TestImagePrefix + Path.GetRandomFileName().Replace('.', '_');
+                string importFrom = exportLocation;
+                ImageTask importTask = await provider.ImportImageAsync(new ImportTaskDescriptor(new ImportTaskInput(imageName, importFrom)), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
+                Assert.IsNotNull(importTask);
+                Assert.AreEqual(ImageTaskStatus.Success, importTask.Status);
+                ImageId importedImageId = importTask.Result["image_id"].ToObject<ImageId>();
+                Assert.IsNotNull(importedImageId);
+
+                await provider.RemoveImageAsync(importedImageId, cancellationTokenSource.Token);
+
+                objectStorageProvider.DeleteContainer(containerName, deleteObjects: true);
+            }
         }
 
         [TestMethod]
@@ -152,15 +194,58 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestAddImageTag()
+        public async Task TestImageTagging()
         {
-            Assert.Inconclusive("Not yet implemented");
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
+            {
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any images");
+
+                Image imageToTag = images.FirstOrDefault(i => string.Equals(i.Name, "UnitTestSourceImage", StringComparison.OrdinalIgnoreCase));
+                Assert.IsNotNull(imageToTag, "Could not find source image to add a tag to.");
+
+                ImageTag tag = new ImageTag(Path.GetRandomFileName().Replace('.', '_'));
+
+                await provider.AddImageTagAsync(imageToTag.Id, tag, cancellationTokenSource.Token);
+                Image taggedImage = await provider.GetImageAsync(imageToTag.Id, cancellationTokenSource.Token);
+                Assert.IsNotNull(taggedImage);
+                Assert.IsNotNull(taggedImage.Tags);
+                Assert.IsTrue(taggedImage.Tags.Contains(tag));
+
+                await provider.RemoveImageTagAsync(imageToTag.Id, tag, cancellationTokenSource.Token);
+                Image untaggedImage = await provider.GetImageAsync(imageToTag.Id, cancellationTokenSource.Token);
+                Assert.IsNotNull(untaggedImage);
+                Assert.IsNotNull(untaggedImage.Tags);
+                Assert.IsFalse(untaggedImage.Tags.Contains(tag));
+            }
         }
 
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestRemoveImageTag()
+        public async Task TestListTasks()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ReadOnlyCollection<ImageTask> images = await ListAllTasksAsync(provider, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any tasks");
+
+                Console.WriteLine("Tasks");
+                foreach (ImageTask image in images)
+                {
+                    Console.WriteLine("    {0} ({1})", image.Id, image.Type);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestGetTask()
         {
             Assert.Inconclusive("Not yet implemented");
         }
@@ -249,6 +334,14 @@
                 throw new ArgumentNullException("service");
 
             return await (await service.ListImagesAsync(null, blockSize, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
+        }
+
+        protected static async Task<ReadOnlyCollection<ImageTask>> ListAllTasksAsync(IImageService service, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<ImageTask>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            return await (await service.ListTasksAsync(cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
         }
 
         private TimeSpan TestTimeout(TimeSpan timeout)
