@@ -1,5 +1,6 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Images
 {
+    using System;
     using Newtonsoft.Json;
 
     /// <summary>

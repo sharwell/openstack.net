@@ -2,10 +2,18 @@
 {
     using System;
     using Newtonsoft.Json;
+    using ProjectId = net.openstack.Core.Domain.ProjectId;
 
+    /// <summary>
+    /// This is the base class for objects modeling specific types of tasks in the
+    /// <see cref="IImageService"/>.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject]
     public abstract class ImageTask
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>
         /// This is the backing field for the <see cref="Id"/> property.
         /// </summary>
@@ -40,7 +48,7 @@
         /// This is the backing field for the <see cref="Owner"/> property.
         /// </summary>
         [JsonProperty("owner")]
-        private string _owner;
+        private ProjectId _owner;
 
         /// <summary>
         /// This is the backing field for the <see cref="Schema"/> property.
@@ -65,6 +73,7 @@
         /// </summary>
         [JsonProperty("type")]
         private ImageTaskType _type;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageTask"/> class
@@ -75,6 +84,9 @@
         {
         }
 
+        /// <summary>
+        /// Gets the unique ID of this task resource.
+        /// </summary>
         public ImageTaskId Id
         {
             get
@@ -83,6 +95,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a time stamp indicating when this task was created.
+        /// </summary>
         public DateTimeOffset? Created
         {
             get
@@ -91,6 +106,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a time stamp indicating when this task was last updated.
+        /// </summary>
         public DateTimeOffset? LastModified
         {
             get
@@ -99,6 +117,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a time stamp indicating when this task resource expires.
+        /// </summary>
         public DateTimeOffset? Expires
         {
             get
@@ -107,6 +128,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a message describing the current status of the task.
+        /// </summary>
         public string Message
         {
             get
@@ -115,7 +139,10 @@
             }
         }
 
-        public string Owner
+        /// <summary>
+        /// Gets the ID of the owner of this task.
+        /// </summary>
+        public ProjectId Owner
         {
             get
             {
@@ -123,22 +150,37 @@
             }
         }
 
-        public string Schema
+        /// <summary>
+        /// Gets a <see cref="Uri"/> for the location of the json-schema representation of this object.
+        /// </summary>
+        public Uri Schema
         {
             get
             {
-                return _schema;
+                if (_schema == null)
+                    return null;
+
+                return new Uri(_schema, UriKind.RelativeOrAbsolute);
             }
         }
 
-        public string Self
+        /// <summary>
+        /// Gets a <see cref="Uri"/> for the location of this object.
+        /// </summary>
+        public Uri Self
         {
             get
             {
-                return _self;
+                if (_self == null)
+                    return null;
+
+                return new Uri(_self, UriKind.RelativeOrAbsolute);
             }
         }
 
+        /// <summary>
+        /// Gets an <see cref="ImageTaskStatus"/> instance indicating the current status of the task.
+        /// </summary>
         public ImageTaskStatus Status
         {
             get
@@ -147,6 +189,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets an <see cref="ImageTaskType"/> instance indicating the task type.
+        /// </summary>
         public ImageTaskType Type
         {
             get

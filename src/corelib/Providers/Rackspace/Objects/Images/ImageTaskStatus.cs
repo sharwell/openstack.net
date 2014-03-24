@@ -5,6 +5,15 @@
     using net.openstack.Core;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Represents an image task status.
+    /// </summary>
+    /// <remarks>
+    /// This class functions as a strongly-typed enumeration of known task statuses,
+    /// with added support for unknown statuses returned by a server extension.
+    /// </remarks>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonConverter(typeof(ImageTaskStatus.Converter))]
     public sealed class ImageTaskStatus : ExtensibleEnum<ImageTaskStatus>
     {
@@ -41,7 +50,7 @@
         }
 
         /// <summary>
-        /// Gets an <see cref="ImageTaskStatus"/> instance representing <placeholder>placeholder</placeholder>.
+        /// Gets an <see cref="ImageTaskStatus"/> instance representing a task which has not yet started.
         /// </summary>
         public static ImageTaskStatus Pending
         {
@@ -52,7 +61,7 @@
         }
 
         /// <summary>
-        /// Gets an <see cref="ImageTaskStatus"/> instance representing <placeholder>placeholder</placeholder>.
+        /// Gets an <see cref="ImageTaskStatus"/> instance representing a task which is currently being processed.
         /// </summary>
         public static ImageTaskStatus Processing
         {
@@ -63,7 +72,7 @@
         }
 
         /// <summary>
-        /// Gets an <see cref="ImageTaskStatus"/> instance representing <placeholder>placeholder</placeholder>.
+        /// Gets an <see cref="ImageTaskStatus"/> instance representing a task which completed successfully.
         /// </summary>
         public static ImageTaskStatus Success
         {
@@ -74,7 +83,7 @@
         }
 
         /// <summary>
-        /// Gets an <see cref="ImageTaskStatus"/> instance representing <placeholder>placeholder</placeholder>.
+        /// Gets an <see cref="ImageTaskStatus"/> instance representing a task which terminated with an error.
         /// </summary>
         public static ImageTaskStatus Failure
         {

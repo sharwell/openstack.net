@@ -19,6 +19,7 @@
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
     using ObjectStore = net.openstack.Core.Domain.ObjectStore;
     using Path = System.IO.Path;
+    using ProjectId = net.openstack.Core.Domain.ProjectId;
 
     [TestClass]
     public class UserImagesTests
@@ -170,25 +171,43 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestCreateImageMember()
+        public async Task TestCreateUpdateRemoveImageMember()
         {
-            Assert.Inconclusive("Not yet implemented");
-        }
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(600))))
+            {
+                ImageFilter filter = new ImageFilter(name: "UnitTestSourceImage");
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any images");
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Images)]
-        public async Task TestRemoveImageMember()
-        {
-            Assert.Inconclusive("Not yet implemented");
-        }
+                Image image = images.FirstOrDefault(i => string.Equals(i.Name, "UnitTestSourceImage", StringComparison.OrdinalIgnoreCase));
+                Assert.IsNotNull(image, "Could not find source image to export.");
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Images)]
-        public async Task TestUpdateImageMember()
-        {
-            Assert.Inconclusive("Not yet implemented");
+                IIdentityProvider identityProvider = Bootstrapper.CreateIdentityProvider();
+                var userAccess = identityProvider.GetUserAccess(Bootstrapper.Settings.TestIdentity);
+                ProjectId memberId = new ProjectId(userAccess.Token.Tenant.Id);
+
+                ImageMember imageMember = await provider.CreateImageMemberAsync(image.Id, memberId, cancellationTokenSource.Token);
+                Assert.IsNotNull(imageMember);
+                Assert.AreEqual(MemberStatus.Pending, imageMember.Status);
+                Assert.AreEqual(image.Id, imageMember.ImageId);
+                Assert.AreEqual(memberId, imageMember.MemberId);
+
+                imageMember = await provider.UpdateImageMemberAsync(image.Id, memberId, MemberStatus.Accepted, cancellationTokenSource.Token);
+                Assert.IsNotNull(imageMember);
+                Assert.AreEqual(MemberStatus.Accepted, imageMember.Status);
+                Assert.AreEqual(image.Id, imageMember.ImageId);
+                Assert.AreEqual(memberId, imageMember.MemberId);
+
+                imageMember = await provider.UpdateImageMemberAsync(image.Id, memberId, MemberStatus.Rejected, cancellationTokenSource.Token);
+                Assert.IsNotNull(imageMember);
+                Assert.AreEqual(MemberStatus.Rejected, imageMember.Status);
+                Assert.AreEqual(image.Id, imageMember.ImageId);
+                Assert.AreEqual(memberId, imageMember.MemberId);
+
+                await provider.RemoveImageMemberAsync(image.Id, memberId, cancellationTokenSource.Token);
+            }
         }
 
         [TestMethod]
@@ -334,6 +353,14 @@
                 throw new ArgumentNullException("service");
 
             return await (await service.ListImagesAsync(null, blockSize, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
+        }
+
+        protected static async Task<ReadOnlyCollection<Image>> ListAllImagesAsync(IImageService service, ImageFilter filter, int? blockSize, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<Image>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            return await (await service.ListImagesAsync(filter, null, blockSize, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
         }
 
         protected static async Task<ReadOnlyCollection<GenericImageTask>> ListAllTasksAsync(IImageService service, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<GenericImageTask>> progress = null)

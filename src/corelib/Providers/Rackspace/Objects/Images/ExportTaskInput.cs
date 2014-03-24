@@ -3,6 +3,12 @@
     using System;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of the input parameters for an
+    /// <see cref="ImageTaskType.Export"/> task in the <see cref="IImageService"/>.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class ExportTaskInput
     {

@@ -1,50 +1,90 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Images
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Linq;
-    using System.Text;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// This class models the JSON representation of an image in the <see cref="IImageService"/>.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class Image
     {
+#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
+        /// <summary>
+        /// This is the backing field for the <see cref="Id"/> property.
+        /// </summary>
         [JsonProperty("id")]
         private ImageId _id;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Name"/> property.
+        /// </summary>
         [JsonProperty("name")]
         private string _name;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Status"/> property.
+        /// </summary>
         [JsonProperty("status")]
         private ImageStatus _status;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Visibility"/> property.
+        /// </summary>
         [JsonProperty("visibility")]
         private ImageVisibility _visibility;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Size"/> property.
+        /// </summary>
         [JsonProperty("size")]
         private long? _size;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Checksum"/> property.
+        /// </summary>
         [JsonProperty("checksum")]
         private string _checksum;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Tags"/> property.
+        /// </summary>
         [JsonProperty("tags")]
         private ImageTag[] _tags;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Created"/> property.
+        /// </summary>
         [JsonProperty("created")]
         private DateTimeOffset? _created;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="LastModified"/> property.
+        /// </summary>
         [JsonProperty("updated")]
         private DateTimeOffset? _updated;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Self"/> property.
+        /// </summary>
         [JsonProperty("self")]
         private string _self;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="File"/> property.
+        /// </summary>
         [JsonProperty("file")]
         private string _file;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Schema"/> property.
+        /// </summary>
         [JsonProperty("schema")]
         private string _schema;
+#pragma warning restore 649
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Image"/> class
@@ -55,6 +95,9 @@
         {
         }
 
+        /// <summary>
+        /// Gets the unique identifier of the image resource in the <see cref="IImageService"/>.
+        /// </summary>
         public ImageId Id
         {
             get
@@ -63,6 +106,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the name of the image.
+        /// </summary>
         public string Name
         {
             get
@@ -71,6 +117,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets an <see cref="ImageStatus"/> instance indicating the current status of the image.
+        /// </summary>
         public ImageStatus Status
         {
             get
@@ -79,6 +128,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets an <see cref="ImageVisibility"/> instance indicating the visibility of the image.
+        /// </summary>
         public ImageVisibility Visibility
         {
             get
@@ -87,6 +139,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the size (in bytes) of the image.
+        /// </summary>
         public long? Size
         {
             get
@@ -95,6 +150,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the checksum for the image.
+        /// </summary>
         public string Checksum
         {
             get
@@ -103,6 +161,11 @@
             }
         }
 
+        /// <summary>
+        /// Gets a collection of tags associated with the image.
+        /// </summary>
+        /// <seealso cref="IImageService.AddImageTagAsync"/>
+        /// <seealso cref="IImageService.RemoveImageTagAsync"/>
         public ReadOnlyCollection<ImageTag> Tags
         {
             get
@@ -114,6 +177,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a timestamp indicating when the image was created.
+        /// </summary>
         public DateTimeOffset? Created
         {
             get
@@ -122,6 +188,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets a timestamp indicating when the image was last modified.
+        /// </summary>
         public DateTimeOffset? LastModified
         {
             get
@@ -130,27 +199,45 @@
             }
         }
 
-        public string Self
+        /// <summary>
+        /// Gets a <see cref="Uri"/> for the location of this object.
+        /// </summary>
+        public Uri Self
         {
             get
             {
-                return _self;
+                if (_self == null)
+                    return null;
+
+                return new Uri(_self, UriKind.RelativeOrAbsolute);
             }
         }
 
-        public string File
+        /// <summary>
+        /// Gets the <see cref="Uri"/> of the image file itself.
+        /// </summary>
+        public Uri File
         {
             get
             {
-                return _file;
+                if (_file == null)
+                    return null;
+
+                return new Uri(_file, UriKind.RelativeOrAbsolute);
             }
         }
 
-        public string Schema
+        /// <summary>
+        /// Gets a <see cref="Uri"/> for the location of the json-schema representation of this object.
+        /// </summary>
+        public Uri Schema
         {
             get
             {
-                return _schema;
+                if (_schema == null)
+                    return null;
+
+                return new Uri(_schema, UriKind.RelativeOrAbsolute);
             }
         }
     }

@@ -5,9 +5,9 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents the unique identifier of a <placeholder>item placeholder</placeholder> in the <see cref="PlaceholderService"/>.
+    /// Represents the unique identifier of an image task in the <see cref="IImageService"/>
     /// </summary>
-    /// <seealso cref="SomeItem.Id"/>
+    /// <seealso cref="ImageTask.Id"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonConverter(typeof(ImageTaskId.Converter))]

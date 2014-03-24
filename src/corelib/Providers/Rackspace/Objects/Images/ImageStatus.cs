@@ -5,6 +5,15 @@
     using net.openstack.Core;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Represents an image status.
+    /// </summary>
+    /// <remarks>
+    /// This class functions as a strongly-typed enumeration of known image statuses,
+    /// with added support for unknown statuses returned by a server extension.
+    /// </remarks>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonConverter(typeof(ImageStatus.Converter))]
     public sealed class ImageStatus : ExtensibleEnum<ImageStatus>
     {
@@ -54,7 +63,8 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="ImageStatus"/> instance representing <placeholder>description</placeholder>.
+        /// Gets a <see cref="ImageStatus"/> instance representing an image whose raw data is being uploaded
+        /// to the <see cref="IImageService"/>.
         /// </summary>
         public static ImageStatus Saving
         {
@@ -65,7 +75,8 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="ImageStatus"/> instance representing <placeholder>description</placeholder>.
+        /// Gets a <see cref="ImageStatus"/> instance representing an image that is fully available if the
+        /// <see cref="IImageService"/>.
         /// </summary>
         public static ImageStatus Active
         {
@@ -76,7 +87,8 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="ImageStatus"/> instance representing <placeholder>description</placeholder>.
+        /// Gets a <see cref="ImageStatus"/> instance representing an image that failed to upload properly,
+        /// and the image data is unreadable.
         /// </summary>
         public static ImageStatus Killed
         {
@@ -87,8 +99,14 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="ImageStatus"/> instance representing <placeholder>description</placeholder>.
+        /// Gets a <see cref="ImageStatus"/> instance representing an image that was deleted and is no
+        /// longer available for use.
         /// </summary>
+        /// <remarks>
+        /// The <see cref="IImageService"/> retains information about images for a provider-specified
+        /// time following deletion of an image. Images with this status are automatically removed
+        /// after the retention period expires.
+        /// </remarks>
         public static ImageStatus Deleted
         {
             get
@@ -98,7 +116,8 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="ImageStatus"/> instance representing <placeholder>description</placeholder>.
+        /// Gets a <see cref="ImageStatus"/> instance representing an image that is no longer available,
+        /// but the image data itself has not yet been deleted. An image with this status is recoverable.
         /// </summary>
         public static ImageStatus PendingDelete
         {

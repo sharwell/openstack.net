@@ -5,6 +5,15 @@
     using net.openstack.Core;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Represents the type of an image task in the <see cref="IImageService"/>.
+    /// </summary>
+    /// <remarks>
+    /// This class functions as a strongly-typed enumeration of known task types,
+    /// with added support for unknown types returned by a server extension.
+    /// </remarks>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonConverter(typeof(ImageTaskType.Converter))]
     public sealed class ImageTaskType : ExtensibleEnum<ImageTaskType>
     {

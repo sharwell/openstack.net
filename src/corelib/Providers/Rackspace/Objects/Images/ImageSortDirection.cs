@@ -5,6 +5,15 @@
     using net.openstack.Core;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Represents the direction used for sorting image lists returned by the <see cref="IImageService"/>.
+    /// </summary>
+    /// <remarks>
+    /// This class functions as a strongly-typed enumeration of known sort directions,
+    /// with added support for unknown directions returned by a server extension.
+    /// </remarks>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonConverter(typeof(ImageSortDirection.Converter))]
     public sealed class ImageSortDirection : ExtensibleEnum<ImageSortDirection>
     {
@@ -39,7 +48,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="ImageSortDirection"/> instance representing <placeholder>description</placeholder>.
+        /// Gets a <see cref="ImageSortDirection"/> instance representing values sorted from low to high.
         /// </summary>
         public static ImageSortDirection Ascending
         {
@@ -50,7 +59,7 @@
         }
 
         /// <summary>
-        /// Gets a <see cref="ImageSortDirection"/> instance representing <placeholder>description</placeholder>.
+        /// Gets a <see cref="ImageSortDirection"/> instance representing values sorted from high to low.
         /// </summary>
         public static ImageSortDirection Descending
         {

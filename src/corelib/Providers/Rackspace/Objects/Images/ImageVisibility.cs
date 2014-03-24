@@ -5,6 +5,15 @@
     using net.openstack.Core;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Represents the visibility of an image in the <see cref="IImageService"/>.
+    /// </summary>
+    /// <remarks>
+    /// This class functions as a strongly-typed enumeration of known visibilities,
+    /// with added support for unknown visibilities returned by a server extension.
+    /// </remarks>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonConverter(typeof(ImageVisibility.Converter))]
     public sealed class ImageVisibility : ExtensibleEnum<ImageVisibility>
     {
