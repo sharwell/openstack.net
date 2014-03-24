@@ -120,7 +120,7 @@
                 Image imageToExport = images.FirstOrDefault(i => string.Equals(i.Name, "UnitTestSourceImage", StringComparison.OrdinalIgnoreCase));
                 Assert.IsNotNull(imageToExport, "Could not find source image to export.");
 
-                ExportImageTask exportTask = await provider.ExportImageAsync(new ExportTaskDescriptor(new ExportTaskInput(imageToExport.Id, containerName)), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
+                ExportImageTask exportTask = await provider.ExportImageAsync(new ExportTaskDescriptor(imageToExport.Id, containerName), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.IsNotNull(exportTask);
                 Assert.AreEqual(ImageTaskStatus.Success, exportTask.Status);
                 string exportLocation = exportTask.Result.ExportLocation;
@@ -128,7 +128,7 @@
 
                 string imageName = TestImagePrefix + Path.GetRandomFileName().Replace('.', '_');
                 string importFrom = exportLocation;
-                ImportImageTask importTask = await provider.ImportImageAsync(new ImportTaskDescriptor(new ImportTaskInput(imageName, importFrom)), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
+                ImportImageTask importTask = await provider.ImportImageAsync(new ImportTaskDescriptor(importFrom, imageName), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.IsNotNull(importTask);
                 Assert.AreEqual(ImageTaskStatus.Success, importTask.Status);
                 ImageId importedImageId = importTask.Result.ImageId;
