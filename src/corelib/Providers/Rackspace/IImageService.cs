@@ -1,6 +1,7 @@
 ﻿namespace net.openstack.Providers.Rackspace
 {
     using System;
+    using System.Collections.Generic;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -73,7 +74,7 @@
         /// <seealso href="http://docs.rackspace.com/images/api/v2/ci-devguide/content/GET_getImage_v2_images__image_id__Image_Calls.html">Get Image Details (Rackspace Cloud Images Developer Guide - API v2.2)</seealso>
         Task<Image> GetImageAsync(ImageId imageId, CancellationToken cancellationToken);
 
-        Task UpdateImageAsync();
+        Task<Image> UpdateImageAsync(ImageId imageId, IEnumerable<ImageUpdateOperation> operations, CancellationToken cancellationToken);
 
         /// <summary>
         /// Remove and delete an image from the image service.

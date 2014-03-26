@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -155,9 +156,32 @@
         }
 
         /// <inheritdoc/>
-        public Task UpdateImageAsync()
+        public Task<Image> UpdateImageAsync(ImageId imageId, IEnumerable<ImageUpdateOperation> operations, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (imageId == null)
+                throw new ArgumentNullException("imageId");
+
+            ImageUpdateOperation[] operationsArray = operations.ToArray();
+            if (operationsArray.Contains(null))
+                throw new ArgumentException("operations cannot contain any null values", "operations");
+
+            UriTemplate template = new UriTemplate("/images/{imageId}");
+            var parameters = new Dictionary<string, string>() { { "imageId", imageId.Value } };
+
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.PATCH, template, parameters, operationsArray);
+
+            Func<Task<HttpWebRequest>, Task<Image>> requestResource =
+                GetResponseAsyncFunc<Image>(cancellationToken);
+
+            return AuthenticateServiceAsync(cancellationToken)
+                .Then(prepareRequest)
+                .Select(task =>
+                {
+                    task.Result.ContentType = "application/openstack-images-v2.1-json-patch";
+                    return task.Result;
+                })
+                .Then(requestResource);
         }
 
         /// <inheritdoc/>
