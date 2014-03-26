@@ -20,7 +20,15 @@
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
     using ProjectId = net.openstack.Core.Domain.ProjectId;
+    using StringBuilder = System.Text.StringBuilder;
 
+    /// <summary>
+    /// Provides an implementation of <see cref="IImageService"/> for operating
+    /// with Rackspace's Cloud Images product.
+    /// </summary>
+    /// <seealso href="http://docs.rackspace.com/images/api/v2/ci-devguide/content/ch_image-service-dev-overview.html">Rackspace Cloud Images Developer Guide - API v2.2</seealso>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public class CloudImagesProvider : ProviderBase<IImageService>, IImageService
     {
         /// <summary>
@@ -66,12 +74,33 @@
         /// <inheritdoc/>
         public Task<ReadOnlyCollectionPage<Image>> ListImagesAsync(ImageFilter filter, ImageId marker, int? limit, CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/images?marker={marker}&limit={limit}");
+            UriTemplate template;
+            if (filter != null)
+            {
+                StringBuilder builder = new StringBuilder("/images?marker={marker}&limit={limit}");
+                foreach (string key in filter.QueryParameters)
+                {
+                    builder.Append('&');
+                    builder.Append(key).Append("={").Append(key).Append('}');
+                }
+
+                template = new UriTemplate(builder.ToString());
+            }
+            else
+            {
+                template = new UriTemplate("/images?marker={marker}&limit={limit}");
+            }
+
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
             if (limit.HasValue)
                 parameters.Add("limit", limit.ToString());
+            if (filter != null)
+            {
+                foreach (var pair in filter.Values)
+                    parameters.Add(pair.Key, pair.Value);
+            }
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
@@ -108,6 +137,9 @@
         /// <inheritdoc/>
         public Task<Image> GetImageAsync(ImageId imageId, CancellationToken cancellationToken)
         {
+            if (imageId == null)
+                throw new ArgumentNullException("imageId");
+
             UriTemplate template = new UriTemplate("/images/{imageId}");
             var parameters = new Dictionary<string, string>() { { "imageId", imageId.Value } };
 
@@ -131,6 +163,9 @@
         /// <inheritdoc/>
         public Task RemoveImageAsync(ImageId imageId, CancellationToken cancellationToken)
         {
+            if (imageId == null)
+                throw new ArgumentNullException("imageId");
+
             UriTemplate template = new UriTemplate("/images/{imageId}");
             var parameters = new Dictionary<string, string>() { { "imageId", imageId.Value } };
 
@@ -145,8 +180,12 @@
                 .Then(requestResource);
         }
 
+        /// <inheritdoc/>
         public virtual Task<ImportImageTask> ImportImageAsync(ImportTaskDescriptor descriptor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<ImportImageTask> progress)
         {
+            if (descriptor == null)
+                throw new ArgumentNullException("descriptor");
+
             Task<ImportImageTask> initialTask = CreateImportTaskAsync(descriptor, cancellationToken);
             if (completionOption != AsyncCompletionOption.RequestCompleted)
                 return initialTask;
@@ -164,8 +203,12 @@
             return initialTask.Then(resultSelector);
         }
 
+        /// <inheritdoc/>
         public virtual Task<ExportImageTask> ExportImageAsync(ExportTaskDescriptor descriptor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<ExportImageTask> progress)
         {
+            if (descriptor == null)
+                throw new ArgumentNullException("descriptor");
+
             Task<ExportImageTask> initialTask = CreateExportTaskAsync(descriptor, cancellationToken);
             if (completionOption != AsyncCompletionOption.RequestCompleted)
                 return initialTask;
@@ -189,8 +232,40 @@
             if (imageId == null)
                 throw new ArgumentNullException("imageId");
 
-            UriTemplate template = new UriTemplate("/images/{imageId}/members");
+            return ListImageMembersAsync(imageId, null, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<ReadOnlyCollectionPage<ImageMember>> ListImageMembersAsync(ImageId imageId, ImageMemberFilter filter, CancellationToken cancellationToken)
+        {
+            if (imageId == null)
+                throw new ArgumentNullException("imageId");
+
+            UriTemplate template;
+            if (filter != null)
+            {
+                StringBuilder builder = new StringBuilder("/images/{imageId}/members");
+                bool first = true;
+                foreach (string key in filter.QueryParameters)
+                {
+                    builder.Append(first ? '?' : '&');
+                    builder.Append(key).Append("={").Append(key).Append('}');
+                    first = false;
+                }
+
+                template = new UriTemplate(builder.ToString());
+            }
+            else
+            {
+                template = new UriTemplate("/images/{imageId}/members");
+            }
+
             var parameters = new Dictionary<string, string>() { { "imageId", imageId.Value } };
+            if (filter != null)
+            {
+                foreach (var pair in filter.Values)
+                    parameters.Add(pair.Key, pair.Value);
+            }
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
@@ -213,6 +288,28 @@
                 .Select(prepareRequest)
                 .Then(requestResource)
                 .Select(selector);
+        }
+
+        /// <inheritdoc/>
+        public Task<ImageMember> GetImageMemberAsync(ImageId imageId, ProjectId memberId, CancellationToken cancellationToken)
+        {
+            if (imageId == null)
+                throw new ArgumentNullException("imageId");
+            if (memberId == null)
+                throw new ArgumentNullException("memberId");
+
+            UriTemplate template = new UriTemplate("/images/{imageId}/members/{memberId}");
+            var parameters = new Dictionary<string, string>() { { "imageId", imageId.Value }, { "memberId", memberId.Value } };
+
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+
+            Func<Task<HttpWebRequest>, Task<ImageMember>> requestResource =
+                GetResponseAsyncFunc<ImageMember>(cancellationToken);
+
+            return AuthenticateServiceAsync(cancellationToken)
+                .Select(prepareRequest)
+                .Then(requestResource);
         }
 
         /// <inheritdoc/>
@@ -428,6 +525,23 @@
             return GetSchemaAsync(template, parameters, cancellationToken);
         }
 
+        /// <summary>
+        /// Gets a json-schema from a web service using a <see cref="HttpMethod.GET"/> request.
+        /// </summary>
+        /// <param name="template">The <see cref="UriTemplate"/> describing the location of the JSON schema.</param>
+        /// <param name="parameters">A collection of named parameters to replace in the <paramref name="template"/> to form the final <see cref="Uri"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When the operation
+        /// completes, the <see cref="Task{TResult}.Result"/> property will contain a <see cref="JsonSchema"/>
+        /// object describing the JSON schema.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="template"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="parameters"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         protected virtual Task<JsonSchema> GetSchemaAsync(UriTemplate template, IDictionary<string, string> parameters, CancellationToken cancellationToken)
         {
             Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
@@ -443,6 +557,22 @@
 
         #endregion
 
+        /// <summary>
+        /// Create an image task to perform an asynchronous import operation within the Image Service.
+        /// </summary>
+        /// <remarks>
+        /// The base implementation calls <see cref="CreateTaskAsync{TTask}"/> to provide the underlying
+        /// functionality.
+        /// </remarks>
+        /// <param name="descriptor">An <see cref="ImportTaskDescriptor"/> providing the arguments used to create the import image task.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe. Note that this parameter only affects the asynchronous operation to <em>create</em> the image task; it does not affect the image task itself operating within the Image Service.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When the operation
+        /// completes, the <see cref="Task{TResult}.Result"/> property will contain a <see cref="ImportImageTask"/>
+        /// object describing the asynchronous image import operation.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="descriptor"/> is <see langword="null"/>.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         protected virtual Task<ImportImageTask> CreateImportTaskAsync(ImportTaskDescriptor descriptor, CancellationToken cancellationToken)
         {
             if (descriptor == null)
@@ -451,6 +581,22 @@
             return CreateTaskAsync<ImportImageTask>(descriptor, cancellationToken);
         }
 
+        /// <summary>
+        /// Create an image task to perform an asynchronous export operation within the Image Service.
+        /// </summary>
+        /// <remarks>
+        /// The base implementation calls <see cref="CreateTaskAsync{TTask}"/> to provide the underlying
+        /// functionality.
+        /// </remarks>
+        /// <param name="descriptor">An <see cref="ExportTaskDescriptor"/> providing the arguments used to create the export image task.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe. Note that this parameter only affects the asynchronous operation to <em>create</em> the image task; it does not affect the image task itself operating within the Image Service.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When the operation
+        /// completes, the <see cref="Task{TResult}.Result"/> property will contain a <see cref="ExportImageTask"/>
+        /// object describing the asynchronous image export operation.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="descriptor"/> is <see langword="null"/>.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         protected virtual Task<ExportImageTask> CreateExportTaskAsync(ExportTaskDescriptor descriptor, CancellationToken cancellationToken)
         {
             if (descriptor == null)
@@ -459,6 +605,27 @@
             return CreateTaskAsync<ExportImageTask>(descriptor, cancellationToken);
         }
 
+        /// <summary>
+        /// Create a generic image task to perform an asynchronous operation within the Image Service.
+        /// </summary>
+        /// <remarks>
+        /// The base implementation always uses a <see cref="HttpMethod.POST"/> operation to create
+        /// the task, based on an arbitrary <paramref name="descriptor"/>. The caller is responsible
+        /// for providing a descriptor that the Image Service provider recognizes, and for using
+        /// a <typeparamref name="TTask"/> type suitable for modeling the result. For general cases,
+        /// the <see cref="GenericImageTask"/> may be used if a more specific type has not been
+        /// defined.
+        /// </remarks>
+        /// <typeparam name="TTask">The specific <see cref="ImageTask"/> type used to model the JSON representation of the resulting type of task.</typeparam>
+        /// <param name="descriptor">An object modeling the JSON representation of the descriptor used to create the image task.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe. Note that this parameter only affects the asynchronous operation to <em>create</em> the image task; it does not affect the image task itself operating within the Image Service.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When the operation
+        /// completes, the <see cref="Task{TResult}.Result"/> property will contain a <typeparamref name="TTask"/>
+        /// object describing the image task.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="descriptor"/> is <see langword="null"/>.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         protected virtual Task<TTask> CreateTaskAsync<TTask>(object descriptor, CancellationToken cancellationToken)
             where TTask : ImageTask
         {
@@ -479,6 +646,32 @@
                 .Then(requestResource);
         }
 
+        /// <summary>
+        /// Creates a <see cref="Task"/> that will complete after an image task enters the
+        /// <see cref="ImageTaskStatus.Success"/> or <see cref="ImageTaskStatus.Failure"/> state.
+        /// </summary>
+        /// <remarks>
+        /// The task is considered complete as soon as a call to <see cref="IImageService.GetTaskAsync{TTask}"/>
+        /// indicates that the task is in the <see cref="ImageTaskStatus.Success"/> or
+        /// <see cref="ImageTaskStatus.Failure"/> state. The method does not perform any other checks
+        /// related to the initial or final state of the task.
+        ///
+        /// <para>The polling intervals used for this method are provided by the <see cref="BackoffPolicy"/>
+        /// property.</para>
+        /// </remarks>
+        /// <typeparam name="TTask">The specific <see cref="ImageTask"/> type used to model the JSON representation of the resulting type of task.</typeparam>
+        /// <param name="taskId">The image task ID. This is obtained from <see cref="ImageTask.Id">ImageTask.Id</see>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <param name="progress">An optional callback object to receive progress notifications. If this is <see langword="null"/>, no progress notifications are sent.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When the operation
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property will contain a
+        /// <typeparamref name="TTask"/> object representing the final state of the task. In addition,
+        /// the <see cref="ImageTask.Status"/> property of the task will be either
+        /// <see cref="ImageTaskStatus.Success"/> or <see cref="ImageTaskStatus.Failure"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="taskId"/> is <see langword="null"/>.</exception>
+        /// <exception cref="WebException">If a REST request does not return successfully.</exception>
         protected Task<TTask> WaitForTaskCompletionAsync<TTask>(ImageTaskId taskId, CancellationToken cancellationToken, IProgress<TTask> progress)
             where TTask : ImageTask
         {
@@ -501,12 +694,8 @@
                     }
                     else
                     {
-                        return Task.Factory.StartNewDelayed((int)backoffPolicy.Current.TotalMilliseconds, cancellationToken).ContinueWith(
-                           task =>
-                           {
-                               task.PropagateExceptions();
-                               return pollImageTask();
-                           }, TaskContinuationOptions.ExecuteSynchronously).Unwrap();
+                        return Task.Factory.StartNewDelayed((int)backoffPolicy.Current.TotalMilliseconds, cancellationToken)
+                            .Then(task => pollImageTask());
                     }
                 };
 
@@ -531,8 +720,10 @@
 
                     // reschedule
                     currentTask = moveNext();
+                    // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
                     currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
                 };
+            // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
             currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
 
             return taskCompletionSource.Task;
@@ -542,14 +733,14 @@
             where TTask : ImageTask
         {
             Task<TTask> chain = GetTaskAsync<TTask>(taskId, cancellationToken);
-            chain = chain.ContinueWith(
+            chain = chain.Select(
                 task =>
                 {
                     if (task.Result == null || task.Result.Id != taskId)
                         throw new InvalidOperationException("Could not obtain status for task");
 
                     return task.Result;
-                }, TaskContinuationOptions.ExecuteSynchronously);
+                }, true);
 
             if (progress != null)
             {

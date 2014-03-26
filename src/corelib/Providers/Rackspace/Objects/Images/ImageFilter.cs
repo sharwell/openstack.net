@@ -1,6 +1,7 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Images
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using ProjectId = net.openstack.Core.Domain.ProjectId;
 
@@ -231,6 +232,67 @@
             get
             {
                 return _sortDirection;
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of custom query parameters defined by this filter. The values are the names
+        /// of query parameters defined by this filter.
+        /// </summary>
+        /// <remarks>
+        /// The keys of the pairs in the result of this method map to the keys of the pairs returned by
+        /// the <see cref="Values"/> property.
+        /// </remarks>
+        public IEnumerable<string> QueryParameters
+        {
+            get
+            {
+                yield return "name";
+                yield return "visibility";
+                yield return "member_status";
+                yield return "owner";
+                yield return "tag";
+                yield return "status";
+                yield return "size_min";
+                yield return "size_max";
+                yield return "sort_key";
+                yield return "sort_dir";
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of filter values defined by this filter. The keys of the pairs in the result
+        /// of this method are the query parameter names, and the values are the actual filter values
+        /// defined for that parameter.
+        /// </summary>
+        /// <remarks>
+        /// Filter values which are not set (i.e. have a <see langword="null"/> value) are omitted from the
+        /// result.
+        /// </remarks>
+        public IEnumerable<KeyValuePair<string, string>> Values
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Name))
+                    yield return new KeyValuePair<string, string>("name", Name);
+                if (Visibility != null)
+                    yield return new KeyValuePair<string, string>("visibility", Visibility.Name);
+                if (MemberStatus != null)
+                    yield return new KeyValuePair<string, string>("member_status", MemberStatus.Name);
+                if (Owner != null)
+                    yield return new KeyValuePair<string, string>("owner", Owner.Value);
+                if (Tag != null)
+                    yield return new KeyValuePair<string, string>("tag", Tag.Value);
+                if (Status != null)
+                    yield return new KeyValuePair<string, string>("status", Status.Name);
+                if (SizeMin != null)
+                    yield return new KeyValuePair<string, string>("size_min", SizeMin.ToString());
+                if (SizeMax != null)
+                    yield return new KeyValuePair<string, string>("size_max", SizeMax.ToString());
+                if (SortKey != null)
+                    yield return new KeyValuePair<string, string>("sort_key", SortKey.Name);
+                if (SortDirection != null)
+                    yield return new KeyValuePair<string, string>("sort_dir", SortDirection.Name);
             }
         }
     }

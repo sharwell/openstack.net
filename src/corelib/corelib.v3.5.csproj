@@ -330,6 +330,7 @@
     <Compile Include="Providers\Rackspace\Objects\Images\ImageFilter.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageMember.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Images\ImageMemberFilter.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageSortDirection.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageSortKey.cs" />
     <Compile Include="Providers\Rackspace\Objects\Images\ImageStatus.cs" />
