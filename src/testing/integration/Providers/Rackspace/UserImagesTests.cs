@@ -109,17 +109,12 @@
             IObjectStorageProvider objectStorageProvider = Bootstrapper.CreateObjectStorageProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(600))))
             {
-                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
-                if (images.Count == 0)
-                    Assert.Inconclusive("The service did not report any images");
-
                 string containerName = UserObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName();
                 containerName = containerName.Replace('.', '_');
                 ObjectStore objectStore = objectStorageProvider.CreateContainer(containerName);
                 Assert.AreEqual(ObjectStore.ContainerCreated, objectStore);
 
-                Image imageToExport = images.FirstOrDefault(i => string.Equals(i.Name, "UnitTestSourceImage", StringComparison.OrdinalIgnoreCase));
-                Assert.IsNotNull(imageToExport, "Could not find source image to export.");
+                Image imageToExport = await GetUnitTestImageAsync(provider, cancellationTokenSource.Token);
 
                 ExportImageTask exportTask = await provider.ExportImageAsync(new ExportTaskDescriptor(imageToExport.Id, containerName), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.IsNotNull(exportTask);
@@ -176,13 +171,7 @@
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(600))))
             {
-                ImageFilter filter = new ImageFilter(name: "UnitTestSourceImage");
-                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
-                if (images.Count == 0)
-                    Assert.Inconclusive("The service did not report any images");
-
-                Image image = images.FirstOrDefault(i => string.Equals(i.Name, "UnitTestSourceImage", StringComparison.OrdinalIgnoreCase));
-                Assert.IsNotNull(image, "Could not find source image to export.");
+                Image image = await GetUnitTestImageAsync(provider, cancellationTokenSource.Token);
 
                 IIdentityProvider identityProvider = Bootstrapper.CreateIdentityProvider();
                 var userAccess = identityProvider.GetUserAccess(Bootstrapper.Settings.TestIdentity);
@@ -218,12 +207,7 @@
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
-                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
-                if (images.Count == 0)
-                    Assert.Inconclusive("The service did not report any images");
-
-                Image imageToTag = images.FirstOrDefault(i => string.Equals(i.Name, "UnitTestSourceImage", StringComparison.OrdinalIgnoreCase));
-                Assert.IsNotNull(imageToTag, "Could not find source image to add a tag to.");
+                Image imageToTag = await GetUnitTestImageAsync(provider, cancellationTokenSource.Token);
 
                 ImageTag tag = new ImageTag(Path.GetRandomFileName().Replace('.', '_'));
 
@@ -345,6 +329,17 @@
                 JsonSchema schema = await provider.GetTaskSchemaAsync(cancellationTokenSource.Token);
                 Assert.IsNotNull(schema);
             }
+        }
+
+        protected static async Task<Image> GetUnitTestImageAsync(IImageService service, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            ImageFilter filter = new ImageFilter(name: "UnitTestSourceImage");
+            ReadOnlyCollection<Image> images = await ListAllImagesAsync(service, filter, null, cancellationToken);
+            Assert.IsTrue(images.Count > 0, string.Format("Could not find an image with the name '{0}' in the test region.", filter.Name));
+            return images.FirstOrDefault();
         }
 
         protected static async Task<ReadOnlyCollection<Image>> ListAllImagesAsync(IImageService service, int? blockSize, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<Image>> progress = null)
