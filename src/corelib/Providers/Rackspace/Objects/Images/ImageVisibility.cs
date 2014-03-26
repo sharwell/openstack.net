@@ -21,6 +21,7 @@
             new ConcurrentDictionary<string, ImageVisibility>(StringComparer.OrdinalIgnoreCase);
         private static readonly ImageVisibility _public = FromName("public");
         private static readonly ImageVisibility _private = FromName("private");
+        private static readonly ImageVisibility _shared = FromName("shared");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageVisibility"/> class with the specified name.
@@ -66,6 +67,17 @@
             get
             {
                 return _private;
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ImageVisibility"/> instance representing <placeholder>description</placeholder>.
+        /// </summary>
+        public static ImageVisibility Shared
+        {
+            get
+            {
+                return _shared;
             }
         }
 
