@@ -228,29 +228,49 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListTasks()
+        public async Task TestListGetTasks()
         {
             IImageService provider = CreateProvider();
-            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            IObjectStorageProvider objectStorageProvider = Bootstrapper.CreateObjectStorageProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(600))))
             {
-                ReadOnlyCollection<GenericImageTask> images = await ListAllTasksAsync(provider, cancellationTokenSource.Token);
-                if (images.Count == 0)
-                    Assert.Inconclusive("The service did not report any tasks");
+                string containerName = UserObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName();
+                containerName = containerName.Replace('.', '_');
+                ObjectStore objectStore = objectStorageProvider.CreateContainer(containerName);
+                Assert.AreEqual(ObjectStore.ContainerCreated, objectStore);
 
-                Console.WriteLine("Tasks");
-                foreach (ImageTask image in images)
+                Image imageToExport = await GetUnitTestImageAsync(provider, cancellationTokenSource.Token);
+
+                Task<ExportImageTask> exportTask1 = provider.ExportImageAsync(new ExportTaskDescriptor(imageToExport.Id, containerName), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
+                Task<ExportImageTask> exportTask2 = provider.ExportImageAsync(new ExportTaskDescriptor(imageToExport.Id, containerName), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
+
+                ReadOnlyCollection<GenericImageTask> tasks = await ListAllTasksAsync(provider, cancellationTokenSource.Token, null);
+                Assert.IsNotNull(tasks);
+                Assert.IsTrue(tasks.Count >= 2);
+                Assert.IsTrue(tasks.Count(i => i.Type == ImageTaskType.Export) >= 2);
+
+                foreach (GenericImageTask task in tasks)
                 {
-                    Console.WriteLine("    {0} ({1})", image.Id, image.Type);
+                    if (task.Type == ImageTaskType.Export)
+                    {
+                        ExportImageTask singleTask = await provider.GetTaskAsync<ExportImageTask>(task.Id, cancellationTokenSource.Token);
+                        Assert.IsNotNull(singleTask);
+                    }
+                    else if (task.Type == ImageTaskType.Import)
+                    {
+                        ImportImageTask singleTask = await provider.GetTaskAsync<ImportImageTask>(task.Id, cancellationTokenSource.Token);
+                        Assert.IsNotNull(singleTask);
+                    }
+                    else
+                    {
+                        GenericImageTask singleTask = await provider.GetTaskAsync<GenericImageTask>(task.Id, cancellationTokenSource.Token);
+                        Assert.IsNotNull(singleTask);
+                    }
                 }
-            }
-        }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Images)]
-        public async Task TestGetTask()
-        {
-            Assert.Inconclusive("Not yet implemented");
+                await Task.WhenAll(exportTask1, exportTask2);
+                objectStorageProvider.DeleteContainer(containerName, deleteObjects: true);
+            }
         }
 
         [TestMethod]
