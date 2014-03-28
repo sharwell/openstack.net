@@ -12,6 +12,7 @@
     using net.openstack.Providers.Rackspace.Objects.Images;
     using Newtonsoft.Json.Linq;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
+    using ContentType = System.Net.Mime.ContentType;
     using Endpoint = net.openstack.Core.Domain.Endpoint;
     using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
@@ -176,11 +177,6 @@
 
             return AuthenticateServiceAsync(cancellationToken)
                 .Then(prepareRequest)
-                .Select(task =>
-                {
-                    task.Result.ContentType = "application/openstack-images-v2.1-json-patch";
-                    return task.Result;
-                })
                 .Then(requestResource);
         }
 
@@ -580,6 +576,23 @@
         }
 
         #endregion
+
+        /// <inheritdoc/>
+        /// <remarks>
+        /// The <see cref="CloudImagesProvider"/> implementation of this method alters the
+        /// resulting <see cref="HttpWebRequest"/> when the <paramref name="method"/> is
+        /// <see cref="HttpMethod.PATCH"/> by properly setting the
+        /// <see cref="HttpWebRequest.ContentType"/> property to
+        /// <c>application/openstack-images-v2.1-json-patch</c>.
+        /// </remarks>
+        protected override HttpWebRequest PrepareRequestImpl(HttpMethod method, IdentityToken identityToken, UriTemplate template, Uri baseUri, IDictionary<string, string> parameters, Func<Uri, Uri> uriTransform)
+        {
+            HttpWebRequest request = base.PrepareRequestImpl(method, identityToken, template, baseUri, parameters, uriTransform);
+            if (method == HttpMethod.PATCH)
+                request.ContentType = new ContentType() { MediaType = "application/openstack-images-v2.1-json-patch", CharSet = "UTF-8" }.ToString();
+
+            return request;
+        }
 
         /// <summary>
         /// Create an image task to perform an asynchronous import operation within the Image Service.
