@@ -68,12 +68,31 @@
         /// <returns>
         /// A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully,
         /// the <see cref="Task{TResult}.Result"/> property will return an <see cref="Image"/> object describing
-        /// the images.
+        /// the image.
         /// </returns>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/images/api/v2/ci-devguide/content/GET_getImage_v2_images__image_id__Image_Calls.html">Get Image Details (Rackspace Cloud Images Developer Guide - API v2.2)</seealso>
         Task<Image> GetImageAsync(ImageId imageId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Update properties of an image resource.
+        /// </summary>
+        /// <param name="imageId">The image ID. This is obtained from <see cref="Image.Id"/>.</param>
+        /// <param name="operations">A collection of <see cref="ImageUpdateOperation"/> objects describing the updates to apply to the image.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully,
+        /// the <see cref="Task{TResult}.Result"/> property will return an <see cref="Image"/> object describing
+        /// the updated image.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="imageId"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="operations"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="operations"/> contains any <see langword="null"/> values.</exception>
+        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <seealso href="http://docs.rackspace.com/images/api/v2/ci-devguide/content/PATCH_updateImage_images__image_id__Image_Calls.html">Update Image (Rackspace Cloud Images Developer Guide - API v2.2)</seealso>
         Task<Image> UpdateImageAsync(ImageId imageId, IEnumerable<ImageUpdateOperation> operations, CancellationToken cancellationToken);
 
         /// <summary>

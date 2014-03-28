@@ -62,6 +62,326 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithAscendingCreatedSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.Created, sortDirection: ImageSortDirection.Ascending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Created).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the ascending created sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(images[i].Created >= images[i - 1].Created);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithDescendingCreatedSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.Created, sortDirection: ImageSortDirection.Descending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Created).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the descending created sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(images[i].Created <= images[i - 1].Created);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithAscendingIdSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.Id, sortDirection: ImageSortDirection.Ascending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Id).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the ascending ID sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Compare(images[i].Id.Value, images[i - 1].Id.Value) >= 0);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithDescendingIdSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.Id, sortDirection: ImageSortDirection.Descending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Id).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the descending ID sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Compare(images[i].Id.Value, images[i - 1].Id.Value) <= 0);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithAscendingLastModifiedSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.LastModified, sortDirection: ImageSortDirection.Ascending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.LastModified).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the ascending last modified sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(images[i].LastModified >= images[i - 1].LastModified);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithDescendingLastModifiedSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.LastModified, sortDirection: ImageSortDirection.Descending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.LastModified).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the descending last modified sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(images[i].LastModified <= images[i - 1].LastModified);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithAscendingNameSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.ImageName, sortDirection: ImageSortDirection.Ascending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Name).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the ascending name sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Compare(images[i].Name, images[i - 1].Name) >= 0);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithDescendingNameSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.ImageName, sortDirection: ImageSortDirection.Descending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Name).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the descending name sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Compare(images[i].Name, images[i - 1].Name) <= 0);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithAscendingSizeSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.Size, sortDirection: ImageSortDirection.Ascending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Size).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the ascending size sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(images[i].Size >= images[i - 1].Size);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithDescendingSizeSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.Size, sortDirection: ImageSortDirection.Descending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Size).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the descending size sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(images[i].Size <= images[i - 1].Size);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithAscendingStatusSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.Status, sortDirection: ImageSortDirection.Ascending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Status).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the ascending status sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Compare(images[i].Status.Name, images[i - 1].Status.Name) >= 0);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithDescendingStatusSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.Status, sortDirection: ImageSortDirection.Descending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Status).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the descending status sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Compare(images[i].Status.Name, images[i - 1].Status.Name) <= 0);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithAscendingVisibilitySortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.Visibility, sortDirection: ImageSortDirection.Ascending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Visibility).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the ascending visibility sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Compare(images[i].Visibility.Name, images[i - 1].Visibility.Name) >= 0);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithDescendingVisibilitySortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.Visibility, sortDirection: ImageSortDirection.Descending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.Visibility).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the descending visibility sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Compare(images[i].Visibility.Name, images[i - 1].Visibility.Name) <= 0);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithAscendingCustomAttributeSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.FromName(PredefinedImageProperties.MinDisk), sortDirection: ImageSortDirection.Ascending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.ExtensionData[PredefinedImageProperties.MinDisk].ToString()).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the ascending custom attribute sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Compare(images[i].ExtensionData[PredefinedImageProperties.MinDisk].ToString(), images[i - 1].ExtensionData[PredefinedImageProperties.MinDisk].ToString()) >= 0);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesWithDescendingCustomAttributeSortFilter()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ImageFilter filter = new ImageFilter(sortKey: ImageSortKey.FromName(PredefinedImageProperties.MinDisk), sortDirection: ImageSortDirection.Descending);
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
+                if (images.Select(i => i.ExtensionData[PredefinedImageProperties.MinDisk].ToString()).Distinct().Count() < 2)
+                    Assert.Inconclusive("The service did not report enough images to test the ascending custom attribute sort");
+
+                for (int i = 1; i < images.Count; i++)
+                {
+                    Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Compare(images[i].ExtensionData[PredefinedImageProperties.MinDisk].ToString(), images[i - 1].ExtensionData[PredefinedImageProperties.MinDisk].ToString()) <= 0);
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
         public async Task TestGetImage()
         {
             IImageService provider = CreateProvider();
@@ -144,9 +464,14 @@
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
             {
-                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
+                IIdentityProvider identityProvider = Bootstrapper.CreateIdentityProvider();
+                var userAccess = identityProvider.GetUserAccess(Bootstrapper.Settings.TestIdentity);
+                ProjectId memberId = new ProjectId(userAccess.Token.Tenant.Id);
+                ImageFilter filter = new ImageFilter(owner: memberId);
+
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token);
                 if (images.Count == 0)
-                    Assert.Inconclusive("The service did not report any images");
+                    Assert.Inconclusive("The service did not report any images owned by the current user");
 
                 Console.WriteLine("Images");
                 foreach (Image image in images)
@@ -166,7 +491,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestCreateUpdateRemoveImageMember()
+        public async Task TestCreateListUpdateRemoveImageMember()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(600))))
@@ -183,6 +508,11 @@
                 Assert.AreEqual(image.Id, imageMember.ImageId);
                 Assert.AreEqual(memberId, imageMember.MemberId);
 
+                ReadOnlyCollection<ImageMember> imageMembers = await ListAllImageMembersAsync(provider, image.Id, cancellationTokenSource.Token);
+                Assert.IsNotNull(imageMembers);
+                Assert.IsTrue(imageMembers.Count > 0);
+                Assert.IsTrue(imageMembers.Any(i => i.ImageId == image.Id && i.MemberId == memberId));
+
                 imageMember = await provider.UpdateImageMemberAsync(image.Id, memberId, MemberStatus.Accepted, cancellationTokenSource.Token);
                 Assert.IsNotNull(imageMember);
                 Assert.AreEqual(MemberStatus.Accepted, imageMember.Status);
@@ -196,6 +526,10 @@
                 Assert.AreEqual(memberId, imageMember.MemberId);
 
                 await provider.RemoveImageMemberAsync(image.Id, memberId, cancellationTokenSource.Token);
+
+                imageMembers = await ListAllImageMembersAsync(provider, image.Id, cancellationTokenSource.Token);
+                Assert.IsNotNull(imageMembers);
+                Assert.IsTrue(!imageMembers.Any(i => i.ImageId == image.Id && i.MemberId == memberId));
             }
         }
 
@@ -376,6 +710,22 @@
                 throw new ArgumentNullException("service");
 
             return await (await service.ListImagesAsync(filter, null, blockSize, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
+        }
+
+        protected static async Task<ReadOnlyCollection<ImageMember>> ListAllImageMembersAsync(IImageService service, ImageId imageId, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<ImageMember>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            return await (await service.ListImageMembersAsync(imageId, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
+        }
+
+        protected static async Task<ReadOnlyCollection<ImageMember>> ListAllImageMembersAsync(IImageService service, ImageId imageId, ImageMemberFilter filter, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<ImageMember>> progress = null)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            return await (await service.ListImageMembersAsync(imageId, filter, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
         }
 
         protected static async Task<ReadOnlyCollection<GenericImageTask>> ListAllTasksAsync(IImageService service, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<GenericImageTask>> progress = null)

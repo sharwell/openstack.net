@@ -24,8 +24,8 @@
         private static readonly ImageSortKey _status = FromName("status");
         private static readonly ImageSortKey _visibility = FromName("visibility");
         private static readonly ImageSortKey _size = FromName("size");
-        private static readonly ImageSortKey _createdAt = FromName("createdAt");
-        private static readonly ImageSortKey _updatedAt = FromName("updatedAt");
+        private static readonly ImageSortKey _createdAt = FromName("created_at");
+        private static readonly ImageSortKey _updatedAt = FromName("updated_at");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageSortKey"/> class with the specified name.

@@ -1,8 +1,11 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Images
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using net.openstack.Core.Collections;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// This class models the JSON representation of an image in the <see cref="IImageService"/>.
@@ -58,13 +61,13 @@
         /// <summary>
         /// This is the backing field for the <see cref="Created"/> property.
         /// </summary>
-        [JsonProperty("created")]
+        [JsonProperty("created_at")]
         private DateTimeOffset? _created;
 
         /// <summary>
         /// This is the backing field for the <see cref="LastModified"/> property.
         /// </summary>
-        [JsonProperty("updated")]
+        [JsonProperty("updated_at")]
         private DateTimeOffset? _updated;
 
         /// <summary>
@@ -84,6 +87,12 @@
         /// </summary>
         [JsonProperty("schema")]
         private string _schema;
+
+        /// <summary>
+        /// This is the backing field for the <see cref="ExtensionData"/> property.
+        /// </summary>
+        [JsonExtensionData]
+        private Dictionary<string, JToken> _extensionData;
 #pragma warning restore 649
 
         /// <summary>
@@ -238,6 +247,21 @@
                     return null;
 
                 return new Uri(_schema, UriKind.RelativeOrAbsolute);
+            }
+        }
+
+        /// <summary>
+        /// Gets the JSON properties returned by the server which are not explicitly handled
+        /// by another property in the <see cref="Image"/> model class.
+        /// </summary>
+        public ReadOnlyDictionary<string, JToken> ExtensionData
+        {
+            get
+            {
+                if (_extensionData == null)
+                    return new ReadOnlyDictionary<string, JToken>(new Dictionary<string, JToken>());
+
+                return new ReadOnlyDictionary<string, JToken>(_extensionData);
             }
         }
     }
