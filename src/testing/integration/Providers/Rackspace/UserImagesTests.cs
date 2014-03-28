@@ -1,11 +1,11 @@
 ﻿namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Net;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -14,7 +14,7 @@
     using net.openstack.Core.Schema;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Images;
-    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
     using ObjectStore = net.openstack.Core.Domain.ObjectStore;
@@ -24,6 +24,12 @@
     [TestClass]
     public class UserImagesTests
     {
+        /// <summary>
+        /// This prefix is used for metadata keys created by unit tests, to avoid
+        /// overwriting metadata created by other applications.
+        /// </summary>
+        internal const string TestKeyPrefix = "UnitTestMetadataKey.";
+
         /// <summary>
         /// This prefix is used for images created by unit tests, to avoid
         /// overwriting images created by other applications.
@@ -417,7 +423,102 @@
         [TestCategory(TestCategories.Images)]
         public async Task TestUpdateImage()
         {
-            Assert.Inconclusive("Not yet implemented");
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(600))))
+            {
+                Image imageToUpdate = await GetUnitTestImageAsync(provider, cancellationTokenSource.Token);
+
+                string metadataKey1 = TestKeyPrefix + Path.GetRandomFileName();
+                string metadataKey2 = TestKeyPrefix + Path.GetRandomFileName();
+                string metadataKey3 = TestKeyPrefix + Path.GetRandomFileName();
+                string metadataKey4 = TestKeyPrefix + Path.GetRandomFileName();
+
+                // test a single add operation
+                await TestUpdateImageAsync(provider, imageToUpdate.Id, UpdateOperation.Add, metadataKey1, null, null, cancellationTokenSource.Token);
+
+                // test multiple add operations
+                await TestUpdateImageAsync(provider, imageToUpdate.Id, UpdateOperation.Add, metadataKey2, UpdateOperation.Add, metadataKey3, cancellationTokenSource.Token);
+
+                // test a single replace operation
+                await TestUpdateImageAsync(provider, imageToUpdate.Id, UpdateOperation.Replace, metadataKey2, null, null, cancellationTokenSource.Token);
+
+                // test multiple replace operations
+                await TestUpdateImageAsync(provider, imageToUpdate.Id, UpdateOperation.Replace, metadataKey1, UpdateOperation.Replace, metadataKey3, cancellationTokenSource.Token);
+
+                // test replace and add
+                await TestUpdateImageAsync(provider, imageToUpdate.Id, UpdateOperation.Replace, metadataKey2, UpdateOperation.Add, metadataKey4, cancellationTokenSource.Token);
+
+                // test replace and remove
+                await TestUpdateImageAsync(provider, imageToUpdate.Id, UpdateOperation.Replace, metadataKey4, UpdateOperation.Remove, metadataKey3, cancellationTokenSource.Token);
+
+                // test add and remove
+                await TestUpdateImageAsync(provider, imageToUpdate.Id, UpdateOperation.Add, metadataKey3, UpdateOperation.Remove, metadataKey2, cancellationTokenSource.Token);
+
+                // test a single remove operation
+                await TestUpdateImageAsync(provider, imageToUpdate.Id, UpdateOperation.Remove, metadataKey1, null, null, cancellationTokenSource.Token);
+
+                // test multiple remove operations
+                await TestUpdateImageAsync(provider, imageToUpdate.Id, UpdateOperation.Remove, metadataKey3, UpdateOperation.Remove, metadataKey4, cancellationTokenSource.Token);
+            }
+        }
+
+        protected async Task<Image> TestUpdateImageAsync(IImageService provider, ImageId imageId, UpdateOperation firstOperation, string firstPath, UpdateOperation secondOperation, string secondPath, CancellationToken cancellationToken)
+        {
+            if (provider == null)
+                throw new ArgumentNullException("provider");
+            if (imageId == null)
+                throw new ArgumentNullException("imageId");
+            if (firstOperation == null)
+                throw new ArgumentNullException("firstOperation");
+            if (firstPath == null)
+                throw new ArgumentNullException("firstPath");
+            if (secondOperation != null && secondPath == null)
+                throw new ArgumentNullException("secondPath");
+            if (string.IsNullOrEmpty(firstPath))
+                throw new ArgumentException("firstPath cannot be empty");
+            if (secondOperation != null && string.IsNullOrEmpty(secondPath))
+                throw new ArgumentException("secondPath cannot be empty if secondOperation is specified");
+
+            string firstValue = firstOperation != UpdateOperation.Remove ? Path.GetRandomFileName() : null;
+            string secondValue = secondOperation != UpdateOperation.Remove ? Path.GetRandomFileName() : null;
+
+            List<ImageUpdateOperation> operations = new List<ImageUpdateOperation>();
+            operations.Add(new ImageUpdateOperation(firstOperation, firstPath, firstValue));
+            if (secondOperation != null)
+                operations.Add(new ImageUpdateOperation(secondOperation, secondPath, secondValue));
+
+            Image updated = await provider.UpdateImageAsync(imageId, operations, cancellationToken);
+            Assert.IsNotNull(updated);
+            Assert.AreEqual(imageId, updated.Id);
+
+            if (firstOperation == UpdateOperation.Remove)
+            {
+                Assert.IsFalse(updated.ExtensionData.ContainsKey(firstPath));
+            }
+            else
+            {
+                JToken value;
+                Assert.IsTrue(updated.ExtensionData.TryGetValue(firstPath, out value));
+                Assert.IsNotNull(value);
+                Assert.AreEqual(firstValue, value.ToString());
+            }
+
+            if (secondOperation != null)
+            {
+                if (secondOperation == UpdateOperation.Remove)
+                {
+                    Assert.IsFalse(updated.ExtensionData.ContainsKey(secondPath));
+                }
+                else
+                {
+                    JToken value;
+                    Assert.IsTrue(updated.ExtensionData.TryGetValue(secondPath, out value));
+                    Assert.IsNotNull(value);
+                    Assert.AreEqual(secondValue, value.ToString());
+                }
+            }
+
+            return updated;
         }
 
         [TestMethod]
