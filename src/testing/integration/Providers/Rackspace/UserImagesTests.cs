@@ -68,7 +68,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithAscendingCreatedSortFilter()
+        public async Task TestListImagesSortedAscendingByCreated()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -88,7 +88,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithDescendingCreatedSortFilter()
+        public async Task TestListImagesSortedDescendingByCreated()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -108,7 +108,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithAscendingIdSortFilter()
+        public async Task TestListImagesSortedAscendingById()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -128,7 +128,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithDescendingIdSortFilter()
+        public async Task TestListImagesSortedDescendingById()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -148,7 +148,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithAscendingLastModifiedSortFilter()
+        public async Task TestListImagesSortedAscendingByLastModified()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -168,7 +168,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithDescendingLastModifiedSortFilter()
+        public async Task TestListImagesSortedDescendingByLastModified()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -188,7 +188,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithAscendingNameSortFilter()
+        public async Task TestListImagesSortedAscendingByName()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -208,7 +208,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithDescendingNameSortFilter()
+        public async Task TestListImagesSortedDescendingByName()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -228,7 +228,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithAscendingSizeSortFilter()
+        public async Task TestListImagesSortedAscendingBySize()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -248,7 +248,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithDescendingSizeSortFilter()
+        public async Task TestListImagesSortedDescendingBySize()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -268,7 +268,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithAscendingStatusSortFilter()
+        public async Task TestListImagesSortedAscendingByStatus()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -288,7 +288,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithDescendingStatusSortFilter()
+        public async Task TestListImagesSortedDescendingByStatus()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -308,7 +308,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithAscendingVisibilitySortFilter()
+        public async Task TestListImagesSortedAscendingByVisibility()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -328,7 +328,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithDescendingVisibilitySortFilter()
+        public async Task TestListImagesSortedDescendingByVisibility()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -348,7 +348,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithAscendingCustomAttributeSortFilter()
+        public async Task TestListImagesSortedAscendingByCustomAttribute()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
@@ -368,7 +368,7 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithDescendingCustomAttributeSortFilter()
+        public async Task TestListImagesSortedDescendingByCustomAttribute()
         {
             IImageService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
