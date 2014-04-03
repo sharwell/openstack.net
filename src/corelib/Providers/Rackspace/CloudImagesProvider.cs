@@ -8,9 +8,9 @@
     using System.Threading.Tasks;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
-    using net.openstack.Core.Schema;
     using net.openstack.Providers.Rackspace.Objects.Images;
     using Newtonsoft.Json.Linq;
+    using Newtonsoft.Json.Schema;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using ContentType = System.Net.Mime.ContentType;
     using Endpoint = net.openstack.Core.Domain.Endpoint;
@@ -567,12 +567,16 @@
             Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JsonSchema>> requestResource =
-                GetResponseAsyncFunc<JsonSchema>(cancellationToken);
+            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                GetResponseAsyncFunc(cancellationToken);
+
+            Func<Task<string>, JsonSchema> resultSelector =
+                task => JsonSchema.Parse(task.Result);
 
             return AuthenticateServiceAsync(cancellationToken)
                 .Select(prepareRequest)
-                .Then(requestResource);
+                .Then(requestResource)
+                .Select(resultSelector);
         }
 
         #endregion

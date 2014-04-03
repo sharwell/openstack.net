@@ -11,10 +11,10 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Providers;
-    using net.openstack.Core.Schema;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Images;
     using Newtonsoft.Json.Linq;
+    using Newtonsoft.Json.Schema;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
     using ObjectStore = net.openstack.Core.Domain.ObjectStore;

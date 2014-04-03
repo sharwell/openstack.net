@@ -8,8 +8,8 @@
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Providers;
-    using net.openstack.Core.Schema;
     using net.openstack.Providers.Rackspace.Objects.Images;
+    using Newtonsoft.Json.Schema;
     using ProjectId = net.openstack.Core.Domain.ProjectId;
     using Tenant = net.openstack.Core.Domain.Tenant;
 
