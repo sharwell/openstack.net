@@ -60,9 +60,219 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Images)]
-        public async Task TestListImagesWithFilter()
+        public async Task TestListImagesFilteredByName()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any images");
+
+                IEnumerable<IGrouping<string, Image>> uniqueNames = images.GroupBy(i => i.Name);
+                if (uniqueNames.Count() < 2)
+                    Assert.Inconclusive("The service doesn't have images with multiple images with a distinct Name property.");
+
+                IGrouping<string, Image> testGroup = uniqueNames.ElementAt(1);
+                ImageFilter filter = new ImageFilter(name: uniqueNames.ElementAt(1).Key);
+                ReadOnlyCollection<Image> filteredImages = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token, null);
+                Assert.IsNotNull(filteredImages);
+                Assert.AreEqual(testGroup.Count(), filteredImages.Count);
+                foreach (Image filteredImage in filteredImages)
+                    Assert.IsTrue(testGroup.Where(i => i.Id == filteredImage.Id).Any());
+                foreach (Image testImage in testGroup)
+                    Assert.IsTrue(filteredImages.Where(i => i.Id == testImage.Id).Any());
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesFilteredByVisibility()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any images");
+
+                IEnumerable<IGrouping<ImageVisibility, Image>> uniqueVisibilities = images.GroupBy(i => i.Visibility);
+                if (uniqueVisibilities.Count() < 2)
+                    Assert.Inconclusive("The service doesn't have images with multiple images with a distinct Visibility property.");
+
+                IGrouping<ImageVisibility, Image> testGroup = uniqueVisibilities.ElementAt(1);
+                ImageFilter filter = new ImageFilter(visibility: uniqueVisibilities.ElementAt(1).Key);
+                ReadOnlyCollection<Image> filteredImages = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token, null);
+                Assert.IsNotNull(filteredImages);
+                Assert.AreEqual(testGroup.Count(), filteredImages.Count);
+                foreach (Image filteredImage in filteredImages)
+                    Assert.IsTrue(testGroup.Where(i => i.Id == filteredImage.Id).Any());
+                foreach (Image testImage in testGroup)
+                    Assert.IsTrue(filteredImages.Where(i => i.Id == testImage.Id).Any());
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public Task TestListImagesFilteredByMemberStatus()
         {
             Assert.Inconclusive("Not yet implemented");
+            throw new NotImplementedException();
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public Task TestListImagesFilteredByOwner()
+        {
+            Assert.Inconclusive("Not yet implemented");
+            throw new NotImplementedException();
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesFilteredByTag()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any images");
+
+                IEnumerable<IGrouping<ImageTag, Image>> uniqueTags = images.SelectMany(i => i.Tags.Select(j => Tuple.Create(j, i))).GroupBy(i => i.Item1, i => i.Item2);
+                if (uniqueTags.Count() < 2)
+                    Assert.Inconclusive("The service doesn't have images with multiple images with a distinct Tag property.");
+
+                IGrouping<ImageTag, Image> testGroup = uniqueTags.ElementAt(1);
+                ImageFilter filter = new ImageFilter(tag: uniqueTags.ElementAt(1).Key);
+                ReadOnlyCollection<Image> filteredImages = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token, null);
+                Assert.IsNotNull(filteredImages);
+                Assert.AreEqual(testGroup.Count(), filteredImages.Count);
+                foreach (Image filteredImage in filteredImages)
+                    Assert.IsTrue(testGroup.Where(i => i.Id == filteredImage.Id).Any());
+                foreach (Image testImage in testGroup)
+                    Assert.IsTrue(filteredImages.Where(i => i.Id == testImage.Id).Any());
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesFilteredByStatus()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any images");
+
+                IEnumerable<IGrouping<ImageStatus, Image>> uniqueStatuss = images.GroupBy(i => i.Status);
+                if (uniqueStatuss.Count() < 2)
+                    Assert.Inconclusive("The service doesn't have images with multiple images with a distinct Status property.");
+
+                IGrouping<ImageStatus, Image> testGroup = uniqueStatuss.ElementAt(1);
+                ImageFilter filter = new ImageFilter(status: uniqueStatuss.ElementAt(1).Key);
+                ReadOnlyCollection<Image> filteredImages = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token, null);
+                Assert.IsNotNull(filteredImages);
+                Assert.AreEqual(testGroup.Count(), filteredImages.Count);
+                foreach (Image filteredImage in filteredImages)
+                    Assert.IsTrue(testGroup.Where(i => i.Id == filteredImage.Id).Any());
+                foreach (Image testImage in testGroup)
+                    Assert.IsTrue(filteredImages.Where(i => i.Id == testImage.Id).Any());
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesFilteredBySizeMin()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any images");
+
+                IEnumerable<IGrouping<long?, Image>> uniqueSizeMins = images.GroupBy(i => i.Size).OrderBy(i => i.Key);
+                if (uniqueSizeMins.Count() < 3)
+                    Assert.Inconclusive("The service doesn't have images with multiple images with a distinct Size property.");
+
+                IGrouping<long?, Image> testGroup = uniqueSizeMins.ElementAt(1);
+                ImageFilter filter = new ImageFilter(sizeMin: testGroup.Key);
+                ReadOnlyCollection<Image> filteredImages = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token, null);
+                Assert.IsNotNull(filteredImages);
+                ISet<ImageId> expectedIds = new HashSet<ImageId>(uniqueSizeMins.Skip(1).SelectMany(i => i).Select(i => i.Id));
+                Assert.AreEqual(expectedIds.Count(), filteredImages.Count);
+                foreach (Image filteredImage in filteredImages)
+                    Assert.IsTrue(expectedIds.Contains(filteredImage.Id));
+                foreach (ImageId id in expectedIds)
+                    Assert.IsTrue(filteredImages.Where(i => i.Id == id).Any());
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesFilteredBySizeMax()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any images");
+
+                IEnumerable<IGrouping<long?, Image>> uniqueSizeMaxs = images.GroupBy(i => i.Size).OrderBy(i => i.Key);
+                if (uniqueSizeMaxs.Count() < 3)
+                    Assert.Inconclusive("The service doesn't have images with multiple images with a distinct Size property.");
+
+                IGrouping<long?, Image> testGroup = uniqueSizeMaxs.ElementAt(1);
+                ImageFilter filter = new ImageFilter(sizeMax: testGroup.Key);
+                ReadOnlyCollection<Image> filteredImages = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token, null);
+                Assert.IsNotNull(filteredImages);
+                ISet<ImageId> expectedIds = new HashSet<ImageId>(uniqueSizeMaxs.Take(2).SelectMany(i => i).Select(i => i.Id));
+                Assert.AreEqual(expectedIds.Count(), filteredImages.Count);
+                foreach (Image filteredImage in filteredImages)
+                    Assert.IsTrue(expectedIds.Contains(filteredImage.Id));
+                foreach (ImageId id in expectedIds)
+                    Assert.IsTrue(filteredImages.Where(i => i.Id == id).Any());
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.Images)]
+        public async Task TestListImagesFilteredBySize()
+        {
+            IImageService provider = CreateProvider();
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            {
+                ReadOnlyCollection<Image> images = await ListAllImagesAsync(provider, null, cancellationTokenSource.Token);
+                if (images.Count == 0)
+                    Assert.Inconclusive("The service did not report any images");
+
+                IEnumerable<IGrouping<long?, Image>> uniqueSizeMaxs = images.GroupBy(i => i.Size).OrderBy(i => i.Key);
+                if (uniqueSizeMaxs.Count() < 4)
+                    Assert.Inconclusive("The service doesn't have images with multiple images with a distinct Size property.");
+
+                IGrouping<long?, Image> testGroupMin = uniqueSizeMaxs.ElementAt(1);
+                IGrouping<long?, Image> testGroupMax = uniqueSizeMaxs.ElementAt(2);
+                ImageFilter filter = new ImageFilter(sizeMin: testGroupMin.Key, sizeMax: testGroupMax.Key);
+                ReadOnlyCollection<Image> filteredImages = await ListAllImagesAsync(provider, filter, null, cancellationTokenSource.Token, null);
+                Assert.IsNotNull(filteredImages);
+                ISet<ImageId> expectedIds = new HashSet<ImageId>(uniqueSizeMaxs.Skip(1).Take(2).SelectMany(i => i).Select(i => i.Id));
+                Assert.AreEqual(expectedIds.Count(), filteredImages.Count);
+                foreach (Image filteredImage in filteredImages)
+                    Assert.IsTrue(expectedIds.Contains(filteredImage.Id));
+                foreach (ImageId id in expectedIds)
+                    Assert.IsTrue(filteredImages.Where(i => i.Id == id).Any());
+            }
         }
 
         [TestMethod]
