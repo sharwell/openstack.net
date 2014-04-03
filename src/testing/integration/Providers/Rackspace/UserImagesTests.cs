@@ -793,7 +793,7 @@
 
             ImageFilter filter = new ImageFilter(name: "UnitTestSourceImage");
             ReadOnlyCollection<Image> images = await ListAllImagesAsync(service, filter, null, cancellationToken);
-            Assert.IsTrue(images.Count > 0, string.Format("Could not find an image with the name '{0}' in the test region.", filter.Name));
+            Assert.IsTrue(images.Count > 0, string.Format("Could not find an image with the name '{0}' in the test region (must be manually created prior to running this test).", filter.Name));
             return images.FirstOrDefault();
         }
 
