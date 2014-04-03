@@ -1,8 +1,9 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Images
 {
     using System;
-    using net.openstack.Core.Domain;
     using Newtonsoft.Json;
+    using ExtensibleJsonObject = net.openstack.Core.Domain.ExtensibleJsonObject;
+    using ProjectId = net.openstack.Core.Domain.ProjectId;
 
     /// <summary>
     /// This class models the JSON representation of an image member in the <see cref="IImageService"/>.
@@ -10,7 +11,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class ImageMember
+    public class ImageMember : ExtensibleJsonObject
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>

@@ -2,6 +2,7 @@
 {
     using System;
     using Newtonsoft.Json;
+    using ExtensibleJsonObject = net.openstack.Core.Domain.ExtensibleJsonObject;
 
     /// <summary>
     /// Defines a single update operation to apply to an image resource during the
@@ -10,7 +11,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class ImageUpdateOperation
+    public class ImageUpdateOperation : ExtensibleJsonObject
     {
         /// <summary>
         /// This is the backing field for the <see cref="Operation"/> property.

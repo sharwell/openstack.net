@@ -1,5 +1,7 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Images
 {
+    using ExtensibleJsonObject = net.openstack.Core.Domain.ExtensibleJsonObject;
+
     /// <summary>
     /// Provides predefined property names which may be used as the <see cref="ImageUpdateOperation.Path"/>
     /// property for an <see cref="ImageUpdateOperation"/>.
@@ -21,7 +23,7 @@
         /// <summary>
         /// The common name of the operating system distribution. The value of this
         /// property, if specified by the Image Service, is specified in the
-        /// <see cref="Image.ExtensionData"/> dictionary.
+        /// <see cref="ExtensibleJsonObject.ExtensionData"/> dictionary.
         /// </summary>
         /// <remarks>
         /// The following table shows the allowed values for this property.
@@ -109,56 +111,56 @@
         /// <summary>
         /// The operating system version as specified by the distributor. The value
         /// of this property, if specified by the Image Service, is specified in the
-        /// <see cref="Image.ExtensionData"/> dictionary.
+        /// <see cref="ExtensibleJsonObject.ExtensionData"/> dictionary.
         /// </summary>
         public static readonly string OsVersion = "os_version";
 
         /// <summary>
         /// <placeholder>placeholder</placeholder>. The value of this
         /// property, if specified by the Image Service, is specified in the
-        /// <see cref="Image.ExtensionData"/> dictionary.
+        /// <see cref="ExtensibleJsonObject.ExtensionData"/> dictionary.
         /// </summary>
         public static readonly string Protected = "protected";
 
         /// <summary>
         /// <placeholder>placeholder</placeholder>. The value of this
         /// property, if specified by the Image Service, is specified in the
-        /// <see cref="Image.ExtensionData"/> dictionary.
+        /// <see cref="ExtensibleJsonObject.ExtensionData"/> dictionary.
         /// </summary>
         public static readonly string ContainerFormat = "container_format";
 
         /// <summary>
         /// <placeholder>placeholder</placeholder>. The value of this
         /// property, if specified by the Image Service, is specified in the
-        /// <see cref="Image.ExtensionData"/> dictionary.
+        /// <see cref="ExtensibleJsonObject.ExtensionData"/> dictionary.
         /// </summary>
         public static readonly string DiskFormat = "disk_format";
 
         /// <summary>
         /// <placeholder>placeholder</placeholder>. The value of this
         /// property, if specified by the Image Service, is specified in the
-        /// <see cref="Image.ExtensionData"/> dictionary.
+        /// <see cref="ExtensibleJsonObject.ExtensionData"/> dictionary.
         /// </summary>
         public static readonly string MinDisk = "min_disk";
 
         /// <summary>
         /// <placeholder>placeholder</placeholder>. The value of this
         /// property, if specified by the Image Service, is specified in the
-        /// <see cref="Image.ExtensionData"/> dictionary.
+        /// <see cref="ExtensibleJsonObject.ExtensionData"/> dictionary.
         /// </summary>
         public static readonly string MinRam = "min_ram";
 
         /// <summary>
         /// <placeholder>placeholder</placeholder>. The value of this
         /// property, if specified by the Image Service, is specified in the
-        /// <see cref="Image.ExtensionData"/> dictionary.
+        /// <see cref="ExtensibleJsonObject.ExtensionData"/> dictionary.
         /// </summary>
         public static readonly string RamdiskId = "ramdisk_id";
 
         /// <summary>
         /// <placeholder>placeholder</placeholder>. The value of this
         /// property, if specified by the Image Service, is specified in the
-        /// <see cref="Image.ExtensionData"/> dictionary.
+        /// <see cref="ExtensibleJsonObject.ExtensionData"/> dictionary.
         /// </summary>
         public static readonly string KernelId = "kernel_id";
     }

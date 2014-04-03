@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using ExtensibleJsonObject = net.openstack.Core.Domain.ExtensibleJsonObject;
     using ProjectId = net.openstack.Core.Domain.ProjectId;
 
     /// <summary>
@@ -10,7 +11,7 @@
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    public class ImageFilter
+    public class ImageFilter : ExtensibleJsonObject
     {
         /// <summary>
         /// This is the backing field for the <see cref="Name"/> property.

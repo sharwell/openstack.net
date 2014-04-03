@@ -3,6 +3,7 @@
     using System;
     using Newtonsoft.Json;
     using ProjectId = net.openstack.Core.Domain.ProjectId;
+    using ExtensibleJsonObject = net.openstack.Core.Domain.ExtensibleJsonObject;
 
     /// <summary>
     /// This is the base class for objects modeling specific types of tasks in the
@@ -11,7 +12,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject]
-    public abstract class ImageTask
+    public abstract class ImageTask : ExtensibleJsonObject
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>

@@ -2,6 +2,7 @@
 {
     using System;
     using Newtonsoft.Json;
+    using ExtensibleJsonObject = net.openstack.Core.Domain.ExtensibleJsonObject;
 
     /// <summary>
     /// This is the base class for objects modeling the JSON data in requests to create a
@@ -14,7 +15,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class ImageTaskDescriptor<TInput>
+    public class ImageTaskDescriptor<TInput> : ExtensibleJsonObject
         where TInput : class
     {
         /// <summary>

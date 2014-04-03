@@ -6,6 +6,7 @@
     using net.openstack.Core.Collections;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using ExtensibleJsonObject = net.openstack.Core.Domain.ExtensibleJsonObject;
 
     /// <summary>
     /// This class models the JSON representation of an image in the <see cref="IImageService"/>.
@@ -13,7 +14,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class Image
+    public class Image : ExtensibleJsonObject
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>
@@ -87,12 +88,6 @@
         /// </summary>
         [JsonProperty("schema")]
         private string _schema;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="ExtensionData"/> property.
-        /// </summary>
-        [JsonExtensionData]
-        private Dictionary<string, JToken> _extensionData;
 #pragma warning restore 649
 
         /// <summary>
@@ -247,21 +242,6 @@
                     return null;
 
                 return new Uri(_schema, UriKind.RelativeOrAbsolute);
-            }
-        }
-
-        /// <summary>
-        /// Gets the JSON properties returned by the server which are not explicitly handled
-        /// by another property in the <see cref="Image"/> model class.
-        /// </summary>
-        public ReadOnlyDictionary<string, JToken> ExtensionData
-        {
-            get
-            {
-                if (_extensionData == null)
-                    return new ReadOnlyDictionary<string, JToken>(new Dictionary<string, JToken>());
-
-                return new ReadOnlyDictionary<string, JToken>(_extensionData);
             }
         }
     }
