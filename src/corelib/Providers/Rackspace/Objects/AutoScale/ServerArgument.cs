@@ -4,8 +4,14 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using net.openstack.Core.Domain;
     using Newtonsoft.Json;
+    using DiskConfiguration = net.openstack.Core.Domain.DiskConfiguration;
+    using ExtensibleJsonObject = net.openstack.Core.Domain.ExtensibleJsonObject;
+    using Flavor = net.openstack.Core.Domain.Flavor;
+    using FlavorId = net.openstack.Core.Domain.FlavorId;
+    using ImageId = net.openstack.Core.Domain.ImageId;
+    using Personality = net.openstack.Core.Domain.Personality;
+    using SimpleServerImage = net.openstack.Core.Domain.SimpleServerImage;
 
     /// <summary>
     /// This class models the JSON representation of the arguments for creating new servers
@@ -15,7 +21,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class ServerArgument
+    public class ServerArgument : ExtensibleJsonObject
     {
         /// <summary>
         /// This is the backing field for the <see cref="FlavorId"/> property.
