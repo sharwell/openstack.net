@@ -3,6 +3,7 @@
     using System;
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
+    using ExtensibleJsonObject = OpenStack.ObjectModel.ExtensibleJsonObject;
     using Link = net.openstack.Core.Domain.Link;
 
     /// <summary>
@@ -11,7 +12,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class DatabaseInstance
+    public class DatabaseInstance : ExtensibleJsonObject
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>

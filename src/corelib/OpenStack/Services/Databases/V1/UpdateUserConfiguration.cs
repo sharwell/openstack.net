@@ -1,6 +1,7 @@
 ﻿namespace OpenStack.Services.Databases.V1
 {
     using Newtonsoft.Json;
+    using ExtensibleJsonObject = OpenStack.ObjectModel.ExtensibleJsonObject;
 
     /// <summary>
     /// This class models the JSON representation of an operation to update properties
@@ -10,7 +11,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class UpdateUserConfiguration
+    public class UpdateUserConfiguration : ExtensibleJsonObject
     {
         /// <summary>
         /// This is one of the backing fields for the <see cref="UserName"/> property.

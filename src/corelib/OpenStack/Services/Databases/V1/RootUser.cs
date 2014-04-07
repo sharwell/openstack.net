@@ -1,6 +1,7 @@
 ﻿namespace OpenStack.Services.Databases.V1
 {
     using Newtonsoft.Json;
+    using ExtensibleJsonObject = OpenStack.ObjectModel.ExtensibleJsonObject;
 
     /// <summary>
     /// This class models the JSON representation of a root user for a database instance.
@@ -9,7 +10,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class RootUser
+    public class RootUser : ExtensibleJsonObject
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>

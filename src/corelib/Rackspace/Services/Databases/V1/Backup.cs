@@ -3,6 +3,7 @@
     using System;
     using Newtonsoft.Json;
     using OpenStack.Services.Databases.V1;
+    using ExtensibleJsonObject = OpenStack.ObjectModel.ExtensibleJsonObject;
 
     /// <summary>
     /// This class models the JSON representation of a database instance backup in the <see cref="IDatabaseService"/>.
@@ -10,7 +11,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class Backup
+    public class Backup : ExtensibleJsonObject
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>
