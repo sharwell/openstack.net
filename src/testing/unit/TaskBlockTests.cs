@@ -211,6 +211,298 @@
 
         #endregion
 
+        #region While Block Simple Condition
+
+        [TestMethod]
+        public async Task TestWhileBlock()
+        {
+            int count = 0;
+            Func<bool> condition =
+                () =>
+                {
+                    count++;
+                    return count <= 3;
+                };
+
+            int iterations = 0;
+            Func<Task> body =
+                () =>
+                {
+                    iterations++;
+                    return InternalTaskExtensions.CompletedTask();
+                };
+
+            await CoreTaskExtensions.While(condition, body);
+            Assert.AreEqual(4, count);
+            Assert.AreEqual(3, iterations);
+        }
+
+        [TestMethod]
+        public async Task TestWhileBlockExceptionInCondition()
+        {
+            int count = 0;
+            Func<bool> condition =
+                () =>
+                {
+                    count++;
+                    throw new ArgumentException(ArgumentExceptionMessage);
+                };
+
+            int iterations = 0;
+            Func<Task> body =
+                () =>
+                {
+                    iterations++;
+                    return InternalTaskExtensions.CompletedTask();
+                };
+
+            try
+            {
+                await CoreTaskExtensions.While(condition, body);
+                Assert.Fail("Expected an exception");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.AreEqual(1, count);
+                Assert.AreEqual(0, iterations);
+                Assert.AreEqual(ArgumentExceptionMessage, ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public async Task TestWhileBlockExceptionInBodyEval()
+        {
+            int count = 0;
+            Func<bool> condition =
+                () =>
+                {
+                    count++;
+                    return count <= 3;
+                };
+
+            int iterations = 0;
+            Func<Task> body =
+                () =>
+                {
+                    iterations++;
+                    throw new ArgumentException(ArgumentExceptionMessage);
+                };
+
+            try
+            {
+                await CoreTaskExtensions.While(condition, body);
+                Assert.Fail("Expected an exception");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.AreEqual(1, count);
+                Assert.AreEqual(1, iterations);
+                Assert.AreEqual(ArgumentExceptionMessage, ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public async Task TestWhileBlockExceptionInBody()
+        {
+            int count = 0;
+            Func<bool> condition =
+                () =>
+                {
+                    count++;
+                    return count <= 3;
+                };
+
+            int iterations = 0;
+            Func<Task> body =
+                () =>
+                {
+                    iterations++;
+                    return InternalTaskExtensions.CompletedTask().Select(
+                        task =>
+                        {
+                            throw new ArgumentException(ArgumentExceptionMessage);
+                        });
+                };
+
+            try
+            {
+                await CoreTaskExtensions.While(condition, body);
+                Assert.Fail("Expected an exception");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.AreEqual(1, count);
+                Assert.AreEqual(1, iterations);
+                Assert.AreEqual(ArgumentExceptionMessage, ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region While Block Task Condition
+
+        [TestMethod]
+        public async Task TestWhileTaskBlock()
+        {
+            int count = 0;
+            Func<Task<bool>> condition =
+                () =>
+                {
+                    count++;
+                    return InternalTaskExtensions.CompletedTask(count <= 3);
+                };
+
+            int iterations = 0;
+            Func<Task> body =
+                () =>
+                {
+                    iterations++;
+                    return InternalTaskExtensions.CompletedTask();
+                };
+
+            await CoreTaskExtensions.While(condition, body);
+            Assert.AreEqual(4, count);
+            Assert.AreEqual(3, iterations);
+        }
+
+        [TestMethod]
+        public async Task TestWhileTaskBlockExceptionInConditionEval()
+        {
+            int count = 0;
+            Func<Task<bool>> condition =
+                () =>
+                {
+                    count++;
+                    throw new ArgumentException(ArgumentExceptionMessage);
+                };
+
+            int iterations = 0;
+            Func<Task> body =
+                () =>
+                {
+                    iterations++;
+                    return InternalTaskExtensions.CompletedTask();
+                };
+
+            try
+            {
+                await CoreTaskExtensions.While(condition, body);
+                Assert.Fail("Expected an exception");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.AreEqual(1, count);
+                Assert.AreEqual(0, iterations);
+                Assert.AreEqual(ArgumentExceptionMessage, ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public async Task TestWhileTaskBlockExceptionInCondition()
+        {
+            int count = 0;
+            Func<Task<bool>> condition =
+                () =>
+                {
+                    count++;
+                    return InternalTaskExtensions.CompletedTask().Select<bool>(
+                        task =>
+                        {
+                            throw new ArgumentException(ArgumentExceptionMessage);
+                        });
+                };
+
+            int iterations = 0;
+            Func<Task> body =
+                () =>
+                {
+                    iterations++;
+                    return InternalTaskExtensions.CompletedTask();
+                };
+
+            try
+            {
+                await CoreTaskExtensions.While(condition, body);
+                Assert.Fail("Expected an exception");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.AreEqual(1, count);
+                Assert.AreEqual(0, iterations);
+                Assert.AreEqual(ArgumentExceptionMessage, ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public async Task TestWhileTaskBlockExceptionInBodyEval()
+        {
+            int count = 0;
+            Func<Task<bool>> condition =
+                () =>
+                {
+                    count++;
+                    return InternalTaskExtensions.CompletedTask(count <= 3);
+                };
+
+            int iterations = 0;
+            Func<Task> body =
+                () =>
+                {
+                    iterations++;
+                    throw new ArgumentException(ArgumentExceptionMessage);
+                };
+
+            try
+            {
+                await CoreTaskExtensions.While(condition, body);
+                Assert.Fail("Expected an exception");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.AreEqual(1, count);
+                Assert.AreEqual(1, iterations);
+                Assert.AreEqual(ArgumentExceptionMessage, ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public async Task TestWhileTaskBlockExceptionInBody()
+        {
+            int count = 0;
+            Func<Task<bool>> condition =
+                () =>
+                {
+                    count++;
+                    return InternalTaskExtensions.CompletedTask(count <= 3);
+                };
+
+            int iterations = 0;
+            Func<Task> body =
+                () =>
+                {
+                    iterations++;
+                    return InternalTaskExtensions.CompletedTask().Select(
+                        task =>
+                        {
+                            throw new ArgumentException(ArgumentExceptionMessage);
+                        });
+                };
+
+            try
+            {
+                await CoreTaskExtensions.While(condition, body);
+                Assert.Fail("Expected an exception");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.AreEqual(1, count);
+                Assert.AreEqual(1, iterations);
+                Assert.AreEqual(ArgumentExceptionMessage, ex.Message);
+            }
+        }
+
+        #endregion
+
         protected sealed class DisposableObject : IDisposable
         {
             private readonly bool _throwExceptionInDispose;

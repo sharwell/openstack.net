@@ -1022,6 +1022,140 @@
                     });
         }
 
+        /// <summary>
+        /// Provides support for a conditional "while" loop in asynchronous code, without requiring the use of <see langword="async/await"/>.
+        /// </summary>
+        /// <remarks>
+        /// This code implements support for the following construct without requiring the use of <see langword="async/await"/>.
+        ///
+        /// <code language="cs">
+        /// while (condition())
+        /// {
+        ///     await <paramref name="body"/>().ConfigureAwait(false);
+        /// }
+        /// </code>
+        /// </remarks>
+        /// <param name="condition">A function which evaluates the condition of the asynchronous <c>while</c> loop.</param>
+        /// <param name="body">A function which returns a <see cref="Task"/> representing one iteration of the body of the <c>while</c> loop.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="condition"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="body"/> is <see langword="null"/>.</para>
+        /// </exception>
+        public static Task While(Func<bool> condition, Func<Task> body)
+        {
+            if (condition == null)
+                throw new ArgumentNullException("condition");
+            if (body == null)
+                throw new ArgumentNullException("body");
+
+            TaskCompletionSource<VoidResult> taskCompletionSource = new TaskCompletionSource<VoidResult>();
+            Task currentTask = InternalTaskExtensions.CompletedTask();
+
+            // This action specifically handles cases where evaluating condition or body
+            // results in an exception.
+            Action<Task> handleErrors =
+                previousTask =>
+                {
+                    if (previousTask.Status != TaskStatus.RanToCompletion)
+                        taskCompletionSource.SetFromTask(previousTask);
+                };
+
+            Action<Task> continuation = null;
+            continuation =
+                previousTask =>
+                {
+                    if (previousTask.Status != TaskStatus.RanToCompletion)
+                    {
+                        taskCompletionSource.SetFromTask(previousTask);
+                        return;
+                    }
+
+                    if (!condition())
+                    {
+                        taskCompletionSource.SetResult(null);
+                        return;
+                    }
+
+                    // reschedule
+                    currentTask = body().Finally(continuation).Finally(handleErrors);
+                };
+
+            currentTask.Finally(continuation).Finally(handleErrors);
+            return taskCompletionSource.Task;
+        }
+
+        /// <summary>
+        /// Provides support for a conditional "while" loop in asynchronous code, without requiring the use of <see langword="async/await"/>.
+        /// </summary>
+        /// <remarks>
+        /// This code implements support for the following construct without requiring the use of <see langword="async/await"/>.
+        ///
+        /// <code language="cs">
+        /// while (await condition().ConfigureAwait(false))
+        /// {
+        ///     await <paramref name="body"/>().ConfigureAwait(false);
+        /// }
+        /// </code>
+        /// </remarks>
+        /// <param name="condition">A function which returns a <see cref="Task"/> representing the asynchronous evaluation of the <c>while</c> condition.</param>
+        /// <param name="body">A function which returns a <see cref="Task"/> representing one iteration of the body of the <c>while</c> loop.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="condition"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="body"/> is <see langword="null"/>.</para>
+        /// </exception>
+        public static Task While(Func<Task<bool>> condition, Func<Task> body)
+        {
+            if (condition == null)
+                throw new ArgumentNullException("condition");
+            if (body == null)
+                throw new ArgumentNullException("body");
+
+            TaskCompletionSource<VoidResult> taskCompletionSource = new TaskCompletionSource<VoidResult>();
+            Task currentTask = InternalTaskExtensions.CompletedTask();
+
+            Action<Task> statusCheck =
+                previousTask =>
+                {
+                    if (previousTask.Status != TaskStatus.RanToCompletion)
+                        taskCompletionSource.SetFromTask(previousTask);
+                };
+
+            Func<Task, Task<bool>> conditionContinuation =
+                previousTask =>
+                {
+                    if (taskCompletionSource.Task.IsCompleted)
+                        return InternalTaskExtensions.CompletedTask(false);
+
+                    return condition();
+                };
+
+            Action<Task<bool>> continuation = null;
+            continuation =
+                previousTask =>
+                {
+                    if (taskCompletionSource.Task.IsCompleted)
+                    {
+                        return;
+                    }
+
+                    if (!previousTask.Result)
+                    {
+                        taskCompletionSource.TrySetResult(null);
+                        return;
+                    }
+
+                    // reschedule
+                    currentTask = body().Finally(statusCheck).Then(conditionContinuation).Select(continuation).Finally(statusCheck);
+                };
+
+            currentTask = currentTask.Finally(statusCheck).Then(conditionContinuation).Select(continuation).Finally(statusCheck);
+            return taskCompletionSource.Task;
+        }
+
         private sealed class VoidResult
         {
         }
