@@ -913,6 +913,62 @@
             return completionSource.Task;
         }
 
+        /// <summary>
+        /// Provides support for resource cleanup in asynchronous code where the <see langword="async/await"/>
+        /// keywords are not available.
+        /// </summary>
+        /// <remarks>
+        /// This code implements support for the following construct without requiring the use of <see langword="async/await"/>.
+        ///
+        /// <code language="cs">
+        /// using (IDisposable disposable = await <paramref name="resource"/>().ConfigureAwait(false))
+        /// {
+        ///     return await <paramref name="body"/>(disposable).ConfigureAwait(false);
+        /// }
+        /// </code>
+        ///
+        /// <note type="caller">
+        /// If the <paramref name="resource"/> function throws an exception, or if the <see cref="Task{TResult}"/> it returns
+        /// does not complete successfully, the resource will not be acquired by this method. In either of these
+        /// situations the caller is responsible for ensuring the <paramref name="resource"/> function cleans up any
+        /// resources it creates.
+        /// </note>
+        /// </remarks>
+        /// <typeparam name="TResource">The type of resource used within the task and disposed of afterwards.</typeparam>
+        /// <typeparam name="TResult">The type of the result produced by the continuation <see cref="Task{TResult}"/>.</typeparam>
+        /// <param name="resource">A function which acquires the resource used during the execution of the task.</param>
+        /// <param name="body">The continuation function which provides the <see cref="Task{TResult}"/> which acts as the body of the <c>using</c> block.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation. When the task completes successfully,
+        /// the <see cref="Task{TResult}.Result"/> property will contain the result provided by the
+        /// <see cref="Task{TResult}.Result"/> property of the task returned from <paramref name="body"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="resource"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="body"/> is <see langword="null"/>.</para>
+        /// </exception>
+        public static Task<TResult> Using<TResource, TResult>(Func<Task<TResource>> resource, Func<Task<TResource>, Task<TResult>> body)
+            where TResource : IDisposable
+        {
+            if (resource == null)
+                throw new ArgumentNullException("resource");
+            if (body == null)
+                throw new ArgumentNullException("body");
+
+            Task<TResource> resourceTask = resource();
+            return resourceTask
+                .Then(body)
+                .Finally(
+                    task =>
+                    {
+                        if (resourceTask.Status == TaskStatus.RanToCompletion)
+                        {
+                            IDisposable disposable = resourceTask.Result;
+                            if (disposable != null)
+                                disposable.Dispose();
+                        }
+                    });
+        }
+
         private sealed class VoidResult
         {
         }
