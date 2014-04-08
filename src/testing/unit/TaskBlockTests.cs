@@ -14,6 +14,7 @@
         #region Using Block with Return
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestUsingBlock()
         {
             DisposableObject disposableObject = new DisposableObject(false);
@@ -27,6 +28,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestUsingBlockNullResource()
         {
             Func<Task<IDisposable>> acquire =
@@ -38,6 +40,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestUsingBlockExceptionInBody()
         {
             DisposableObject disposableObject = new DisposableObject(false);
@@ -62,6 +65,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestUsingBlockExceptionInDispose()
         {
             DisposableObject disposableObject = new DisposableObject(true);
@@ -83,6 +87,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestUsingBlockExceptionInBodyAndDispose()
         {
             DisposableObject disposableObject = new DisposableObject(true);
@@ -115,6 +120,7 @@
         #region Using Block without Return
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestVoidUsingBlock()
         {
             DisposableObject disposableObject = new DisposableObject(false);
@@ -127,6 +133,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestVoidUsingBlockNullResource()
         {
             Func<Task<IDisposable>> acquire =
@@ -137,6 +144,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestVoidUsingBlockExceptionInBody()
         {
             DisposableObject disposableObject = new DisposableObject(false);
@@ -161,6 +169,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestVoidUsingBlockExceptionInDispose()
         {
             DisposableObject disposableObject = new DisposableObject(true);
@@ -182,6 +191,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestVoidUsingBlockExceptionInBodyAndDispose()
         {
             DisposableObject disposableObject = new DisposableObject(true);
@@ -214,6 +224,7 @@
         #region While Block Simple Condition
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestWhileBlock()
         {
             int count = 0;
@@ -238,6 +249,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestWhileBlockExceptionInCondition()
         {
             int count = 0;
@@ -270,6 +282,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestWhileBlockExceptionInBodyEval()
         {
             int count = 0;
@@ -302,6 +315,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestWhileBlockExceptionInBody()
         {
             int count = 0;
@@ -342,6 +356,7 @@
         #region While Block Task Condition
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestWhileTaskBlock()
         {
             int count = 0;
@@ -366,6 +381,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestWhileTaskBlockExceptionInConditionEval()
         {
             int count = 0;
@@ -398,6 +414,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestWhileTaskBlockExceptionInCondition()
         {
             int count = 0;
@@ -434,6 +451,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestWhileTaskBlockExceptionInBodyEval()
         {
             int count = 0;
@@ -466,6 +484,7 @@
         }
 
         [TestMethod]
+        [Timeout(1500)]
         public async Task TestWhileTaskBlockExceptionInBody()
         {
             int count = 0;
