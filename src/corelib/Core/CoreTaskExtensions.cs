@@ -5,7 +5,7 @@
 
     /// <summary>
     /// Provides extension methods for efficiently creating <see cref="Task"/> continuations,
-    /// with automatic handling of faulted and cancelled antecedent tasks.
+    /// with automatic handling of faulted and canceled antecedent tasks.
     /// </summary>
     public static class CoreTaskExtensions
     {
@@ -13,7 +13,7 @@
         /// Synchronously execute a continuation when a task completes successfully.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent task is cancelled or faulted, the status of the antecedent is
+        /// <para>If the antecedent task is canceled or faulted, the status of the antecedent is
         /// directly applied to the task returned by this method; it is not wrapped in an additional
         /// <see cref="AggregateException"/>.
         /// </para>
@@ -45,7 +45,7 @@
         /// parameter specifies whether the continuation is executed if the antecedent task is faulted.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent task is cancelled, or faulted with <paramref name="supportsErrors"/>
+        /// <para>If the antecedent task is canceled, or faulted with <paramref name="supportsErrors"/>
         /// set to <see langword="false"/>, the status of the antecedent is directly applied to the task
         /// returned by this method; it is not wrapped in an additional <see cref="AggregateException"/>.
         /// </para>
@@ -98,7 +98,7 @@
         /// Synchronously execute a continuation when a task completes successfully.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent task is cancelled or faulted, the status of the antecedent is
+        /// <para>If the antecedent task is canceled or faulted, the status of the antecedent is
         /// directly applied to the task returned by this method; it is not wrapped in an additional
         /// <see cref="AggregateException"/>.
         /// </para>
@@ -130,7 +130,7 @@
         /// parameter specifies whether the continuation is executed if the antecedent task is faulted.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent task is cancelled, or faulted with <paramref name="supportsErrors"/>
+        /// <para>If the antecedent task is canceled, or faulted with <paramref name="supportsErrors"/>
         /// set to <see langword="false"/>, the status of the antecedent is directly applied to the task
         /// returned by this method; it is not wrapped in an additional <see cref="AggregateException"/>.
         /// </para>
@@ -183,7 +183,7 @@
         /// Synchronously execute a continuation when a task completes successfully.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent task is cancelled or faulted, the status of the antecedent is
+        /// <para>If the antecedent task is canceled or faulted, the status of the antecedent is
         /// directly applied to the task returned by this method; it is not wrapped in an additional
         /// <see cref="AggregateException"/>.
         /// </para>
@@ -213,7 +213,7 @@
         /// parameter specifies whether the continuation is executed if the antecedent task is faulted.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent task is cancelled, or faulted with <paramref name="supportsErrors"/>
+        /// <para>If the antecedent task is canceled, or faulted with <paramref name="supportsErrors"/>
         /// set to <see langword="false"/>, the status of the antecedent is directly applied to the task
         /// returned by this method; it is not wrapped in an additional <see cref="AggregateException"/>.
         /// </para>
@@ -264,7 +264,7 @@
         /// Synchronously execute a continuation when a task completes successfully.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent task is cancelled or faulted, the status of the antecedent is
+        /// <para>If the antecedent task is canceled or faulted, the status of the antecedent is
         /// directly applied to the task returned by this method; it is not wrapped in an additional
         /// <see cref="AggregateException"/>.
         /// </para>
@@ -294,7 +294,7 @@
         /// parameter specifies whether the continuation is executed if the antecedent task is faulted.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent task is cancelled, or faulted with <paramref name="supportsErrors"/>
+        /// <para>If the antecedent task is canceled, or faulted with <paramref name="supportsErrors"/>
         /// set to <see langword="false"/>, the status of the antecedent is directly applied to the task
         /// returned by this method; it is not wrapped in an additional <see cref="AggregateException"/>.
         /// </para>
@@ -347,7 +347,7 @@
         /// form the result of this method.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent <paramref name="task"/> is cancelled or faulted, the status
+        /// <para>If the antecedent <paramref name="task"/> is canceled or faulted, the status
         /// of the antecedent is directly applied to the task returned by this method; it is
         /// not wrapped in an additional <see cref="AggregateException"/>.
         /// </para>
@@ -382,7 +382,7 @@
         /// executed if the antecedent task is faulted.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent <paramref name="task"/> is cancelled, or faulted with <paramref name="supportsErrors"/>
+        /// <para>If the antecedent <paramref name="task"/> is canceled, or faulted with <paramref name="supportsErrors"/>
         /// set to <see langword="false"/>, the status
         /// of the antecedent is directly applied to the task returned by this method; it is
         /// not wrapped in an additional <see cref="AggregateException"/>.
@@ -440,7 +440,7 @@
         /// form the result of this method.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent <paramref name="task"/> is cancelled or faulted, the status
+        /// <para>If the antecedent <paramref name="task"/> is canceled or faulted, the status
         /// of the antecedent is directly applied to the task returned by this method; it is
         /// not wrapped in an additional <see cref="AggregateException"/>.
         /// </para>
@@ -476,7 +476,7 @@
         /// parameter specifies whether the continuation is executed if the antecedent task is faulted.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent <paramref name="task"/> is cancelled, or faulted with <paramref name="supportsErrors"/>
+        /// <para>If the antecedent <paramref name="task"/> is canceled, or faulted with <paramref name="supportsErrors"/>
         /// set to <see langword="false"/>, the status
         /// of the antecedent is directly applied to the task returned by this method; it is
         /// not wrapped in an additional <see cref="AggregateException"/>.
@@ -535,7 +535,7 @@
         /// form the result of this method.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent <paramref name="task"/> is cancelled or faulted, the status
+        /// <para>If the antecedent <paramref name="task"/> is canceled or faulted, the status
         /// of the antecedent is directly applied to the task returned by this method; it is
         /// not wrapped in an additional <see cref="AggregateException"/>.
         /// </para>
@@ -567,7 +567,7 @@
         /// executed if the antecedent task is faulted.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent <paramref name="task"/> is cancelled, or faulted with <paramref name="supportsErrors"/>
+        /// <para>If the antecedent <paramref name="task"/> is canceled, or faulted with <paramref name="supportsErrors"/>
         /// set to <see langword="false"/>, the status
         /// of the antecedent is directly applied to the task returned by this method; it is
         /// not wrapped in an additional <see cref="AggregateException"/>.
@@ -622,7 +622,7 @@
         /// form the result of this method.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent <paramref name="task"/> is cancelled or faulted, the status
+        /// <para>If the antecedent <paramref name="task"/> is canceled or faulted, the status
         /// of the antecedent is directly applied to the task returned by this method; it is
         /// not wrapped in an additional <see cref="AggregateException"/>.
         /// </para>
@@ -655,7 +655,7 @@
         /// parameter specifies whether the continuation is executed if the antecedent task is faulted.
         /// </summary>
         /// <remarks>
-        /// <para>If the antecedent <paramref name="task"/> is cancelled, or faulted with <paramref name="supportsErrors"/>
+        /// <para>If the antecedent <paramref name="task"/> is canceled, or faulted with <paramref name="supportsErrors"/>
         /// set to <see langword="false"/>, the status
         /// of the antecedent is directly applied to the task returned by this method; it is
         /// not wrapped in an additional <see cref="AggregateException"/>.
