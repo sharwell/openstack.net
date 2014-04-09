@@ -28,6 +28,7 @@
 
 using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 
 namespace System.Net.Http.Headers
 {
@@ -97,7 +98,7 @@ namespace System.Net.Http.Headers
 			// what .NET does when one of the values is invalid
 			// But it better represents what is actually hold by
 			// the collection
-			return string.Join (", ", list);
+			return string.Join (", ", list.Select (i => i != null ? i.ToString() : string.Empty).ToArray ());
 		}
 
 		public bool TryParseAdd (string input)

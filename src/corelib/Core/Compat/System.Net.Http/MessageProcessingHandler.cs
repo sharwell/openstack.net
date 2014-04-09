@@ -28,6 +28,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using net.openstack.Core;
 
 namespace System.Net.Http
 {
@@ -45,10 +46,11 @@ namespace System.Net.Http
 		protected abstract HttpRequestMessage ProcessRequest (HttpRequestMessage request, CancellationToken cancellationToken);
 		protected abstract HttpResponseMessage ProcessResponse (HttpResponseMessage response, CancellationToken cancellationToken);
 		
-		protected internal sealed override async Task<HttpResponseMessage> SendAsync (HttpRequestMessage request, CancellationToken cancellationToken)
+		protected internal sealed override Task<HttpResponseMessage> SendAsync (HttpRequestMessage request, CancellationToken cancellationToken)
 		{
 			request = ProcessRequest (request, cancellationToken);
-			return ProcessResponse (await base.SendAsync (request, cancellationToken).ConfigureAwait (false), cancellationToken);
+			return base.SendAsync (request, cancellationToken)
+				.Select(task => ProcessResponse(task.Result, cancellationToken));
 		}
 	}
 }

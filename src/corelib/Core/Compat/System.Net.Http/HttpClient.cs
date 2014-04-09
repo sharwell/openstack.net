@@ -30,6 +30,7 @@ using System.Threading;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.IO;
+using net.openstack.Core;
 
 namespace System.Net.Http
 {
@@ -94,7 +95,7 @@ namespace System.Net.Http
 				return timeout;
 			}
 			set {
-				if (value != System.Threading.Timeout.InfiniteTimeSpan && value < TimeSpan.Zero)
+				if (value != new TimeSpan(0, 0, 0, 0, System.Threading.Timeout.Infinite) && value < TimeSpan.Zero)
 					throw new ArgumentOutOfRangeException ();
 
 				timeout = value;
@@ -285,50 +286,122 @@ namespace System.Net.Http
 			}
 		}
 
-		public async Task<byte[]> GetByteArrayAsync (string requestUri)
+		public Task<byte[]> GetByteArrayAsync (string requestUri)
 		{
-			using (var resp = await GetAsync (requestUri, HttpCompletionOption.ResponseContentRead).ConfigureAwait (false)) {
-				resp.EnsureSuccessStatusCode ();
-				return await resp.Content.ReadAsByteArrayAsync ().ConfigureAwait (false);
-			}
+			var respTask = GetAsync (requestUri, HttpCompletionOption.ResponseContentRead);
+			return respTask
+				.Then(
+					task =>
+					{
+						respTask.Result.EnsureSuccessStatusCode ();
+						return respTask.Result.Content.ReadAsByteArrayAsync ();
+					})
+				.Select(
+					task =>
+					{
+						if (respTask.Status == TaskStatus.RanToCompletion)
+						{
+							IDisposable disposable = respTask.Result;
+							if (disposable != null)
+								disposable.Dispose();
+						}
+
+						return task.Result;
+					}, true);
 		}
 
-		public async Task<byte[]> GetByteArrayAsync (Uri requestUri)
+		public Task<byte[]> GetByteArrayAsync (Uri requestUri)
 		{
-			using (var resp = await GetAsync (requestUri, HttpCompletionOption.ResponseContentRead).ConfigureAwait (false)) {
-				resp.EnsureSuccessStatusCode ();
-				return await resp.Content.ReadAsByteArrayAsync ().ConfigureAwait (false);
-			}
+			var respTask = GetAsync (requestUri, HttpCompletionOption.ResponseContentRead);
+			return respTask
+				.Then(
+					task =>
+					{
+						respTask.Result.EnsureSuccessStatusCode ();
+						return respTask.Result.Content.ReadAsByteArrayAsync ();
+					})
+				.Select(
+					task =>
+					{
+						if (respTask.Status == TaskStatus.RanToCompletion)
+						{
+							IDisposable disposable = respTask.Result;
+							if (disposable != null)
+								disposable.Dispose();
+						}
+
+						return task.Result;
+					}, true);
 		}
 
-		public async Task<Stream> GetStreamAsync (string requestUri)
+		public Task<Stream> GetStreamAsync (string requestUri)
 		{
-			var resp = await GetAsync (requestUri, HttpCompletionOption.ResponseContentRead).ConfigureAwait (false);
-			resp.EnsureSuccessStatusCode ();
-			return await resp.Content.ReadAsStreamAsync ().ConfigureAwait (false);
+			return GetAsync (requestUri, HttpCompletionOption.ResponseContentRead)
+				.Then(
+					task =>
+					{
+						task.Result.EnsureSuccessStatusCode ();
+						return task.Result.Content.ReadAsStreamAsync ();
+					});
 		}
 
-		public async Task<Stream> GetStreamAsync (Uri requestUri)
+		public Task<Stream> GetStreamAsync (Uri requestUri)
 		{
-			var resp = await GetAsync (requestUri, HttpCompletionOption.ResponseContentRead).ConfigureAwait (false);
-			resp.EnsureSuccessStatusCode ();
-			return await resp.Content.ReadAsStreamAsync ().ConfigureAwait (false);
+			return GetAsync (requestUri, HttpCompletionOption.ResponseContentRead)
+				.Then(
+					task =>
+					{
+						task.Result.EnsureSuccessStatusCode ();
+						return task.Result.Content.ReadAsStreamAsync ();
+					});
 		}
 
-		public async Task<string> GetStringAsync (string requestUri)
+		public Task<string> GetStringAsync (string requestUri)
 		{
-			using (var resp = await GetAsync (requestUri, HttpCompletionOption.ResponseContentRead).ConfigureAwait (false)) {
-				resp.EnsureSuccessStatusCode ();
-				return await resp.Content.ReadAsStringAsync ().ConfigureAwait (false);
-			}
+			var respTask = GetAsync (requestUri, HttpCompletionOption.ResponseContentRead);
+			return respTask
+				.Then(
+					task =>
+					{
+						respTask.Result.EnsureSuccessStatusCode();
+						return respTask.Result.Content.ReadAsStringAsync();
+					})
+				.Select(
+					task =>
+					{
+						if (respTask.Status == TaskStatus.RanToCompletion)
+						{
+							IDisposable disposable = respTask.Result;
+							if (disposable != null)
+								disposable.Dispose();
+						}
+
+						return task.Result;
+					}, true);
 		}
 
-		public async Task<string> GetStringAsync (Uri requestUri)
+		public Task<string> GetStringAsync (Uri requestUri)
 		{
-			using (var resp = await GetAsync (requestUri, HttpCompletionOption.ResponseContentRead).ConfigureAwait (false)) {
-				resp.EnsureSuccessStatusCode ();
-				return await resp.Content.ReadAsStringAsync ().ConfigureAwait (false);
-			}
+			var respTask = GetAsync (requestUri, HttpCompletionOption.ResponseContentRead);
+			return respTask
+				.Then(
+					task =>
+					{
+						respTask.Result.EnsureSuccessStatusCode();
+						return respTask.Result.Content.ReadAsStringAsync();
+					})
+				.Select(
+					task =>
+					{
+						if (respTask.Status == TaskStatus.RanToCompletion)
+						{
+							IDisposable disposable = respTask.Result;
+							if (disposable != null)
+								disposable.Dispose();
+						}
+
+						return task.Result;
+					}, true);
 		}
 	}
 }

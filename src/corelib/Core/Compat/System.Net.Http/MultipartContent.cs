@@ -54,7 +54,7 @@ namespace System.Net.Http
 
 		public MultipartContent (string subtype, string boundary)
 		{
-			if (string.IsNullOrWhiteSpace (subtype))
+			if (subtype == null || subtype.Trim ().Length == 0)
 				throw new ArgumentException ("boundary");
 
 			//
@@ -62,7 +62,7 @@ namespace System.Net.Http
 			// of 1 to 70 characters from a set of characters known to be very robust through email gateways,
 			// and NOT ending with white space
 			//
-			if (string.IsNullOrWhiteSpace (boundary))
+			if (boundary == null || boundary.Trim ().Length == 0)
 				throw new ArgumentException ("boundary");
 
 			if (boundary.Length > 70)
@@ -153,7 +153,7 @@ namespace System.Net.Http
 				sb.Append ('\r').Append ('\n');
 					
 				buffer = Encoding.ASCII.GetBytes (sb.ToString ());
-				sb.Clear ();
+				sb.Length = 0;
 				await stream.WriteAsync (buffer, 0, buffer.Length).ConfigureAwait (false);
 
 				await c.SerializeToStreamAsync (stream, context).ConfigureAwait (false);
