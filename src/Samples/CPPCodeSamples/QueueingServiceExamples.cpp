@@ -79,4 +79,18 @@ public:
 		Task<bool>^ task = queueingService->QueueExistsAsync(queueName, CancellationToken::None);
 #pragma endregion
 	}
+
+#pragma region SampleMetadata
+	ref class SampleMetadata
+	{
+	public:
+		property int ValueA;
+		property String^ ValueB;
+		SampleMetadata(int valueA, String^ valueB)
+		{
+			ValueA = valueA;
+			ValueB = valueB;
+		}
+	};
+#pragma endregion
 };

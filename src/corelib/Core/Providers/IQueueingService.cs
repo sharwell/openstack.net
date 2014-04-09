@@ -464,6 +464,37 @@
         /// <para>If <paramref name="gracePeriod"/> is negative.</para>
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <example>
+        /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
+        /// implementation of the <see cref="IQueueingService"/>. For more information about creating the provider, see
+        /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
+        /// <para>The code below refers to the following <c>SampleMetadata</c> class, and performs the following operations.</para>
+        /// <list type="number">
+        /// <item>Post a new message into a queue using <c>SampleMetadata</c> for representing the body of the message.</item>
+        /// <item>Claim messages from the queue.</item>
+        /// <item>Process claimed messages, and delete the messages after processing is complete.</item>
+        /// <item>Release the claim.</item>
+        /// </list>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="SampleMetadata" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="SampleMetadata" language="vbnet"/>
+        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="SampleMetadata" language="cpp"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="SampleMetadata" language="fs"/>
+        /// <token>AsyncAwaitExample</token>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="ClaimMessageAsync (await)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="ClaimMessageAsync (await)" language="vbnet"/>
+        /// <!--<code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="ClaimMessageAsync (await)" language="fs"/>-->
+        /// <token>TplExample</token>
+        /// <para>
+        /// This example uses the <see cref="O:net.openstack.Core.CoreTaskExtensions.Using"/> and
+        /// <see cref="O:net.openstack.Core.CoreTaskExtensions.Then"/> methods to simplify the code
+        /// required to create efficient asynchronous code without relying on
+        /// <see langword="async/await"/>.
+        /// </para>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="ClaimMessageAsync (TPL)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="ClaimMessageAsync (TPL)" language="vbnet"/>
+        /// <!--<code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="ClaimMessageAsync (TPL)" language="cpp"/>-->
+        /// <!--<code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="ClaimMessageAsync (TPL)" language="fs"/>-->
+        /// </example>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Claim_Messages">Claim Messages (OpenStack Marconi API v1 Blueprint)</seealso>
         Task<Claim> ClaimMessageAsync(QueueName queueName, int? limit, TimeSpan timeToLive, TimeSpan gracePeriod, CancellationToken cancellationToken);
 

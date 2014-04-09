@@ -119,3 +119,11 @@ let queueExists =
     let task = queueingService.QueueExistsAsync(queueName, CancellationToken.None)
     //#endregion
     ()
+
+//#region SampleMetadata
+type SampleMetadata(valueA : int, valueB : string) =
+    class
+        member val ValueA = valueA with get, set
+        member val ValueB = valueB with get, set
+    end
+//#endregion
