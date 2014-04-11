@@ -76,6 +76,7 @@
     <Compile Include="Core\Compat\ISafeSerializationData.cs" />
     <Compile Include="Core\Compat\IStructuralComparable.cs" />
     <Compile Include="Core\Compat\IStructuralEquatable.cs" />
+    <Compile Include="Core\Compat\StringBuilderExtensions.cs" />
     <Compile Include="Core\Compat\StringEx.cs" />
     <Compile Include="Core\Compat\System.Net.Http.Headers\AuthenticationHeaderValue.cs" />
     <Compile Include="Core\Compat\System.Net.Http.Headers\CacheControlHeaderValue.cs" />
