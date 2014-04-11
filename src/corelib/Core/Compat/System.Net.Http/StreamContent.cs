@@ -29,6 +29,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using net.openstack.Core;
 using net.openstack.Core.Compat;
 
 namespace System.Net.Http
@@ -70,7 +71,7 @@ namespace System.Net.Http
 
 		protected override Task<Stream> CreateContentReadStreamAsync ()
 		{
-			return Task.FromResult (content);
+			return InternalTaskExtensions.CompletedTask (content);
 		}
 
 		protected override void Dispose (bool disposing)

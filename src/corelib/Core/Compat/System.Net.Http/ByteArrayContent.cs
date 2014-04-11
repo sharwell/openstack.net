@@ -28,6 +28,7 @@
 
 using System.IO;
 using System.Threading.Tasks;
+using net.openstack.Core;
 using net.openstack.Core.Compat;
 
 namespace System.Net.Http
@@ -61,7 +62,7 @@ namespace System.Net.Http
 
 		protected override Task<Stream> CreateContentReadStreamAsync ()
 		{
-			return Task.FromResult<Stream> (new MemoryStream (content, offset, count));
+			return InternalTaskExtensions.CompletedTask<Stream> (new MemoryStream (content, offset, count));
 		}
 
 		protected internal override Task SerializeToStreamAsync (Stream stream, TransportContext context)
