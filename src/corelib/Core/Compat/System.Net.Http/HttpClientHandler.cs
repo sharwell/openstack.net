@@ -223,8 +223,8 @@ namespace System.Net.Http
 
 		internal virtual HttpWebRequest CreateWebRequest (HttpRequestMessage request)
 		{
-			var wr = new HttpWebRequest (request.RequestUri);
-			wr.ThrowOnError = false;
+			var wr = (HttpWebRequest)WebRequest.Create (request.RequestUri);
+			wr.Headers = new RestWebHeaderCollection ();
 
 			wr.ConnectionGroupName = "HttpClientHandler";
 			wr.Method = request.Method.Method;
@@ -267,7 +267,7 @@ namespace System.Net.Http
 			var headers = wr.Headers;
 			foreach (var header in request.Headers) {
 				foreach (var value in header.Value) {
-					headers.AddValue (header.Key, value);
+					headers.Add (header.Key, value);
 				}
 			}
 			
@@ -298,40 +298,49 @@ namespace System.Net.Http
 			return response;
 		}
 
-		protected async internal override Task<HttpResponseMessage> SendAsync (HttpRequestMessage request, CancellationToken cancellationToken)
+		protected internal override Task<HttpResponseMessage> SendAsync (HttpRequestMessage request, CancellationToken cancellationToken)
 		{
 			sentRequest = true;
 			var wrequest = CreateWebRequest (request);
 
+			Task intermediate;
 			if (request.Content != null) {
 				var headers = wrequest.Headers;
 				foreach (var header in request.Content.Headers) {
 					foreach (var value in header.Value) {
-						headers.AddValue (header.Key, value);
+						headers.Add (header.Key, value);
 					}
 				}
 
-				var stream = await wrequest.GetRequestStreamAsync ().ConfigureAwait (false);
-				await request.Content.CopyToAsync (stream).ConfigureAwait (false);
+				intermediate = wrequest.GetRequestStreamAsync ()
+					.Then (task => request.Content.CopyToAsync (task.Result));
+			}
+			else {
+				intermediate = InternalTaskExtensions.CompletedTask ();
 			}
 
 			HttpWebResponse wresponse = null;
-			using (cancellationToken.Register (l => ((HttpWebRequest) l).Abort (), wrequest)) {
-				try {
-					wresponse = (HttpWebResponse) await wrequest.GetResponseAsync ().ConfigureAwait (false);
-				} catch (WebException we) {
-					if (we.Status != WebExceptionStatus.RequestCanceled)
-						throw;
-				}
+			Func<Task<CancellationTokenRegistration>> resource =
+				() => InternalTaskExtensions.CompletedTask (cancellationToken.Register (l => ((HttpWebRequest) l).Abort (), wrequest));
+			Func<Task<CancellationTokenRegistration>, Task> body =
+				_ => {
+					return wrequest.GetResponseAsync (false, cancellationToken)
+						.Select (responseTask => {
+							if (responseTask.IsFaulted)
+							{
+								WebException we = responseTask.Exception.InnerException as WebException;
+								if (we == null || we.Status != WebExceptionStatus.RequestCanceled)
+									responseTask.PropagateExceptions();
+							}
+							else {
+								wresponse = (HttpWebResponse) responseTask.Result;
+							}
+						}, true);
+				};
 
-				if (cancellationToken.IsCancellationRequested) {
-					var cancelled = new TaskCompletionSource<HttpResponseMessage> ();
-					cancelled.SetCanceled ();
-					return await cancelled.Task;
-				}
-			}
-			
-			return CreateResponseMessage (wresponse, request, cancellationToken);
+			return intermediate
+				.Then (_ => CoreTaskExtensions.Using (resource, body))
+				.Select (_ => CreateResponseMessage (wresponse, request, cancellationToken));
 		}
 	}
 }

@@ -72,6 +72,7 @@
     <Compile Include="Core\Collections\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\ReadOnlyCollectionPage`1.cs" />
     <Compile Include="Core\Collections\ReadOnlyDictionary`2.cs" />
+    <Compile Include="Core\Compat\CancellationTokenSourceExtensions.cs" />
     <Compile Include="Core\Compat\Funcs.cs" />
     <Compile Include="Core\Compat\ISafeSerializationData.cs" />
     <Compile Include="Core\Compat\IStructuralComparable.cs" />
@@ -133,7 +134,6 @@
     <Compile Include="Core\Compat\System.Net.Http\StringContent.cs" />
     <Compile Include="Core\Compat\Tuple.cs" />
     <Compile Include="Core\Compat\Tuples.cs" />
-    <Compile Include="Core\Compat\WebHeaderCollectionExtensions.cs" />
     <Compile Include="Core\CoreTaskExtensions.cs" />
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />

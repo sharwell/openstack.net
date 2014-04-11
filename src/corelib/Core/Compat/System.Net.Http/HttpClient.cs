@@ -31,6 +31,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.IO;
 using net.openstack.Core;
+using net.openstack.Core.Compat;
 
 namespace System.Net.Http
 {
