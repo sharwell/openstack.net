@@ -30,6 +30,7 @@ using System.Net.Http.Headers;
 using System.IO;
 using System.Threading.Tasks;
 using System.Text;
+using net.openstack.Core;
 using net.openstack.Core.Compat;
 
 namespace System.Net.Http
@@ -98,10 +99,9 @@ namespace System.Net.Http
 			return SerializeToStreamAsync (stream, context);
 		}
 
-		protected async virtual Task<Stream> CreateContentReadStreamAsync ()
+		protected virtual Task<Stream> CreateContentReadStreamAsync ()
 		{
-			await LoadIntoBufferAsync ().ConfigureAwait (false);
-			return buffer;
+			return LoadIntoBufferAsync ().Select<Stream> (task => buffer);
 		}
 		
 		static FixedMemoryStream CreateFixedMemoryStream (long maxBufferSize)
@@ -129,53 +129,58 @@ namespace System.Net.Http
 			return LoadIntoBufferAsync (int.MaxValue);
 		}
 
-		public async Task LoadIntoBufferAsync (long maxBufferSize)
+		public Task LoadIntoBufferAsync (long maxBufferSize)
 		{
 			if (disposed)
 				throw new ObjectDisposedException (GetType ().ToString ());
 
 			if (buffer != null)
-				return;
+				return InternalTaskExtensions.CompletedTask ();
 
 			buffer = CreateFixedMemoryStream (maxBufferSize);
-			await SerializeToStreamAsync (buffer, null).ConfigureAwait (false);
-			buffer.Seek (0, SeekOrigin.Begin);
+			return SerializeToStreamAsync (buffer, null)
+				.Select (task => buffer.Seek (0, SeekOrigin.Begin));
 		}
 		
-		public async Task<Stream> ReadAsStreamAsync ()
+		public Task<Stream> ReadAsStreamAsync ()
 		{
 			if (disposed)
 				throw new ObjectDisposedException (GetType ().ToString ());
 
 			if (buffer != null)
-				return new MemoryStream (buffer.GetBuffer (), 0, (int)buffer.Length, false);
+				return InternalTaskExtensions.CompletedTask<Stream> (new MemoryStream (buffer.GetBuffer (), 0, (int)buffer.Length, false));
 
 			if (stream == null)
-				stream = await CreateContentReadStreamAsync ().ConfigureAwait (false);
-
-			return stream;
-		}
-
-		public async Task<byte[]> ReadAsByteArrayAsync ()
-		{
-			await LoadIntoBufferAsync ().ConfigureAwait (false);
-			return buffer.ToArray ();
-		}
-
-		public async Task<string> ReadAsStringAsync ()
-		{
-			await LoadIntoBufferAsync ().ConfigureAwait (false);
-			if (buffer.Length == 0)
-				return string.Empty;
-
-			Encoding encoding;
-			if (headers != null && headers.ContentType != null && headers.ContentType.CharSet != null) {
-				encoding = Encoding.GetEncoding (headers.ContentType.CharSet);
-			} else {
-				encoding = Encoding.UTF8;
+			{
+				return CreateContentReadStreamAsync ()
+					.Select (task => stream = task.Result);
 			}
 
-			return encoding.GetString (buffer.GetBuffer (), 0, (int) buffer.Length);
+			return InternalTaskExtensions.CompletedTask (stream);
+		}
+
+		public Task<byte[]> ReadAsByteArrayAsync ()
+		{
+			return LoadIntoBufferAsync ().Select (task => buffer.ToArray ());
+		}
+
+		public Task<string> ReadAsStringAsync ()
+		{
+			return LoadIntoBufferAsync ().Select (
+				task =>
+				{
+					if (buffer.Length == 0)
+						return string.Empty;
+
+					Encoding encoding;
+					if (headers != null && headers.ContentType != null && headers.ContentType.CharSet != null) {
+						encoding = Encoding.GetEncoding (headers.ContentType.CharSet);
+					} else {
+						encoding = Encoding.UTF8;
+					}
+
+					return encoding.GetString (buffer.GetBuffer (), 0, (int) buffer.Length);
+				});
 		}
 
 		protected internal abstract Task SerializeToStreamAsync (Stream stream, TransportContext context);
