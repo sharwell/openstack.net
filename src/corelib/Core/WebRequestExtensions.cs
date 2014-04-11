@@ -4,6 +4,7 @@
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
+    using Stream = System.IO.Stream;
 
     /// <summary>
     /// Provides extension methods for asynchronous operations on
@@ -13,6 +14,14 @@
     /// <preliminary/>
     public static class WebRequestExtensions
     {
+        public static Task<Stream> GetRequestStreamAsync(this WebRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException("request");
+
+            return Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, null);
+        }
+
         /// <summary>
         /// Returns a response to an Internet request as an asynchronous operation.
         /// </summary>
