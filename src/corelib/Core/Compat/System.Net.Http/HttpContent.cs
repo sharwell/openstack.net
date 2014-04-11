@@ -30,6 +30,7 @@ using System.Net.Http.Headers;
 using System.IO;
 using System.Threading.Tasks;
 using System.Text;
+using net.openstack.Core.Compat;
 
 namespace System.Net.Http
 {

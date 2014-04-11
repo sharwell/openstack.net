@@ -32,6 +32,27 @@
             return completionSource.Task;
         }
 
+        /// <summary>
+        /// Gets a canceled <see cref="Task"/>.
+        /// </summary>
+        /// <returns>A canceled <see cref="Task"/>.</returns>
+        public static Task CanceledTask()
+        {
+            return CanceledTaskHolder.Default;
+        }
+
+        /// <summary>
+        /// Gets a canceled <see cref="Task{TResult}"/>.
+        /// </summary>
+        /// <typeparam name="TResult">The task result type.</typeparam>
+        /// <returns>A canceled <see cref="Task{TResult}"/>.</returns>
+        public static Task<TResult> CanceledTask<TResult>()
+        {
+            TaskCompletionSource<TResult> completionSource = new TaskCompletionSource<TResult>();
+            completionSource.SetCanceled();
+            return completionSource.Task;
+        }
+
         private static class CompletedTaskHolder
         {
             public static readonly Task Default;
@@ -50,6 +71,28 @@
             {
                 TaskCompletionSource<T> completionSource = new TaskCompletionSource<T>();
                 completionSource.SetResult(default(T));
+                Default = completionSource.Task;
+            }
+        }
+
+        private static class CanceledTaskHolder
+        {
+            public static readonly Task Default;
+
+            static CanceledTaskHolder()
+            {
+                Default = CanceledTaskHolder<object>.Default;
+            }
+        }
+
+        private static class CanceledTaskHolder<T>
+        {
+            public static readonly Task<T> Default;
+
+            static CanceledTaskHolder()
+            {
+                TaskCompletionSource<T> completionSource = new TaskCompletionSource<T>();
+                completionSource.SetCanceled();
                 Default = completionSource.Task;
             }
         }

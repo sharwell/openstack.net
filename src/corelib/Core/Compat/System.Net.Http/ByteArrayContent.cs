@@ -28,6 +28,7 @@
 
 using System.IO;
 using System.Threading.Tasks;
+using net.openstack.Core.Compat;
 
 namespace System.Net.Http
 {
