@@ -28,6 +28,7 @@
 
 using System.Collections.Generic;
 using System.Collections;
+using net.openstack.Core.Compat;
 
 namespace System.Net.Http.Headers
 {
@@ -97,7 +98,7 @@ namespace System.Net.Http.Headers
 			// what .NET does when one of the values is invalid
 			// But it better represents what is actually hold by
 			// the collection
-			return string.Join (", ", list);
+			return StringEx.Join (", ", list);
 		}
 
 		public bool TryParseAdd (string input)
