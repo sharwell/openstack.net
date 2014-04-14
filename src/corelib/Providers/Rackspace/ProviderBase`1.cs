@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using JSIStudios.SimpleRESTServices.Client.Json;
 using net.openstack.Core;
@@ -1010,7 +1009,7 @@ namespace net.openstack.Providers.Rackspace
             string bodyText = JsonConvert.SerializeObject(body);
             byte[] encodedBody = Encoding.UTF8.GetBytes(bodyText);
             ByteArrayContent content = new ByteArrayContent(encodedBody);
-            content.Headers.ContentType = new MediaTypeHeaderValue(new ContentType() { MediaType = JsonRequestSettings.JsonContentType, CharSet = "UTF-8" }.ToString());
+            content.Headers.ContentType = new MediaTypeHeaderValue(JsonRequestSettings.JsonContentType) { CharSet = "UTF-8" };
 
             content.Headers.ContentLength = encodedBody.Length;
 
