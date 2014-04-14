@@ -1,50 +1,63 @@
 ﻿namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
     using System;
-    using System.Net;
+    using System.Collections.Generic;
+    using System.Net.Http;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using net.openstack.Providers.Rackspace;
     using Newtonsoft.Json;
 
     internal static class TestHelpers
     {
-        public static byte[] EncodeRequestBody<TBody>(HttpWebRequest request, TBody body, Func<HttpWebRequest, TBody, byte[]> encodeRequestBodyImpl)
+        public static void HandleBeforeAsyncWebRequest(object sender, WebRequestEventArgs e)
         {
-            byte[] encoded = encodeRequestBodyImpl(request, body);
+            HttpRequestMessage request = e.Request;
 
-            foreach (string header in request.Headers)
+            Console.Error.WriteLine("{0} (Request) {1} {2}", DateTime.Now, e.Request.Method, e.Request.RequestUri);
+
+            foreach (KeyValuePair<string, IEnumerable<string>> header in request.Headers)
             {
-                Console.Error.WriteLine(string.Format("{0}: {1}", header, request.Headers[header]));
+                Console.Error.WriteLine(string.Format("{0}: {1}", header.Key, string.Join(", ", header.Value)));
             }
 
-            Console.Error.WriteLine("<== " + Encoding.UTF8.GetString(encoded));
-            return encoded;
-        }
-
-        public static Tuple<HttpWebResponse, string> ReadResult(Task<WebResponse> task, CancellationToken cancellationToken, Func<Task<WebResponse>, CancellationToken, Tuple<HttpWebResponse, string>> readResultImpl, bool reformat = true)
-        {
-            try
+            if (request.Content != null)
             {
-                Tuple<HttpWebResponse, string> result = readResultImpl(task, cancellationToken);
-                LogResult(result.Item1, result.Item2, reformat);
-                return result;
-            }
-            catch (WebException ex)
-            {
-                HttpWebResponse response = ex.Response as HttpWebResponse;
-                if (response != null && response.ContentLength != 0)
-                    LogResult(response, ex.Message, reformat);
+                foreach (KeyValuePair<string, IEnumerable<string>> header in request.Content.Headers)
+                {
+                    Console.Error.WriteLine(string.Format("{0}: {1}", header.Key, string.Join(", ", header.Value)));
+                }
 
-                throw;
+                Console.Error.WriteLine("<== " + Encoding.UTF8.GetString(request.Content.ReadAsByteArrayAsync().Result));
             }
         }
 
-        private static void LogResult(HttpWebResponse response, string rawBody, bool reformat)
+        public static void HandleAfterAsyncWebRequest(object sender, WebResponseEventArgs e)
         {
-            foreach (string header in response.Headers)
+            Console.Error.WriteLine("{0} (Result {1})", DateTime.Now, e.Response.StatusCode);
+        }
+
+        public static Task<Tuple<HttpResponseMessage, string>> ReadResult(Task<HttpResponseMessage> task, CancellationToken cancellationToken, Func<Task<HttpResponseMessage>, CancellationToken, Task<Tuple<HttpResponseMessage, string>>> readResultImpl, bool reformat = true)
+        {
+            Task<Tuple<HttpResponseMessage, string>> result = readResultImpl(task, cancellationToken);
+            LogResult(result.Result.Item1, result.Result.Item2, reformat);
+            return result;
+        }
+
+        private static void LogResult(HttpResponseMessage response, string rawBody, bool reformat)
+        {
+            foreach (KeyValuePair<string, IEnumerable<string>> header in response.Headers)
             {
-                Console.Error.WriteLine(string.Format("{0}: {1}", header, response.Headers[header]));
+                Console.Error.WriteLine(string.Format("{0}: {1}", header.Key, string.Join(", ", header.Value)));
+            }
+
+            if (response.Content != null)
+            {
+                foreach (KeyValuePair<string, IEnumerable<string>> header in response.Content.Headers)
+                {
+                    Console.Error.WriteLine(string.Format("{0}: {1}", header.Key, string.Join(", ", header.Value)));
+                }
             }
 
             if (!string.IsNullOrEmpty(rawBody))

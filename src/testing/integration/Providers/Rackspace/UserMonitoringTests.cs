@@ -6,6 +6,7 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Net;
+    using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -2967,17 +2968,8 @@
         internal static IMonitoringService CreateProvider()
         {
             var provider = new TestCloudMonitoringProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
-            provider.BeforeAsyncWebRequest +=
-                (sender, e) =>
-                {
-                    Console.Error.WriteLine("{0} (Request) {1} {2}", DateTime.Now, e.Request.Method, e.Request.RequestUri);
-                };
-            provider.AfterAsyncWebResponse +=
-                (sender, e) =>
-                {
-                    Console.Error.WriteLine("{0} (Result {1}) {2}", DateTime.Now, e.Response.StatusCode, e.Response.ResponseUri);
-                };
-
+            provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
+            provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
             provider.ConnectionLimit = 20;
             return provider;
         }
@@ -2989,12 +2981,7 @@
             {
             }
 
-            protected override byte[] EncodeRequestBodyImpl<TBody>(HttpWebRequest request, TBody body)
-            {
-                return TestHelpers.EncodeRequestBody(request, body, base.EncodeRequestBodyImpl);
-            }
-
-            protected override Tuple<HttpWebResponse, string> ReadResultImpl(Task<WebResponse> task, CancellationToken cancellationToken)
+            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
             {
                 return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
             }
