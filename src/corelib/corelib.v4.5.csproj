@@ -5,15 +5,14 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E49D9DC3-79D5-4C5E-8C38-FD5060B4E318}</ProjectGuid>
+    <ProjectGuid>{C9AAE5D1-6A4B-4E97-8A7F-012D835B60BB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>net.openstack</RootNamespace>
     <AssemblyName>openstacknet</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>obj\v3.5\</BaseIntermediateOutputPath>
-    <TargetFrameworkProfile />
+    <BaseIntermediateOutputPath>obj\v4.5\</BaseIntermediateOutputPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -21,20 +20,20 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\v3.5\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;NET35;NET35PLUS</DefineConstants>
+    <OutputPath>bin\v4.5\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NET45;NET45PLUS;NET40PLUS;NET35PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\v3.5\Debug\openstacknet.xml</DocumentationFile>
+    <DocumentationFile>bin\v4.5\Debug\openstacknet.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\v3.5\Release\</OutputPath>
-    <DefineConstants>TRACE;NET35;NET35PLUS</DefineConstants>
+    <OutputPath>bin\v4.5\Release\</OutputPath>
+    <DefineConstants>TRACE;NET45;NET45PLUS;NET40PLUS;NET35PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\v3.5\Release\openstacknet.xml</DocumentationFile>
+    <DocumentationFile>bin\v4.5\Release\openstacknet.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -45,19 +44,17 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net35\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SimpleRESTServices, Version=1.3.0.0, Culture=neutral, PublicKeyToken=8965cea5c205d3a3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\SimpleRESTServices.1.3.0.1\lib\net35\SimpleRESTServices.dll</HintPath>
+      <HintPath>..\packages\SimpleRESTServices.1.3.0.1\lib\net40\SimpleRESTServices.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel.Web" />
-    <Reference Include="System.Threading">
-      <HintPath>..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll</HintPath>
-    </Reference>
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web">
       <Aliases>web</Aliases>
     </Reference>
@@ -65,77 +62,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\AsyncCompletionOption.cs" />
-    <Compile Include="Core\BackoffPolicy.cs" />
     <Compile Include="Core\Caching\ICache`1.cs" />
     <Compile Include="Core\Caching\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\BasicReadOnlyCollectionPage`1.cs" />
     <Compile Include="Core\Collections\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\ReadOnlyCollectionPage`1.cs" />
-    <Compile Include="Core\Collections\ReadOnlyDictionary`2.cs" />
-    <Compile Include="Core\Compat\CancellationTokenSourceExtensions.cs" />
-    <Compile Include="Core\Compat\Funcs.cs" />
-    <Compile Include="Core\Compat\ISafeSerializationData.cs" />
-    <Compile Include="Core\Compat\IStructuralComparable.cs" />
-    <Compile Include="Core\Compat\IStructuralEquatable.cs" />
+    <Compile Include="Core\BackoffPolicy.cs" />
     <Compile Include="Core\Compat\StreamExtensions.cs" />
-    <Compile Include="Core\Compat\StringBuilderExtensions.cs" />
-    <Compile Include="Core\Compat\StringEx.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\AuthenticationHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\CacheControlHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\CollectionExtensions.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\CollectionParser.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\ContentDispositionHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\ContentRangeHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\EntityTagHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HashCodeCalculator.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HeaderInfo.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpContentHeaders.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpHeaderKind.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpHeaders.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpHeaderValueCollection.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpRequestHeaders.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpResponseHeaders.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\Lexer.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\MediaTypeHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\MediaTypeWithQualityHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\NameValueHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\NameValueWithParametersHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\Parser.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\ProductHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\ProductInfoHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\QualityValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\RangeConditionHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\RangeHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\RangeItemHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\RetryConditionHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\StringWithQualityHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\TransferCodingHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\TransferCodingWithQualityHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\ViaHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\WarningHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\ByteArrayContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\ClientCertificateOption.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\DelegatingHandler.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\FormUrlEncodedContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpClient.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpClientHandler.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpCompletionOption.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpMessageHandler.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpMessageInvoker.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpMethod.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpRequestException.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpRequestMessage.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpResponseMessage.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\MessageProcessingHandler.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\MultipartContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\MultipartFormDataContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\StreamContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\StringContent.cs" />
-    <Compile Include="Core\Compat\Tuple.cs" />
-    <Compile Include="Core\Compat\Tuples.cs" />
     <Compile Include="Core\CoreTaskExtensions.cs" />
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
+    <Compile Include="Core\Domain\AuthenticationType.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />
     <Compile Include="Core\Domain\Converters\NamespaceDoc.cs" />
     <Compile Include="Core\Domain\Converters\PhysicalAddressSimpleConverter.cs" />
@@ -144,7 +80,6 @@
     <Compile Include="Core\Domain\DiskConfiguration.cs" />
     <Compile Include="Core\Domain\ExtendedEndpoint.cs" />
     <Compile Include="Core\Domain\FlavorId.cs" />
-    <Compile Include="Core\Domain\HomeDocument.cs" />
     <Compile Include="Core\Domain\ImageId.cs" />
     <Compile Include="Core\Domain\ImageState.cs" />
     <Compile Include="Core\Domain\IPAddressList.cs" />
@@ -201,8 +136,8 @@
     <Compile Include="Core\ExtensibleEnum`1.cs" />
     <Compile Include="Core\IBackoffPolicy.cs" />
     <Compile Include="Core\InternalTaskExtensions.cs" />
-    <Compile Include="Core\IProgress`1.cs" />
     <Compile Include="Core\NamespaceDoc.cs" />
+    <Compile Include="Core\Domain\HomeDocument.cs" />
     <Compile Include="Core\ParallelExtensionsExtras\TaskCompletionSourceExtensions.cs" />
     <Compile Include="Core\ParallelExtensionsExtras\TaskExtrasExtensions.cs" />
     <Compile Include="Core\ParallelExtensionsExtras\TaskFactoryExtensions_Common.cs" />
@@ -229,7 +164,6 @@
     <Compile Include="Core\UriPart.cs" />
     <Compile Include="Core\UriUtility.cs" />
     <Compile Include="Core\Validators\NamespaceDoc.cs" />
-    <Compile Include="Core\WebRequestExtensions.cs" />
     <Compile Include="Providers\Hp\HpIdentityProvider.cs" />
     <Compile Include="Providers\Hp\NamespaceDoc.cs" />
     <Compile Include="Providers\Hp\PredefinedHpIdentityEndpoints.cs" />
@@ -274,6 +208,7 @@
     <Compile Include="Core\Validators\INetworksValidator.cs" />
     <Compile Include="Core\UserAgentGenerator.cs" />
     <Compile Include="Core\Validators\IHttpResponseCodeValidator.cs" />
+    <Compile Include="Core\WebRequestExtensions.cs" />
     <Compile Include="Providers\Rackspace\CloudBlockStorageProvider.cs" />
     <Compile Include="Core\Exceptions\TTLLengthException.cs" />
     <Compile Include="Core\Providers\IObjectStorageProvider.cs" />
@@ -289,7 +224,6 @@
     <Compile Include="Providers\Rackspace\IMonitoringService.cs" />
     <Compile Include="Providers\Rackspace\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\ArchiveFormat.cs" />
-    <Compile Include="Core\Domain\AuthenticationType.cs" />
     <Compile Include="Providers\Rackspace\Objects\AutoScale\ActiveServer.cs" />
     <Compile Include="Providers\Rackspace\Objects\AutoScale\GenericLaunchConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\AutoScale\GroupConfiguration.cs" />
@@ -340,6 +274,7 @@
     <Compile Include="Providers\Rackspace\Objects\Databases\UpdateUserConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Databases\UserConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Databases\UserName.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Domain.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\DnsChange.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\DnsConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\DnsDomain.cs" />
@@ -374,7 +309,6 @@
     <Compile Include="Providers\Rackspace\Objects\Dns\RecordId.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\SerializedDomain.cs" />
     <Compile Include="Providers\Rackspace\Objects\Dns\SerializedDomainFormat.cs" />
-    <Compile Include="Providers\Rackspace\Objects\Domain.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\AccessType.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\ConnectionHealthMonitor.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\ConnectionThrottles.cs" />
@@ -415,9 +349,42 @@
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\NodeStatus.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\NodeType.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\NodeUpdate.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\AddLoadBalancerMetadataRequest.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\AddNodesRequest.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\CreateAccessListRequest.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\CreateLoadBalancerRequest.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\NamespaceDoc.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\SetLoadBalancerConnectionLoggingRequest.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\SetLoadBalancerContentCachingRequest.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\SetLoadBalancerErrorPageRequest.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\UpdateLoadBalancerMetadataItemRequest.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\UpdateLoadBalancerNodeRequest.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\UpdateLoadBalancerRequest.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetAccessListResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerConnectionLoggingResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerContentCachingResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerErrorPageResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerMetadataItemResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerNodeResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerSslConfigurationResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListAllowedDomainsResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancerMetadataResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancerNodesResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancersResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancerThrottlesResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancerUsageResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancingAlgorithmsResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancingProtocolsResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListNodeServiceEventsResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListVirtualAddressesResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\NamespaceDoc.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\SessionPersistence.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\SessionPersistenceType.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\VirtualAddressId.cs" />
+    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\WebServerHealthMonitor.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Mapping\BulkDeletionResultMapper.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Mapping\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AccountConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\Agent.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\AgentConnection.cs" />
@@ -538,46 +505,13 @@
     <Compile Include="Providers\Rackspace\Objects\Monitoring\UpdateNotificationPlanConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\WebhookNotificationDetails.cs" />
     <Compile Include="Providers\Rackspace\Objects\Monitoring\WebhookToken.cs" />
+    <Compile Include="Providers\Rackspace\Objects\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Queues\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Queues\Request\ClaimMessagesRequest.cs" />
     <Compile Include="Providers\Rackspace\Objects\Queues\Request\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Queues\Response\ListCloudQueueMessagesResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Queues\Response\ListCloudQueuesResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Queues\Response\NamespaceDoc.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\AddLoadBalancerMetadataRequest.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\AddNodesRequest.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\CreateAccessListRequest.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\CreateLoadBalancerRequest.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\SetLoadBalancerConnectionLoggingRequest.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\SetLoadBalancerContentCachingRequest.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\SetLoadBalancerErrorPageRequest.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\UpdateLoadBalancerMetadataItemRequest.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\UpdateLoadBalancerNodeRequest.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Request\UpdateLoadBalancerRequest.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetAccessListResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerConnectionLoggingResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerContentCachingResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerErrorPageResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerMetadataItemResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerNodeResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\GetLoadBalancerSslConfigurationResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListAllowedDomainsResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancerMetadataResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancerNodesResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancersResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancerThrottlesResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancingAlgorithmsResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListLoadBalancingProtocolsResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListNodeServiceEventsResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\Response\ListVirtualAddressesResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\SessionPersistence.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\SessionPersistenceType.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\VirtualAddressId.cs" />
-    <Compile Include="Providers\Rackspace\Objects\LoadBalancers\WebServerHealthMonitor.cs" />
-    <Compile Include="Providers\Rackspace\Objects\Mapping\BulkDeletionResultMapper.cs" />
-    <Compile Include="Providers\Rackspace\Objects\Mapping\NamespaceDoc.cs" />
-    <Compile Include="Providers\Rackspace\Objects\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Request\CreateVirtualInterfaceRequest.cs" />
     <Compile Include="Providers\Rackspace\Objects\Request\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Request\PasswordCredential.cs" />
@@ -585,8 +519,8 @@
     <Compile Include="Providers\Rackspace\Objects\Response\ExtractArchiveError.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\ExtractArchiveResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\ListEndpointsResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\Response\ListVirtualInterfacesResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\MetadataItemResponse.cs" />
+    <Compile Include="Providers\Rackspace\Objects\Response\ListVirtualInterfacesResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\RoleResponse.cs" />
     <Compile Include="Providers\Rackspace\Validators\CloudFilesValidator.cs" />
@@ -697,7 +631,7 @@
       <Link>openstacknetsdk.snk</Link>
     </None>
     <None Include="corelib.nuspec" />
-    <None Include="packages.corelib.v3.5.config" />
+    <None Include="packages.corelib.v4.5.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Icons\openstack_net_logo.png" />

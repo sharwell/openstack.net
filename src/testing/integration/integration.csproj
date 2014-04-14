@@ -68,6 +68,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
@@ -102,9 +103,9 @@
     <Compile Include="Providers\Rackspace\UserServerTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\corelib\corelib.v4.0.csproj">
-      <Project>{7DBA11EB-DBA7-4D3A-8D42-B5312E74B9C0}</Project>
-      <Name>corelib.v4.0</Name>
+    <ProjectReference Include="..\..\corelib\corelib.v4.5.csproj">
+      <Project>{c9aae5d1-6a4b-4e97-8a7f-012d835b60bb}</Project>
+      <Name>corelib.v4.5</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
