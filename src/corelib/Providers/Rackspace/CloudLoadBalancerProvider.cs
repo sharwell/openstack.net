@@ -148,7 +148,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<LoadBalancer> CreateLoadBalancerAsync(LoadBalancerConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task<LoadBalancer> CreateLoadBalancerAsync(LoadBalancerConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
@@ -180,7 +180,7 @@
         }
 
         /// <inheritdoc/>
-        public Task UpdateLoadBalancerAsync(LoadBalancerId loadBalancerId, LoadBalancerUpdate configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task UpdateLoadBalancerAsync(LoadBalancerId loadBalancerId, LoadBalancerUpdate configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -213,7 +213,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveLoadBalancerAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveLoadBalancerAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -242,7 +242,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveLoadBalancerRangeAsync(IEnumerable<LoadBalancerId> loadBalancerIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer[]> progress)
+        public Task RemoveLoadBalancerRangeAsync(IEnumerable<LoadBalancerId> loadBalancerIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer[]> progress)
         {
             if (loadBalancerIds == null)
                 throw new ArgumentNullException("loadBalancerIds");
@@ -272,7 +272,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Remove_Load_Balancer-d1e2093.html">Remove Load Balancer (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        public Task RemoveLoadBalancerRangeAsync(LoadBalancerId[] loadBalancerIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer[]> progress)
+        public Task RemoveLoadBalancerRangeAsync(LoadBalancerId[] loadBalancerIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer[]> progress)
         {
             if (loadBalancerIds == null)
                 throw new ArgumentNullException("loadBalancerIds");
@@ -285,7 +285,7 @@
             }
             else if (loadBalancerIds.Length == 1)
             {
-                net.openstack.Core.IProgress<LoadBalancer> wrapper = null;
+                IProgress<LoadBalancer> wrapper = null;
                 if (progress != null)
                     wrapper = new ArrayElementProgressWrapper<LoadBalancer>(progress);
 
@@ -354,7 +354,7 @@
         }
 
         /// <inheritdoc/>
-        public Task SetErrorPageAsync(LoadBalancerId loadBalancerId, string content, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task SetErrorPageAsync(LoadBalancerId loadBalancerId, string content, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -392,7 +392,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveErrorPageAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveErrorPageAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -497,7 +497,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<Node> AddNodeAsync(LoadBalancerId loadBalancerId, NodeConfiguration nodeConfiguration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task<Node> AddNodeAsync(LoadBalancerId loadBalancerId, NodeConfiguration nodeConfiguration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (nodeConfiguration == null)
                 throw new ArgumentNullException("nodeConfiguration");
@@ -511,7 +511,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollection<Node>> AddNodeRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NodeConfiguration> nodeConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task<ReadOnlyCollection<Node>> AddNodeRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NodeConfiguration> nodeConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (nodeConfigurations == null)
                 throw new ArgumentNullException("nodeConfigurations");
@@ -544,7 +544,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Add_Nodes-d1e2379.html">Add Nodes (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        public Task<ReadOnlyCollection<Node>> AddNodeRangeAsync(LoadBalancerId loadBalancerId, NodeConfiguration[] nodeConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task<ReadOnlyCollection<Node>> AddNodeRangeAsync(LoadBalancerId loadBalancerId, NodeConfiguration[] nodeConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -592,7 +592,7 @@
         }
 
         /// <inheritdoc/>
-        public Task UpdateNodeAsync(LoadBalancerId loadBalancerId, NodeId nodeId, NodeUpdate configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task UpdateNodeAsync(LoadBalancerId loadBalancerId, NodeId nodeId, NodeUpdate configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -627,7 +627,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveNodeAsync(LoadBalancerId loadBalancerId, NodeId nodeId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveNodeAsync(LoadBalancerId loadBalancerId, NodeId nodeId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -658,7 +658,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveNodeRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NodeId> nodeIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveNodeRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NodeId> nodeIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (nodeIds == null)
                 throw new ArgumentNullException("nodeIds");
@@ -687,7 +687,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Remove_Nodes-d1e2675.html">Remove Nodes (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        public Task RemoveNodeRangeAsync(LoadBalancerId loadBalancerId, NodeId[] nodeIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveNodeRangeAsync(LoadBalancerId loadBalancerId, NodeId[] nodeIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -826,7 +826,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<LoadBalancerVirtualAddress> AddVirtualAddressAsync(LoadBalancerId loadBalancerId, LoadBalancerVirtualAddressType type, AddressFamily addressFamily, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task<LoadBalancerVirtualAddress> AddVirtualAddressAsync(LoadBalancerId loadBalancerId, LoadBalancerVirtualAddressType type, AddressFamily addressFamily, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -867,7 +867,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveVirtualAddressAsync(LoadBalancerId loadBalancerId, VirtualAddressId virtualAddressId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveVirtualAddressAsync(LoadBalancerId loadBalancerId, VirtualAddressId virtualAddressId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/virtualips/{virtualipId}");
             var parameters = new Dictionary<string, string>()
@@ -898,7 +898,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveVirtualAddressRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<VirtualAddressId> virtualAddressIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveVirtualAddressRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<VirtualAddressId> virtualAddressIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (virtualAddressIds == null)
                 throw new ArgumentNullException("virtualAddressIds");
@@ -931,7 +931,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Remove_Virtual_IP-d1e2919.html">Remove Virtual IP (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        public Task RemoveVirtualAddressRangeAsync(LoadBalancerId loadBalancerId, VirtualAddressId[] virtualAddressIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveVirtualAddressRangeAsync(LoadBalancerId loadBalancerId, VirtualAddressId[] virtualAddressIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1165,7 +1165,7 @@
         }
 
         /// <inheritdoc/>
-        public Task CreateAccessListAsync(LoadBalancerId loadBalancerId, NetworkItem networkItem, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task CreateAccessListAsync(LoadBalancerId loadBalancerId, NetworkItem networkItem, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (networkItem == null)
                 throw new ArgumentNullException("networkItem");
@@ -1174,7 +1174,7 @@
         }
 
         /// <inheritdoc/>
-        public Task CreateAccessListAsync(LoadBalancerId loadBalancerId, IEnumerable<NetworkItem> networkItems, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task CreateAccessListAsync(LoadBalancerId loadBalancerId, IEnumerable<NetworkItem> networkItems, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (networkItems == null)
                 throw new ArgumentNullException("networkItems");
@@ -1208,7 +1208,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Manage_Access_Lists-d1e3187.html">Manage Access Lists (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        public Task CreateAccessListAsync(LoadBalancerId loadBalancerId, NetworkItem[] networkItems, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task CreateAccessListAsync(LoadBalancerId loadBalancerId, NetworkItem[] networkItems, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1253,7 +1253,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveAccessListAsync(LoadBalancerId loadBalancerId, NetworkItemId networkItemId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveAccessListAsync(LoadBalancerId loadBalancerId, NetworkItemId networkItemId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1289,7 +1289,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveAccessListRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NetworkItemId> networkItemIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveAccessListRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NetworkItemId> networkItemIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (networkItemIds == null)
                 throw new ArgumentNullException("networkItemIds");
@@ -1318,7 +1318,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Manage_Access_Lists-d1e3187.html">Manage Access Lists (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        public Task RemoveAccessListRangeAsync(LoadBalancerId loadBalancerId, NetworkItemId[] networkItemIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveAccessListRangeAsync(LoadBalancerId loadBalancerId, NetworkItemId[] networkItemIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1375,7 +1375,7 @@
         }
 
         /// <inheritdoc/>
-        public Task ClearAccessListAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task ClearAccessListAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1445,7 +1445,7 @@
         }
 
         /// <inheritdoc/>
-        public Task SetHealthMonitorAsync(LoadBalancerId loadBalancerId, HealthMonitor monitor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task SetHealthMonitorAsync(LoadBalancerId loadBalancerId, HealthMonitor monitor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1480,7 +1480,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveHealthMonitorAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveHealthMonitorAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1536,7 +1536,7 @@
         }
 
         /// <inheritdoc/>
-        public Task SetSessionPersistenceAsync(LoadBalancerId loadBalancerId, SessionPersistence sessionPersistence, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task SetSessionPersistenceAsync(LoadBalancerId loadBalancerId, SessionPersistence sessionPersistence, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1571,7 +1571,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveSessionPersistenceAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveSessionPersistenceAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1631,7 +1631,7 @@
         }
 
         /// <inheritdoc/>
-        public Task SetConnectionLoggingAsync(LoadBalancerId loadBalancerId, bool enabled, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task SetConnectionLoggingAsync(LoadBalancerId loadBalancerId, bool enabled, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1692,7 +1692,7 @@
         }
 
         /// <inheritdoc/>
-        public Task UpdateThrottlesAsync(LoadBalancerId loadBalancerId, ConnectionThrottles throttleConfiguration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task UpdateThrottlesAsync(LoadBalancerId loadBalancerId, ConnectionThrottles throttleConfiguration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1727,7 +1727,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveThrottlesAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveThrottlesAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1787,7 +1787,7 @@
         }
 
         /// <inheritdoc/>
-        public Task SetContentCachingAsync(LoadBalancerId loadBalancerId, bool enabled, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task SetContentCachingAsync(LoadBalancerId loadBalancerId, bool enabled, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1892,7 +1892,7 @@
         }
 
         /// <inheritdoc/>
-        public Task UpdateSslConfigurationAsync(LoadBalancerId loadBalancerId, LoadBalancerSslConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task UpdateSslConfigurationAsync(LoadBalancerId loadBalancerId, LoadBalancerSslConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -1928,7 +1928,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveSslConfigurationAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        public Task RemoveSslConfigurationAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -2411,7 +2411,7 @@
         /// <para>-or-</para>
         /// <para>If <paramref name="state"/> is <see langword="null"/>.</para>
         /// </exception>
-        protected Task<LoadBalancer> WaitForLoadBalancerToLeaveStateAsync(LoadBalancerId loadBalancerId, LoadBalancerStatus state, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        protected Task<LoadBalancer> WaitForLoadBalancerToLeaveStateAsync(LoadBalancerId loadBalancerId, LoadBalancerStatus state, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
@@ -2483,7 +2483,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="loadBalancerId"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        private Task<LoadBalancer> PollLoadBalancerStateAsync(LoadBalancerId loadBalancerId, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress)
+        private Task<LoadBalancer> PollLoadBalancerStateAsync(LoadBalancerId loadBalancerId, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
             Task<LoadBalancer> chain = GetLoadBalancerAsync(loadBalancerId, cancellationToken);
             chain = chain.Select(
@@ -2534,7 +2534,7 @@
         /// <para>If <paramref name="state"/> is <see langword="null"/>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">If <paramref name="loadBalancerIds"/> contains any <see langword="null"/> values.</exception>
-        protected Task<LoadBalancer[]> WaitForLoadBalancersToLeaveStateAsync(LoadBalancerId[] loadBalancerIds, LoadBalancerStatus state, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer[]> progress)
+        protected Task<LoadBalancer[]> WaitForLoadBalancersToLeaveStateAsync(LoadBalancerId[] loadBalancerIds, LoadBalancerStatus state, CancellationToken cancellationToken, IProgress<LoadBalancer[]> progress)
         {
             if (loadBalancerIds == null)
                 throw new ArgumentNullException("loadBalancerIds");
@@ -2636,16 +2636,16 @@
         }
 
         /// <summary>
-        /// This class provides a wrapper implementation of <see cref="net.openstack.Core.IProgress{T}"/> which
+        /// This class provides a wrapper implementation of <see cref="IProgress{T}"/> which
         /// wraps a single progress report values into a single-element array.
         /// </summary>
         /// <typeparam name="T">The type of progress update value.</typeparam>
-        private class ArrayElementProgressWrapper<T> : net.openstack.Core.IProgress<T>
+        private class ArrayElementProgressWrapper<T> : IProgress<T>
         {
             /// <summary>
             /// The delegate progress handler to dispatch progress reports to.
             /// </summary>
-            private readonly net.openstack.Core.IProgress<T[]> _delegate;
+            private readonly IProgress<T[]> _delegate;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ArrayElementProgressWrapper{T}"/> class
@@ -2654,7 +2654,7 @@
             /// </summary>
             /// <param name="delegate">The delegate to dispatch progress reports to.</param>
             /// <exception cref="ArgumentNullException">If <paramref name="delegate"/> is <see langword="null"/>.</exception>
-            public ArrayElementProgressWrapper(net.openstack.Core.IProgress<T[]> @delegate)
+            public ArrayElementProgressWrapper(IProgress<T[]> @delegate)
             {
                 if (@delegate == null)
                     throw new ArgumentNullException("delegate");

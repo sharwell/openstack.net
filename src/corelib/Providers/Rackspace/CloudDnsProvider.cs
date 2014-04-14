@@ -364,7 +364,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob<ExportedDomain>> ExportDomainAsync(DomainId domainId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<ExportedDomain>> progress)
+        public Task<DnsJob<ExportedDomain>> ExportDomainAsync(DomainId domainId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<ExportedDomain>> progress)
         {
             UriTemplate template = new UriTemplate("/domains/{domainId}/export");
             var parameters = new Dictionary<string, string>()
@@ -399,7 +399,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob<DnsDomains>> CreateDomainsAsync(DnsConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<DnsDomains>> progress)
+        public Task<DnsJob<DnsDomains>> CreateDomainsAsync(DnsConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsDomains>> progress)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
@@ -434,7 +434,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob> UpdateDomainsAsync(DnsUpdateConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress)
+        public Task<DnsJob> UpdateDomainsAsync(DnsUpdateConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
@@ -469,7 +469,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob<DnsDomains>> CloneDomainAsync(DomainId domainId, string cloneName, bool? cloneSubdomains, bool? modifyRecordData, bool? modifyEmailAddress, bool? modifyComment, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<DnsDomains>> progress)
+        public Task<DnsJob<DnsDomains>> CloneDomainAsync(DomainId domainId, string cloneName, bool? cloneSubdomains, bool? modifyRecordData, bool? modifyEmailAddress, bool? modifyComment, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsDomains>> progress)
         {
             UriTemplate template = new UriTemplate("/domains/{domainId}/clone?cloneName={cloneName}&cloneSubdomains={cloneSubdomains}&modifyRecordData={modifyRecordData}&modifyEmailAddress={modifyEmailAddress}&modifyComment={modifyComment}");
             var parameters = new Dictionary<string, string> { { "domainId", domainId.Value }, { "cloneName", cloneName } };
@@ -509,7 +509,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob<DnsDomains>> ImportDomainAsync(IEnumerable<SerializedDomain> serializedDomains, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<DnsDomains>> progress)
+        public Task<DnsJob<DnsDomains>> ImportDomainAsync(IEnumerable<SerializedDomain> serializedDomains, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsDomains>> progress)
         {
             if (serializedDomains == null)
                 throw new ArgumentNullException("serializedDomains");
@@ -545,7 +545,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob> RemoveDomainsAsync(IEnumerable<DomainId> domainIds, bool deleteSubdomains, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress)
+        public Task<DnsJob> RemoveDomainsAsync(IEnumerable<DomainId> domainIds, bool deleteSubdomains, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
             UriTemplate template = new UriTemplate("/domains?deleteSubdomains={deleteSubdomains}");
             var parameters = new Dictionary<string, string>()
@@ -742,7 +742,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob<DnsRecordsList>> AddRecordsAsync(DomainId domainId, IEnumerable<DnsDomainRecordConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<DnsRecordsList>> progress)
+        public Task<DnsJob<DnsRecordsList>> AddRecordsAsync(DomainId domainId, IEnumerable<DnsDomainRecordConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsRecordsList>> progress)
         {
             UriTemplate template = new UriTemplate("/domains/{domainId}/records");
             var parameters = new Dictionary<string, string>()
@@ -778,7 +778,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob> UpdateRecordsAsync(DomainId domainId, IEnumerable<DnsDomainRecordUpdateConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress)
+        public Task<DnsJob> UpdateRecordsAsync(DomainId domainId, IEnumerable<DnsDomainRecordUpdateConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
             UriTemplate template = new UriTemplate("/domains/{domainId}/records");
             var parameters = new Dictionary<string, string>()
@@ -814,7 +814,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob> RemoveRecordsAsync(DomainId domainId, IEnumerable<RecordId> recordIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress)
+        public Task<DnsJob> RemoveRecordsAsync(DomainId domainId, IEnumerable<RecordId> recordIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
             UriTemplate template = new UriTemplate("/domains/{domainId}/records");
             var parameters = new Dictionary<string, string>()
@@ -949,7 +949,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob<DnsRecordsList>> AddPtrRecordsAsync(string serviceName, Uri deviceResourceUri, IEnumerable<DnsDomainRecordConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<DnsRecordsList>> progress)
+        public Task<DnsJob<DnsRecordsList>> AddPtrRecordsAsync(string serviceName, Uri deviceResourceUri, IEnumerable<DnsDomainRecordConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsRecordsList>> progress)
         {
             if (serviceName == null)
                 throw new ArgumentNullException("serviceName");
@@ -995,7 +995,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob> UpdatePtrRecordsAsync(string serviceName, Uri deviceResourceUri, IEnumerable<DnsDomainRecordUpdateConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress)
+        public Task<DnsJob> UpdatePtrRecordsAsync(string serviceName, Uri deviceResourceUri, IEnumerable<DnsDomainRecordUpdateConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
             if (serviceName == null)
                 throw new ArgumentNullException("serviceName");
@@ -1041,7 +1041,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<DnsJob> RemovePtrRecordsAsync(string serviceName, Uri deviceResourceUri, IPAddress ipAddress, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress)
+        public Task<DnsJob> RemovePtrRecordsAsync(string serviceName, Uri deviceResourceUri, IPAddress ipAddress, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
             UriTemplate template = new UriTemplate("/rdns/{serviceName}?href={deviceResourceUri}&ip={ipAddress}");
             var parameters = new Dictionary<string, string>()
@@ -1102,7 +1102,7 @@
         /// <exception cref="ArgumentNullException">If <paramref name="job"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/sync_asynch_responses.html">Synchronous and Asynchronous Responses (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        protected Task<DnsJob> WaitForJobAsync(DnsJob job, bool showDetails, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress)
+        protected Task<DnsJob> WaitForJobAsync(DnsJob job, bool showDetails, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
             if (job == null)
                 throw new ArgumentNullException("job");
@@ -1183,7 +1183,7 @@
         /// <exception cref="ArgumentNullException">If <paramref name="job"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/sync_asynch_responses.html">Synchronous and Asynchronous Responses (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        protected Task<DnsJob<TResult>> WaitForJobAsync<TResult>(DnsJob<TResult> job, bool showDetails, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<TResult>> progress)
+        protected Task<DnsJob<TResult>> WaitForJobAsync<TResult>(DnsJob<TResult> job, bool showDetails, CancellationToken cancellationToken, IProgress<DnsJob<TResult>> progress)
         {
             if (job == null)
                 throw new ArgumentNullException("job");
@@ -1296,7 +1296,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="job"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        private Task<DnsJob> PollJobStateAsync(DnsJob job, bool showDetails, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress)
+        private Task<DnsJob> PollJobStateAsync(DnsJob job, bool showDetails, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
             if (job == null)
                 throw new ArgumentNullException("job");
@@ -1339,7 +1339,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="job"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        private Task<DnsJob<TResponse>> PollJobStateAsync<TResponse>(DnsJob<TResponse> job, bool showDetails, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<TResponse>> progress)
+        private Task<DnsJob<TResponse>> PollJobStateAsync<TResponse>(DnsJob<TResponse> job, bool showDetails, CancellationToken cancellationToken, IProgress<DnsJob<TResponse>> progress)
         {
             if (job == null)
                 throw new ArgumentNullException("job");

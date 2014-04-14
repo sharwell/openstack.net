@@ -273,7 +273,7 @@
           <listItem>
             <para>
               The synchronous extensions do not support progress callbacks, and pass <codeInline>null</codeInline>
-              to APIs with an <codeEntityReference>T:net.openstack.Core.IProgress`1</codeEntityReference> parameter.
+              to APIs with an <codeEntityReference>T:System.IProgress`1</codeEntityReference> parameter.
             </para>
           </listItem>
         </list>

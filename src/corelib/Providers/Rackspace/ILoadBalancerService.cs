@@ -69,7 +69,7 @@
         /// <exception cref="ArgumentException">If <paramref name="completionOption"/> is not a valid <see cref="AsyncCompletionOption"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/List_Load_Balancer_Details-d1e1522.html">List Load Balancer Details (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task<LoadBalancer> CreateLoadBalancerAsync(LoadBalancerConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task<LoadBalancer> CreateLoadBalancerAsync(LoadBalancerConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Updates attributes for an existing load balancer.
@@ -94,7 +94,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Update_Load_Balancer_Attributes-d1e1812.html">Update Load Balancer Attributes (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task UpdateLoadBalancerAsync(LoadBalancerId loadBalancerId, LoadBalancerUpdate configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task UpdateLoadBalancerAsync(LoadBalancerId loadBalancerId, LoadBalancerUpdate configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Removes a load balancer.
@@ -115,7 +115,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Remove_Load_Balancer-d1e2093.html">Remove Load Balancer (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveLoadBalancerAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveLoadBalancerAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Removes one or more load balancers.
@@ -138,7 +138,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Remove_Load_Balancer-d1e2093.html">Remove Load Balancer (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveLoadBalancerRangeAsync(IEnumerable<LoadBalancerId> loadBalancerIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer[]> progress);
+        Task RemoveLoadBalancerRangeAsync(IEnumerable<LoadBalancerId> loadBalancerIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer[]> progress);
 
         #endregion Load Balancers
 
@@ -185,7 +185,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/List_Errorpage-d1e2218.html">Error Page Operations (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task SetErrorPageAsync(LoadBalancerId loadBalancerId, string content, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task SetErrorPageAsync(LoadBalancerId loadBalancerId, string content, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Removes the custom error page which is shown to an end user who is attempting to access a load balancer node that is offline or unavailable.
@@ -205,7 +205,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/List_Errorpage-d1e2218.html">Error Page Operations (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveErrorPageAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveErrorPageAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         #endregion Error Page
 
@@ -292,7 +292,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Add_Nodes-d1e2379.html">Add Nodes (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task<Node> AddNodeAsync(LoadBalancerId loadBalancerId, NodeConfiguration nodeConfiguration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task<Node> AddNodeAsync(LoadBalancerId loadBalancerId, NodeConfiguration nodeConfiguration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Add one or more nodes to a load balancer.
@@ -321,7 +321,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Add_Nodes-d1e2379.html">Add Nodes (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task<ReadOnlyCollection<Node>> AddNodeRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NodeConfiguration> nodeConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task<ReadOnlyCollection<Node>> AddNodeRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NodeConfiguration> nodeConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Update the configuration of a load balancer node.
@@ -349,7 +349,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Modify_Nodes-d1e2503.html">Modify Nodes (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task UpdateNodeAsync(LoadBalancerId loadBalancerId, NodeId nodeId, NodeUpdate configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task UpdateNodeAsync(LoadBalancerId loadBalancerId, NodeId nodeId, NodeUpdate configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Remove a nodes from a load balancer.
@@ -374,7 +374,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Remove_Nodes-d1e2675.html">Remove Nodes (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveNodeAsync(LoadBalancerId loadBalancerId, NodeId nodeId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveNodeAsync(LoadBalancerId loadBalancerId, NodeId nodeId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Remove one or more nodes from a load balancer.
@@ -401,7 +401,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Remove_Nodes-d1e2675.html">Remove Nodes (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveNodeRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NodeId> nodeIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveNodeRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NodeId> nodeIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// List the service events for a load balancer node.
@@ -468,7 +468,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Add_Virtual_IP_Version_6.html">Add Virtual IP Version 6 (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task<LoadBalancerVirtualAddress> AddVirtualAddressAsync(LoadBalancerId loadBalancerId, LoadBalancerVirtualAddressType type, AddressFamily addressFamily, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task<LoadBalancerVirtualAddress> AddVirtualAddressAsync(LoadBalancerId loadBalancerId, LoadBalancerVirtualAddressType type, AddressFamily addressFamily, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Remove a virtual address associated with a load balancer.
@@ -493,7 +493,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Remove_Virtual_IP-d1e2919.html">Remove Virtual IP (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveVirtualAddressAsync(LoadBalancerId loadBalancerId, VirtualAddressId virtualAddressId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveVirtualAddressAsync(LoadBalancerId loadBalancerId, VirtualAddressId virtualAddressId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Remove a collection of virtual addresses associated with a load balancer.
@@ -520,7 +520,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Remove_Virtual_IP-d1e2919.html">Remove Virtual IP (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveVirtualAddressRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<VirtualAddressId> virtualAddressIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveVirtualAddressRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<VirtualAddressId> virtualAddressIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         #endregion Virtual IPs
 
@@ -665,7 +665,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Manage_Access_Lists-d1e3187.html">Manage Access Lists (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task CreateAccessListAsync(LoadBalancerId loadBalancerId, NetworkItem networkItem, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task CreateAccessListAsync(LoadBalancerId loadBalancerId, NetworkItem networkItem, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Add a collection of network items to the access list for a load balancer.
@@ -692,7 +692,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Manage_Access_Lists-d1e3187.html">Manage Access Lists (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task CreateAccessListAsync(LoadBalancerId loadBalancerId, IEnumerable<NetworkItem> networkItems, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task CreateAccessListAsync(LoadBalancerId loadBalancerId, IEnumerable<NetworkItem> networkItems, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Remove a network item from the access list of a load balancer.
@@ -717,7 +717,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Manage_Access_Lists-d1e3187.html">Manage Access Lists (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveAccessListAsync(LoadBalancerId loadBalancerId, NetworkItemId networkItemId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveAccessListAsync(LoadBalancerId loadBalancerId, NetworkItemId networkItemId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Remove a collection of network items from the access list of a load balancer.
@@ -744,7 +744,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Manage_Access_Lists-d1e3187.html">Manage Access Lists (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveAccessListRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NetworkItemId> networkItemIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveAccessListRangeAsync(LoadBalancerId loadBalancerId, IEnumerable<NetworkItemId> networkItemIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Remove all network items from the access list of a load balancer.
@@ -764,7 +764,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Manage_Access_Lists-d1e3187.html">Manage Access Lists (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task ClearAccessListAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task ClearAccessListAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         #endregion Access Lists
 
@@ -809,7 +809,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Monitor_Health-d1e3434.html">Monitor Health (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task SetHealthMonitorAsync(LoadBalancerId loadBalancerId, HealthMonitor monitor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task SetHealthMonitorAsync(LoadBalancerId loadBalancerId, HealthMonitor monitor, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Remove the health monitor currently configured for a load balancer.
@@ -829,7 +829,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Monitor_Health-d1e3434.html">Monitor Health (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveHealthMonitorAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveHealthMonitorAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         #endregion Monitors
 
@@ -894,7 +894,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Manage_Session_Persistence-d1e3733.html">Manage Session Persistence (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task SetSessionPersistenceAsync(LoadBalancerId loadBalancerId, SessionPersistence sessionPersistence, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task SetSessionPersistenceAsync(LoadBalancerId loadBalancerId, SessionPersistence sessionPersistence, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Removes the session persistence configuration for a load balancer.
@@ -914,7 +914,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Manage_Session_Persistence-d1e3733.html">Manage Session Persistence (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveSessionPersistenceAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveSessionPersistenceAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         #endregion Sessions
 
@@ -954,7 +954,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Log_Connections-d1e3924.html">Log Connections (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task SetConnectionLoggingAsync(LoadBalancerId loadBalancerId, bool enabled, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task SetConnectionLoggingAsync(LoadBalancerId loadBalancerId, bool enabled, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Gets the connection throttling configuration for a load balancer.
@@ -994,7 +994,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Throttle_Connections-d1e4057.html">Throttle Connections (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task UpdateThrottlesAsync(LoadBalancerId loadBalancerId, ConnectionThrottles throttleConfiguration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task UpdateThrottlesAsync(LoadBalancerId loadBalancerId, ConnectionThrottles throttleConfiguration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Removes the connection throttling configuration for a load balancer.
@@ -1014,7 +1014,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/Throttle_Connections-d1e4057.html">Throttle Connections (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveThrottlesAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveThrottlesAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         #endregion Connections
 
@@ -1082,7 +1082,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/ContentCaching-d1e3358.html">Content Caching (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task SetContentCachingAsync(LoadBalancerId loadBalancerId, bool enabled, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task SetContentCachingAsync(LoadBalancerId loadBalancerId, bool enabled, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         #endregion Content Caching
 
@@ -1163,7 +1163,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/SSLTermination-d1e2479.html#d6e3823">SSL Termination (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task UpdateSslConfigurationAsync(LoadBalancerId loadBalancerId, LoadBalancerSslConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task UpdateSslConfigurationAsync(LoadBalancerId loadBalancerId, LoadBalancerSslConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         /// <summary>
         /// Update the SSL termination configuration for a load balancer.
@@ -1183,7 +1183,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/content/SSLTermination-d1e2479.html#d6e3823">SSL Termination (Rackspace Cloud Load Balancers Developer Guide - API v1.0)</seealso>
-        Task RemoveSslConfigurationAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<LoadBalancer> progress);
+        Task RemoveSslConfigurationAsync(LoadBalancerId loadBalancerId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress);
 
         #endregion SSL Termination
 

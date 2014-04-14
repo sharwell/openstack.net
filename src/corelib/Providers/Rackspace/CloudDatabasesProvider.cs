@@ -63,7 +63,7 @@
         #region IDatabaseService Members
 
         /// <inheritdoc/>
-        public Task<DatabaseInstance> CreateDatabaseInstanceAsync(DatabaseInstanceConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress)
+        public Task<DatabaseInstance> CreateDatabaseInstanceAsync(DatabaseInstanceConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
@@ -193,7 +193,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RemoveDatabaseInstanceAsync(DatabaseInstanceId instanceId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress)
+        public Task RemoveDatabaseInstanceAsync(DatabaseInstanceId instanceId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
         {
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
@@ -294,7 +294,7 @@
         }
 
         /// <inheritdoc/>
-        public Task RestartDatabaseInstanceAsync(DatabaseInstanceId instanceId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress)
+        public Task RestartDatabaseInstanceAsync(DatabaseInstanceId instanceId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
         {
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
@@ -328,7 +328,7 @@
         }
 
         /// <inheritdoc/>
-        public Task ResizeDatabaseInstanceAsync(DatabaseInstanceId instanceId, FlavorRef flavorRef, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress)
+        public Task ResizeDatabaseInstanceAsync(DatabaseInstanceId instanceId, FlavorRef flavorRef, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
         {
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
@@ -365,7 +365,7 @@
         }
 
         /// <inheritdoc/>
-        public Task ResizeDatabaseInstanceVolumeAsync(DatabaseInstanceId instanceId, int volumeSize, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress)
+        public Task ResizeDatabaseInstanceVolumeAsync(DatabaseInstanceId instanceId, int volumeSize, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
         {
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
@@ -862,7 +862,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<Backup> CreateBackupAsync(BackupConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress)
+        public Task<Backup> CreateBackupAsync(BackupConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
@@ -1064,7 +1064,7 @@
         /// <para>-or-</para>
         /// <para>If <paramref name="state"/> is <see langword="null"/>.</para>
         /// </exception>
-        protected Task<DatabaseInstance> WaitForDatabaseInstanceToLeaveStateAsync(DatabaseInstanceId instanceId, DatabaseInstanceStatus state, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress)
+        protected Task<DatabaseInstance> WaitForDatabaseInstanceToLeaveStateAsync(DatabaseInstanceId instanceId, DatabaseInstanceStatus state, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
         {
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
@@ -1160,7 +1160,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="instanceId"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        private Task<DatabaseInstance> PollDatabaseInstanceStateAsync(DatabaseInstanceId instanceId, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress)
+        private Task<DatabaseInstance> PollDatabaseInstanceStateAsync(DatabaseInstanceId instanceId, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
         {
             Task<DatabaseInstance> chain = GetDatabaseInstanceAsync(instanceId, cancellationToken);
             chain = chain.Select(
