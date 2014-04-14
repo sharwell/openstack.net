@@ -2,10 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
-    using net.openstack.Core.Collections;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
+#if NET45PLUS
+    using System.Collections.ObjectModel;
+#else
+    using net.openstack.Core.Collections;
+#endif
 
     /// <summary>
     /// This class represents the detailed configuration parameters for a

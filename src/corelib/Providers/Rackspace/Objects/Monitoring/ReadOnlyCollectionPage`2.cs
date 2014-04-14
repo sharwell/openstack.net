@@ -7,6 +7,9 @@
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using Newtonsoft.Json.Linq;
+#if NET45PLUS
+    using System.Collections.ObjectModel;
+#endif
 
     /// <summary>
     /// This class provides read-only access to a single page of results returned
