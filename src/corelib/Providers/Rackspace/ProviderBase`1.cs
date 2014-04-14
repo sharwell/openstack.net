@@ -1081,7 +1081,7 @@ namespace net.openstack.Providers.Rackspace
             HttpRequestMessage request = new HttpRequestMessage(method, boundUri);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(JsonRequestSettings.JsonContentType));
             request.Headers.Add("X-Auth-Token", identityToken.Id);
-            request.Headers.UserAgent.Add(new ProductInfoHeaderValue(UserAgentGenerator.UserAgent));
+            request.Headers.UserAgent.Add(new ProductInfoHeaderValue(UserAgentGenerator.ProductName, UserAgentGenerator.ProductVersion));
             if (ConnectionLimit.HasValue)
             {
                 ServicePoint servicePoint = ServicePointManager.FindServicePoint(boundUri);
