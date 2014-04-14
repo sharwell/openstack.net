@@ -1,6 +1,8 @@
-﻿namespace net.openstack.Providers.Rackspace
+﻿// Intentionally placed in the outer scope to avoid naming collisions between System.IProgress<T> and Rackspace.Threading.IProgress<T>
+using System;
+
+namespace net.openstack.Providers.Rackspace
 {
-    using System;
     using System.Collections.ObjectModel;
     using System.Threading.Tasks;
     using global::Rackspace.Threading;

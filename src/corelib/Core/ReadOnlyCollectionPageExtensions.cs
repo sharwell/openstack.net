@@ -1,6 +1,8 @@
-﻿namespace net.openstack.Core
+﻿// Intentionally placed in the outer scope to avoid naming collisions between System.IProgress<T> and Rackspace.Threading.IProgress<T>
+using System;
+
+namespace net.openstack.Core
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Threading;
