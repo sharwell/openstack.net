@@ -20,8 +20,8 @@ using Rackspace.Threading;
 using CancellationToken = System.Threading.CancellationToken;
 using Encoding = System.Text.Encoding;
 using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
-using Response = JSIStudios.SimpleRESTServices.Client.Response;
 using RequestSettings = JSIStudios.SimpleRESTServices.Client.RequestSettings;
+using Response = JSIStudios.SimpleRESTServices.Client.Response;
 using Thread = System.Threading.Thread;
 
 namespace net.openstack.Providers.Rackspace
