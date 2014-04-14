@@ -7,9 +7,9 @@ namespace net.openstack.Providers.Rackspace
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Net;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
-    using JSIStudios.SimpleRESTServices.Client;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
@@ -19,6 +19,7 @@ namespace net.openstack.Providers.Rackspace
     using CancellationToken = System.Threading.CancellationToken;
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
+    using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
 
     /// <summary>
@@ -79,10 +80,10 @@ namespace net.openstack.Providers.Rackspace
             UriTemplate template = new UriTemplate("/limits");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsServiceLimits> resultSelector =
@@ -111,10 +112,10 @@ namespace net.openstack.Providers.Rackspace
             UriTemplate template = new UriTemplate("/limits/types");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, ReadOnlyCollection<LimitType>> resultSelector =
@@ -146,10 +147,10 @@ namespace net.openstack.Providers.Rackspace
                     { "type", type.Name.ToLowerInvariant() }
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsServiceLimits> resultSelector =
@@ -185,10 +186,10 @@ namespace net.openstack.Providers.Rackspace
                     { "showDetails", showDetails ? "true" : "false" },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -220,10 +221,10 @@ namespace net.openstack.Providers.Rackspace
                     { "showDetails", showDetails ? "true" : "false" },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<TResponse>> resultSelector =
@@ -254,10 +255,10 @@ namespace net.openstack.Providers.Rackspace
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, Tuple<ReadOnlyCollectionPage<DnsDomain>, int?>> resultSelector =
@@ -310,10 +311,10 @@ namespace net.openstack.Providers.Rackspace
                 { "showSubdomains", showSubdomains ? "true" : "false" },
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsDomain> resultSelector =
@@ -343,10 +344,10 @@ namespace net.openstack.Providers.Rackspace
             if (since.HasValue)
                 parameters.Add("since", since.Value.ToString("G"));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsDomainChanges> resultSelector =
@@ -374,10 +375,10 @@ namespace net.openstack.Providers.Rackspace
                     { "domainId", domainId.Value },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<ExportedDomain>> resultSelector =
@@ -409,10 +410,10 @@ namespace net.openstack.Providers.Rackspace
             UriTemplate template = new UriTemplate("/domains");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, configuration);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, configuration);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<DnsDomains>> resultSelector =
@@ -444,10 +445,10 @@ namespace net.openstack.Providers.Rackspace
             UriTemplate template = new UriTemplate("/domains");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, configuration);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, configuration);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -484,10 +485,10 @@ namespace net.openstack.Providers.Rackspace
             if (modifyComment != null)
                 parameters.Add("modifyComment", modifyComment.Value ? "true" : "false");
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<DnsDomains>> resultSelector =
@@ -520,10 +521,10 @@ namespace net.openstack.Providers.Rackspace
             var parameters = new Dictionary<string, string>();
 
             JObject request = new JObject(new JProperty("domains", JArray.FromObject(serializedDomains)));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<DnsDomains>> resultSelector =
@@ -563,10 +564,10 @@ namespace net.openstack.Providers.Rackspace
                     return builder.Uri;
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, transform);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, transform);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -602,10 +603,10 @@ namespace net.openstack.Providers.Rackspace
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, Tuple<ReadOnlyCollectionPage<DnsSubdomain>, int?>> resultSelector =
@@ -666,10 +667,10 @@ namespace net.openstack.Providers.Rackspace
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, Tuple<ReadOnlyCollectionPage<DnsRecord>, int?>> resultSelector =
@@ -721,10 +722,10 @@ namespace net.openstack.Providers.Rackspace
                     { "recordId", recordId.Value }
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsRecord> resultSelector =
@@ -753,10 +754,10 @@ namespace net.openstack.Providers.Rackspace
                 };
 
             JObject request = new JObject(new JProperty("records", JArray.FromObject(recordConfigurations)));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<DnsRecordsList>> resultSelector =
@@ -789,10 +790,10 @@ namespace net.openstack.Providers.Rackspace
                 };
 
             JObject request = new JObject(new JProperty("records", JArray.FromObject(recordConfigurations)));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -832,10 +833,10 @@ namespace net.openstack.Providers.Rackspace
                     return builder.Uri;
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, transform);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, transform);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -872,10 +873,10 @@ namespace net.openstack.Providers.Rackspace
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, Tuple<ReadOnlyCollectionPage<DnsRecord>, int?>> resultSelector =
@@ -928,10 +929,10 @@ namespace net.openstack.Providers.Rackspace
                     { "recordId", recordId.Value },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsRecord> resultSelector =
@@ -970,10 +971,10 @@ namespace net.openstack.Providers.Rackspace
                     new JProperty("content", new JValue(string.Empty)))),
                 new JProperty("recordsList", new JObject(
                     new JProperty("records", JArray.FromObject(recordConfigurations)))));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<DnsRecordsList>> resultSelector =
@@ -1016,10 +1017,10 @@ namespace net.openstack.Providers.Rackspace
                     new JProperty("content", new JValue(string.Empty)))),
                 new JProperty("recordsList", new JObject(
                     new JProperty("records", JArray.FromObject(recordConfigurations)))));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -1054,10 +1055,10 @@ namespace net.openstack.Providers.Rackspace
             if (ipAddress != null)
                 parameters.Add("ipAddress", ipAddress.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =

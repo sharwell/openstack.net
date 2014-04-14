@@ -7,10 +7,10 @@ namespace net.openstack.Providers.Rackspace
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Net;
+    using System.Net.Http;
     using System.Net.Sockets;
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
-    using JSIStudios.SimpleRESTServices.Client;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
@@ -22,6 +22,7 @@ namespace net.openstack.Providers.Rackspace
     using Newtonsoft.Json.Linq;
     using CancellationToken = System.Threading.CancellationToken;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
+    using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
 
     /// <summary>
@@ -89,10 +90,10 @@ namespace net.openstack.Providers.Rackspace
                     parameters.Add("limit", limit.ToString());
                 }
             }
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancersResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancersResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancersResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancersResponse>, ReadOnlyCollectionPage<LoadBalancer>> resultSelector =
@@ -134,10 +135,10 @@ namespace net.openstack.Providers.Rackspace
 
             UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<GetLoadBalancerResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<GetLoadBalancerResponse>> requestResource =
                 GetResponseAsyncFunc<GetLoadBalancerResponse>(cancellationToken);
 
             Func<Task<GetLoadBalancerResponse>, LoadBalancer> resultSelector =
@@ -159,10 +160,10 @@ namespace net.openstack.Providers.Rackspace
             var parameters = new Dictionary<string, string>();
 
             CreateLoadBalancerRequest requestBody = new CreateLoadBalancerRequest(configuration);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<GetLoadBalancerResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<GetLoadBalancerResponse>> requestResource =
                 GetResponseAsyncFunc<GetLoadBalancerResponse>(cancellationToken);
 
             Func<Task<GetLoadBalancerResponse>, Task<LoadBalancer>> resultSelector =
@@ -193,10 +194,10 @@ namespace net.openstack.Providers.Rackspace
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
 
             UpdateLoadBalancerRequest requestBody = new UpdateLoadBalancerRequest(configuration);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc<string>(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -222,10 +223,10 @@ namespace net.openstack.Providers.Rackspace
 
             UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -306,10 +307,10 @@ namespace net.openstack.Providers.Rackspace
                         return new Uri(path + query);
                     };
 
-                Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                    PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, uriTransform);
+                Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                    PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, uriTransform);
 
-                Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                     GetResponseAsyncFunc(cancellationToken);
 
                 Func<Task<string>, Task<LoadBalancer[]>> resultSelector =
@@ -340,10 +341,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<GetLoadBalancerErrorPageResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<GetLoadBalancerErrorPageResponse>> requestResource =
                 GetResponseAsyncFunc<GetLoadBalancerErrorPageResponse>(cancellationToken);
 
             Func<Task<GetLoadBalancerErrorPageResponse>, string> resultSelector =
@@ -372,10 +373,10 @@ namespace net.openstack.Providers.Rackspace
             };
 
             SetLoadBalancerErrorPageRequest requestBody = new SetLoadBalancerErrorPageRequest(content);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -405,10 +406,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -438,10 +439,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<LoadBalancerStatistics>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<LoadBalancerStatistics>> requestResource =
                 GetResponseAsyncFunc<LoadBalancerStatistics>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -458,10 +459,10 @@ namespace net.openstack.Providers.Rackspace
             UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancerNodesResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancerNodesResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancerNodesResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancerNodesResponse>, ReadOnlyCollection<Node>> resultSelector =
@@ -483,10 +484,10 @@ namespace net.openstack.Providers.Rackspace
 
             UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value }, { "nodeId", nodeId.Value } };
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<GetLoadBalancerNodeResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<GetLoadBalancerNodeResponse>> requestResource =
                 GetResponseAsyncFunc<GetLoadBalancerNodeResponse>(cancellationToken);
 
             Func<Task<GetLoadBalancerNodeResponse>, Node> resultSelector =
@@ -568,10 +569,10 @@ namespace net.openstack.Providers.Rackspace
                 };
 
                 AddNodesRequest requestBody = new AddNodesRequest(nodeConfigurations);
-                Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                    PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+                Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                    PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-                Func<Task<HttpWebRequest>, Task<ListLoadBalancerNodesResponse>> requestResource =
+                Func<Task<HttpRequestMessage>, Task<ListLoadBalancerNodesResponse>> requestResource =
                     GetResponseAsyncFunc<ListLoadBalancerNodesResponse>(cancellationToken);
 
                 Func<Task<ListLoadBalancerNodesResponse>, Task<ReadOnlyCollection<Node>>> resultSelector =
@@ -607,10 +608,10 @@ namespace net.openstack.Providers.Rackspace
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value }, { "nodeId", nodeId.Value } };
 
             UpdateLoadBalancerNodeRequest requestBody = new UpdateLoadBalancerNodeRequest(configuration);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc<string>(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -638,10 +639,10 @@ namespace net.openstack.Providers.Rackspace
 
             UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value }, { "nodeId", nodeId.Value } };
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -719,10 +720,10 @@ namespace net.openstack.Providers.Rackspace
                         return new Uri(path + query);
                     };
 
-                Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                    PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, uriTransform);
+                Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                    PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, uriTransform);
 
-                Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                     GetResponseAsyncFunc(cancellationToken);
 
                 Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -766,10 +767,10 @@ namespace net.openstack.Providers.Rackspace
                 }
             }
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListNodeServiceEventsResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListNodeServiceEventsResponse>> requestResource =
                 GetResponseAsyncFunc<ListNodeServiceEventsResponse>(cancellationToken);
 
             Func<Task<ListNodeServiceEventsResponse>, ReadOnlyCollectionPage<NodeServiceEvent>> resultSelector =
@@ -812,10 +813,10 @@ namespace net.openstack.Providers.Rackspace
             UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/virtualips");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListVirtualAddressesResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListVirtualAddressesResponse>> requestResource =
                 GetResponseAsyncFunc<ListVirtualAddressesResponse>(cancellationToken);
 
             Func<Task<ListVirtualAddressesResponse>, ReadOnlyCollection<LoadBalancerVirtualAddress>> resultSelector =
@@ -844,10 +845,10 @@ namespace net.openstack.Providers.Rackspace
             };
 
             LoadBalancerVirtualAddress requestBody = new LoadBalancerVirtualAddress(type, addressFamily);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<LoadBalancerVirtualAddress>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<LoadBalancerVirtualAddress>> requestResource =
                 GetResponseAsyncFunc<LoadBalancerVirtualAddress>(cancellationToken);
 
             Func<Task<LoadBalancerVirtualAddress>, Task<LoadBalancerVirtualAddress>> resultSelector =
@@ -878,10 +879,10 @@ namespace net.openstack.Providers.Rackspace
                     { "virtualipId", virtualAddressId.Value }
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -967,10 +968,10 @@ namespace net.openstack.Providers.Rackspace
                         return new Uri(path + query);
                     };
 
-                Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                    PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, uriTransform);
+                Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                    PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, uriTransform);
 
-                Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                     GetResponseAsyncFunc(cancellationToken);
 
                 Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -994,10 +995,10 @@ namespace net.openstack.Providers.Rackspace
         {
             UriTemplate template = new UriTemplate("/loadbalancers/alloweddomains");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListAllowedDomainsResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListAllowedDomainsResponse>> requestResource =
                 GetResponseAsyncFunc<ListAllowedDomainsResponse>(cancellationToken);
 
             Func<Task<ListAllowedDomainsResponse>, ReadOnlyCollection<string>> resultSelector =
@@ -1030,10 +1031,10 @@ namespace net.openstack.Providers.Rackspace
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancersResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancersResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancersResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancersResponse>, ReadOnlyCollectionPage<LoadBalancer>> resultSelector =
@@ -1070,10 +1071,10 @@ namespace net.openstack.Providers.Rackspace
             if (endTime != null)
                 parameters.Add("endTime", endTime.Value.ToString("yyyy-MM-dd"));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancerUsageResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancerUsageResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancerUsageResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancerUsageResponse>, ReadOnlyCollection<LoadBalancerUsage>> resultSelector =
@@ -1100,10 +1101,10 @@ namespace net.openstack.Providers.Rackspace
             if (endTime != null)
                 parameters.Add("endTime", endTime.Value.ToString("yyyy-MM-dd"));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancerUsageResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancerUsageResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancerUsageResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancerUsageResponse>, ReadOnlyCollection<LoadBalancerUsage>> resultSelector =
@@ -1124,10 +1125,10 @@ namespace net.openstack.Providers.Rackspace
             UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/usage/current");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancerUsageResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancerUsageResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancerUsageResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancerUsageResponse>, ReadOnlyCollection<LoadBalancerUsage>> resultSelector =
@@ -1151,10 +1152,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<GetAccessListResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<GetAccessListResponse>> requestResource =
                 GetResponseAsyncFunc<GetAccessListResponse>(cancellationToken);
 
             Func<Task<GetAccessListResponse>, ReadOnlyCollection<NetworkItem>> resultSelector =
@@ -1232,10 +1233,10 @@ namespace net.openstack.Providers.Rackspace
                 };
 
                 CreateAccessListRequest requestBody = new CreateAccessListRequest(networkItems);
-                Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                    PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+                Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                    PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-                Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                     GetResponseAsyncFunc(cancellationToken);
 
                 Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1269,10 +1270,10 @@ namespace net.openstack.Providers.Rackspace
                 { "networkItemId", networkItemId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1354,10 +1355,10 @@ namespace net.openstack.Providers.Rackspace
                         return new Uri(path + query);
                     };
 
-                Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                    PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, uriTransform);
+                Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                    PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, uriTransform);
 
-                Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                     GetResponseAsyncFunc(cancellationToken);
 
                 Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1388,10 +1389,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value },
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1421,10 +1422,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, HealthMonitor> resultSelector =
@@ -1460,10 +1461,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, monitor);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, monitor);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1493,10 +1494,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value },
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1526,10 +1527,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<SessionPersistence>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<SessionPersistence>> requestResource =
                 GetResponseAsyncFunc<SessionPersistence>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1551,10 +1552,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, sessionPersistence);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, sessionPersistence);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1584,10 +1585,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1617,10 +1618,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<GetLoadBalancerConnectionLoggingResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<GetLoadBalancerConnectionLoggingResponse>> requestResource =
                 GetResponseAsyncFunc<GetLoadBalancerConnectionLoggingResponse>(cancellationToken);
 
             Func<Task<GetLoadBalancerConnectionLoggingResponse>, bool> resultSelector =
@@ -1645,10 +1646,10 @@ namespace net.openstack.Providers.Rackspace
             };
 
             SetLoadBalancerConnectionLoggingRequest request = new SetLoadBalancerConnectionLoggingRequest(enabled);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1678,10 +1679,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancerThrottlesResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancerThrottlesResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancerThrottlesResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancerThrottlesResponse>, ConnectionThrottles> resultSelector =
@@ -1707,10 +1708,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, throttleConfiguration);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, throttleConfiguration);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1740,10 +1741,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1773,10 +1774,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<GetLoadBalancerContentCachingResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<GetLoadBalancerContentCachingResponse>> requestResource =
                 GetResponseAsyncFunc<GetLoadBalancerContentCachingResponse>(cancellationToken);
 
             Func<Task<GetLoadBalancerContentCachingResponse>, bool> resultSelector =
@@ -1801,10 +1802,10 @@ namespace net.openstack.Providers.Rackspace
             };
 
             SetLoadBalancerContentCachingRequest request = new SetLoadBalancerContentCachingRequest(enabled);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1828,10 +1829,10 @@ namespace net.openstack.Providers.Rackspace
             UriTemplate template = new UriTemplate("/loadbalancers/protocols");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancingProtocolsResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancingProtocolsResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancingProtocolsResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancingProtocolsResponse>, ReadOnlyCollection<LoadBalancingProtocol>> resultSelector =
@@ -1850,10 +1851,10 @@ namespace net.openstack.Providers.Rackspace
             UriTemplate template = new UriTemplate("/loadbalancers/algorithms");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancingAlgorithmsResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancingAlgorithmsResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancingAlgorithmsResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancingAlgorithmsResponse>, ReadOnlyCollection<LoadBalancingAlgorithm>> resultSelector =
@@ -1878,10 +1879,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<GetLoadBalancerSslConfigurationResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<GetLoadBalancerSslConfigurationResponse>> requestResource =
                 GetResponseAsyncFunc<GetLoadBalancerSslConfigurationResponse>(cancellationToken);
 
             Func<Task<GetLoadBalancerSslConfigurationResponse>, LoadBalancerSslConfiguration> resultSelector =
@@ -1908,10 +1909,10 @@ namespace net.openstack.Providers.Rackspace
             };
 
             LoadBalancerSslConfiguration requestBody = configuration;
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1941,10 +1942,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value }
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<LoadBalancer>> resultSelector =
@@ -1974,10 +1975,10 @@ namespace net.openstack.Providers.Rackspace
                 { "loadBalancerId", loadBalancerId.Value },
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancerMetadataResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancerMetadataResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancerMetadataResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancerMetadataResponse>, ReadOnlyCollection<LoadBalancerMetadataItem>> resultSelector =
@@ -2004,10 +2005,10 @@ namespace net.openstack.Providers.Rackspace
                 { "metaId", metadataId.Value },
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<GetLoadBalancerMetadataItemResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<GetLoadBalancerMetadataItemResponse>> requestResource =
                 GetResponseAsyncFunc<GetLoadBalancerMetadataItemResponse>(cancellationToken);
 
             Func<Task<GetLoadBalancerMetadataItemResponse>, LoadBalancerMetadataItem> resultSelector =
@@ -2034,10 +2035,10 @@ namespace net.openstack.Providers.Rackspace
                 { "nodeId", nodeId.Value },
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancerMetadataResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancerMetadataResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancerMetadataResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancerMetadataResponse>, ReadOnlyCollection<LoadBalancerMetadataItem>> resultSelector =
@@ -2067,10 +2068,10 @@ namespace net.openstack.Providers.Rackspace
                 { "metaId", metadataId.Value },
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<GetLoadBalancerMetadataItemResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<GetLoadBalancerMetadataItemResponse>> requestResource =
                 GetResponseAsyncFunc<GetLoadBalancerMetadataItemResponse>(cancellationToken);
 
             Func<Task<GetLoadBalancerMetadataItemResponse>, LoadBalancerMetadataItem> resultSelector =
@@ -2097,10 +2098,10 @@ namespace net.openstack.Providers.Rackspace
             };
 
             AddLoadBalancerMetadataRequest requestBody = new AddLoadBalancerMetadataRequest(metadata);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancerMetadataResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancerMetadataResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancerMetadataResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancerMetadataResponse>, ReadOnlyCollection<LoadBalancerMetadataItem>> resultSelector =
@@ -2130,10 +2131,10 @@ namespace net.openstack.Providers.Rackspace
             };
 
             AddLoadBalancerMetadataRequest requestBody = new AddLoadBalancerMetadataRequest(metadata);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<ListLoadBalancerMetadataResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListLoadBalancerMetadataResponse>> requestResource =
                 GetResponseAsyncFunc<ListLoadBalancerMetadataResponse>(cancellationToken);
 
             Func<Task<ListLoadBalancerMetadataResponse>, ReadOnlyCollection<LoadBalancerMetadataItem>> resultSelector =
@@ -2163,10 +2164,10 @@ namespace net.openstack.Providers.Rackspace
             };
 
             UpdateLoadBalancerMetadataItemRequest requestBody = new UpdateLoadBalancerMetadataItemRequest(value);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -2195,10 +2196,10 @@ namespace net.openstack.Providers.Rackspace
             };
 
             UpdateLoadBalancerMetadataItemRequest requestBody = new UpdateLoadBalancerMetadataItemRequest(value);
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -2254,10 +2255,10 @@ namespace net.openstack.Providers.Rackspace
                     { "metaId", metadataIds[0].Value }
                 };
 
-                Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                    PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+                Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                    PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-                Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                     GetResponseAsyncFunc(cancellationToken);
 
                 return AuthenticateServiceAsync(cancellationToken)
@@ -2281,10 +2282,10 @@ namespace net.openstack.Providers.Rackspace
                         return new Uri(path + query);
                     };
 
-                Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                    PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, uriTransform);
+                Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                    PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, uriTransform);
 
-                Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                     GetResponseAsyncFunc(cancellationToken);
 
                 return AuthenticateServiceAsync(cancellationToken)
@@ -2347,10 +2348,10 @@ namespace net.openstack.Providers.Rackspace
                     { "metaId", metadataIds[0].Value }
                 };
 
-                Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                    PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+                Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                    PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-                Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                     GetResponseAsyncFunc(cancellationToken);
 
                 return AuthenticateServiceAsync(cancellationToken)
@@ -2375,10 +2376,10 @@ namespace net.openstack.Providers.Rackspace
                         return new Uri(path + query);
                     };
 
-                Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                    PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, uriTransform);
+                Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                    PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, uriTransform);
 
-                Func<Task<HttpWebRequest>, Task<string>> requestResource =
+                Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                     GetResponseAsyncFunc(cancellationToken);
 
                 return AuthenticateServiceAsync(cancellationToken)

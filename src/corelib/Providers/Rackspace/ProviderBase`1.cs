@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using JSIStudios.SimpleRESTServices.Client;
 using JSIStudios.SimpleRESTServices.Client.Json;
 using net.openstack.Core;
 using net.openstack.Core.Domain;
@@ -19,6 +20,9 @@ using Newtonsoft.Json.Linq;
 using Rackspace.Threading;
 using CancellationToken = System.Threading.CancellationToken;
 using Encoding = System.Text.Encoding;
+using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
+using Response = JSIStudios.SimpleRESTServices.Client.Response;
+using RequestSettings = JSIStudios.SimpleRESTServices.Client.RequestSettings;
 using Thread = System.Threading.Thread;
 
 namespace net.openstack.Providers.Rackspace
@@ -67,6 +71,8 @@ namespace net.openstack.Providers.Rackspace
         /// </summary>
         private IBackoffPolicy _backoffPolicy;
 
+        private HttpClient _httpClient;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProviderBase{TProvider}"/> class using
         /// the specified default identity, default region, identity provider, and REST service
@@ -95,6 +101,7 @@ namespace net.openstack.Providers.Rackspace
             IdentityProvider = identityProvider ?? this as IIdentityProvider ?? new CloudIdentityProvider(defaultIdentity);
             RestService = restService ?? new JsonRestServices();
             ResponseCodeValidator = httpStatusCodeValidator ?? HttpResponseCodeValidator.Default;
+            _httpClient = new HttpClient();
         }
 
         /// <summary>
@@ -233,13 +240,13 @@ namespace net.openstack.Providers.Rackspace
         /// If <paramref name="identity"/> is <see langword="null"/> and no default identity is available for the provider.
         /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
-        protected Response<T> ExecuteRESTRequest<T>(CloudIdentity identity, Uri absoluteUri, HttpMethod method, object body = null, Dictionary<string, string> queryStringParameter = null, Dictionary<string, string> headers = null, bool isRetry = false, bool isTokenRequest = false, RequestSettings settings = null)
+        protected JSIStudios.SimpleRESTServices.Client.Response<T> ExecuteRESTRequest<T>(CloudIdentity identity, Uri absoluteUri, JSIStudios.SimpleRESTServices.Client.HttpMethod method, object body = null, Dictionary<string, string> queryStringParameter = null, Dictionary<string, string> headers = null, bool isRetry = false, bool isTokenRequest = false, RequestSettings settings = null)
         {
             if (absoluteUri == null)
                 throw new ArgumentNullException("absoluteUri");
             CheckIdentity(identity);
 
-            return ExecuteRESTRequest<Response<T>>(identity, absoluteUri, method, body, queryStringParameter, headers, isRetry, isTokenRequest, settings, RestService.Execute<T>);
+            return ExecuteRESTRequest<JSIStudios.SimpleRESTServices.Client.Response<T>>(identity, absoluteUri, method, body, queryStringParameter, headers, isRetry, isTokenRequest, settings, RestService.Execute<T>);
         }
 
         /// <summary>
@@ -291,7 +298,7 @@ namespace net.openstack.Providers.Rackspace
         /// If <paramref name="identity"/> is <see langword="null"/> and no default identity is available for the provider.
         /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
-        protected Response ExecuteRESTRequest(CloudIdentity identity, Uri absoluteUri, HttpMethod method, object body = null, Dictionary<string, string> queryStringParameter = null, Dictionary<string, string> headers = null, bool isRetry = false, bool isTokenRequest = false, RequestSettings settings = null)
+        protected Response ExecuteRESTRequest(CloudIdentity identity, Uri absoluteUri, JSIStudios.SimpleRESTServices.Client.HttpMethod method, object body = null, Dictionary<string, string> queryStringParameter = null, Dictionary<string, string> headers = null, bool isRetry = false, bool isTokenRequest = false, RequestSettings settings = null)
         {
             if (absoluteUri == null)
                 throw new ArgumentNullException("absoluteUri");
@@ -354,7 +361,7 @@ namespace net.openstack.Providers.Rackspace
         /// If <paramref name="identity"/> is <see langword="null"/> and no default identity is available for the provider.
         /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
-        protected Response ExecuteRESTRequest(CloudIdentity identity, Uri absoluteUri, HttpMethod method, Func<HttpWebResponse, bool, Response> buildResponseCallback, object body = null, Dictionary<string, string> queryStringParameter = null, Dictionary<string, string> headers = null, bool isRetry = false, bool isTokenRequest = false, RequestSettings settings = null)
+        protected Response ExecuteRESTRequest(CloudIdentity identity, Uri absoluteUri, JSIStudios.SimpleRESTServices.Client.HttpMethod method, Func<HttpWebResponse, bool, Response> buildResponseCallback, object body = null, Dictionary<string, string> queryStringParameter = null, Dictionary<string, string> headers = null, bool isRetry = false, bool isTokenRequest = false, RequestSettings settings = null)
         {
             if (absoluteUri == null)
                 throw new ArgumentNullException("absoluteUri");
@@ -410,8 +417,8 @@ namespace net.openstack.Providers.Rackspace
         /// If <paramref name="identity"/> is <see langword="null"/> and no default identity is available for the provider.
         /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
-        private T ExecuteRESTRequest<T>(CloudIdentity identity, Uri absoluteUri, HttpMethod method, object body, Dictionary<string, string> queryStringParameter, Dictionary<string, string> headers, bool isRetry, bool isTokenRequest, RequestSettings requestSettings,
-            Func<Uri, HttpMethod, string, Dictionary<string, string>, Dictionary<string, string>, RequestSettings, T> callback) where T : Response
+        private T ExecuteRESTRequest<T>(CloudIdentity identity, Uri absoluteUri, JSIStudios.SimpleRESTServices.Client.HttpMethod method, object body, Dictionary<string, string> queryStringParameter, Dictionary<string, string> headers, bool isRetry, bool isTokenRequest, RequestSettings requestSettings,
+            Func<Uri, JSIStudios.SimpleRESTServices.Client.HttpMethod, string, Dictionary<string, string>, Dictionary<string, string>, RequestSettings, T> callback) where T : Response
         {
             if (absoluteUri == null)
                 throw new ArgumentNullException("absoluteUri");
@@ -512,7 +519,7 @@ namespace net.openstack.Providers.Rackspace
         /// If <paramref name="identity"/> is <see langword="null"/> and no default identity is available for the provider.
         /// </exception>
         /// <exception cref="ResponseException">If the REST API request failed.</exception>
-        protected Response StreamRESTRequest(CloudIdentity identity, Uri absoluteUri, HttpMethod method, Stream stream, int chunkSize, long maxReadLength = 0, Dictionary<string, string> queryStringParameter = null, Dictionary<string, string> headers = null, bool isRetry = false, RequestSettings requestSettings = null, Action<long> progressUpdated = null)
+        protected Response StreamRESTRequest(CloudIdentity identity, Uri absoluteUri, JSIStudios.SimpleRESTServices.Client.HttpMethod method, Stream stream, int chunkSize, long maxReadLength = 0, Dictionary<string, string> queryStringParameter = null, Dictionary<string, string> headers = null, bool isRetry = false, RequestSettings requestSettings = null, Action<long> progressUpdated = null)
         {
             if (absoluteUri == null)
                 throw new ArgumentNullException("absoluteUri");
@@ -914,24 +921,24 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <summary>
-        /// Creates a task continuation function responsible for creating an <see cref="HttpWebRequest"/> for use
+        /// Creates a task continuation function responsible for creating an <see cref="HttpRequestMessage"/> for use
         /// in asynchronous REST API calls. The input to the continuation function is a completed task which
         /// computes an <see cref="IdentityToken"/> for an authenticated user and a base URI for use in binding
         /// the URI templates for REST API calls. The continuation function calls <see cref="PrepareRequestImpl"/>
-        /// to create and prepare the resulting <see cref="HttpWebRequest"/>.
+        /// to create and prepare the resulting <see cref="HttpRequestMessage"/>.
         /// </summary>
         /// <param name="method">The <see cref="HttpMethod"/> to use for the request.</param>
         /// <param name="template">The <see cref="UriTemplate"/> for the target URI.</param>
         /// <param name="parameters">A collection of parameters for binding the URI template in a call to <see cref="UriTemplate.BindByName(Uri, IDictionary{string, string})"/>.</param>
         /// <param name="uriTransform">An optional transformation to apply to the bound URI for the request. If this value is <see langword="null"/>, the result of binding the <paramref name="template"/> with <paramref name="parameters"/> will be used as the absolute request URI.</param>
-        /// <returns>A task continuation delegate which can be used to create an <see cref="HttpWebRequest"/> following the completion of a task that obtains an <see cref="IdentityToken"/> and the base URI for a service.</returns>
+        /// <returns>A task continuation delegate which can be used to create an <see cref="HttpRequestMessage"/> following the completion of a task that obtains an <see cref="IdentityToken"/> and the base URI for a service.</returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="template"/> is <see langword="null"/>.
         /// <para>-or-</para>
         /// <para>If <paramref name="parameters"/> is <see langword="null"/>.</para>
         /// </exception>
         /// <preliminary/>
-        protected Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> PrepareRequestAsyncFunc(HttpMethod method, UriTemplate template, IDictionary<string, string> parameters, Func<Uri, Uri> uriTransform = null)
+        protected Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> PrepareRequestAsyncFunc(HttpMethod method, UriTemplate template, IDictionary<string, string> parameters, Func<Uri, Uri> uriTransform = null)
         {
             if (template == null)
                 throw new ArgumentNullException("template");
@@ -947,11 +954,11 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <summary>
-        /// Creates a task continuation function responsible for creating an <see cref="HttpWebRequest"/> for use
+        /// Creates a task continuation function responsible for creating an <see cref="HttpRequestMessage"/> for use
         /// in asynchronous REST API calls. The input to the continuation function is a completed task which
         /// computes an <see cref="IdentityToken"/> for an authenticated user and a base URI for use in binding
         /// the URI templates for REST API calls. The continuation function calls <see cref="PrepareRequestImpl"/>
-        /// to create and prepare the resulting <see cref="HttpWebRequest"/>, and then asynchronously obtains
+        /// to create and prepare the resulting <see cref="HttpRequestMessage"/>, and then asynchronously obtains
         /// the request stream for the request and writes the specified <paramref name="body"/> in JSON notation.
         /// </summary>
         /// <typeparam name="TBody">The type modeling the body of the request.</typeparam>
@@ -960,66 +967,58 @@ namespace net.openstack.Providers.Rackspace
         /// <param name="parameters">A collection of parameters for binding the URI template in a call to <see cref="UriTemplate.BindByName(Uri, IDictionary{string, string})"/>.</param>
         /// <param name="body">A object modeling the body of the web request. The object is serialized in JSON notation for inclusion in the request.</param>
         /// <param name="uriTransform">An optional transformation to apply to the bound URI for the request. If this value is <see langword="null"/>, the result of binding the <paramref name="template"/> with <paramref name="parameters"/> will be used as the absolute request URI.</param>
-        /// <returns>A task continuation delegate which can be used to create an <see cref="HttpWebRequest"/> following the completion of a task that obtains an <see cref="IdentityToken"/> and the base URI for a service.</returns>
+        /// <returns>A task continuation delegate which can be used to create an <see cref="HttpRequestMessage"/> following the completion of a task that obtains an <see cref="IdentityToken"/> and the base URI for a service.</returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="template"/> is <see langword="null"/>.
         /// <para>-or-</para>
         /// <para>If <paramref name="parameters"/> is <see langword="null"/>.</para>
         /// </exception>
         /// <preliminary/>
-        protected Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> PrepareRequestAsyncFunc<TBody>(HttpMethod method, UriTemplate template, IDictionary<string, string> parameters, TBody body, Func<Uri, Uri> uriTransform = null)
+        protected Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> PrepareRequestAsyncFunc<TBody>(HttpMethod method, UriTemplate template, IDictionary<string, string> parameters, TBody body, Func<Uri, Uri> uriTransform = null)
         {
             return
                 task =>
                 {
                     Uri baseUri = task.Result.Item2;
-                    HttpWebRequest request = PrepareRequestImpl(method, task.Result.Item1, template, baseUri, parameters, uriTransform);
-                    byte[] encodedBody = EncodeRequestBodyImpl(request, body);
-
-                    Task<Stream> streamTask = Task.Factory.FromAsync<Stream>(request.BeginGetRequestStream(null, null), request.EndGetRequestStream);
-                    return
-                        streamTask.Then(subTask =>
-                        {
-                            return
-                                Task.Factory.FromAsync((callback, state) => subTask.Result.BeginWrite(encodedBody, 0, encodedBody.Length, callback, state), subTask.Result.EndWrite, null)
-                                .Select(t => request);
-                        });
+                    HttpRequestMessage request = PrepareRequestImpl(method, task.Result.Item1, template, baseUri, parameters, uriTransform);
+                    request.Content = EncodeRequestBodyImpl(request, body);
+                    return CompletedTask.FromResult(request);
                 };
         }
 
         /// <summary>
-        /// Encode the body of a request, and update the <see cref="HttpWebRequest"/> properties
+        /// Encode the body of a request, and update the <see cref="HttpRequestMessage"/> properties
         /// as necessary to support the encoded body.
         /// </summary>
         /// <remarks>
         /// The default implementation uses <see cref="JsonConvert"/> to convert <paramref name="body"/>
         /// to JSON notation, and then uses <see cref="Encoding.UTF8"/> to encode the text. The
-        /// <see cref="HttpWebRequest.ContentType"/> and <see cref="HttpWebRequest.ContentLength"/>
+        /// <see cref="HttpRequestMessage.ContentType"/> and <see cref="HttpRequestMessage.ContentLength"/>
         /// properties are updated to reflect the JSON content.
         /// </remarks>
         /// <typeparam name="TBody">The type modeling the body of the request.</typeparam>
-        /// <param name="request">The <see cref="HttpWebRequest"/> object for the request.</param>
+        /// <param name="request">The <see cref="HttpRequestMessage"/> object for the request.</param>
         /// <param name="body">The object modeling the body of the request.</param>
-        /// <returns>The encoded content to send with the <see cref="HttpWebRequest"/>.</returns>
+        /// <returns>The encoded content to send with the <see cref="HttpRequestMessage"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="request"/> is <see langword="null"/>.</exception>
         /// <preliminary/>
-        protected virtual byte[] EncodeRequestBodyImpl<TBody>(HttpWebRequest request, TBody body)
+        protected virtual HttpContent EncodeRequestBodyImpl<TBody>(HttpRequestMessage request, TBody body)
         {
             if (request == null)
                 throw new ArgumentNullException("request");
 
             string bodyText = JsonConvert.SerializeObject(body);
             byte[] encodedBody = Encoding.UTF8.GetBytes(bodyText);
-            if (string.IsNullOrEmpty(request.ContentType))
-                request.ContentType = new ContentType() { MediaType = JsonRequestSettings.JsonContentType, CharSet = "UTF-8" }.ToString();
+            ByteArrayContent content = new ByteArrayContent(encodedBody);
+            content.Headers.ContentType = new MediaTypeHeaderValue(new ContentType() { MediaType = JsonRequestSettings.JsonContentType, CharSet = "UTF-8" }.ToString());
 
-            request.ContentLength = encodedBody.Length;
+            content.Headers.ContentLength = encodedBody.Length;
 
-            return encodedBody;
+            return content;
         }
 
         /// <summary>
-        /// Creates and prepares an <see cref="HttpWebRequest"/> for an asynchronous REST API call.
+        /// Creates and prepares an <see cref="HttpRequestMessage"/> for an asynchronous REST API call.
         /// </summary>
         /// <remarks>
         /// The base implementation sets the following properties of the web request.
@@ -1034,7 +1033,7 @@ namespace net.openstack.Providers.Rackspace
         /// <description><paramref name="method"/></description>
         /// </item>
         /// <item>
-        /// <description><see cref="HttpWebRequest.Accept"/></description>
+        /// <description><see cref="HttpRequestMessage.Accept"/></description>
         /// <description><see cref="JsonRequestSettings.JsonContentType"/></description>
         /// </item>
         /// <item>
@@ -1042,7 +1041,7 @@ namespace net.openstack.Providers.Rackspace
         /// <description><see name="IdentityToken.Id"/></description>
         /// </item>
         /// <item>
-        /// <description><see cref="HttpWebRequest.UserAgent"/></description>
+        /// <description><see cref="HttpRequestMessage.UserAgent"/></description>
         /// <description><see cref="UserAgentGenerator.UserAgent"/></description>
         /// </item>
         /// <item>
@@ -1061,7 +1060,7 @@ namespace net.openstack.Providers.Rackspace
         /// <param name="baseUri">The base URI to use for binding the URI template.</param>
         /// <param name="parameters">A collection of parameters for binding the URI template in a call to <see cref="UriTemplate.BindByName(Uri, IDictionary{string, string})"/>.</param>
         /// <param name="uriTransform">An optional transformation to apply to the bound URI for the request. If this value is <see langword="null"/>, the result of binding the <paramref name="template"/> with <paramref name="parameters"/> will be used as the absolute request URI.</param>
-        /// <returns>An <see cref="HttpWebRequest"/> to use for making the asynchronous REST API call.</returns>
+        /// <returns>An <see cref="HttpRequestMessage"/> to use for making the asynchronous REST API call.</returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="identityToken"/> is <see langword="null"/>.
         /// <para>-or-</para>
@@ -1073,20 +1072,21 @@ namespace net.openstack.Providers.Rackspace
         /// </exception>
         /// <exception cref="ArgumentException">If <paramref name="baseUri"/> is not an absolute URI.</exception>
         /// <preliminary/>
-        protected virtual HttpWebRequest PrepareRequestImpl(HttpMethod method, IdentityToken identityToken, UriTemplate template, Uri baseUri, IDictionary<string, string> parameters, Func<Uri, Uri> uriTransform)
+        protected virtual HttpRequestMessage PrepareRequestImpl(HttpMethod method, IdentityToken identityToken, UriTemplate template, Uri baseUri, IDictionary<string, string> parameters, Func<Uri, Uri> uriTransform)
         {
             Uri boundUri = template.BindByName(baseUri, parameters);
             if (uriTransform != null)
                 boundUri = uriTransform(boundUri);
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(boundUri);
-            request.Method = method.ToString().ToUpperInvariant();
-            request.Accept = JsonRequestSettings.JsonContentType;
-            request.Headers["X-Auth-Token"] = identityToken.Id;
-            request.UserAgent = UserAgentGenerator.UserAgent;
-            request.Timeout = (int)TimeSpan.FromSeconds(14400).TotalMilliseconds;
+            HttpRequestMessage request = new HttpRequestMessage(method, boundUri);
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(JsonRequestSettings.JsonContentType));
+            request.Headers.Add("X-Auth-Token", identityToken.Id);
+            request.Headers.UserAgent.Add(new ProductInfoHeaderValue(UserAgentGenerator.UserAgent));
             if (ConnectionLimit.HasValue)
-                request.ServicePoint.ConnectionLimit = ConnectionLimit.Value;
+            {
+                ServicePoint servicePoint = ServicePointManager.FindServicePoint(boundUri);
+                servicePoint.ConnectionLimit = ConnectionLimit.Value;
+            }
 
             return request;
         }
@@ -1150,7 +1150,7 @@ namespace net.openstack.Providers.Rackspace
         /// <param name="request">The web request.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="request"/> is <see langword="null"/>.</exception>
         /// <preliminary/>
-        protected virtual void OnBeforeAsyncWebRequest(HttpWebRequest request)
+        protected virtual void OnBeforeAsyncWebRequest(HttpRequestMessage request)
         {
             var handler = BeforeAsyncWebRequest;
             if (handler != null)
@@ -1163,7 +1163,7 @@ namespace net.openstack.Providers.Rackspace
         /// <param name="response">The web response.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
         /// <preliminary/>
-        protected virtual void OnAfterAsyncWebResponse(HttpWebResponse response)
+        protected virtual void OnAfterAsyncWebResponse(HttpResponseMessage response)
         {
             if (response == null)
                 throw new ArgumentNullException("response");
@@ -1178,26 +1178,26 @@ namespace net.openstack.Providers.Rackspace
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
-        /// A continuation function delegate which takes an asynchronously prepared <see cref="HttpWebRequest"/>
+        /// A continuation function delegate which takes an asynchronously prepared <see cref="HttpRequestMessage"/>
         /// and returns the resulting body of the operation, if any, as a string.
         /// </returns>
         /// <preliminary/>
-        protected virtual Func<Task<HttpWebRequest>, Task<string>> GetResponseAsyncFunc(CancellationToken cancellationToken)
+        protected virtual Func<Task<HttpRequestMessage>, Task<string>> GetResponseAsyncFunc(CancellationToken cancellationToken)
         {
-            Func<Task<HttpWebRequest>, Task<WebResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<HttpResponseMessage>> requestResource =
                 task => RequestResourceImplAsync(task, cancellationToken);
 
-            Func<Task<WebResponse>, Tuple<HttpWebResponse, string>> readResult =
+            Func<Task<HttpResponseMessage>, Task<Tuple<HttpResponseMessage, string>>> readResult =
                 task => ReadResultImpl(task, cancellationToken);
 
-            Func<Task<Tuple<HttpWebResponse, string>>, string> parseResult =
+            Func<Task<Tuple<HttpResponseMessage, string>>, string> parseResult =
                 task => task.Result.Item2;
 
-            Func<Task<HttpWebRequest>, Task<string>> result =
+            Func<Task<HttpRequestMessage>, Task<string>> result =
                 task =>
                 {
                     return task.Then(requestResource)
-                        .Select(readResult, true)
+                        .Then(readResult)
                         .Select(parseResult);
                 };
 
@@ -1210,21 +1210,21 @@ namespace net.openstack.Providers.Rackspace
         /// <typeparam name="T">The type for the response object.</typeparam>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <param name="parseResult">
-        /// A continuation function delegate which parses the body of the <see cref="HttpWebResponse"/>
+        /// A continuation function delegate which parses the body of the <see cref="HttpResponseMessage"/>
         /// and returns an object of type <typeparamref name="T"/>, as an asynchronous operation. If
         /// this value is <see langword="null"/>, the conversion will be performed by calling <see cref="ParseJsonResultImplAsync{T}"/>.
         /// </param>
         /// <returns>
-        /// A continuation function delegate which takes an asynchronously prepared <see cref="HttpWebRequest"/>
+        /// A continuation function delegate which takes an asynchronously prepared <see cref="HttpRequestMessage"/>
         /// and returns the resulting body of the operation, if any, as an instance of type <typeparamref name="T"/>.
         /// </returns>
         /// <preliminary/>
-        protected virtual Func<Task<HttpWebRequest>, Task<T>> GetResponseAsyncFunc<T>(CancellationToken cancellationToken, Func<Task<Tuple<HttpWebResponse, string>>, Task<T>> parseResult = null)
+        protected virtual Func<Task<HttpRequestMessage>, Task<T>> GetResponseAsyncFunc<T>(CancellationToken cancellationToken, Func<Task<Tuple<HttpResponseMessage, string>>, Task<T>> parseResult = null)
         {
-            Func<Task<HttpWebRequest>, Task<WebResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<HttpResponseMessage>> requestResource =
                 task => RequestResourceImplAsync(task, cancellationToken);
 
-            Func<Task<WebResponse>, Tuple<HttpWebResponse, string>> readResult =
+            Func<Task<HttpResponseMessage>, Task<Tuple<HttpResponseMessage, string>>> readResult =
                 task => ReadResultImpl(task, cancellationToken);
 
             if (parseResult == null)
@@ -1232,11 +1232,11 @@ namespace net.openstack.Providers.Rackspace
                 parseResult = task => ParseJsonResultImplAsync<T>(task, cancellationToken);
             }
 
-            Func<Task<HttpWebRequest>, Task<T>> result =
+            Func<Task<HttpRequestMessage>, Task<T>> result =
                 task =>
                 {
                     return task.Then(requestResource)
-                        .Select(readResult, true)
+                        .Then(readResult)
                         .Then(parseResult);
                 };
 
@@ -1250,87 +1250,49 @@ namespace net.openstack.Providers.Rackspace
         /// <remarks>
         /// This method is the first step of implementing <see cref="GetResponseAsyncFunc"/> and <see cref="GetResponseAsyncFunc{T}"/>.
         /// </remarks>
-        /// <param name="task">A task which created and prepared the <see cref="HttpWebRequest"/>.</param>
+        /// <param name="task">A task which created and prepared the <see cref="HttpRequestMessage"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
         /// <preliminary/>
-        protected virtual Task<WebResponse> RequestResourceImplAsync(Task<HttpWebRequest> task, CancellationToken cancellationToken)
+        protected virtual Task<HttpResponseMessage> RequestResourceImplAsync(Task<HttpRequestMessage> task, CancellationToken cancellationToken)
         {
             if (task == null)
                 throw new ArgumentNullException("task");
 
             OnBeforeAsyncWebRequest(task.Result);
-            return task.Result.GetResponseAsync(cancellationToken);
+            return _httpClient.SendAsync(task.Result, HttpCompletionOption.ResponseContentRead, cancellationToken);
         }
 
         /// <summary>
-        /// This method reads the complete body of an asynchronous <see cref="WebResponse"/> as a string.
+        /// This method reads the complete body of an asynchronous <see cref="HttpResponseMessage"/> as a string.
         /// </summary>
-        /// <param name="task">A <see cref="Task"/> object representing the asynchronous operation to get the <see cref="WebResponse"/>.</param>
+        /// <param name="task">A <see cref="Task"/> object representing the asynchronous operation to get the <see cref="HttpResponseMessage"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>A <see cref="Tuple{T1, T2}"/> object. The first element of the tuple contains the
-        /// <see cref="WebResponse"/> provided by <paramref name="task"/> as an <see cref="HttpWebResponse"/>.
+        /// <see cref="HttpResponseMessage"/> provided by <paramref name="task"/> as an <see cref="HttpResponseMessage"/>.
         /// The second element of the tuple contains the complete body of the response as a string.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
         /// <preliminary/>
-        protected virtual Tuple<HttpWebResponse, string> ReadResultImpl(Task<WebResponse> task, CancellationToken cancellationToken)
+        protected virtual Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
         {
             if (task == null)
                 throw new ArgumentNullException("task");
 
-            HttpWebResponse response;
-            WebException webException = null;
-            if (task.IsFaulted)
-            {
-                webException = task.Exception.Flatten().InnerException as WebException;
-                if (webException == null)
-                {
-                    // propagate the exception
-                    task.Wait();
-                }
-
-                response = webException.Response as HttpWebResponse;
-                if (response == null)
-                {
-                    // propagate the exception
-                    task.Wait();
-                }
-            }
-            else
-            {
-                response = (HttpWebResponse)task.Result;
-            }
-
+            HttpResponseMessage response = task.Result;
             OnAfterAsyncWebResponse(response);
-            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-            {
-                string body = reader.ReadToEnd();
-                if (task.IsFaulted)
-                {
-                    if (!string.IsNullOrEmpty(body))
-                    {
-                        WebExceptionStatus webExceptionStatus = webException != null ? webException.Status : WebExceptionStatus.UnknownError;
-                        WebResponse webResponse = webException != null ? webException.Response : null;
-                        throw new WebException(body, task.Exception, webExceptionStatus, webResponse);
-                    }
-
-                    // propagate the exception
-                    task.Wait();
-                }
-
-                return Tuple.Create(response, body);
-            }
+            return task.Result.Content.ReadAsStringAsync()
+                .Select(t => Tuple.Create(response, t.Result));
         }
 
         /// <summary>
         /// Provides a default object parser for <see cref="GetResponseAsyncFunc{T}"/> which converts the
-        /// body of an <see cref="HttpWebResponse"/> to an object of type <typeparamref name="T"/> by calling
+        /// body of an <see cref="HttpResponseMessage"/> to an object of type <typeparamref name="T"/> by calling
         /// <see cref="JsonConvert.DeserializeObject{T}(String)"/>
         /// </summary>
         /// <typeparam name="T">The type for the response object.</typeparam>
-        /// <param name="task">A <see cref="Task"/> object representing the asynchronous operation to get the <see cref="WebResponse"/>.</param>
+        /// <param name="task">A <see cref="Task"/> object representing the asynchronous operation to get the <see cref="HttpResponseMessage"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
         /// A <see cref="Task"/> object representing the asynchronous operation. When the operation
@@ -1339,7 +1301,7 @@ namespace net.openstack.Providers.Rackspace
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
         /// <preliminary/>
-        protected virtual Task<T> ParseJsonResultImplAsync<T>(Task<Tuple<HttpWebResponse, string>> task, CancellationToken cancellationToken)
+        protected virtual Task<T> ParseJsonResultImplAsync<T>(Task<Tuple<HttpResponseMessage, string>> task, CancellationToken cancellationToken)
         {
 #if NET35
             return Task.Factory.StartNew(() => JsonConvert.DeserializeObject<T>(task.Result.Item2));
