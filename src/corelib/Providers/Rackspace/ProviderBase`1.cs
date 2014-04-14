@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using JSIStudios.SimpleRESTServices.Client.Json;
 using net.openstack.Core;
-using net.openstack.Core.Compat;
 using net.openstack.Core.Domain;
 using net.openstack.Core.Exceptions;
 using net.openstack.Core.Exceptions.Response;
@@ -19,9 +19,8 @@ using Newtonsoft.Json.Linq;
 using CancellationToken = System.Threading.CancellationToken;
 using Encoding = System.Text.Encoding;
 using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
-using Response = JSIStudios.SimpleRESTServices.Client.Response;
 using RequestSettings = JSIStudios.SimpleRESTServices.Client.RequestSettings;
-using System.Net.Http.Headers;
+using Response = JSIStudios.SimpleRESTServices.Client.Response;
 
 namespace net.openstack.Providers.Rackspace
 {
