@@ -2,6 +2,7 @@
 {
     using System;
     using System.Net;
+    using System.Net.Http;
 
     /// <summary>
     /// This class contains data for events that happen in the context of a
@@ -14,7 +15,7 @@
         /// <summary>
         /// This is the backing field for the <see cref="Request"/> property.
         /// </summary>
-        private readonly HttpWebRequest _request;
+        private readonly HttpRequestMessage _request;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebRequestEventArgs"/> class
@@ -22,7 +23,7 @@
         /// </summary>
         /// <param name="request">The HTTP web request.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="request"/> is <see langword="null"/>.</exception>
-        public WebRequestEventArgs(HttpWebRequest request)
+        public WebRequestEventArgs(HttpRequestMessage request)
         {
             if (request == null)
                 throw new ArgumentNullException("request");
@@ -31,9 +32,9 @@
         }
 
         /// <summary>
-        /// Gets the <see cref="HttpWebRequest"/> associated with the event.
+        /// Gets the <see cref="HttpRequestMessage"/> associated with the event.
         /// </summary>
-        public HttpWebRequest Request
+        public HttpRequestMessage Request
         {
             get
             {

@@ -5,8 +5,8 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Net;
+    using System.Net.Http;
     using System.Threading.Tasks;
-    using JSIStudios.SimpleRESTServices.Client;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
@@ -16,6 +16,7 @@
     using CancellationToken = System.Threading.CancellationToken;
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
+    using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
 
     /// <summary>
@@ -76,10 +77,10 @@
             UriTemplate template = new UriTemplate("/limits");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsServiceLimits> resultSelector =
@@ -108,10 +109,10 @@
             UriTemplate template = new UriTemplate("/limits/types");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, ReadOnlyCollection<LimitType>> resultSelector =
@@ -143,10 +144,10 @@
                     { "type", type.Name.ToLowerInvariant() }
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsServiceLimits> resultSelector =
@@ -182,10 +183,10 @@
                     { "showDetails", showDetails ? "true" : "false" },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -217,10 +218,10 @@
                     { "showDetails", showDetails ? "true" : "false" },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<TResponse>> resultSelector =
@@ -251,10 +252,10 @@
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, Tuple<ReadOnlyCollectionPage<DnsDomain>, int?>> resultSelector =
@@ -307,10 +308,10 @@
                 { "showSubdomains", showSubdomains ? "true" : "false" },
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsDomain> resultSelector =
@@ -340,10 +341,10 @@
             if (since.HasValue)
                 parameters.Add("since", since.Value.ToString("G"));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsDomainChanges> resultSelector =
@@ -371,10 +372,10 @@
                     { "domainId", domainId.Value },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<ExportedDomain>> resultSelector =
@@ -406,10 +407,10 @@
             UriTemplate template = new UriTemplate("/domains");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, configuration);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, configuration);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<DnsDomains>> resultSelector =
@@ -441,10 +442,10 @@
             UriTemplate template = new UriTemplate("/domains");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, configuration);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, configuration);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -481,10 +482,10 @@
             if (modifyComment != null)
                 parameters.Add("modifyComment", modifyComment.Value ? "true" : "false");
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<DnsDomains>> resultSelector =
@@ -517,10 +518,10 @@
             var parameters = new Dictionary<string, string>();
 
             JObject request = new JObject(new JProperty("domains", JArray.FromObject(serializedDomains)));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<DnsDomains>> resultSelector =
@@ -560,10 +561,10 @@
                     return builder.Uri;
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, transform);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, transform);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -599,10 +600,10 @@
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, Tuple<ReadOnlyCollectionPage<DnsSubdomain>, int?>> resultSelector =
@@ -663,10 +664,10 @@
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, Tuple<ReadOnlyCollectionPage<DnsRecord>, int?>> resultSelector =
@@ -718,10 +719,10 @@
                     { "recordId", recordId.Value }
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsRecord> resultSelector =
@@ -750,10 +751,10 @@
                 };
 
             JObject request = new JObject(new JProperty("records", JArray.FromObject(recordConfigurations)));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<DnsRecordsList>> resultSelector =
@@ -786,10 +787,10 @@
                 };
 
             JObject request = new JObject(new JProperty("records", JArray.FromObject(recordConfigurations)));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -829,10 +830,10 @@
                     return builder.Uri;
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, transform);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, transform);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -869,10 +870,10 @@
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, Tuple<ReadOnlyCollectionPage<DnsRecord>, int?>> resultSelector =
@@ -925,10 +926,10 @@
                     { "recordId", recordId.Value },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsRecord> resultSelector =
@@ -967,10 +968,10 @@
                     new JProperty("content", new JValue(string.Empty)))),
                 new JProperty("recordsList", new JObject(
                     new JProperty("records", JArray.FromObject(recordConfigurations)))));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob<DnsRecordsList>> resultSelector =
@@ -1013,10 +1014,10 @@
                     new JProperty("content", new JValue(string.Empty)))),
                 new JProperty("recordsList", new JObject(
                     new JProperty("records", JArray.FromObject(recordConfigurations)))));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =
@@ -1051,10 +1052,10 @@
             if (ipAddress != null)
                 parameters.Add("ipAddress", ipAddress.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DnsJob> resultSelector =

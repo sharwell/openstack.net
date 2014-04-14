@@ -5,10 +5,9 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Net;
+    using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
-    using JSIStudios.SimpleRESTServices.Client;
-    using JSIStudios.SimpleRESTServices.Client.Json;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
@@ -20,6 +19,7 @@
     using Newtonsoft.Json.Linq;
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
+    using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
 
     /// <summary>
     /// Provides an implementation of <see cref="IQueueingService"/> for operating
@@ -108,10 +108,10 @@
             }
 
             UriTemplate template = new UriTemplate("/");
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, new Dictionary<string, string>());
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, new Dictionary<string, string>());
 
-            Func<Task<HttpWebRequest>, Task<HomeDocument>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<HomeDocument>> requestResource =
                 GetResponseAsyncFunc<HomeDocument>(cancellationToken);
 
             Func<Task<HomeDocument>, HomeDocument> cacheResult =
@@ -131,10 +131,10 @@
         public Task GetNodeHealthAsync(CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate("/health");
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.HEAD, template, new Dictionary<string, string>());
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Head, template, new Dictionary<string, string>());
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -154,10 +154,10 @@
                     { "queue_name", queueName.Value }
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters);
 
-            Func<Task<Tuple<HttpWebResponse, string>>, Task<bool>> parseResult =
+            Func<Task<Tuple<HttpResponseMessage, string>>, Task<bool>> parseResult =
                 task =>
                 {
                     if (task.Result.Item1.StatusCode == HttpStatusCode.Created)
@@ -166,7 +166,7 @@
                         return InternalTaskExtensions.CompletedTask(false);
                 };
 
-            Func<Task<HttpWebRequest>, Task<bool>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<bool>> requestResource =
                 GetResponseAsyncFunc(cancellationToken, parseResult);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -190,10 +190,10 @@
             if (limit.HasValue)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListCloudQueuesResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListCloudQueuesResponse>> requestResource =
                 GetResponseAsyncFunc<ListCloudQueuesResponse>(cancellationToken);
 
             Func<Task<ListCloudQueuesResponse>, ReadOnlyCollectionPage<CloudQueue>> resultSelector =
@@ -226,44 +226,17 @@
 
             UriTemplate template = new UriTemplate("/queues/{queue_name}");
             var parameters = new Dictionary<string, string>() { { "queue_name", queueName.Value } };
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.HEAD, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Head, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
-            Func<Task<string>, bool> interpretResult =
-                task =>
-                {
-                    // a WebException would have been thrown if the queue didn't exist
-                    if (task.Status == TaskStatus.RanToCompletion)
-                        return true;
-
-                    task.Exception.Flatten().Handle(
-                        ex =>
-                        {
-                            WebException webException = ex as WebException;
-                            if (webException == null)
-                                return false;
-
-                            HttpWebResponse response = webException.Response as HttpWebResponse;
-                            if (response == null)
-                                return false;
-
-                            if (response.StatusCode != HttpStatusCode.NotFound)
-                                return false;
-
-                            // a 404 error means the queue does not exist
-                            return true;
-                        });
-
-                    return false;
-                };
+            Func<Task<Tuple<HttpResponseMessage, string>>, Task<bool>> parseResult =
+                task => InternalTaskExtensions.CompletedTask(task.Result.Item1.IsSuccessStatusCode);
+            Func<Task<HttpRequestMessage>, Task<bool>> requestResource =
+                GetResponseAsyncFunc<bool>(cancellationToken, parseResult);
 
             return AuthenticateServiceAsync(cancellationToken)
                 .Select(prepareRequest)
-                .Then(requestResource)
-                .Select(interpretResult, true);
+                .Then(requestResource);
         }
 
         /// <inheritdoc/>
@@ -278,10 +251,10 @@
                     { "queue_name", queueName.Value }
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -302,10 +275,10 @@
                     { "queue_name", queueName.Value }
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, metadata);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, metadata);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -335,10 +308,10 @@
                     { "queue_name", queueName.Value }
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<T>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<T>> requestResource =
                 GetResponseAsyncFunc<T>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -354,10 +327,10 @@
 
             UriTemplate template = new UriTemplate("/queues/{queue_name}/stats");
             var parameters = new Dictionary<string, string>() { { "queue_name", queueName.Value } };
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<QueueStatistics>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<QueueStatistics>> requestResource =
                 GetResponseAsyncFunc<QueueStatistics>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -387,10 +360,10 @@
             if (limit != null)
                 parameters["limit"] = limit.ToString();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<ListCloudQueueMessagesResponse>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ListCloudQueueMessagesResponse>> requestResource =
                 GetResponseAsyncFunc<ListCloudQueueMessagesResponse>(cancellationToken);
 
             Func<Task<ListCloudQueueMessagesResponse>, QueuedMessageList> resultSelector =
@@ -460,10 +433,10 @@
                     { "message_id", messageId.Value },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<QueuedMessage>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<QueuedMessage>> requestResource =
                 GetResponseAsyncFunc<QueuedMessage>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -493,10 +466,10 @@
             Func<Uri, Uri> uriTransform =
                 uri => new Uri(uri.GetLeftPart(UriPartial.Path) + uri.Query.Replace("%2c", ","));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters, uriTransform);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, uriTransform);
 
-            Func<Task<HttpWebRequest>, Task<ReadOnlyCollection<QueuedMessage>>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<ReadOnlyCollection<QueuedMessage>>> requestResource =
                 GetResponseAsyncFunc<ReadOnlyCollection<QueuedMessage>>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -536,10 +509,10 @@
                     { "queue_name", queueName.Value },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, messages);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, messages);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -579,10 +552,10 @@
                     { "queue_name", queueName.Value },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, messages);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, messages);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -609,10 +582,10 @@
             if (claim != null)
                 parameters["claim_id"] = claim.Id.Value;
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -642,10 +615,10 @@
             Func<Uri, Uri> uriTransform =
                 uri => new Uri(uri.GetLeftPart(UriPartial.Path) + uri.Query.Replace("%2c", ","));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters, uriTransform);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, uriTransform);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -677,27 +650,25 @@
 
             var request = new ClaimMessagesRequest(timeToLive, gracePeriod);
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request);
 
-            Func<Task<Tuple<HttpWebResponse, string>>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> parseResult =
+            Func<Task<Tuple<HttpResponseMessage, string>>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> parseResult =
                 task =>
                 {
-                    string location = task.Result.Item1.Headers[HttpResponseHeader.Location];
-                    Uri locationUri = location != null ? new Uri(_baseUri, location) : null;
-
+                    Uri location = task.Result.Item1.Headers.Location;
                     if (task.Result.Item1.StatusCode == HttpStatusCode.NoContent)
                     {
                         // the queue did not contain any messages to claim
-                        Tuple<Uri, IEnumerable<QueuedMessage>> result = Tuple.Create(locationUri, Enumerable.Empty<QueuedMessage>());
+                        Tuple<Uri, IEnumerable<QueuedMessage>> result = Tuple.Create(location, Enumerable.Empty<QueuedMessage>());
                         return InternalTaskExtensions.CompletedTask(result);
                     }
 
                     IEnumerable<QueuedMessage> messages = JsonConvert.DeserializeObject<IEnumerable<QueuedMessage>>(task.Result.Item2);
 
-                    return InternalTaskExtensions.CompletedTask(Tuple.Create(locationUri, messages));
+                    return InternalTaskExtensions.CompletedTask(Tuple.Create(location, messages));
                 };
-            Func<Task<HttpWebRequest>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> requestResource =
                 GetResponseAsyncFunc<Tuple<Uri, IEnumerable<QueuedMessage>>>(cancellationToken, parseResult);
 
             Func<Task<Tuple<Uri, IEnumerable<QueuedMessage>>>, Claim> resultSelector =
@@ -726,14 +697,14 @@
                     { "claim_id", claim.Id.Value }
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<Tuple<HttpWebResponse, string>>, Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>> parseResult =
+            Func<Task<Tuple<HttpResponseMessage, string>>, Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>> parseResult =
                 task =>
                 {
                     // this response uses ContentLocation instead of Location
-                    string location = task.Result.Item1.Headers[HttpResponseHeader.ContentLocation];
+                    string location = task.Result.Item1.Headers.GetValues("Content-Location").FirstOrDefault();
                     Uri locationUri = location != null ? new Uri(_baseUri, location) : null;
 
                     JObject result = JsonConvert.DeserializeObject<JObject>(task.Result.Item2);
@@ -742,7 +713,7 @@
                     IEnumerable<QueuedMessage> messages = result["messages"].ToObject<IEnumerable<QueuedMessage>>();
                     return InternalTaskExtensions.CompletedTask(Tuple.Create(locationUri, ttl, age, messages));
                 };
-            Func<Task<HttpWebRequest>, Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>> requestResource =
                 GetResponseAsyncFunc(cancellationToken, parseResult);
 
             Func<Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>, Claim> resultSelector =
@@ -774,10 +745,10 @@
                 };
 
             JObject request = new JObject(new JProperty("ttl", new JValue((int)timeToLive.TotalSeconds)));
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PATCH, template, parameters, request);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(new HttpMethod("PATCH"), template, parameters, request);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -802,10 +773,10 @@
                     { "claim_id", claim.Id.Value },
                 };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -841,13 +812,13 @@
         /// <inheritdoc/>
         /// <remarks>
         /// This method calls <see cref="ProviderBase{TProvider}.PrepareRequestImpl"/> to create the
-        /// initial <see cref="HttpWebRequest"/>, and then sets the <c>Client-Id</c> header according
+        /// initial <see cref="HttpRequestMessage"/>, and then sets the <c>Client-Id</c> header according
         /// to the Marconi (Cloud Queues) specification before returning.
         /// </remarks>
-        protected override HttpWebRequest PrepareRequestImpl(HttpMethod method, IdentityToken identityToken, UriTemplate template, Uri baseUri, IDictionary<string, string> parameters, Func<Uri, Uri> uriTransform)
+        protected override HttpRequestMessage PrepareRequestImpl(HttpMethod method, IdentityToken identityToken, UriTemplate template, Uri baseUri, IDictionary<string, string> parameters, Func<Uri, Uri> uriTransform)
         {
-            HttpWebRequest request = base.PrepareRequestImpl(method, identityToken, template, baseUri, parameters, uriTransform);
-            request.Headers["Client-Id"] = _clientId.ToString("D");
+            HttpRequestMessage request = base.PrepareRequestImpl(method, identityToken, template, baseUri, parameters, uriTransform);
+            request.Headers.Add("Client-Id", _clientId.ToString("D"));
             return request;
         }
     }

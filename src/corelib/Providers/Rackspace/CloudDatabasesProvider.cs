@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Net;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
@@ -13,7 +14,6 @@
     using Newtonsoft.Json.Linq;
     using CancellationToken = System.Threading.CancellationToken;
     using FlavorId = net.openstack.Providers.Rackspace.Objects.Databases.FlavorId;
-    using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
@@ -74,10 +74,10 @@
             JObject requestBody = new JObject(
                 new JProperty("instance", JObject.FromObject(configuration)));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DatabaseInstance> resultSelector =
@@ -124,10 +124,10 @@
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, ReadOnlyCollectionPage<DatabaseInstance>> resultSelector =
@@ -166,10 +166,10 @@
             UriTemplate template = new UriTemplate("/instances/{instanceId}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DatabaseInstance> resultSelector =
@@ -201,10 +201,10 @@
             UriTemplate template = new UriTemplate("/instances/{instanceId}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<DatabaseInstance>> completionSelector =
@@ -232,10 +232,10 @@
             UriTemplate template = new UriTemplate("/instances/{instanceId}/root");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, RootUser> resultSelector =
@@ -267,10 +267,10 @@
             UriTemplate template = new UriTemplate("/instances/{instanceId}/root");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, bool?> resultSelector =
@@ -306,10 +306,10 @@
                 new JObject(
                     new JProperty("restart", new JObject()));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<DatabaseInstance>> resultSelector =
@@ -343,10 +343,10 @@
                     new JProperty("resize", new JObject(
                         new JProperty("flavorRef", JValue.FromObject(flavorRef.Value)))));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<DatabaseInstance>> resultSelector =
@@ -381,10 +381,10 @@
                         new JProperty("volume", new JObject(
                             new JProperty("size", JValue.FromObject(volumeSize)))))));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             Func<Task<string>, Task<DatabaseInstance>> resultSelector =
@@ -418,10 +418,10 @@
                     new JProperty("databases", new JArray(
                         JObject.FromObject(configuration))));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -444,10 +444,10 @@
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, ReadOnlyCollectionPage<Database>> resultSelector =
@@ -488,10 +488,10 @@
             UriTemplate template = new UriTemplate("/instances/{instanceId}/databases/{databaseName}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value }, { "databaseName", EscapeDatabaseName(databaseName) } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -515,10 +515,10 @@
                     new JProperty("users", new JArray(
                         JObject.FromObject(configuration))));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -541,10 +541,10 @@
             if (limit != null)
                 parameters.Add("limit", limit.ToString());
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, ReadOnlyCollectionPage<DatabaseUser>> resultSelector =
@@ -596,10 +596,10 @@
                             new JProperty("name", JValue.CreateString(userName.Value)),
                             new JProperty("password", JValue.CreateString(password))))));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -624,10 +624,10 @@
                 new JObject(
                     new JProperty("user", JObject.FromObject(configuration)));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -646,10 +646,10 @@
             UriTemplate template = new UriTemplate("/instances/{instanceId}/users/{name}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value }, { "name", EscapeUserName(userName) } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DatabaseUser> resultSelector =
@@ -683,10 +683,10 @@
             UriTemplate template = new UriTemplate("/instances/{instanceId}/users/{name}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value }, { "name", EscapeUserName(userName) } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -705,10 +705,10 @@
             UriTemplate template = new UriTemplate("/instances/{instanceId}/users/{name}/databases");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value }, { "name", EscapeUserName(userName) } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, ReadOnlyCollection<DatabaseName>> resultSelector =
@@ -754,10 +754,10 @@
                         new JObject(
                             new JProperty("name", JToken.FromObject(databaseName))))));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.PUT, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -783,10 +783,10 @@
                 { "databaseName", EscapeDatabaseName(databaseName) },
             };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -800,10 +800,10 @@
             UriTemplate template = new UriTemplate("/flavors");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, ReadOnlyCollection<DatabaseFlavor>> resultSelector =
@@ -835,10 +835,10 @@
             UriTemplate template = new UriTemplate("/flavors/{flavorId}");
             var parameters = new Dictionary<string, string> { { "flavorId", flavorId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, DatabaseFlavor> resultSelector =
@@ -874,10 +874,10 @@
                 new JObject(
                     new JProperty("backup", JObject.FromObject(configuration)));
 
-            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpWebRequest>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.POST, template, parameters, requestBody);
+            Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, requestBody);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, Backup> resultSelector =
@@ -922,10 +922,10 @@
             UriTemplate template = new UriTemplate("/backups");
             var parameters = new Dictionary<string, string>();
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, ReadOnlyCollection<Backup>> resultSelector =
@@ -957,10 +957,10 @@
             UriTemplate template = new UriTemplate("/backups/{backupId}");
             var parameters = new Dictionary<string, string> { { "backupId", backupId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, Backup> resultSelector =
@@ -992,10 +992,10 @@
             UriTemplate template = new UriTemplate("/backups/{backupId}");
             var parameters = new Dictionary<string, string> { { "backupId", backupId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.DELETE, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<string>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
                 GetResponseAsyncFunc(cancellationToken);
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1012,10 +1012,10 @@
             UriTemplate template = new UriTemplate("/instances/{instanceId}/backups");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
-            Func<Task<Tuple<IdentityToken, Uri>>, HttpWebRequest> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.GET, template, parameters);
+            Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
+                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
 
-            Func<Task<HttpWebRequest>, Task<JObject>> requestResource =
+            Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
             Func<Task<JObject>, ReadOnlyCollection<Backup>> resultSelector =
