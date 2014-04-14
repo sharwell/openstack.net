@@ -1,15 +1,28 @@
-﻿using System;
-
-namespace net.openstack.Core
+﻿namespace net.openstack.Core
 {
+    using System.Net.Http.Headers;
+    using System.Reflection;
+
     /// <summary>
     /// Generates the User-Agent value which identifies this SDK in REST requests.
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     public static class UserAgentGenerator
     {
-        private static readonly Version _currentVersion = typeof(UserAgentGenerator).Assembly.GetName().Version;
-        private static readonly string _userAgent = string.Format("openstack.net/{0}", _currentVersion);
+        private static readonly string _productName;
+        private static readonly string _productVersion;
+        private static readonly string _userAgent;
+
+        static UserAgentGenerator()
+        {
+            var productAttribute = typeof(UserAgentGenerator).Assembly.GetCustomAttribute<AssemblyProductAttribute>();
+            _productName = productAttribute.Product;
+
+            var informationalVersionAttribute = typeof(UserAgentGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            _productVersion = informationalVersionAttribute.InformationalVersion;
+
+            _userAgent = string.Format("{0}/{1}", _productName, _productVersion);
+        }
 
         /// <summary>
         /// Gets the User-Agent value for this SDK.
@@ -19,6 +32,28 @@ namespace net.openstack.Core
             get
             {
                 return _userAgent;
+            }
+        }
+
+        /// <summary>
+        /// Gets the product name for this SDK, for use with the <see cref="ProductInfoHeaderValue"/> class.
+        /// </summary>
+        public static string ProductName
+        {
+            get
+            {
+                return _productName;
+            }
+        }
+
+        /// <summary>
+        /// Gets the product version for this SDK, for use with the <see cref="ProductInfoHeaderValue"/> class.
+        /// </summary>
+        public static string ProductVersion
+        {
+            get
+            {
+                return _productVersion;
             }
         }
     }
