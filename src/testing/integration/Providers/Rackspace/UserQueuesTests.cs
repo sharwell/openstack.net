@@ -323,7 +323,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         public async Task TestListAllQueueMessages()
         {
             IQueueingService provider = CreateProvider();
-            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(20))))
             {
                 QueueName queueName = CreateRandomQueueName();
 
