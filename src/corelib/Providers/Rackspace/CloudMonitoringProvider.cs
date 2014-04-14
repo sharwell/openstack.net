@@ -182,7 +182,8 @@
                 task =>
                 {
                     UriTemplate entityTemplate = new UriTemplate("/entities/{entityId}");
-                    Uri location = task.Result.Item1.Headers.Location;
+                    Uri relativeLocation = task.Result.Item1.Headers.Location;
+                    Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = entityTemplate.Match(_baseUri, location);
                     return InternalTaskExtensions.CompletedTask(new EntityId(match.BoundVariables["entityId"]));
                 };
@@ -320,7 +321,8 @@
                 task =>
                 {
                     UriTemplate entityTemplate = new UriTemplate("/entities/{entityId}/checks/{checkId}");
-                    Uri location = task.Result.Item1.Headers.Location;
+                    Uri relativeLocation = task.Result.Item1.Headers.Location;
+                    Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = entityTemplate.Match(_baseUri, location);
                     return InternalTaskExtensions.CompletedTask(new CheckId(match.BoundVariables["checkId"]));
                 };
@@ -687,7 +689,8 @@
                 task =>
                 {
                     UriTemplate entityTemplate = new UriTemplate("/entities/{entityId}/alarms/{alarmId}");
-                    Uri location = task.Result.Item1.Headers.Location;
+                    Uri relativeLocation = task.Result.Item1.Headers.Location;
+                    Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = entityTemplate.Match(_baseUri, location);
                     return InternalTaskExtensions.CompletedTask(new AlarmId(match.BoundVariables["alarmId"]));
                 };
@@ -853,7 +856,8 @@
                 task =>
                 {
                     UriTemplate entityTemplate = new UriTemplate("/notification_plans/{notificationPlanId}");
-                    Uri location = task.Result.Item1.Headers.Location;
+                    Uri relativeLocation = task.Result.Item1.Headers.Location;
+                    Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = entityTemplate.Match(_baseUri, location);
                     return InternalTaskExtensions.CompletedTask(new NotificationPlanId(match.BoundVariables["notificationPlanId"]));
                 };
@@ -1194,7 +1198,8 @@
                 task =>
                 {
                     UriTemplate entityTemplate = new UriTemplate("/notifications/{notificationId}");
-                    Uri location = task.Result.Item1.Headers.Location;
+                    Uri relativeLocation = task.Result.Item1.Headers.Location;
+                    Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = entityTemplate.Match(_baseUri, location);
                     return InternalTaskExtensions.CompletedTask(new NotificationId(match.BoundVariables["notificationId"]));
                 };
@@ -1778,7 +1783,8 @@
                 task =>
                 {
                     UriTemplate agentTokenTemplate = new UriTemplate("/agent_tokens/{tokenId}");
-                    Uri location = task.Result.Item1.Headers.Location;
+                    Uri relativeLocation = task.Result.Item1.Headers.Location;
+                    Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = agentTokenTemplate.Match(_baseUri, location);
                     return InternalTaskExtensions.CompletedTask(new AgentTokenId(match.BoundVariables["tokenId"]));
                 };

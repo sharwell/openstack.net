@@ -656,7 +656,8 @@
             Func<Task<Tuple<HttpResponseMessage, string>>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> parseResult =
                 task =>
                 {
-                    Uri location = task.Result.Item1.Headers.Location;
+                    Uri relativeLocation = task.Result.Item1.Headers.Location;
+                    Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     if (task.Result.Item1.StatusCode == HttpStatusCode.NoContent)
                     {
                         // the queue did not contain any messages to claim
@@ -704,14 +705,14 @@
                 task =>
                 {
                     // this response uses ContentLocation instead of Location
-                    string location = task.Result.Item1.Headers.GetValues("Content-Location").FirstOrDefault();
-                    Uri locationUri = location != null ? new Uri(_baseUri, location) : null;
+                    Uri relativeLocation = task.Result.Item1.Content.Headers.ContentLocation;
+                    Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
 
                     JObject result = JsonConvert.DeserializeObject<JObject>(task.Result.Item2);
                     TimeSpan age = TimeSpan.FromSeconds((int)result["age"]);
                     TimeSpan ttl = TimeSpan.FromSeconds((int)result["ttl"]);
                     IEnumerable<QueuedMessage> messages = result["messages"].ToObject<IEnumerable<QueuedMessage>>();
-                    return InternalTaskExtensions.CompletedTask(Tuple.Create(locationUri, ttl, age, messages));
+                    return InternalTaskExtensions.CompletedTask(Tuple.Create(location, ttl, age, messages));
                 };
             Func<Task<HttpRequestMessage>, Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>> requestResource =
                 GetResponseAsyncFunc(cancellationToken, parseResult);
