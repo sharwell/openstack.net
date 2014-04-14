@@ -36,7 +36,7 @@
         /// <exception cref="ArgumentException">If <paramref name="completionOption"/> is not a valid <see cref="AsyncCompletionOption"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/POST_createInstance__version___accountId__instances_.html">Create Database Instance (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        Task<DatabaseInstance> CreateDatabaseInstanceAsync(DatabaseInstanceConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress);
+        Task<DatabaseInstance> CreateDatabaseInstanceAsync(DatabaseInstanceConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress);
 
         /// <summary>
         /// Gets a collection of all database instances.
@@ -91,7 +91,7 @@
         /// <exception cref="ArgumentException">If <paramref name="completionOption"/> is not a valid <see cref="AsyncCompletionOption"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/DELETE_deleteInstance__version___accountId__instances__instanceId__.html">Delete Database Instance (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        Task RemoveDatabaseInstanceAsync(DatabaseInstanceId instanceId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress);
+        Task RemoveDatabaseInstanceAsync(DatabaseInstanceId instanceId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress);
 
         /// <summary>
         /// Enables login from any host for the root user, and returns the root username and generated password.
@@ -154,7 +154,7 @@
         /// <exception cref="ArgumentException">If <paramref name="completionOption"/> is not a valid <see cref="AsyncCompletionOption"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/POST_restartInstance__version___accountId__instances__instanceId__action_.html">Restart Instance (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        Task RestartDatabaseInstanceAsync(DatabaseInstanceId instanceId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress);
+        Task RestartDatabaseInstanceAsync(DatabaseInstanceId instanceId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress);
 
         /// <summary>
         /// Resize the memory of the database instance.
@@ -177,7 +177,7 @@
         /// <exception cref="ArgumentException">If <paramref name="completionOption"/> is not a valid <see cref="AsyncCompletionOption"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/POST_resizeInstance__version___accountId__instances__instanceId__action_.html">Resize the Instance (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        Task ResizeDatabaseInstanceAsync(DatabaseInstanceId instanceId, FlavorRef flavorRef, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress);
+        Task ResizeDatabaseInstanceAsync(DatabaseInstanceId instanceId, FlavorRef flavorRef, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress);
 
         /// <summary>
         /// Resize the volume attached to the database instance.
@@ -200,7 +200,7 @@
         /// <exception cref="ArgumentException">If <paramref name="completionOption"/> is not a valid <see cref="AsyncCompletionOption"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/POST_resizeVolume__version___accountId__instances__instanceId__action_.html">Resize the Instance Volume (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        Task ResizeDatabaseInstanceVolumeAsync(DatabaseInstanceId instanceId, int volumeSize, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress);
+        Task ResizeDatabaseInstanceVolumeAsync(DatabaseInstanceId instanceId, int volumeSize, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress);
 
         #endregion
 
@@ -493,7 +493,7 @@
         /// <exception cref="ArgumentException">If <paramref name="completionOption"/> is not a valid <see cref="AsyncCompletionOption"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/POST_createBackup__version___accountId__backups_.html">Create Backup (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        Task<Backup> CreateBackupAsync(BackupConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress);
+        Task<Backup> CreateBackupAsync(BackupConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DatabaseInstance> progress);
 
         /// <summary>
         /// Get a collection of all backups for database instances in an account.

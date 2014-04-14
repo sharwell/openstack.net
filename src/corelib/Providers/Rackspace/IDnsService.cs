@@ -168,7 +168,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/export_domain.html">Export Domain (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob<ExportedDomain>> ExportDomainAsync(DomainId domainId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<ExportedDomain>> progress);
+        Task<DnsJob<ExportedDomain>> ExportDomainAsync(DomainId domainId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<ExportedDomain>> progress);
 
         /// <summary>
         /// Registers one or more new domains in the DNS service.
@@ -195,7 +195,7 @@
         /// <exception cref="ArgumentException">If <paramref name="completionOption"/> is not a valid <see cref="AsyncCompletionOption"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/create_domains.html">Create Domain(s) (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob<DnsDomains>> CreateDomainsAsync(DnsConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsDomains>> progress);
+        Task<DnsJob<DnsDomains>> CreateDomainsAsync(DnsConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<DnsDomains>> progress);
 
         /// <summary>
         /// Updates one or more domains in the DNS service.
@@ -219,7 +219,7 @@
         /// <exception cref="ArgumentException">If <paramref name="completionOption"/> is not a valid <see cref="AsyncCompletionOption"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/Modify_Domain_s_-d1e3848.html">Modify Domain(s) (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob> UpdateDomainsAsync(DnsUpdateConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress);
+        Task<DnsJob> UpdateDomainsAsync(DnsUpdateConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress);
 
         /// <summary>
         /// Clones a domain registered in the DNS service, optionally cloning its subdomains as well.
@@ -259,7 +259,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/clone_domain-dle846.html">Clone Domain (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob<DnsDomains>> CloneDomainAsync(DomainId domainId, string cloneName, bool? cloneSubdomains, bool? modifyRecordData, bool? modifyEmailAddress, bool? modifyComment, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsDomains>> progress);
+        Task<DnsJob<DnsDomains>> CloneDomainAsync(DomainId domainId, string cloneName, bool? cloneSubdomains, bool? modifyRecordData, bool? modifyEmailAddress, bool? modifyComment, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<DnsDomains>> progress);
 
         /// <summary>
         /// Imports domains into the DNS service.
@@ -290,7 +290,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/import_domain.html">Import Domain (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob<DnsDomains>> ImportDomainAsync(IEnumerable<SerializedDomain> serializedDomains, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsDomains>> progress);
+        Task<DnsJob<DnsDomains>> ImportDomainAsync(IEnumerable<SerializedDomain> serializedDomains, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<DnsDomains>> progress);
 
         /// <summary>
         /// Removes one or more domains from the DNS service.
@@ -321,7 +321,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/Remove_Domain_s_-d1e4022.html">Remove Domain(s) (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob> RemoveDomainsAsync(IEnumerable<DomainId> domainIds, bool deleteSubdomains, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress);
+        Task<DnsJob> RemoveDomainsAsync(IEnumerable<DomainId> domainIds, bool deleteSubdomains, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress);
 
         #endregion
 
@@ -432,7 +432,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/Add_Records-d1e4895.html">Add Records (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob<DnsRecordsList>> AddRecordsAsync(DomainId domainId, IEnumerable<DnsDomainRecordConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsRecordsList>> progress);
+        Task<DnsJob<DnsRecordsList>> AddRecordsAsync(DomainId domainId, IEnumerable<DnsDomainRecordConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<DnsRecordsList>> progress);
 
         /// <summary>
         /// Updates domain records in the DNS service.
@@ -465,7 +465,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/Modify_Records-d1e5033.html">Modify Records (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob> UpdateRecordsAsync(DomainId domainId, IEnumerable<DnsDomainRecordUpdateConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress);
+        Task<DnsJob> UpdateRecordsAsync(DomainId domainId, IEnumerable<DnsDomainRecordUpdateConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress);
 
         /// <summary>
         /// Removes one or more domain records from the DNS service.
@@ -500,7 +500,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/Remove_Records-d1e5188.html">Remove Records (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob> RemoveRecordsAsync(DomainId domainId, IEnumerable<RecordId> recordIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress);
+        Task<DnsJob> RemoveRecordsAsync(DomainId domainId, IEnumerable<RecordId> recordIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress);
 
         #endregion
 
@@ -598,7 +598,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/ReverseDNS-123457003.html">Add PTR Records (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob<DnsRecordsList>> AddPtrRecordsAsync(string serviceName, Uri deviceResourceUri, IEnumerable<DnsDomainRecordConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsRecordsList>> progress);
+        Task<DnsJob<DnsRecordsList>> AddPtrRecordsAsync(string serviceName, Uri deviceResourceUri, IEnumerable<DnsDomainRecordConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob<DnsRecordsList>> progress);
 
         /// <summary>
         /// Update reverse DNS records for a cloud resource in the DNS service.
@@ -636,7 +636,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/ReverseDNS-123457004.html">Modify PTR Records (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob> UpdatePtrRecordsAsync(string serviceName, Uri deviceResourceUri, IEnumerable<DnsDomainRecordUpdateConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress);
+        Task<DnsJob> UpdatePtrRecordsAsync(string serviceName, Uri deviceResourceUri, IEnumerable<DnsDomainRecordUpdateConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress);
 
         /// <summary>
         /// Removes one or more reverse DNS records from the DNS service.
@@ -672,7 +672,7 @@
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/ReverseDNS-123457005.html">Remove PTR Records (Rackspace Cloud DNS Developer Guide - API v1.0)</seealso>
-        Task<DnsJob> RemovePtrRecordsAsync(string serviceName, Uri deviceResourceUri, IPAddress ipAddress, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress);
+        Task<DnsJob> RemovePtrRecordsAsync(string serviceName, Uri deviceResourceUri, IPAddress ipAddress, AsyncCompletionOption completionOption, CancellationToken cancellationToken, net.openstack.Core.IProgress<DnsJob> progress);
 
         #endregion
     }
