@@ -6,6 +6,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -431,17 +432,8 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         internal static IDatabaseService CreateProvider()
         {
             CloudDatabasesProvider provider = new TestCloudDatabasesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
-            provider.BeforeAsyncWebRequest +=
-                (sender, e) =>
-                {
-                    Console.Error.WriteLine("{0} (Request) {1} {2}", DateTime.Now, e.Request.Method, e.Request.RequestUri);
-                };
-            provider.AfterAsyncWebResponse +=
-                (sender, e) =>
-                {
-                    Console.Error.WriteLine("{0} (Result {1}) {2}", DateTime.Now, e.Response.StatusCode, e.Response.ResponseUri);
-                };
-
+            provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
+            provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
             return provider;
         }
 
@@ -452,12 +444,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             {
             }
 
-            protected override byte[] EncodeRequestBodyImpl<TBody>(HttpWebRequest request, TBody body)
-            {
-                return TestHelpers.EncodeRequestBody(request, body, base.EncodeRequestBodyImpl);
-            }
-
-            protected override Tuple<HttpWebResponse, string> ReadResultImpl(Task<WebResponse> task, CancellationToken cancellationToken)
+            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
             {
                 return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
             }

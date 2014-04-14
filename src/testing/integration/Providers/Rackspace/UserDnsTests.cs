@@ -8,6 +8,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using System.Diagnostics;
     using System.Linq;
     using System.Net;
+    using System.Net.Http;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
@@ -818,17 +819,8 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         internal static IDnsService CreateProvider()
         {
             CloudDnsProvider provider = new TestCloudDnsProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, false, null);
-            provider.BeforeAsyncWebRequest +=
-                (sender, e) =>
-                {
-                    Console.Error.WriteLine("{0} (Request) {1} {2}", DateTime.Now, e.Request.Method, e.Request.RequestUri);
-                };
-            provider.AfterAsyncWebResponse +=
-                (sender, e) =>
-                {
-                    Console.Error.WriteLine("{0} (Result {1}) {2}", DateTime.Now, e.Response.StatusCode, e.Response.ResponseUri);
-                };
-
+            provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
+            provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
             return provider;
         }
 
@@ -839,12 +831,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             {
             }
 
-            protected override byte[] EncodeRequestBodyImpl<TBody>(HttpWebRequest request, TBody body)
-            {
-                return TestHelpers.EncodeRequestBody(request, body, base.EncodeRequestBodyImpl);
-            }
-
-            protected override Tuple<HttpWebResponse, string> ReadResultImpl(Task<WebResponse> task, CancellationToken cancellationToken)
+            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
             {
                 return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
             }
