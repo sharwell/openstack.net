@@ -1281,8 +1281,44 @@ namespace net.openstack.Providers.Rackspace
 
             HttpResponseMessage response = task.Result;
             OnAfterAsyncWebResponse(response);
-            return task.Result.Content.ReadAsStringAsync()
+            return ValidateResultImplAsync(task, cancellationToken)
+                .Then(task2 => task2.Result.Content.ReadAsStringAsync())
                 .Select(t => Tuple.Create(response, t.Result));
+        }
+
+        /// <summary>
+        /// This method validates the response to an asynchronous web request was successful.
+        /// </summary>
+        /// <remarks>
+        /// The default implementation determines if the call was successful by checking the
+        /// <see cref="HttpResponseMessage.IsSuccessStatusCode"/> property of the result
+        /// message. This validation is performed synchronously, and upon success the method
+        /// simply returns <paramref name="task"/>, which has already completed.
+        ///
+        /// <note type="implement">
+        /// Most overriding implementations will not need to transform the resulting
+        /// <see cref="HttpResponseMessage"/>, and may simply return <paramref name="task"/>
+        /// for efficiency. Another option in this case is to perform custom validation first,
+        /// and if that validation succeeds return the result of the base implementation.
+        /// </note>
+        /// </remarks>
+        /// <param name="task">The antecedent task, which provides the <see cref="HttpResponseMessage"/> from the service.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When the operation
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property will contain the
+        /// <see cref="HttpResponseMessage"/> providing information about the result of the call.
+        /// </returns>
+        /// <exception cref="HttpWebException">
+        /// If the <see cref="HttpResponseMessage"/> provided by the antecedent <paramref name="task"/>
+        /// indicates that the request failed.
+        /// </exception>
+        protected virtual Task<HttpResponseMessage> ValidateResultImplAsync(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
+        {
+            if (task.Result.IsSuccessStatusCode)
+                return task;
+
+            throw new HttpWebException(task.Result);
         }
 
         /// <summary>
