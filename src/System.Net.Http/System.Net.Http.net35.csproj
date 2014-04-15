@@ -109,6 +109,7 @@
     <None Include="..\..\..\keys\openstacknetsdk.snk">
       <Link>openstacknetsdk.snk</Link>
     </None>
+    <None Include="HttpClientNet35.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OpenStack.Threading\OpenStack.Threading.net35.csproj">

@@ -56,6 +56,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="OpenStack.Threading.nuspec" />
     <None Include="packages.OpenStack.Threading.portable-net45+wp80+win8.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

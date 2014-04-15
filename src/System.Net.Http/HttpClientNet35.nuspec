@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>HttpClient.Net35</id>
+    <version>0.0.0</version>
+    <title>HttpClient.Net35</title>
+    <authors>Sam Harwell</authors>
+    <owners>Sam Harwell</owners>
+    <licenseUrl>http://openstacknetsdk.org/docs/html/8b286b82-7aaf-4e45-9ffc-adbd7dbcfaa6.htm</licenseUrl>
+    <projectUrl>https://github.com/openstacknetsdk/openstack.net</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>A complete backport of System.Net.Http to .NET 3.5, based on Mono's implementation.</description>
+    <releaseNotes>https://github.com/openstacknetsdk/openstack.net/releases/v$version$</releaseNotes>
+    <copyright></copyright>
+    <tags>openstack httpclient</tags>
+    <dependencies>
+      <group targetFramework="3.5">
+        <dependency id="TaskParallelLibrary" version="1.0.2856.0" />
+        <dependency id="OpenStack.Threading" version="[1.0, 1.1)" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+
+    <!-- Runtime libraries -->
+    <file src="bin\$Configuration$\System.Net.Http.dll" target="lib\net35"/>
+    <file src="bin\$Configuration$\System.Net.Http.pdb" target="lib\net35"/>
+    <file src="bin\$Configuration$\System.Net.Http.xml" target="lib\net35"/>
+
+    <!-- Source code -->
+    <file src="**\*.cs" target="src" />
+
+  </files>
+</package>

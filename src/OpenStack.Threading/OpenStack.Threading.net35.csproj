@@ -67,6 +67,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="OpenStack.Threading.nuspec" />
     <None Include="packages.OpenStack.Threading.net35.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
