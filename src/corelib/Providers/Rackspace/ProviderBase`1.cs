@@ -16,6 +16,7 @@ using net.openstack.Core.Validators;
 using net.openstack.Providers.Rackspace.Validators;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenStack.Threading;
 using CancellationToken = System.Threading.CancellationToken;
 using Encoding = System.Text.Encoding;
 using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
@@ -959,7 +960,7 @@ namespace net.openstack.Providers.Rackspace
                     Uri baseUri = task.Result.Item2;
                     HttpRequestMessage request = PrepareRequestImpl(method, task.Result.Item1, template, baseUri, parameters, uriTransform);
                     request.Content = EncodeRequestBodyImpl(request, body);
-                    return InternalTaskExtensions.CompletedTask(request);
+                    return CompletedTask.FromResult(request);
                 };
         }
 

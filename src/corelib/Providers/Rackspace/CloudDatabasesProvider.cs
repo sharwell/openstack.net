@@ -12,6 +12,7 @@
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using FlavorId = net.openstack.Providers.Rackspace.Objects.Databases.FlavorId;
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
@@ -101,7 +102,7 @@
                     if (databaseInstance != null && completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForDatabaseInstanceToLeaveStateAsync(databaseInstance.Id, DatabaseInstanceStatus.Build, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(databaseInstance);
+                    return CompletedTask.FromResult(databaseInstance);
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -214,7 +215,7 @@
                     if (databaseInstance != null && completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForDatabaseInstanceToLeaveStateAsync(instanceId, DatabaseInstanceStatus.Shutdown, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(DatabaseInstance));
+                    return CompletedTask.FromResult(default(DatabaseInstance));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -318,7 +319,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForDatabaseInstanceToLeaveStateAsync(instanceId, DatabaseInstanceStatus.Reboot, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(DatabaseInstance));
+                    return CompletedTask.FromResult(default(DatabaseInstance));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -355,7 +356,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForDatabaseInstanceToLeaveStateAsync(instanceId, DatabaseInstanceStatus.Resize, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(DatabaseInstance));
+                    return CompletedTask.FromResult(default(DatabaseInstance));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -393,7 +394,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForDatabaseInstanceToLeaveStateAsync(instanceId, DatabaseInstanceStatus.Reboot, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(DatabaseInstance));
+                    return CompletedTask.FromResult(default(DatabaseInstance));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -906,7 +907,7 @@
                             .Then(finalResultSelector);
                     }
 
-                    return InternalTaskExtensions.CompletedTask(task.Result);
+                    return CompletedTask.FromResult(task.Result);
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1207,7 +1208,7 @@
         {
             if (_baseUri != null)
             {
-                return InternalTaskExtensions.CompletedTask(_baseUri);
+                return CompletedTask.FromResult(_baseUri);
             }
 
             return Task.Factory.StartNew(

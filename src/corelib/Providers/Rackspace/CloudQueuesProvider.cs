@@ -17,6 +17,7 @@
     using net.openstack.Providers.Rackspace.Objects.Queues.Response;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Threading;
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
@@ -105,7 +106,7 @@
         {
             if (_homeDocument != null)
             {
-                return InternalTaskExtensions.CompletedTask(_homeDocument);
+                return CompletedTask.FromResult(_homeDocument);
             }
 
             UriTemplate template = new UriTemplate("/");
@@ -162,9 +163,9 @@
                 task =>
                 {
                     if (task.Result.Item1.StatusCode == HttpStatusCode.Created)
-                        return InternalTaskExtensions.CompletedTask(true);
+                        return CompletedTask.FromResult(true);
                     else
-                        return InternalTaskExtensions.CompletedTask(false);
+                        return CompletedTask.FromResult(false);
                 };
 
             Func<Task<HttpRequestMessage>, Task<bool>> requestResource =
@@ -231,7 +232,7 @@
                 PrepareRequestAsyncFunc(HttpMethod.Head, template, parameters);
 
             Func<Task<Tuple<HttpResponseMessage, string>>, Task<bool>> parseResult =
-                task => InternalTaskExtensions.CompletedTask(task.Result.Item1.IsSuccessStatusCode);
+                task => CompletedTask.FromResult(task.Result.Item1.IsSuccessStatusCode);
             Func<Task<HttpRequestMessage>, Task<bool>> requestResource =
                 GetResponseAsyncFunc<bool>(cancellationToken, parseResult);
 
@@ -690,12 +691,12 @@
                     {
                         // the queue did not contain any messages to claim
                         Tuple<Uri, IEnumerable<QueuedMessage>> result = Tuple.Create(location, Enumerable.Empty<QueuedMessage>());
-                        return InternalTaskExtensions.CompletedTask(result);
+                        return CompletedTask.FromResult(result);
                     }
 
                     IEnumerable<QueuedMessage> messages = JsonConvert.DeserializeObject<IEnumerable<QueuedMessage>>(task.Result.Item2);
 
-                    return InternalTaskExtensions.CompletedTask(Tuple.Create(location, messages));
+                    return CompletedTask.FromResult(Tuple.Create(location, messages));
                 };
             Func<Task<HttpRequestMessage>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> requestResource =
                 GetResponseAsyncFunc<Tuple<Uri, IEnumerable<QueuedMessage>>>(cancellationToken, parseResult);
@@ -740,7 +741,7 @@
                     TimeSpan age = TimeSpan.FromSeconds((int)result["age"]);
                     TimeSpan ttl = TimeSpan.FromSeconds((int)result["ttl"]);
                     IEnumerable<QueuedMessage> messages = result["messages"].ToObject<IEnumerable<QueuedMessage>>();
-                    return InternalTaskExtensions.CompletedTask(Tuple.Create(location, ttl, age, messages));
+                    return CompletedTask.FromResult(Tuple.Create(location, ttl, age, messages));
                 };
             Func<Task<HttpRequestMessage>, Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>> requestResource =
                 GetResponseAsyncFunc(cancellationToken, parseResult);
@@ -841,7 +842,7 @@
         {
             if (_baseUri != null)
             {
-                return InternalTaskExtensions.CompletedTask(_baseUri);
+                return CompletedTask.FromResult(_baseUri);
             }
 
             return Task.Factory.StartNew(

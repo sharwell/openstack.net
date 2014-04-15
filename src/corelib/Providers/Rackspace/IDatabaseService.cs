@@ -8,6 +8,9 @@
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using CancellationToken = System.Threading.CancellationToken;
     using WebException = System.Net.WebException;
+#if NET35
+    using OpenStack.Threading;
+#endif
 
     /// <summary>
     /// Represents a provider for the Rackspace Cloud Databases service.

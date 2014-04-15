@@ -72,70 +72,13 @@
     <Compile Include="Core\Collections\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\ReadOnlyCollectionPage`1.cs" />
     <Compile Include="Core\Collections\ReadOnlyDictionary`2.cs" />
-    <Compile Include="Core\Compat\CancellationTokenSourceExtensions.cs" />
     <Compile Include="Core\Compat\CustomAttributeExtensions.cs" />
     <Compile Include="Core\Compat\Funcs.cs" />
     <Compile Include="Core\Compat\ISafeSerializationData.cs" />
     <Compile Include="Core\Compat\IStructuralComparable.cs" />
     <Compile Include="Core\Compat\IStructuralEquatable.cs" />
-    <Compile Include="Core\Compat\StreamExtensions.cs" />
-    <Compile Include="Core\Compat\StringBuilderExtensions.cs" />
-    <Compile Include="Core\Compat\StringEx.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\AuthenticationHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\CacheControlHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\CollectionExtensions.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\CollectionParser.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\ContentDispositionHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\ContentRangeHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\EntityTagHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HashCodeCalculator.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HeaderInfo.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpContentHeaders.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpHeaderKind.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpHeaders.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpHeaderValueCollection.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpRequestHeaders.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\HttpResponseHeaders.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\Lexer.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\MediaTypeHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\MediaTypeWithQualityHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\NameValueHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\NameValueWithParametersHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\Parser.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\ProductHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\ProductInfoHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\QualityValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\RangeConditionHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\RangeHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\RangeItemHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\RetryConditionHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\StringWithQualityHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\TransferCodingHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\TransferCodingWithQualityHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\ViaHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http.Headers\WarningHeaderValue.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\ByteArrayContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\ClientCertificateOption.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\DelegatingHandler.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\FormUrlEncodedContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpClient.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpClientHandler.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpCompletionOption.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpMessageHandler.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpMessageInvoker.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpMethod.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpRequestException.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpRequestMessage.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\HttpResponseMessage.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\MessageProcessingHandler.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\MultipartContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\MultipartFormDataContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\StreamContent.cs" />
-    <Compile Include="Core\Compat\System.Net.Http\StringContent.cs" />
     <Compile Include="Core\Compat\Tuple.cs" />
     <Compile Include="Core\Compat\Tuples.cs" />
-    <Compile Include="Core\CoreTaskExtensions.cs" />
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />
     <Compile Include="Core\Domain\Converters\NamespaceDoc.cs" />
@@ -202,7 +145,6 @@
     <Compile Include="Core\Exceptions\VolumeEnteredErrorStateException.cs" />
     <Compile Include="Core\ExtensibleEnum`1.cs" />
     <Compile Include="Core\IBackoffPolicy.cs" />
-    <Compile Include="Core\InternalTaskExtensions.cs" />
     <Compile Include="Core\NamespaceDoc.cs" />
     <Compile Include="Core\ParallelExtensionsExtras\TaskCompletionSourceExtensions.cs" />
     <Compile Include="Core\ParallelExtensionsExtras\TaskExtrasExtensions.cs" />
@@ -230,7 +172,6 @@
     <Compile Include="Core\UriPart.cs" />
     <Compile Include="Core\UriUtility.cs" />
     <Compile Include="Core\Validators\NamespaceDoc.cs" />
-    <Compile Include="Core\WebRequestExtensions.cs" />
     <Compile Include="Providers\Hp\HpIdentityProvider.cs" />
     <Compile Include="Providers\Hp\NamespaceDoc.cs" />
     <Compile Include="Providers\Hp\PredefinedHpIdentityEndpoints.cs" />
@@ -702,6 +643,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Icons\openstack_net_logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenStack.Threading\OpenStack.Threading.net35.csproj">
+      <Project>{52ca4a3b-f296-4489-b5f0-ad375d039b35}</Project>
+      <Name>OpenStack.Threading.net35</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Net.Http\System.Net.Http.net35.csproj">
+      <Project>{b24029ba-14b2-472f-8d4e-a759e016a667}</Project>
+      <Name>System.Net.Http.net35</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

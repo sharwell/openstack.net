@@ -68,7 +68,6 @@
     <Compile Include="Core\Collections\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\ReadOnlyCollectionPage`1.cs" />
     <Compile Include="Core\BackoffPolicy.cs" />
-    <Compile Include="Core\CoreTaskExtensions.cs" />
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\AuthenticationType.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />
@@ -135,7 +134,6 @@
     <Compile Include="Core\Exceptions\VolumeEnteredErrorStateException.cs" />
     <Compile Include="Core\ExtensibleEnum`1.cs" />
     <Compile Include="Core\IBackoffPolicy.cs" />
-    <Compile Include="Core\InternalTaskExtensions.cs" />
     <Compile Include="Core\NamespaceDoc.cs" />
     <Compile Include="Core\Domain\HomeDocument.cs" />
     <Compile Include="Core\ParallelExtensionsExtras\TaskCompletionSourceExtensions.cs" />
@@ -208,7 +206,6 @@
     <Compile Include="Core\Validators\INetworksValidator.cs" />
     <Compile Include="Core\UserAgentGenerator.cs" />
     <Compile Include="Core\Validators\IHttpResponseCodeValidator.cs" />
-    <Compile Include="Core\WebRequestExtensions.cs" />
     <Compile Include="Providers\Rackspace\CloudBlockStorageProvider.cs" />
     <Compile Include="Core\Exceptions\TTLLengthException.cs" />
     <Compile Include="Core\Providers\IObjectStorageProvider.cs" />
@@ -635,6 +632,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Icons\openstack_net_logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenStack.Threading\OpenStack.Threading.net45.csproj">
+      <Project>{808f5d89-ff4f-43d5-8ba7-e558ad4945d7}</Project>
+      <Name>OpenStack.Threading.net45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

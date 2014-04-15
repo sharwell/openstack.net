@@ -11,6 +11,9 @@
     using net.openstack.Core.Domain;
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
+#if NET35
+    using OpenStack.Threading;
+#endif
 
     /// <summary>
     /// Represents a provider for the Rackspace Cloud DNS service.

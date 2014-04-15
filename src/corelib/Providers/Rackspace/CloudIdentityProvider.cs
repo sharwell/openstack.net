@@ -15,6 +15,7 @@ using net.openstack.Providers.Rackspace.Objects.Request;
 using net.openstack.Providers.Rackspace.Objects.Response;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenStack.Threading;
 using CancellationToken = System.Threading.CancellationToken;
 
 namespace net.openstack.Providers.Rackspace

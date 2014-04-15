@@ -13,6 +13,7 @@
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
@@ -1268,7 +1269,7 @@
         {
             if (_baseUri != null)
             {
-                return InternalTaskExtensions.CompletedTask(_baseUri);
+                return CompletedTask.FromResult(_baseUri);
             }
 
             return Task.Factory.StartNew(

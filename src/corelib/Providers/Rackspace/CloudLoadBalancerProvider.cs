@@ -17,6 +17,7 @@
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers.Response;
     using net.openstack.Providers.Rackspace.Validators;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
@@ -170,7 +171,7 @@
                     if (loadBalancer != null && completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancer.Id, LoadBalancerStatus.Build, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(loadBalancer);
+                    return CompletedTask.FromResult(loadBalancer);
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -203,7 +204,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -232,7 +233,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingDelete, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -281,7 +282,7 @@
 
             if (loadBalancerIds.Length == 0)
             {
-                return InternalTaskExtensions.CompletedTask();
+                return CompletedTask.Default;
             }
             else if (loadBalancerIds.Length == 1)
             {
@@ -316,7 +317,7 @@
                         if (completionOption == AsyncCompletionOption.RequestCompleted)
                             return WaitForLoadBalancersToLeaveStateAsync(loadBalancerIds, LoadBalancerStatus.PendingDelete, cancellationToken, progress);
 
-                        return InternalTaskExtensions.CompletedTask(default(LoadBalancer[]));
+                        return CompletedTask.FromResult(default(LoadBalancer[]));
                     };
 
                 return AuthenticateServiceAsync(cancellationToken)
@@ -382,7 +383,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -415,7 +416,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -555,7 +556,7 @@
 
             if (nodeConfigurations.Length == 0)
             {
-                return InternalTaskExtensions.CompletedTask(new ReadOnlyCollection<Node>(new Node[0]));
+                return CompletedTask.FromResult(new ReadOnlyCollection<Node>(new Node[0]));
             }
             else
             {
@@ -581,7 +582,7 @@
                                 .Select(t => task.Result.Nodes);
                         }
 
-                        return InternalTaskExtensions.CompletedTask(task.Result.Nodes);
+                        return CompletedTask.FromResult(task.Result.Nodes);
                     };
 
                 return AuthenticateServiceAsync(cancellationToken)
@@ -617,7 +618,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -648,7 +649,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -698,7 +699,7 @@
 
             if (nodeIds.Length == 0)
             {
-                return InternalTaskExtensions.CompletedTask();
+                return CompletedTask.Default;
             }
             else if (nodeIds.Length == 1)
             {
@@ -729,7 +730,7 @@
                         if (completionOption == AsyncCompletionOption.RequestCompleted)
                             return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                        return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                        return CompletedTask.FromResult(default(LoadBalancer));
                     };
 
                 return AuthenticateServiceAsync(cancellationToken)
@@ -857,7 +858,7 @@
                             .Select(t => task.Result);
                     }
 
-                    return InternalTaskExtensions.CompletedTask(task.Result);
+                    return CompletedTask.FromResult(task.Result);
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -888,7 +889,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -942,7 +943,7 @@
 
             if (virtualAddressIds.Length == 0)
             {
-                return InternalTaskExtensions.CompletedTask();
+                return CompletedTask.Default;
             }
             else if (virtualAddressIds.Length == 1)
             {
@@ -977,7 +978,7 @@
                         if (completionOption == AsyncCompletionOption.RequestCompleted)
                             return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                        return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                        return CompletedTask.FromResult(default(LoadBalancer));
                     };
 
                 return AuthenticateServiceAsync(cancellationToken)
@@ -1219,7 +1220,7 @@
 
             if (networkItems.Length == 0)
             {
-                return InternalTaskExtensions.CompletedTask(Enumerable.Empty<NetworkItem>());
+                return CompletedTask.FromResult(Enumerable.Empty<NetworkItem>());
             }
             else
             {
@@ -1242,7 +1243,7 @@
                         if (completionOption == AsyncCompletionOption.RequestCompleted)
                             return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                        return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                        return CompletedTask.FromResult(default(LoadBalancer));
                     };
 
                 return AuthenticateServiceAsync(cancellationToken)
@@ -1279,7 +1280,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1329,7 +1330,7 @@
 
             if (networkItemIds.Length == 0)
             {
-                return InternalTaskExtensions.CompletedTask();
+                return CompletedTask.Default;
             }
             else if (networkItemIds.Length == 1)
             {
@@ -1364,7 +1365,7 @@
                         if (completionOption == AsyncCompletionOption.RequestCompleted)
                             return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                        return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                        return CompletedTask.FromResult(default(LoadBalancer));
                     };
 
                 return AuthenticateServiceAsync(cancellationToken)
@@ -1398,7 +1399,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1470,7 +1471,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1503,7 +1504,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1561,7 +1562,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1594,7 +1595,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1655,7 +1656,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1717,7 +1718,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1750,7 +1751,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1811,7 +1812,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1918,7 +1919,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -1951,7 +1952,7 @@
                     if (completionOption == AsyncCompletionOption.RequestCompleted)
                         return WaitForLoadBalancerToLeaveStateAsync(loadBalancerId, LoadBalancerStatus.PendingUpdate, cancellationToken, progress);
 
-                    return InternalTaskExtensions.CompletedTask(default(LoadBalancer));
+                    return CompletedTask.FromResult(default(LoadBalancer));
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -2241,7 +2242,7 @@
 
             if (metadataIds.Length == 0)
             {
-                return InternalTaskExtensions.CompletedTask();
+                return CompletedTask.Default;
             }
             else if (metadataIds.Length == 1)
             {
@@ -2333,7 +2334,7 @@
 
             if (metadataIds.Length == 0)
             {
-                return InternalTaskExtensions.CompletedTask();
+                return CompletedTask.Default;
             }
             else if (metadataIds.Length == 1)
             {
@@ -2623,7 +2624,7 @@
         {
             if (_baseUri != null)
             {
-                return InternalTaskExtensions.CompletedTask(_baseUri);
+                return CompletedTask.FromResult(_baseUri);
             }
 
             return Task.Factory.StartNew(

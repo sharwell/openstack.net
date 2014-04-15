@@ -10,6 +10,9 @@
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
+#if NET35
+    using OpenStack.Threading;
+#endif
 
     /// <summary>
     /// Represents a provider for the Rackspace Cloud Load Balancers service.
