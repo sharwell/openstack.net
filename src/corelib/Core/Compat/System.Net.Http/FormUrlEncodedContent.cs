@@ -32,8 +32,16 @@ using System.Text;
 
 namespace System.Net.Http
 {
+	/// <summary>
+	/// A container for name/value tuples encoded using application/x-www-form-urlencoded MIME type.
+	/// </summary>
+	/// <threadsafety static="true" instance="false"/>
 	public class FormUrlEncodedContent : ByteArrayContent
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FormUrlEncodedContent"/> class with a specific collection of name/value pairs.
+		/// </summary>
+		/// <param name="nameValueCollection">A collection of name/value pairs.</param>
 		public FormUrlEncodedContent (IEnumerable<KeyValuePair<string, string>> nameValueCollection)
 			: base (EncodeContent (nameValueCollection))
 		{

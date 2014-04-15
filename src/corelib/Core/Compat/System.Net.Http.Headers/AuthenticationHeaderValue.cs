@@ -30,13 +30,29 @@ using System.Collections.Generic;
 
 namespace System.Net.Http.Headers
 {
+	/// <summary>
+	/// Represents authentication information in Authorization, ProxyAuthorization, WWW-Authenticate, and Proxy-Authenticate header values.
+	/// </summary>
+	/// <remarks>
+	/// The <see cref="AuthenticationHeaderValue"/> class provides support for the Authorization, ProxyAuthorization, WWW-Authenticate, and Proxy-Authenticate HTTP header values as defined in RFC 2616 by the IETF.
+	/// </remarks>
+	/// <threadsafety static="true" instance="false"/>
 	public class AuthenticationHeaderValue : ICloneable
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AuthenticationHeaderValue"/> class.
+		/// </summary>
+		/// <param name="scheme">The scheme to use for authorization.</param>
 		public AuthenticationHeaderValue (string scheme)
 			: this (scheme, null)
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AuthenticationHeaderValue"/> class.
+		/// </summary>
+		/// <param name="scheme">The scheme to use for authorization.</param>
+		/// <param name="parameter">The credentials containing the authentication information of the user agent for the resource being requested.</param>
 		public AuthenticationHeaderValue (string scheme, string parameter)
 		{
 			Parser.Token.Check (scheme);
@@ -49,7 +65,20 @@ namespace System.Net.Http.Headers
 		{
 		}
 
+		/// <summary>
+		/// Gets the credentials containing the authentication information of the user agent for the resource being requested.
+		/// </summary>
+		/// <value>
+		/// The credentials containing the authentication information.
+		/// </value>
 		public string Parameter { get; private set; }
+
+		/// <summary>
+		/// Gets the scheme to use for authorization.
+		/// </summary>
+		/// <value>
+		/// The scheme to use for authorization.
+		/// </value>
 		public string Scheme { get; private set; }
 
 		object ICloneable.Clone ()
@@ -57,6 +86,10 @@ namespace System.Net.Http.Headers
 			return MemberwiseClone ();
 		}
 
+		/// <summary>
+		/// Determines whether the specified Object is equal to the current <see cref="AuthenticationHeaderValue"/> object.
+		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals (object obj)
 		{
 			var source = obj as AuthenticationHeaderValue;
@@ -65,6 +98,10 @@ namespace System.Net.Http.Headers
 				source.Parameter == Parameter;
 		}
 
+		/// <summary>
+		/// Serves as a hash function for an <see cref="AuthenticationHeaderValue"/> object.
+		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode ()
 		{
 			int hc = Scheme.ToLowerInvariant ().GetHashCode ();
@@ -75,6 +112,13 @@ namespace System.Net.Http.Headers
 			return hc;
 		}
 
+		/// <summary>
+		/// Converts a string to an <see cref="AuthenticationHeaderValue"/> instance.
+		/// </summary>
+		/// <param name="input">A string that represents authentication header value information.</param>
+		/// <returns>An <see cref="AuthenticationHeaderValue"/> instance.</returns>
+		/// <exception cref="ArgumentNullException">If <paramref name="input"/> is <see langword="null"/>.</exception>
+		/// <exception cref="FormatException">If <paramref name="input"/> is not valid authentication header value information.</exception>
 		public static AuthenticationHeaderValue Parse (string input)
 		{
 			AuthenticationHeaderValue value;
@@ -84,6 +128,12 @@ namespace System.Net.Http.Headers
 			throw new FormatException (input);
 		}
 
+		/// <summary>
+		/// Determines whether a string is valid <see cref="AuthenticationHeaderValue"/> information.
+		/// </summary>
+		/// <param name="input">The string to validate.</param>
+		/// <param name="parsedValue">The <see cref="AuthenticationHeaderValue"/> version of the string.</param>
+		/// <returns><see langword="true"/> if <paramref name="input"/> is valid <see cref="AuthenticationHeaderValue"/> information; otherwise, <see langword="false"/>.</returns>
 		public static bool TryParse (string input, out AuthenticationHeaderValue parsedValue)
 		{
 			var lexer = new Lexer (input);
@@ -121,6 +171,10 @@ namespace System.Net.Http.Headers
 			return true;
 		}
 
+		/// <summary>
+		/// Returns a string that represents the current <see cref="AuthenticationHeaderValue"/> object.
+		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString ()
 		{
 			return Parameter != null ?
