@@ -15,6 +15,12 @@
     public static class WebRequestExtensions
     {
 #if !NET45PLUS
+        /// <summary>
+        /// Returns a <see cref="Stream"/> for writing data to the Internet resource as an asynchronous operation.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns>This operation will not block. The returned <see cref="Task{TResult}"/> object will complete when the <see cref="Stream"/> for writing data to the Internet resource is available.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="request"/> is <see langword="null"/>.</exception>
         public static Task<Stream> GetRequestStreamAsync(this WebRequest request)
         {
             if (request == null)
