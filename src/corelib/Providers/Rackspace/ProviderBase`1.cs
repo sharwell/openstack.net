@@ -198,7 +198,7 @@ namespace net.openstack.Providers.Rackspace
         ///
         /// <para>This method calls <see cref="IHttpResponseCodeValidator.Validate"/>, which results in a <see cref="ResponseException"/> if the request fails.</para>
         ///
-        /// <para>This method uses <see cref="IRestService.Execute{T}(Uri, HttpMethod, string, Dictionary{string, string}, Dictionary{string, string}, RequestSettings)"/> to handle the underlying REST request(s).</para>
+        /// <para>This method uses <see cref="IRestService.Execute{T}(Uri, JSIStudios.SimpleRESTServices.Client.HttpMethod, string, Dictionary{string, string}, Dictionary{string, string}, RequestSettings)"/> to handle the underlying REST request(s).</para>
         /// </remarks>
         /// <typeparam name="T">The type of the data returned in the REST response.</typeparam>
         /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
@@ -226,7 +226,7 @@ namespace net.openstack.Providers.Rackspace
         /// provide the settings.
         /// </param>
         /// <returns>
-        /// Returns a <see cref="Response{T}"/> object containing the HTTP status code,
+        /// Returns a <see cref="JSIStudios.SimpleRESTServices.Client.Response{T}"/> object containing the HTTP status code,
         /// headers, body, and strongly-typed data from the REST response.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="absoluteUri"/> is <see langword="null"/>.</exception>
@@ -257,7 +257,7 @@ namespace net.openstack.Providers.Rackspace
         ///
         /// <para>This method calls <see cref="IHttpResponseCodeValidator.Validate"/>, which results in a <see cref="ResponseException"/> if the request fails.</para>
         ///
-        /// <para>This method uses <see cref="IRestService.Execute(Uri, HttpMethod, string, Dictionary{string, string}, Dictionary{string, string}, RequestSettings)"/> to handle the underlying REST request(s).</para>
+        /// <para>This method uses <see cref="IRestService.Execute(Uri, JSIStudios.SimpleRESTServices.Client.HttpMethod, string, Dictionary{string, string}, Dictionary{string, string}, RequestSettings)"/> to handle the underlying REST request(s).</para>
         /// </remarks>
         /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
         /// <param name="absoluteUri">The absolute URI for the request.</param>
@@ -316,7 +316,7 @@ namespace net.openstack.Providers.Rackspace
         ///
         /// <para>This method calls <see cref="IHttpResponseCodeValidator.Validate"/>, which results in a <see cref="ResponseException"/> if the request fails.</para>
         ///
-        /// <para>This method uses <see cref="IRestService.Execute(Uri, HttpMethod, Func{HttpWebResponse, bool, Response}, string, Dictionary{string, string}, Dictionary{string, string}, RequestSettings)"/> to handle the underlying REST request(s).</para>
+        /// <para>This method uses <see cref="IRestService.Execute(Uri, JSIStudios.SimpleRESTServices.Client.HttpMethod, Func{HttpWebResponse, bool, Response}, string, Dictionary{string, string}, Dictionary{string, string}, RequestSettings)"/> to handle the underlying REST request(s).</para>
         /// </remarks>
         /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
         /// <param name="absoluteUri">The absolute URI for the request.</param>
@@ -326,7 +326,7 @@ namespace net.openstack.Providers.Rackspace
         /// object from the <see cref="HttpWebResponse"/> and a Boolean value specifying
         /// whether or not a <see cref="WebException"/> was thrown during the request. If
         /// this value is <see langword="null"/>, this method is equivalent to calling
-        /// <see cref="ExecuteRESTRequest(CloudIdentity, Uri, HttpMethod, object, Dictionary{string, string}, Dictionary{string, string}, bool, bool, RequestSettings)"/>.
+        /// <see cref="ExecuteRESTRequest(CloudIdentity, Uri, JSIStudios.SimpleRESTServices.Client.HttpMethod, object, Dictionary{string, string}, Dictionary{string, string}, bool, bool, RequestSettings)"/>.
         /// </param>
         /// <param name="body">
         /// The body of the request. This parameter is optional. If the value is <see langword="null"/>,
@@ -371,7 +371,7 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <summary>
-        /// Execute a REST request, using a callback method to deserialize the result into a <see cref="Response"/> or <see cref="Response{T}"/> object.
+        /// Execute a REST request, using a callback method to deserialize the result into a <see cref="Response"/> or <see cref="JSIStudios.SimpleRESTServices.Client.Response{T}"/> object.
         /// </summary>
         /// <remarks>
         /// If the request fails due to an authorization failure, i.e. the <see cref="Response.StatusCode"/> is <see cref="HttpStatusCode.Unauthorized"/>,
@@ -992,7 +992,7 @@ namespace net.openstack.Providers.Rackspace
         /// <remarks>
         /// The default implementation uses <see cref="JsonConvert"/> to convert <paramref name="body"/>
         /// to JSON notation, and then uses <see cref="Encoding.UTF8"/> to encode the text. The
-        /// <see cref="HttpRequestMessage.ContentType"/> and <see cref="HttpRequestMessage.ContentLength"/>
+        /// <see cref="HttpContentHeaders.ContentType"/> and <see cref="HttpContentHeaders.ContentLength"/>
         /// properties are updated to reflect the JSON content.
         /// </remarks>
         /// <typeparam name="TBody">The type modeling the body of the request.</typeparam>
@@ -1032,7 +1032,7 @@ namespace net.openstack.Providers.Rackspace
         /// <description><paramref name="method"/></description>
         /// </item>
         /// <item>
-        /// <description><see cref="HttpRequestMessage.Accept"/></description>
+        /// <description><see cref="HttpRequestHeaders.Accept"/></description>
         /// <description><see cref="JsonRequestSettings.JsonContentType"/></description>
         /// </item>
         /// <item>
@@ -1040,7 +1040,7 @@ namespace net.openstack.Providers.Rackspace
         /// <description><see name="IdentityToken.Id"/></description>
         /// </item>
         /// <item>
-        /// <description><see cref="HttpRequestMessage.UserAgent"/></description>
+        /// <description><see cref="HttpRequestHeaders.UserAgent"/></description>
         /// <description><see cref="UserAgentGenerator.UserAgent"/></description>
         /// </item>
         /// <item>
