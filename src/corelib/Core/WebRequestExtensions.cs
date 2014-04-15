@@ -14,6 +14,7 @@
     /// <preliminary/>
     public static class WebRequestExtensions
     {
+#if !NET45PLUS
         public static Task<Stream> GetRequestStreamAsync(this WebRequest request)
         {
             if (request == null)
@@ -39,6 +40,7 @@
 
             return GetResponseAsync(request, CancellationToken.None);
         }
+#endif
 
         /// <summary>
         /// Returns a response to an Internet request as an asynchronous operation.

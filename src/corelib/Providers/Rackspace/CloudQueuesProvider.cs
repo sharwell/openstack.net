@@ -20,6 +20,7 @@
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
+    using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
 
     /// <summary>
     /// Provides an implementation of <see cref="IQueueingService"/> for operating

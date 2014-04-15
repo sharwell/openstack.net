@@ -68,7 +68,6 @@
     <Compile Include="Core\Collections\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\ReadOnlyCollectionPage`1.cs" />
     <Compile Include="Core\BackoffPolicy.cs" />
-    <Compile Include="Core\Compat\StreamExtensions.cs" />
     <Compile Include="Core\CoreTaskExtensions.cs" />
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\AuthenticationType.cs" />
