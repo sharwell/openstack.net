@@ -243,6 +243,33 @@
                 .Then(requestResource);
         }
 
+        /// <summary>
+        /// This helper method determines if a specified <see cref="HttpRequestMessage"/> represents a
+        /// request from the <see cref="QueueExistsAsync"/> method.
+        /// </summary>
+        /// <remarks>
+        /// This method is used by <see cref="ValidateResultImplAsync"/> to support specialized handling
+        /// for the HTTP response to the <see cref="QueueExistsAsync"/> call. Unlike most calls, the
+        /// status code <see cref="HttpStatusCode.NotFound"/> indicates a successful response from this
+        /// call.
+        /// </remarks>
+        /// <param name="message">The request message, which may be <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if <paramref name="message"/> has the form of a message created by <see cref="QueueExistsAsync"/>; otherwise, <see langword="false"/>.</returns>
+        protected virtual bool IsQueueExistsMessage(HttpRequestMessage message)
+        {
+            if (message == null)
+                return false;
+
+            if (message.Method != HttpMethod.Head)
+                return false;
+
+            string[] uriSegments = message.RequestUri.Segments;
+            if (uriSegments.Length < 2 || !string.Equals("queues/", uriSegments[uriSegments.Length - 2], StringComparison.Ordinal))
+                return false;
+
+            return true;
+        }
+
         /// <inheritdoc/>
         public Task DeleteQueueAsync(QueueName queueName, CancellationToken cancellationToken)
         {
@@ -790,6 +817,22 @@
         }
 
         #endregion
+
+        /// <inheritdoc/>
+        /// <remarks>
+        /// This method extends the base implementation by providing special support for the
+        /// result of a call to <see cref="QueueExistsAsync"/>.
+        /// </remarks>
+        /// <seealso cref="IsQueueExistsMessage"/>
+        protected override Task<HttpResponseMessage> ValidateResultImplAsync(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
+        {
+            // special handling for QueueExistsAsync
+            if (task.Result.StatusCode == HttpStatusCode.NotFound && IsQueueExistsMessage(task.Result.RequestMessage))
+                return task;
+
+            // all other cases defer to the base implementation
+            return base.ValidateResultImplAsync(task, cancellationToken);
+        }
 
         /// <inheritdoc/>
         /// <remarks>
