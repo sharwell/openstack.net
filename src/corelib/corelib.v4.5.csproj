@@ -46,6 +46,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Rackspace.Net.UriTemplate, Version=1.0.0.0, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rackspace.Net.UriTemplate.1.0.0-beta002\lib\net40-client\Rackspace.Net.UriTemplate.dll</HintPath>
+    </Reference>
     <Reference Include="Rackspace.Threading, Version=1.1.0.0, Culture=neutral, PublicKeyToken=c5149d599dccb791, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Rackspace.Threading.1.1.0-beta001\lib\net45\Rackspace.Threading.dll</HintPath>
@@ -58,7 +62,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web">
       <Aliases>web</Aliases>
     </Reference>
@@ -68,6 +71,7 @@
     <Compile Include="Core\AsyncCompletionOption.cs" />
     <Compile Include="Core\Caching\ICache`1.cs" />
     <Compile Include="Core\Caching\NamespaceDoc.cs" />
+    <Compile Include="Core\Collections\ArrayExtensions.cs" />
     <Compile Include="Core\Collections\BasicReadOnlyCollectionPage`1.cs" />
     <Compile Include="Core\Collections\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\ReadOnlyCollectionPage`1.cs" />
@@ -76,6 +80,7 @@
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\AuthenticationType.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />
+    <Compile Include="Core\Domain\Converters\HttpMethodConverter.cs" />
     <Compile Include="Core\Domain\Converters\NamespaceDoc.cs" />
     <Compile Include="Core\Domain\Converters\PhysicalAddressSimpleConverter.cs" />
     <Compile Include="Core\Domain\Converters\SimpleStringJsonConverter`1.cs" />

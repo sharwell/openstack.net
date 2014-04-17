@@ -5,6 +5,12 @@
     using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
 
+#if PORTABLE
+    using IPAddress = System.String;
+#else
+    using IPAddress = System.Net.IPAddress;
+#endif
+
     /// <summary>
     /// This class models the JSON representation of a monitoring agent connection.
     /// </summary>
@@ -55,7 +61,9 @@
         /// This is the backing field for the <see cref="AgentAddress"/> property.
         /// </summary>
         [JsonProperty("agent_ip")]
+#if !PORTABLE
         [JsonConverter(typeof(IPAddressSimpleConverter))]
+#endif
         private IPAddress _agentIp;
 #pragma warning restore 649
 

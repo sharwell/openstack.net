@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using JSIStudios.SimpleRESTServices.Client.Json;
 using net.openstack.Core;
 using net.openstack.Core.Domain;
 using net.openstack.Core.Exceptions;
@@ -16,16 +15,25 @@ using net.openstack.Core.Validators;
 using net.openstack.Providers.Rackspace.Validators;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Rackspace.Net;
 using Rackspace.Threading;
 using CancellationToken = System.Threading.CancellationToken;
 using Encoding = System.Text.Encoding;
+
+#if !PORTABLE
+using JSIStudios.SimpleRESTServices.Client.Json;
 using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
 using RequestSettings = JSIStudios.SimpleRESTServices.Client.RequestSettings;
 using Response = JSIStudios.SimpleRESTServices.Client.Response;
 using Thread = System.Threading.Thread;
+#endif
 
 namespace net.openstack.Providers.Rackspace
 {
+#if PORTABLE
+    using IIdentityProvider = IIdentityService;
+#endif
+
     /// <summary>
     /// Adds common functionality for all Rackspace Providers.
     /// </summary>
@@ -39,16 +47,19 @@ namespace net.openstack.Providers.Rackspace
         /// </summary>
         protected readonly IIdentityProvider IdentityProvider;
 
+#if !PORTABLE
         /// <summary>
         /// The REST service implementation to use for requests sent from this provider.
         /// </summary>
         protected readonly IRestService RestService;
+#endif
 
         /// <summary>
         /// The default identity to use when none is specified in the specific request.
         /// </summary>
         protected readonly CloudIdentity DefaultIdentity;
 
+#if !PORTABLE
         /// <summary>
         /// The validator to use for determining whether a particular HTTP status code represents
         /// a success or failure.
@@ -59,6 +70,7 @@ namespace net.openstack.Providers.Rackspace
         /// This is the backing field for the <see cref="ConnectionLimit"/> property.
         /// </summary>
         private int? _connectionLimit;
+#endif
 
         /// <summary>
         /// This is the backing field for the <see cref="DefaultRegion"/> property.
@@ -72,6 +84,23 @@ namespace net.openstack.Providers.Rackspace
 
         private HttpClient _httpClient;
 
+#if PORTABLE
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProviderBase{TProvider}"/> class using
+        /// the specified default identity, default region, identity provider, and REST service
+        /// implementation, and the default HTTP response code validator.
+        /// </summary>
+        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, no default identity is available so all calls must specify an explicit identity.</param>
+        /// <param name="defaultRegion">The default region to use for calls that do not explicitly specify a region. If this value is <see langword="null"/>, the default region for the user will be used; otherwise if the service uses region-specific endpoints all calls must specify an explicit region.</param>
+        /// <param name="identityProvider">The identity provider to use for authenticating requests to this provider. If this value is <see langword="null"/>, a new instance of <see cref="CloudIdentityProvider"/> is created using <paramref name="defaultIdentity"/> as the default identity.</param>
+        protected ProviderBase(CloudIdentity defaultIdentity, string defaultRegion, IIdentityProvider identityProvider)
+        {
+            DefaultIdentity = defaultIdentity;
+            _defaultRegion = defaultRegion;
+            IdentityProvider = identityProvider ?? this as IIdentityProvider ?? new CloudIdentityProvider(defaultIdentity);
+            _httpClient = new HttpClient();
+        }
+#else
         /// <summary>
         /// Initializes a new instance of the <see cref="ProviderBase{TProvider}"/> class using
         /// the specified default identity, default region, identity provider, and REST service
@@ -102,6 +131,7 @@ namespace net.openstack.Providers.Rackspace
             ResponseCodeValidator = httpStatusCodeValidator ?? HttpResponseCodeValidator.Default;
             _httpClient = new HttpClient();
         }
+#endif
 
         /// <summary>
         /// This event is fired immediately before sending an asynchronous web request.
@@ -115,6 +145,7 @@ namespace net.openstack.Providers.Rackspace
         /// <preliminary/>
         public event EventHandler<WebResponseEventArgs> AfterAsyncWebResponse;
 
+#if !PORTABLE
         /// <summary>
         /// Gets or sets the maximum number of connections allowed on the <see cref="ServicePoint"/>
         /// objects used for requests. If the value is <see langword="null"/>, the connection limit value for the
@@ -136,6 +167,7 @@ namespace net.openstack.Providers.Rackspace
                 _connectionLimit = value;
             }
         }
+#endif
 
         /// <summary>
         /// Gets the default region for this provider instance, if one was specified.
@@ -189,6 +221,7 @@ namespace net.openstack.Providers.Rackspace
             }
         }
 
+#if !PORTABLE
         /// <summary>
         /// Execute a REST request with an <see cref="object"/> body and strongly-typed result.
         /// </summary>
@@ -639,6 +672,7 @@ namespace net.openstack.Providers.Rackspace
                 ConnectionLimit = ConnectionLimit,
             };
         }
+#endif
 
         /// <summary>
         /// Gets the <see cref="Endpoint"/> associated with the specified service in the user's service catalog.
@@ -685,7 +719,11 @@ namespace net.openstack.Providers.Rackspace
 
             identity = GetDefaultIdentity(identity);
 
+#if PORTABLE
+            var userAccess = IdentityProvider.GetUserAccessAsync(identity, false, CancellationToken.None).Result;
+#else
             var userAccess = IdentityProvider.GetUserAccess(identity);
+#endif
 
             if (userAccess == null || userAccess.ServiceCatalog == null)
                 throw new UserAuthenticationException("Unable to authenticate user and retrieve authorized service endpoints.");
@@ -795,6 +833,7 @@ namespace net.openstack.Providers.Rackspace
             return endpoint.InternalURL;
         }
 
+#if !PORTABLE
         /// <summary>
         /// Validate the response to an HTTP request.
         /// </summary>
@@ -868,6 +907,7 @@ namespace net.openstack.Providers.Rackspace
             input.Identity = identity;
             return input;
         }
+#endif
 
         /// <summary>
         /// Gets the effective cloud identity to use for a request based on the <paramref name="identity"/>
@@ -883,7 +923,11 @@ namespace net.openstack.Providers.Rackspace
             if (DefaultIdentity != null)
                 return DefaultIdentity;
 
+#if PORTABLE
+            return null;
+#else
             return IdentityProvider.DefaultIdentity;
+#endif
         }
 
         /// <summary>
@@ -1009,7 +1053,7 @@ namespace net.openstack.Providers.Rackspace
             string bodyText = JsonConvert.SerializeObject(body);
             byte[] encodedBody = Encoding.UTF8.GetBytes(bodyText);
             ByteArrayContent content = new ByteArrayContent(encodedBody);
-            content.Headers.ContentType = new MediaTypeHeaderValue(JsonRequestSettings.JsonContentType) { CharSet = "UTF-8" };
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json") { CharSet = "UTF-8" };
 
             content.Headers.ContentLength = encodedBody.Length;
 
@@ -1078,14 +1122,16 @@ namespace net.openstack.Providers.Rackspace
                 boundUri = uriTransform(boundUri);
 
             HttpRequestMessage request = new HttpRequestMessage(method, boundUri);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(JsonRequestSettings.JsonContentType));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.Add("X-Auth-Token", identityToken.Id);
             request.Headers.UserAgent.Add(new ProductInfoHeaderValue(UserAgentGenerator.ProductName, UserAgentGenerator.ProductVersion));
+#if !PORTABLE
             if (ConnectionLimit.HasValue)
             {
                 ServicePoint servicePoint = ServicePointManager.FindServicePoint(boundUri);
                 servicePoint.ConnectionLimit = ConnectionLimit.Value;
             }
+#endif
 
             return request;
         }
@@ -1120,12 +1166,14 @@ namespace net.openstack.Providers.Rackspace
         /// <preliminary/>
         protected virtual Task<Tuple<IdentityToken, Uri>> AuthenticateServiceAsync(CancellationToken cancellationToken)
         {
-            Task<IdentityToken> authenticate;
+            Task<IdentityToken> authenticate = null;
             IIdentityService identityService = IdentityProvider as IIdentityService;
             if (identityService != null)
                 authenticate = identityService.GetTokenAsync(GetDefaultIdentity(null), cancellationToken);
+#if !PORTABLE
             else
                 authenticate = Task.Factory.StartNew(() => IdentityProvider.GetToken(GetDefaultIdentity(null)));
+#endif
 
             Func<Task<IdentityToken>, Task<Tuple<IdentityToken, Uri>>> getBaseUri =
                 task =>
@@ -1338,7 +1386,7 @@ namespace net.openstack.Providers.Rackspace
         /// <preliminary/>
         protected virtual Task<T> ParseJsonResultImplAsync<T>(Task<Tuple<HttpResponseMessage, string>> task, CancellationToken cancellationToken)
         {
-#if NET35
+#if NET35 || (PORTABLE && !NET45PLUS)
             return Task.Factory.StartNew(() => JsonConvert.DeserializeObject<T>(task.Result.Item2));
 #else
             return JsonConvert.DeserializeObjectAsync<T>(task.Result.Item2);

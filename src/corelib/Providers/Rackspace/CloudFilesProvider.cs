@@ -22,6 +22,7 @@ using net.openstack.Providers.Rackspace.Objects.Monitoring;
 using net.openstack.Providers.Rackspace.Objects.Response;
 using net.openstack.Providers.Rackspace.Validators;
 using Newtonsoft.Json;
+using global::Rackspace.Net;
 
 #if NET45PLUS
 using System.Collections.ObjectModel;

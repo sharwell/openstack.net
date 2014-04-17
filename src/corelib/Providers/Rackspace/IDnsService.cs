@@ -15,6 +15,12 @@ namespace net.openstack.Providers.Rackspace
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
 
+#if PORTABLE
+    using IPAddress = System.String;
+#else
+    using IPAddress = System.Net.IPAddress;
+#endif
+
     /// <summary>
     /// Represents a provider for the Rackspace Cloud DNS service.
     /// </summary>

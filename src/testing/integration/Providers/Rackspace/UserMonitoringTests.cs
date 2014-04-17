@@ -21,9 +21,14 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
-    using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
+    using HttpMethod = System.Net.Http.HttpMethod;
     using Path = System.IO.Path;
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#else
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
+#endif
 
     [TestClass]
     public class UserMonitoringTests
@@ -374,7 +379,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
+                    method: default(HttpMethod),
                     payload: default(string));
                 IEnumerable<MonitoringZoneId> monitoringZonesPoll = new[] { zone.Id };
                 TimeSpan? timeout = null;
@@ -431,7 +436,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
+                    method: default(HttpMethod),
                     payload: default(string));
                 IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
                 TimeSpan? timeout = null;
@@ -492,7 +497,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
+                    method: default(HttpMethod),
                     payload: default(string));
                 IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
                 TimeSpan? timeout = null;
@@ -557,7 +562,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
+                    method: default(HttpMethod),
                     payload: default(string));
                 IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
                 TimeSpan? timeout = null;
@@ -611,7 +616,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
+                    method: default(HttpMethod),
                     payload: default(string));
                 IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
                 TimeSpan? timeout = null;
@@ -811,7 +816,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
+                    method: default(HttpMethod),
                     payload: default(string));
                 IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
                 TimeSpan? timeout = null;
@@ -879,7 +884,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
+                    method: default(HttpMethod),
                     payload: default(string));
                 IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
                 TimeSpan? timeout = null;
@@ -936,7 +941,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
+                    method: default(HttpMethod),
                     payload: default(string));
                 IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
                 TimeSpan? timeout = null;
@@ -1029,7 +1034,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     bodyMatches: default(IDictionary<string, string>),
                     followRedirects: default(bool?),
                     headers: default(IDictionary<string, string>),
-                    method: default(HttpMethod?),
+                    method: default(HttpMethod),
                     payload: default(string));
                 IEnumerable<MonitoringZoneId> monitoringZonesPoll = monitoringZones.Select(i => i.Id);
                 TimeSpan? timeout = null;
@@ -2973,7 +2978,9 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var provider = new TestCloudMonitoringProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
+#if !PORTABLE
             provider.ConnectionLimit = 20;
+#endif
             return provider;
         }
 

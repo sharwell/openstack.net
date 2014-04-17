@@ -48,6 +48,7 @@ namespace Net.OpenStack.Testing.Integration
             _settings = appCredentials;
         }
 
+#if !PORTABLE
         public static IIdentityProvider CreateIdentityProvider()
         {
             return CreateIdentityProvider(Bootstrapper.Settings.TestIdentity);
@@ -77,6 +78,7 @@ namespace Net.OpenStack.Testing.Integration
         {
             return new CloudFilesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null, null);
         }
+#endif
     }
 
     public class OpenstackNetSetings

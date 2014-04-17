@@ -3,7 +3,11 @@
     using System;
     using System.Collections.Generic;
     using Newtonsoft.Json;
+#if PORTABLE
+    using IPAddress = System.String;
+#else
     using IPAddress = System.Net.IPAddress;
+#endif
 
     /// <summary>
     /// This class models the JSON representation of a request to create a new

@@ -7,19 +7,27 @@
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using global::Rackspace.Net;
     using global::Rackspace.Threading;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.Monitoring;
     using Newtonsoft.Json.Linq;
     using CancellationToken = System.Threading.CancellationToken;
+
+#if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
+#endif
 
 #if NET35
     using net.openstack.Core;
+#endif
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
 #endif
 
     /// <summary>
@@ -37,6 +45,19 @@
         /// <seealso cref="GetBaseUriAsync"/>
         private Uri _baseUri;
 
+#if PORTABLE
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudMonitoringProvider"/> class with
+        /// the specified values.
+        /// </summary>
+        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, no default identity is available so all calls must specify an explicit identity.</param>
+        /// <param name="defaultRegion">The default region to use for calls that do not explicitly specify a region. If this value is <see langword="null"/>, the default region for the user will be used; otherwise if the service uses region-specific endpoints all calls must specify an explicit region.</param>
+        /// <param name="identityProvider">The identity provider to use for authenticating requests to this provider. If this value is <see langword="null"/>, a new instance of <see cref="CloudIdentityProvider"/> is created using <paramref name="defaultIdentity"/> as the default identity.</param>
+        public CloudMonitoringProvider(CloudIdentity defaultIdentity, string defaultRegion, IIdentityProvider identityProvider)
+            : base(defaultIdentity, defaultRegion, identityProvider)
+        {
+        }
+#else
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudMonitoringProvider"/> class with
         /// the specified values.
@@ -62,13 +83,14 @@
             : base(defaultIdentity, defaultRegion, identityProvider, restService, httpStatusCodeValidator)
         {
         }
+#endif
 
         #region IMonitoringService Members
 
         /// <inheritdoc/>
         public Task<MonitoringAccount> GetAccountAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/account");
+            UriTemplate template = new UriTemplate("account");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -90,7 +112,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/account");
+            UriTemplate template = new UriTemplate("account");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -107,7 +129,7 @@
         /// <inheritdoc/>
         public Task<MonitoringLimits> GetLimitsAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/limits");
+            UriTemplate template = new UriTemplate("limits");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -127,7 +149,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/audits?marker={marker}&limit={limit}&from={from}&to={to}");
+            UriTemplate template = new UriTemplate("audits{?marker,limit,from,to}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -176,7 +198,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/entities");
+            UriTemplate template = new UriTemplate("entities");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -185,11 +207,11 @@
             Func<Task<Tuple<HttpResponseMessage, string>>, Task<EntityId>> parseResult =
                 task =>
                 {
-                    UriTemplate entityTemplate = new UriTemplate("/entities/{entityId}");
+                    UriTemplate entityTemplate = new UriTemplate("entities/{entityId}");
                     Uri relativeLocation = task.Result.Item1.Headers.Location;
                     Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = entityTemplate.Match(_baseUri, location);
-                    return CompletedTask.FromResult(new EntityId(match.BoundVariables["entityId"]));
+                    return CompletedTask.FromResult(new EntityId((string)match.Bindings["entityId"].Value));
                 };
 
             Func<Task<HttpRequestMessage>, Task<EntityId>> requestResource =
@@ -206,7 +228,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/entities?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("entities{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -251,7 +273,7 @@
             if (entityId == null)
                 throw new ArgumentNullException("entityId");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}");
+            UriTemplate template = new UriTemplate("entities/{entityId}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -273,7 +295,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}");
+            UriTemplate template = new UriTemplate("entities/{entityId}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -293,7 +315,7 @@
             if (entityId == null)
                 throw new ArgumentNullException("entityId");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}");
+            UriTemplate template = new UriTemplate("entities/{entityId}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -315,7 +337,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/checks");
+            UriTemplate template = new UriTemplate("entities/{entityId}/checks");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -324,11 +346,11 @@
             Func<Task<Tuple<HttpResponseMessage, string>>, Task<CheckId>> parseResult =
                 task =>
                 {
-                    UriTemplate entityTemplate = new UriTemplate("/entities/{entityId}/checks/{checkId}");
+                    UriTemplate entityTemplate = new UriTemplate("entities/{entityId}/checks/{checkId}");
                     Uri relativeLocation = task.Result.Item1.Headers.Location;
                     Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = entityTemplate.Match(_baseUri, location);
-                    return CompletedTask.FromResult(new CheckId(match.BoundVariables["checkId"]));
+                    return CompletedTask.FromResult(new CheckId((string)match.Bindings["checkId"].Value));
                 };
 
             Func<Task<HttpRequestMessage>, Task<CheckId>> requestResource =
@@ -347,7 +369,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/test-check?debug={debug}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/test-check{?debug}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value } };
             if (debug != null)
                 parameters.Add("debug", debug.ToString());
@@ -371,7 +393,7 @@
             if (checkId == null)
                 throw new ArgumentNullException("checkId");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/checks/{checkId}/test");
+            UriTemplate template = new UriTemplate("entities/{entityId}/checks/{checkId}/test");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "checkId", checkId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -393,7 +415,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/checks?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/checks{?marker,limit}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value } };
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -440,7 +462,7 @@
             if (checkId == null)
                 throw new ArgumentNullException("checkId");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/checks/{checkId}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/checks/{checkId}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "checkId", checkId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -464,7 +486,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/checks/{checkId}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/checks/{checkId}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "checkId", checkId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -486,7 +508,7 @@
             if (checkId == null)
                 throw new ArgumentNullException("checkId");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/checks/{checkId}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/checks/{checkId}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "checkId", checkId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -506,7 +528,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/check_types?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("check_types{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -551,7 +573,7 @@
             if (checkTypeId == null)
                 throw new ArgumentNullException("checkTypeId");
 
-            UriTemplate template = new UriTemplate("/check_types/{checkTypeId}");
+            UriTemplate template = new UriTemplate("check_types/{checkTypeId}");
             var parameters = new Dictionary<string, string> { { "checkTypeId", checkTypeId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -575,7 +597,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/checks/{checkId}/metrics?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/checks/{checkId}/metrics{?marker,limit}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "checkId", checkId.Value } };
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -626,7 +648,7 @@
             if (points <= 0)
                 throw new ArgumentOutOfRangeException("points");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/checks/{checkId}/metrics/{metricName}/plot?points={points}&resolution={resolution}&SELECT={select}&from={from}&to={to}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/checks/{checkId}/metrics/{metricName}/plot{?points,resolution,SELECT,from,to}");
             var parameters = new Dictionary<string, string>
             {
                 { "entityId", entityId.Value },
@@ -640,7 +662,7 @@
             if (resolution != null)
                 parameters.Add("resolution", resolution.Name);
             if (select != null)
-                parameters.Add("select", "select");
+                parameters.Add("SELECT", "select");
 
             Func<Uri, Uri> transform =
                 uri =>
@@ -686,7 +708,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/alarms");
+            UriTemplate template = new UriTemplate("entities/{entityId}/alarms");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -695,11 +717,11 @@
             Func<Task<Tuple<HttpResponseMessage, string>>, Task<AlarmId>> parseResult =
                 task =>
                 {
-                    UriTemplate entityTemplate = new UriTemplate("/entities/{entityId}/alarms/{alarmId}");
+                    UriTemplate entityTemplate = new UriTemplate("entities/{entityId}/alarms/{alarmId}");
                     Uri relativeLocation = task.Result.Item1.Headers.Location;
                     Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = entityTemplate.Match(_baseUri, location);
-                    return CompletedTask.FromResult(new AlarmId(match.BoundVariables["alarmId"]));
+                    return CompletedTask.FromResult(new AlarmId((string)match.Bindings["alarmId"].Value));
                 };
 
             Func<Task<HttpRequestMessage>, Task<AlarmId>> requestResource =
@@ -718,7 +740,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/test-alarm");
+            UriTemplate template = new UriTemplate("entities/{entityId}/test-alarm");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -740,7 +762,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/alarms?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/alarms{?marker,limit}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value } };
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -787,7 +809,7 @@
             if (alarmId == null)
                 throw new ArgumentNullException("alarmId");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/alarms/{alarmId}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/alarms/{alarmId}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "alarmId", alarmId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -811,7 +833,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/alarms/{alarmId}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/alarms/{alarmId}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "alarmId", alarmId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -833,7 +855,7 @@
             if (alarmId == null)
                 throw new ArgumentNullException("alarmId");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/alarms/{alarmId}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/alarms/{alarmId}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "alarmId", alarmId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -853,7 +875,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/notification_plans");
+            UriTemplate template = new UriTemplate("notification_plans");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -862,11 +884,11 @@
             Func<Task<Tuple<HttpResponseMessage, string>>, Task<NotificationPlanId>> parseResult =
                 task =>
                 {
-                    UriTemplate entityTemplate = new UriTemplate("/notification_plans/{notificationPlanId}");
+                    UriTemplate entityTemplate = new UriTemplate("notification_plans/{notificationPlanId}");
                     Uri relativeLocation = task.Result.Item1.Headers.Location;
                     Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = entityTemplate.Match(_baseUri, location);
-                    return CompletedTask.FromResult(new NotificationPlanId(match.BoundVariables["notificationPlanId"]));
+                    return CompletedTask.FromResult(new NotificationPlanId((string)match.Bindings["notificationPlanId"].Value));
                 };
 
             Func<Task<HttpRequestMessage>, Task<NotificationPlanId>> requestResource =
@@ -883,7 +905,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/notification_plans?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("notification_plans{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -928,7 +950,7 @@
             if (notificationPlanId == null)
                 throw new ArgumentNullException("notificationPlanId");
 
-            UriTemplate template = new UriTemplate("/notification_plans/{notificationPlanId}");
+            UriTemplate template = new UriTemplate("notification_plans/{notificationPlanId}");
             var parameters = new Dictionary<string, string> { { "notificationPlanId", notificationPlanId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -950,7 +972,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/notification_plans/{notificationPlanId}");
+            UriTemplate template = new UriTemplate("notification_plans/{notificationPlanId}");
             var parameters = new Dictionary<string, string> { { "notificationPlanId", notificationPlanId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -970,7 +992,7 @@
             if (notificationPlanId == null)
                 throw new ArgumentNullException("notificationPlanId");
 
-            UriTemplate template = new UriTemplate("/notification_plans/{notificationPlanId}");
+            UriTemplate template = new UriTemplate("notification_plans/{notificationPlanId}");
             var parameters = new Dictionary<string, string> { { "notificationPlanId", notificationPlanId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -990,7 +1012,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/monitoring_zones?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("monitoring_zones{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -1035,7 +1057,7 @@
             if (monitoringZoneId == null)
                 throw new ArgumentNullException("monitoringZoneId");
 
-            UriTemplate template = new UriTemplate("/monitoring_zones/{monitoringZoneId}");
+            UriTemplate template = new UriTemplate("monitoring_zones/{monitoringZoneId}");
             var parameters = new Dictionary<string, string> { { "monitoringZoneId", monitoringZoneId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1057,7 +1079,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/monitoring_zones/{monitoringZoneId}/traceroute");
+            UriTemplate template = new UriTemplate("monitoring_zones/{monitoringZoneId}/traceroute");
             var parameters = new Dictionary<string, string> { { "monitoringZoneId", monitoringZoneId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -1079,7 +1101,7 @@
             if (alarmId == null)
                 throw new ArgumentNullException("alarmId");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/alarms/{alarmId}/notification_history");
+            UriTemplate template = new UriTemplate("entities/{entityId}/alarms/{alarmId}/notification_history");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "alarmId", alarmId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1120,7 +1142,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/alarms/{alarmId}/notification_history/{checkId}?marker={marker}&limit={limit}&from={from}&to={to}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/alarms/{alarmId}/notification_history/{checkId}{?marker,limit,from,to}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "alarmId", alarmId.Value }, { "checkId", checkId.Value } };
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -1175,7 +1197,7 @@
             if (alarmNotificationHistoryItemId == null)
                 throw new ArgumentNullException("alarmNotificationHistoryItemId");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/alarms/{alarmId}/notification_history/{checkId}/{uuid}");
+            UriTemplate template = new UriTemplate("entities/{entityId}/alarms/{alarmId}/notification_history/{checkId}/{uuid}");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "alarmId", alarmId.Value }, { "checkId", checkId.Value }, { "uuid", alarmNotificationHistoryItemId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1195,7 +1217,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/notifications");
+            UriTemplate template = new UriTemplate("notifications");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -1204,11 +1226,11 @@
             Func<Task<Tuple<HttpResponseMessage, string>>, Task<NotificationId>> parseResult =
                 task =>
                 {
-                    UriTemplate entityTemplate = new UriTemplate("/notifications/{notificationId}");
+                    UriTemplate entityTemplate = new UriTemplate("notifications/{notificationId}");
                     Uri relativeLocation = task.Result.Item1.Headers.Location;
                     Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = entityTemplate.Match(_baseUri, location);
-                    return CompletedTask.FromResult(new NotificationId(match.BoundVariables["notificationId"]));
+                    return CompletedTask.FromResult(new NotificationId((string)match.Bindings["notificationId"].Value));
                 };
 
             Func<Task<HttpRequestMessage>, Task<NotificationId>> requestResource =
@@ -1225,7 +1247,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/test-notification");
+            UriTemplate template = new UriTemplate("test-notification");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -1245,7 +1267,7 @@
             if (notificationId == null)
                 throw new ArgumentNullException("notificationId");
 
-            UriTemplate template = new UriTemplate("/notifications/{notificationId}/test");
+            UriTemplate template = new UriTemplate("notifications/{notificationId}/test");
             var parameters = new Dictionary<string, string> { { "notificationId", notificationId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1265,7 +1287,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/notifications?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("notifications{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -1310,7 +1332,7 @@
             if (notificationId == null)
                 throw new ArgumentNullException("notificationId");
 
-            UriTemplate template = new UriTemplate("/notifications/{notificationId}");
+            UriTemplate template = new UriTemplate("notifications/{notificationId}");
             var parameters = new Dictionary<string, string> { { "notificationId", notificationId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1332,7 +1354,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/notifications/{notificationId}");
+            UriTemplate template = new UriTemplate("notifications/{notificationId}");
             var parameters = new Dictionary<string, string> { { "notificationId", notificationId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -1352,7 +1374,7 @@
             if (notificationId == null)
                 throw new ArgumentNullException("notificationId");
 
-            UriTemplate template = new UriTemplate("/notifications/{notificationId}");
+            UriTemplate template = new UriTemplate("notifications/{notificationId}");
             var parameters = new Dictionary<string, string> { { "notificationId", notificationId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1372,7 +1394,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/notification_types?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("notification_types{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -1417,7 +1439,7 @@
             if (notificationTypeId == null)
                 throw new ArgumentNullException("notificationTypeId");
 
-            UriTemplate template = new UriTemplate("/notification_types/{notificationTypeId}");
+            UriTemplate template = new UriTemplate("notification_types/{notificationTypeId}");
             var parameters = new Dictionary<string, string> { { "notificationTypeId", notificationTypeId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1443,7 +1465,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/changelogs/alarms?entityId={entityId}&marker={marker}&limit={limit}&from={from}&to={to}");
+            UriTemplate template = new UriTemplate("changelogs/alarms?entityId={entityId}{&marker,limit,from,to}");
             var parameters = new Dictionary<string, string>();
             if (entityId != null)
                 parameters.Add("entityId", entityId.Value);
@@ -1501,7 +1523,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/views/overview?ENTITYID={entityIdFilter}&marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("views/overview?ENTITYID={entityIdFilter}{&marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -1558,7 +1580,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/alarm_examples?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("alarm_examples{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -1603,7 +1625,7 @@
             if (alarmExampleId == null)
                 throw new ArgumentNullException("alarmExampleId");
 
-            UriTemplate template = new UriTemplate("/alarm_examples/{alarmExampleId}");
+            UriTemplate template = new UriTemplate("alarm_examples/{alarmExampleId}");
             var parameters = new Dictionary<string, string> { { "alarmExampleId", alarmExampleId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1623,7 +1645,7 @@
             if (alarmExampleId == null)
                 throw new ArgumentNullException("alarmExampleId");
 
-            UriTemplate template = new UriTemplate("/alarm_examples/{alarmExampleId}");
+            UriTemplate template = new UriTemplate("alarm_examples/{alarmExampleId}");
             var parameters = new Dictionary<string, string> { { "alarmExampleId", alarmExampleId.Value } };
 
             JObject body = new JObject(
@@ -1646,7 +1668,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/agents?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("agents{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -1691,7 +1713,7 @@
             if (agentId == null)
                 throw new ArgumentNullException("agentId");
 
-            UriTemplate template = new UriTemplate("/agents/{agentId}");
+            UriTemplate template = new UriTemplate("agents/{agentId}");
             var parameters = new Dictionary<string, string> { { "agentId", agentId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1713,7 +1735,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/agents/{agentId}/connections?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("agents/{agentId}/connections{?marker,limit}");
             var parameters = new Dictionary<string, string> { { "agentId", agentId.Value } };
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -1760,7 +1782,7 @@
             if (agentConnectionId == null)
                 throw new ArgumentNullException("agentConnectionId");
 
-            UriTemplate template = new UriTemplate("/agents/{agentId}/connections/{connId}");
+            UriTemplate template = new UriTemplate("agents/{agentId}/connections/{connId}");
             var parameters = new Dictionary<string, string> { { "agentId", agentId.Value }, { "connId", agentConnectionId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1780,7 +1802,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/agent_tokens");
+            UriTemplate template = new UriTemplate("agent_tokens");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -1789,11 +1811,11 @@
             Func<Task<Tuple<HttpResponseMessage, string>>, Task<AgentTokenId>> parseResult =
                 task =>
                 {
-                    UriTemplate agentTokenTemplate = new UriTemplate("/agent_tokens/{tokenId}");
+                    UriTemplate agentTokenTemplate = new UriTemplate("agent_tokens/{tokenId}");
                     Uri relativeLocation = task.Result.Item1.Headers.Location;
                     Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
                     UriTemplateMatch match = agentTokenTemplate.Match(_baseUri, location);
-                    return CompletedTask.FromResult(new AgentTokenId(match.BoundVariables["tokenId"]));
+                    return CompletedTask.FromResult(new AgentTokenId((string)match.Bindings["tokenId"].Value));
                 };
 
             Func<Task<HttpRequestMessage>, Task<AgentTokenId>> requestResource =
@@ -1810,7 +1832,7 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/agent_tokens?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("agent_tokens{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -1855,7 +1877,7 @@
             if (agentTokenId == null)
                 throw new ArgumentNullException("agentTokenId");
 
-            UriTemplate template = new UriTemplate("/agent_tokens/{tokenId}");
+            UriTemplate template = new UriTemplate("agent_tokens/{tokenId}");
             var parameters = new Dictionary<string, string> { { "tokenId", agentTokenId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1877,7 +1899,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/agent_tokens/{tokenId}");
+            UriTemplate template = new UriTemplate("agent_tokens/{tokenId}");
             var parameters = new Dictionary<string, string> { { "tokenId", agentTokenId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -1897,7 +1919,7 @@
             if (agentTokenId == null)
                 throw new ArgumentNullException("agentTokenId");
 
-            UriTemplate template = new UriTemplate("/agent_tokens/{tokenId}");
+            UriTemplate template = new UriTemplate("agent_tokens/{tokenId}");
             var parameters = new Dictionary<string, string> { { "tokenId", agentTokenId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -2006,7 +2028,7 @@
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/entities/{entityId}/agent/check_types/{agentCheckType}/targets");
+            UriTemplate template = new UriTemplate("entities/{entityId}/agent/check_types/{agentCheckType}/targets");
             var parameters = new Dictionary<string, string> { { "entityId", entityId.Value }, { "agentCheckType", agentCheckType.ToString() } };
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -2074,7 +2096,7 @@
             if (hostInformation == null)
                 throw new ArgumentNullException("hostInformation");
 
-            UriTemplate template = new UriTemplate("/agents/{agentId}/host_info/{hostInfo}");
+            UriTemplate template = new UriTemplate("agents/{agentId}/host_info/{hostInfo}");
             var parameters = new Dictionary<string, string> { { "agentId", agentId.Value }, { "hostInfo", hostInformation.ToString() } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -2105,7 +2127,11 @@
                 () =>
                 {
                     Endpoint endpoint = GetServiceEndpoint(null, "rax:monitor", "cloudMonitoring", null);
-                    _baseUri = new Uri(endpoint.PublicURL);
+                    string uri = endpoint.PublicURL;
+                    if (!uri.EndsWith("/"))
+                        uri += "/";
+
+                    _baseUri = new Uri(uri);
                     return _baseUri;
                 });
         }

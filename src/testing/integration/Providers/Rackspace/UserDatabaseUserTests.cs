@@ -5,12 +5,18 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Net;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
+    using net.openstack.Core.Exceptions;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#endif
 
     [TestClass]
     public class UserDatabaseUserTests
@@ -300,11 +306,11 @@
                     if (innerExceptions.Count != 1)
                         throw;
 
-                    WebException webException = innerExceptions[0] as WebException;
+                    HttpWebException webException = innerExceptions[0] as HttpWebException;
                     if (webException == null)
                         throw;
 
-                    HttpWebResponse response = webException.Response as HttpWebResponse;
+                    HttpResponseMessage response = webException.ResponseMessage;
                     if (response == null)
                         throw;
 

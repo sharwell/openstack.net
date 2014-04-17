@@ -17,18 +17,25 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
+    using net.openstack.Core.Exceptions;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
     using Newtonsoft.Json;
+    using global::Rackspace.Net;
     using Security.Cryptography;
     using Security.Cryptography.X509Certificates;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
     using Interlocked = System.Threading.Interlocked;
     using Path = System.IO.Path;
     using StringBuilder = System.Text.StringBuilder;
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#else
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
+#endif
 
     /// <preliminary/>
     [TestClass]
@@ -213,7 +220,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         public async Task TestRemoveLoadBalancerRange()
         {
             ILoadBalancerService provider = CreateProvider();
-            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(30))))
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(90))))
             {
                 IEnumerable<LoadBalancingProtocol> protocols = await provider.ListProtocolsAsync(cancellationTokenSource.Token);
                 LoadBalancingProtocol httpProtocol = protocols.First(i => i.Name.Equals("HTTP", StringComparison.OrdinalIgnoreCase));
@@ -303,7 +310,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         public async Task TestModifyErrorPage()
         {
             ILoadBalancerService provider = CreateProvider();
-            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(30))))
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(60))))
             {
                 IEnumerable<LoadBalancingProtocol> protocols = await provider.ListProtocolsAsync(cancellationTokenSource.Token);
                 LoadBalancingProtocol httpProtocol = protocols.First(i => i.Name.Equals("HTTP", StringComparison.OrdinalIgnoreCase));
@@ -407,7 +414,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Status);
 
+#if PORTABLE
+                NodeConfiguration nodeConfiguration = new NodeConfiguration(entry.AddressList[0].ToString(), 80, NodeCondition.Enabled, NodeType.Primary, null);
+#else
                 NodeConfiguration nodeConfiguration = new NodeConfiguration(entry.AddressList[0], 80, NodeCondition.Enabled, NodeType.Primary, null);
+#endif
                 Node node = await provider.AddNodeAsync(tempLoadBalancer.Id, nodeConfiguration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 Assert.AreEqual(NodeStatus.Online, node.Status);
@@ -465,8 +476,13 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 NodeConfiguration[] nodeConfigurations =
                     new[]
                     {
+#if PORTABLE
+                        new NodeConfiguration(entryA.AddressList[0].ToString(), 80, NodeCondition.Enabled, NodeType.Primary, null),
+                        new NodeConfiguration(entryB.AddressList[0].ToString(), 80, NodeCondition.Enabled, NodeType.Primary, null)
+#else
                         new NodeConfiguration(entryA.AddressList[0], 80, NodeCondition.Enabled, NodeType.Primary, null),
                         new NodeConfiguration(entryB.AddressList[0], 80, NodeCondition.Enabled, NodeType.Primary, null)
+#endif
                     };
 
                 IEnumerable<Node> nodes = await provider.AddNodeRangeAsync(tempLoadBalancer.Id, nodeConfigurations, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
@@ -519,7 +535,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 LoadBalancerConfiguration configuration = new LoadBalancerConfiguration(
                     name: loadBalancerName,
+#if PORTABLE
+                    nodes: new[] { new NodeConfiguration(entry.AddressList[0].ToString(), 80, NodeCondition.Enabled, NodeType.Primary, null) },
+#else
                     nodes: new[] { new NodeConfiguration(entry.AddressList[0], 80, NodeCondition.Enabled, NodeType.Primary, null) },
+#endif
                     protocol: httpProtocol,
                     virtualAddresses: new[] { new LoadBalancerVirtualAddress(LoadBalancerVirtualAddressType.ServiceNet) },
                     algorithm: LoadBalancingAlgorithm.RoundRobin);
@@ -554,7 +574,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 LoadBalancerConfiguration configuration = new LoadBalancerConfiguration(
                     name: loadBalancerName,
+#if PORTABLE
+                    nodes: new[] { new NodeConfiguration(entry.AddressList[0].ToString(), 80, NodeCondition.Enabled, NodeType.Primary, null) },
+#else
                     nodes: new[] { new NodeConfiguration(entry.AddressList[0], 80, NodeCondition.Enabled, NodeType.Primary, null) },
+#endif
                     protocol: httpProtocol,
                     virtualAddresses: new[] { new LoadBalancerVirtualAddress(LoadBalancerVirtualAddressType.ServiceNet) },
                     algorithm: LoadBalancingAlgorithm.RoundRobin);
@@ -647,10 +671,22 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 for (int i = 0; i < 4; i++)
                 {
                     // add a virtual address
-                    LoadBalancerVirtualAddress addedAddress = await provider.AddVirtualAddressAsync(tempLoadBalancer.Id, LoadBalancerVirtualAddressType.Public, AddressFamily.InterNetworkV6, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
+                    LoadBalancerVirtualAddress addedAddress = await provider.AddVirtualAddressAsync(
+                        tempLoadBalancer.Id,
+                        LoadBalancerVirtualAddressType.Public,
+#if PORTABLE
+                        "IPV6",
+#else
+                        AddressFamily.InterNetworkV6,
+#endif
+                        AsyncCompletionOption.RequestCompleted,
+                        cancellationTokenSource.Token,
+                        null);
                     Assert.IsNotNull(addedAddress);
                     Assert.IsNotNull(addedAddress.Address);
+#if !PORTABLE
                     Assert.AreEqual(AddressFamily.InterNetworkV6, addedAddress.Address.AddressFamily);
+#endif
                     addedAddresses.Add(addedAddress);
                 }
 
@@ -861,7 +897,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         public async Task TestAccessLists()
         {
             ILoadBalancerService provider = CreateProvider();
-            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(60))))
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(200))))
             {
                 IEnumerable<LoadBalancingProtocol> protocols = await provider.ListProtocolsAsync(cancellationTokenSource.Token);
                 LoadBalancingProtocol httpProtocol = protocols.First(i => i.Name.Equals("HTTP", StringComparison.OrdinalIgnoreCase));
@@ -883,7 +919,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 // allow docs.rackspace.com
                 IPHostEntry resolved = await Task.Factory.FromAsync<IPHostEntry>(Dns.BeginGetHostEntry("docs.rackspace.com", null, null), Dns.EndGetHostEntry);
+#if PORTABLE
+                NetworkItem firstNetworkItem = new NetworkItem(resolved.AddressList[0].ToString(), AccessType.Allow);
+#else
                 NetworkItem firstNetworkItem = new NetworkItem(resolved.AddressList[0], AccessType.Allow);
+#endif
                 await provider.CreateAccessListAsync(tempLoadBalancer.Id, firstNetworkItem, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 //List<NetworkItem> expected = new List<NetworkItem> { firstNetworkItem };
                 LoadBalancer loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
@@ -900,6 +940,27 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 // allow developer.rackspace.com
                 // deny google.com, yahoo.com, microsoft.com, amazon.com
+#if PORTABLE
+                NetworkItem[] batch =
+                    new[]
+                    {
+                        new NetworkItem(
+                            (await Task.Factory.FromAsync<IPHostEntry>(Dns.BeginGetHostEntry("google.com", null, null), Dns.EndGetHostEntry)).AddressList[0].ToString(),
+                            AccessType.Deny),
+                        new NetworkItem(
+                            (await Task.Factory.FromAsync<IPHostEntry>(Dns.BeginGetHostEntry("developer.rackspace.com", null, null), Dns.EndGetHostEntry)).AddressList[0].ToString(),
+                            AccessType.Allow),
+                        new NetworkItem(
+                            (await Task.Factory.FromAsync<IPHostEntry>(Dns.BeginGetHostEntry("yahoo.com", null, null), Dns.EndGetHostEntry)).AddressList[0].ToString(),
+                            AccessType.Deny),
+                        new NetworkItem(
+                            (await Task.Factory.FromAsync<IPHostEntry>(Dns.BeginGetHostEntry("microsoft.com", null, null), Dns.EndGetHostEntry)).AddressList[0].ToString(),
+                            AccessType.Deny),
+                        new NetworkItem(
+                            (await Task.Factory.FromAsync<IPHostEntry>(Dns.BeginGetHostEntry("amazon.com", null, null), Dns.EndGetHostEntry)).AddressList[0].ToString(),
+                            AccessType.Deny),
+                    };
+#else
                 NetworkItem[] batch =
                     new[]
                     {
@@ -919,6 +980,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                             (await Task.Factory.FromAsync<IPHostEntry>(Dns.BeginGetHostEntry("amazon.com", null, null), Dns.EndGetHostEntry)).AddressList[0],
                             AccessType.Deny),
                     };
+#endif
                 await provider.CreateAccessListAsync(tempLoadBalancer.Id, batch, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 //expected.AddRange(batch.AsEnumerable().Reverse());
                 loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
@@ -968,7 +1030,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     {
                         await provider.ClearAccessListAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                     }
-                    catch (WebException ex)
+                    catch (HttpWebException ex)
                     {
                         throw new AggregateException(ex);
                     }
@@ -978,11 +1040,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     aggregate.Flatten().Handle(
                         ex =>
                         {
-                            WebException webException = ex as WebException;
+                            HttpWebException webException = ex as HttpWebException;
                             if (webException == null)
                                 return false;
 
-                            HttpWebResponse response = webException.Response as HttpWebResponse;
+                            HttpResponseMessage response = webException.ResponseMessage;
                             if (response == null)
                                 return false;
 
@@ -1060,7 +1122,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     {
                         await provider.RemoveHealthMonitorAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                     }
-                    catch (WebException ex)
+                    catch (HttpWebException ex)
                     {
                         throw new AggregateException(ex);
                     }
@@ -1070,11 +1132,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     aggregate.Flatten().Handle(
                         ex =>
                         {
-                            WebException webException = ex as WebException;
+                            HttpWebException webException = ex as HttpWebException;
                             if (webException == null)
                                 return false;
 
-                            HttpWebResponse response = webException.Response as HttpWebResponse;
+                            HttpResponseMessage response = webException.ResponseMessage;
                             if (response == null)
                                 return false;
 
@@ -1095,7 +1157,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         public async Task TestHealthMonitorHttp()
         {
             ILoadBalancerService provider = CreateProvider();
-            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(60))))
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(200))))
             {
                 IEnumerable<LoadBalancingProtocol> protocols = await provider.ListProtocolsAsync(cancellationTokenSource.Token);
                 LoadBalancingProtocol httpProtocol = protocols.First(i => i.Name.Equals("HTTP", StringComparison.OrdinalIgnoreCase));
@@ -1164,7 +1226,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     {
                         await provider.RemoveHealthMonitorAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                     }
-                    catch (WebException ex)
+                    catch (HttpWebException ex)
                     {
                         throw new AggregateException(ex);
                     }
@@ -1174,11 +1236,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     aggregate.Flatten().Handle(
                         ex =>
                         {
-                            WebException webException = ex as WebException;
+                            HttpWebException webException = ex as HttpWebException;
                             if (webException == null)
                                 return false;
 
-                            HttpWebResponse response = webException.Response as HttpWebResponse;
+                            HttpResponseMessage response = webException.ResponseMessage;
                             if (response == null)
                                 return false;
 
@@ -1246,9 +1308,9 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     try
                     {
                         await provider.SetSessionPersistenceAsync(tempLoadBalancer.Id, new SessionPersistence(SessionPersistenceType.SourceAddress), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                        Assert.Fail("Expected a WebException");
+                        Assert.Fail("Expected a HttpWebException");
                     }
-                    catch (WebException ex)
+                    catch (HttpWebException ex)
                     {
                         throw new AggregateException(ex);
                     }
@@ -1258,11 +1320,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     aggregate.Flatten().Handle(
                         ex =>
                         {
-                            WebException webException = ex as WebException;
+                            HttpWebException webException = ex as HttpWebException;
                             if (webException == null)
                                 return false;
 
-                            HttpWebResponse response = webException.Response as HttpWebResponse;
+                            HttpResponseMessage response = webException.ResponseMessage;
                             if (response == null)
                                 return false;
 
@@ -1287,9 +1349,9 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     {
                         // set to none again
                         await provider.RemoveSessionPersistenceAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                        Assert.Fail("Expected a WebException");
+                        Assert.Fail("Expected a HttpWebException");
                     }
-                    catch (WebException ex)
+                    catch (HttpWebException ex)
                     {
                         throw new AggregateException(ex);
                     }
@@ -1299,11 +1361,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     aggregate.Flatten().Handle(
                         ex =>
                         {
-                            WebException webException = ex as WebException;
+                            HttpWebException webException = ex as HttpWebException;
                             if (webException == null)
                                 return false;
 
-                            HttpWebResponse response = webException.Response as HttpWebResponse;
+                            HttpResponseMessage response = webException.ResponseMessage;
                             if (response == null)
                                 return false;
 
@@ -1376,9 +1438,9 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     try
                     {
                         await provider.SetSessionPersistenceAsync(tempLoadBalancer.Id, new SessionPersistence(SessionPersistenceType.HttpCookie), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                        Assert.Fail("Expected a WebException");
+                        Assert.Fail("Expected a HttpWebException");
                     }
-                    catch (WebException ex)
+                    catch (HttpWebException ex)
                     {
                         throw new AggregateException(ex);
                     }
@@ -1388,11 +1450,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     aggregate.Flatten().Handle(
                         ex =>
                         {
-                            WebException webException = ex as WebException;
+                            HttpWebException webException = ex as HttpWebException;
                             if (webException == null)
                                 return false;
 
-                            HttpWebResponse response = webException.Response as HttpWebResponse;
+                            HttpResponseMessage response = webException.ResponseMessage;
                             if (response == null)
                                 return false;
 
@@ -1417,9 +1479,9 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     {
                         // set to none again
                         await provider.RemoveSessionPersistenceAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                        Assert.Fail("Expected a WebException");
+                        Assert.Fail("Expected a HttpWebException");
                     }
-                    catch (WebException ex)
+                    catch (HttpWebException ex)
                     {
                         throw new AggregateException(ex);
                     }
@@ -1429,11 +1491,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     aggregate.Flatten().Handle(
                         ex =>
                         {
-                            WebException webException = ex as WebException;
+                            HttpWebException webException = ex as HttpWebException;
                             if (webException == null)
                                 return false;
 
-                            HttpWebResponse response = webException.Response as HttpWebResponse;
+                            HttpResponseMessage response = webException.ResponseMessage;
                             if (response == null)
                                 return false;
 
@@ -1901,7 +1963,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 string expectedValue = "value!!";
                 LoadBalancerConfiguration configuration = new LoadBalancerConfiguration(
                     name: loadBalancerName,
+#if PORTABLE
+                    nodes: new[] { new NodeConfiguration(entry.AddressList[0].ToString(), 80, NodeCondition.Enabled, NodeType.Primary, null) },
+#else
                     nodes: new[] { new NodeConfiguration(entry.AddressList[0], 80, NodeCondition.Enabled, NodeType.Primary, null) },
+#endif
                     protocol: httpProtocol,
                     virtualAddresses: new[] { new LoadBalancerVirtualAddress(LoadBalancerVirtualAddressType.ServiceNet) },
                     algorithm: LoadBalancingAlgorithm.RoundRobin);
@@ -2026,7 +2092,9 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var provider = new TestCloudLoadBalancerProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
+#if !PORTABLE
             provider.ConnectionLimit = 3;
+#endif
             return provider;
         }
 

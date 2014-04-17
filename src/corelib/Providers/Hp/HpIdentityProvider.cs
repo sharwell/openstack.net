@@ -5,10 +5,13 @@
     using net.openstack.Core.Domain;
     using Newtonsoft.Json.Linq;
     using CloudIdentityProvider = net.openstack.Providers.Rackspace.CloudIdentityProvider;
+
+#if !PORTABLE
     using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
+#endif
 
     /// <summary>
     /// Provides an implementation of <see cref="IIdentityProvider"/> for operating with
@@ -22,6 +25,7 @@
     /// <preliminary/>
     public class HpIdentityProvider : CloudIdentityProvider
     {
+#if !PORTABLE
         /// <summary>
         /// Initializes a new instance of the <see cref="HpIdentityProvider"/> class
         /// with no default identity, the <see cref="PredefinedHpIdentityEndpoints.Default"/> base URL, and the default REST service
@@ -121,7 +125,9 @@
             if (urlBase == null)
                 throw new ArgumentNullException("urlBase");
         }
+#endif
 
+#if !PORTABLE
         /// <inheritdoc/>
         public override UserAccess GetUserAccess(CloudIdentity identity, bool forceCacheRefresh = false)
         {
@@ -182,5 +188,6 @@
 
             return userAccess;
         }
+#endif
     }
 }

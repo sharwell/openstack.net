@@ -3,8 +3,15 @@
     using System;
     using System.Collections.ObjectModel;
     using System.Net;
+    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
+
+#if PORTABLE
+    using IPAddress = System.String;
+#else
+    using IPAddress = System.Net.IPAddress;
+#endif
 
     /// <summary>
     /// This class models the JSON representation of a single hop in the
@@ -28,7 +35,9 @@
         /// This is the backing field for the <see cref="IPAddress"/> property.
         /// </summary>
         [JsonProperty("ip")]
+#if !PORTABLE
         [JsonConverter(typeof(IPAddressConverter))]
+#endif
         private IPAddress _ip;
 
         /// <summary>
@@ -103,10 +112,11 @@
                 if (_responseTimes == null)
                     return null;
 
-                return new ReadOnlyCollection<TimeSpan>(Array.ConvertAll(_responseTimes, TimeSpan.FromSeconds));
+                return new ReadOnlyCollection<TimeSpan>(_responseTimes.ConvertAll(TimeSpan.FromSeconds));
             }
         }
 
+#if !PORTABLE
         /// <summary>
         /// This implementation of <see cref="JsonConverter"/> allows for JSON serialization
         /// and deserialization of <see cref="IPAddress"/> objects using a simple string
@@ -133,5 +143,6 @@
                 return base.ConvertToObject(str);
             }
         }
+#endif
     }
 }

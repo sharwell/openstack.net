@@ -1,10 +1,9 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Dns
 {
     using System;
-    using JSIStudios.SimpleRESTServices.Client;
+    using System.Net.Http;
+    using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
-    using CancellationToken = System.Threading.CancellationToken;
 
     /// <summary>
     /// This class models the detailed parameters of a specific single rate limit within
@@ -22,8 +21,8 @@
         /// This is the backing field for the <see cref="Verb"/> property.
         /// </summary>
         [JsonProperty("verb")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        private HttpMethod? _verb;
+        [JsonConverter(typeof(HttpMethodConverter))]
+        private HttpMethod _verb;
 
         /// <summary>
         /// This is the backing field for the <see cref="Unit"/> property.
@@ -66,7 +65,7 @@
         /// The specific HTTP method which is rate limited, or <see langword="null"/> if the JSON
         /// response from the server did not include this property.
         /// </value>
-        public HttpMethod? Verb
+        public HttpMethod Verb
         {
             get
             {

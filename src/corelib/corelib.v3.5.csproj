@@ -47,6 +47,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net35\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Rackspace.Net.UriTemplate, Version=1.0.0.0, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rackspace.Net.UriTemplate.1.0.0-beta002\lib\net35-client\Rackspace.Net.UriTemplate.dll</HintPath>
+    </Reference>
     <Reference Include="Rackspace.Threading">
       <HintPath>..\packages\Rackspace.Threading.1.1.0-beta001\lib\net35-client\Rackspace.Threading.dll</HintPath>
     </Reference>
@@ -60,7 +64,6 @@
       <HintPath>..\packages\Rackspace.HttpClient35.1.0.0-beta002\lib\net35\System.Net.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Threading">
       <HintPath>..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll</HintPath>
     </Reference>
@@ -74,6 +77,7 @@
     <Compile Include="Core\BackoffPolicy.cs" />
     <Compile Include="Core\Caching\ICache`1.cs" />
     <Compile Include="Core\Caching\NamespaceDoc.cs" />
+    <Compile Include="Core\Collections\ArrayExtensions.cs" />
     <Compile Include="Core\Collections\BasicReadOnlyCollectionPage`1.cs" />
     <Compile Include="Core\Collections\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\ReadOnlyCollectionPage`1.cs" />
@@ -87,6 +91,7 @@
     <Compile Include="Core\Compat\Tuples.cs" />
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />
+    <Compile Include="Core\Domain\Converters\HttpMethodConverter.cs" />
     <Compile Include="Core\Domain\Converters\NamespaceDoc.cs" />
     <Compile Include="Core\Domain\Converters\PhysicalAddressSimpleConverter.cs" />
     <Compile Include="Core\Domain\Converters\SimpleStringJsonConverter`1.cs" />

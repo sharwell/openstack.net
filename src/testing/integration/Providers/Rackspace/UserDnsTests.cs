@@ -24,6 +24,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using Newtonsoft.Json;
     using Path = System.IO.Path;
 
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#endif
+
     [TestClass]
     public class UserDnsTests
     {
@@ -656,7 +660,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
             IDnsService provider = CreateProvider();
             ILoadBalancerService loadBalancerProvider = UserLoadBalancerTests.CreateProvider();
-            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(60))))
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(120))))
             {
                 IEnumerable<LoadBalancingProtocol> protocols = await loadBalancerProvider.ListProtocolsAsync(cancellationTokenSource.Token);
                 LoadBalancingProtocol httpProtocol = protocols.First(i => i.Name.Equals("HTTP", StringComparison.OrdinalIgnoreCase));

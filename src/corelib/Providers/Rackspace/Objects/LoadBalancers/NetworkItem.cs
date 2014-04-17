@@ -41,6 +41,7 @@
         {
         }
 
+#if !PORTABLE
         /// <summary>
         /// Initializes a new instance of the <see cref="NetworkItem"/> class with the
         /// specified IP address and access type.
@@ -62,6 +63,7 @@
             _address = address.ToString();
             _type = accessType;
         }
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NetworkItem"/> class with the

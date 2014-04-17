@@ -3,11 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using JSIStudios.SimpleRESTServices.Client;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Linq;
-    using ContentType = System.Net.Mime.ContentType;
 
     /// <summary>
     /// This class models the Resource Hints of the home document described by
@@ -45,7 +45,7 @@
         /// <summary>
         /// This is the backing field for the <see cref="Allow"/> property.
         /// </summary>
-        [JsonProperty("allow", DefaultValueHandling = DefaultValueHandling.Ignore, ItemConverterType = typeof(StringEnumConverter))]
+        [JsonProperty("allow", DefaultValueHandling = DefaultValueHandling.Ignore, ItemConverterType = typeof(HttpMethodConverter))]
         private HttpMethod[] _allow;
 
         /// <summary>
@@ -128,7 +128,7 @@
         /// <summary>
         /// Gets the representation types that the resource produces and consumes, using the
         /// GET and PUT methods respectively, subject to the <see cref="Allow"/> hint. The
-        /// keys of this collections are <see cref="ContentType.MediaType">media types</see>,
+        /// keys of this collections are <see cref="MediaTypeHeaderValue">media types</see>,
         /// and the values are objects which have not yet been defined.
         /// </summary>
         public Dictionary<string, JObject> Formats

@@ -15,11 +15,17 @@
 
         static UserAgentGenerator()
         {
+#if !PORTABLE
             var productAttribute = typeof(UserAgentGenerator).Assembly.GetCustomAttribute<AssemblyProductAttribute>();
             _productName = productAttribute.Product;
 
             var informationalVersionAttribute = typeof(UserAgentGenerator).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
             _productVersion = informationalVersionAttribute.InformationalVersion;
+#else
+#warning this should get the information from the assembly...
+            _productName = "openstack.net";
+            _productVersion = "1.3.3.0-dev";
+#endif
 
             _userAgent = string.Format("{0}/{1}", _productName, _productVersion);
         }

@@ -6,13 +6,20 @@ namespace net.openstack.Providers.Rackspace
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Net;
-    using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
+
+#if !PORTABLE
+    using System.Net.Sockets;
+#endif
+
+#if PORTABLE
+    using AddressFamily = System.String;
+#endif
 
     /// <summary>
     /// Represents a provider for the Rackspace Cloud Load Balancers service.

@@ -25,13 +25,17 @@
         /// <param name="response">The response to the web request. In most cases, the <see cref="HttpResponseMessage.IsSuccessStatusCode"/> property will return <see langword="false"/>.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
         public HttpWebException(HttpResponseMessage response)
+#if !PORTABLE
             : base(response.ReasonPhrase, WebExceptionStatus.ProtocolError)
+#else
+            : base(response.ReasonPhrase, WebExceptionStatus.UnknownError)
+#endif
         {
             if (response == null)
                 throw new ArgumentNullException("response");
 
             _state.ResponseMessage = response;
-#if !NET35
+#if NET40PLUS && !PORTABLE
             SerializeObjectState += (ex, args) => args.AddSerializedState(_state);
 #endif
         }

@@ -6,6 +6,10 @@
     using Newtonsoft.Json.Linq;
     using net.openstack.Core.Providers;
 
+#if PORTABLE && !NET45PLUS
+    using net.openstack.Core.Compat;
+#endif
+
     /// <summary>
     /// Represents a message which is queued in the <see cref="IQueueingService"/>.
     /// </summary>
@@ -66,10 +70,15 @@
                 if (!href.IsAbsoluteUri)
                     href = new Uri(new Uri("http://example.com"), href);
 
-                if (href.Segments.Length == 0)
+#if PORTABLE && !NET45PLUS
+                string[] segments = href.GetSegments();
+#else
+                string[] segments = href.Segments;
+#endif
+                if (segments.Length == 0)
                     return null;
 
-                return new MessageId(href.Segments.Last());
+                return new MessageId(segments.Last());
             }
         }
 
