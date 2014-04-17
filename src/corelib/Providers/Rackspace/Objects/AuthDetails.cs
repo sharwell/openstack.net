@@ -5,13 +5,13 @@ namespace net.openstack.Providers.Rackspace.Objects
     [JsonObject(MemberSerialization.OptIn)]
     internal class AuthDetails
     {
-        [JsonProperty("passwordCredentials", DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty("passwordCredentials", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Credentials PasswordCredentials { get; set; }
 
-        [JsonProperty("RAX-KSKEY:apiKeyCredentials", DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty("RAX-KSKEY:apiKeyCredentials", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Credentials APIKeyCredentials { get; set; }
 
-        [JsonProperty("RAX-AUTH:domain", DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty("RAX-AUTH:domain", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Domain Domain { get; set; }
     }
 }

@@ -9,16 +9,25 @@
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
+    using net.openstack.Core.Exceptions;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using Newtonsoft.Json.Linq;
     using OpenStack.Threading;
+    using global::Rackspace.Net;
     using CancellationToken = System.Threading.CancellationToken;
     using FlavorId = net.openstack.Providers.Rackspace.Objects.Databases.FlavorId;
+
+#if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
+#endif
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#endif
 
     /// <summary>
     /// Provides an implementation of <see cref="IDatabaseService"/> for operating
@@ -35,6 +44,19 @@
         /// <seealso cref="GetBaseUriAsync"/>
         private Uri _baseUri;
 
+#if PORTABLE
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudDatabasesProvider"/> class with
+        /// the specified values.
+        /// </summary>
+        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, no default identity is available so all calls must specify an explicit identity.</param>
+        /// <param name="defaultRegion">The default region to use for calls that do not explicitly specify a region. If this value is <see langword="null"/>, the default region for the user will be used; otherwise if the service uses region-specific endpoints all calls must specify an explicit region.</param>
+        /// <param name="identityProvider">The identity provider to use for authenticating requests to this provider. If this value is <see langword="null"/>, a new instance of <see cref="CloudIdentityProvider"/> is created using <paramref name="defaultIdentity"/> as the default identity.</param>
+        public CloudDatabasesProvider(CloudIdentity defaultIdentity, string defaultRegion, IIdentityProvider identityProvider)
+            : base(defaultIdentity, defaultRegion, identityProvider)
+        {
+        }
+#else
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudDatabasesProvider"/> class with
         /// the specified values.
@@ -60,6 +82,7 @@
             : base(defaultIdentity, defaultRegion, identityProvider, restService, httpStatusCodeValidator)
         {
         }
+#endif
 
         #region IDatabaseService Members
 
@@ -69,7 +92,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/instances");
+            UriTemplate template = new UriTemplate("instances");
             var parameters = new Dictionary<string, string>();
 
             JObject requestBody = new JObject(
@@ -118,7 +141,7 @@
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/instances?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("instances{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -164,7 +187,7 @@
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}");
+            UriTemplate template = new UriTemplate("instances/{instanceId}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -199,7 +222,7 @@
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}");
+            UriTemplate template = new UriTemplate("instances/{instanceId}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -230,7 +253,7 @@
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/root");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/root");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -265,7 +288,7 @@
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/root");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/root");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -300,7 +323,7 @@
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/action");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/action");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             JObject requestBody =
@@ -336,7 +359,7 @@
             if (flavorRef == null)
                 throw new ArgumentNullException("flavorRef");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/action");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/action");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             JObject requestBody =
@@ -373,7 +396,7 @@
             if (volumeSize <= 0)
                 throw new ArgumentOutOfRangeException("volumeSize");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/action");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/action");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             JObject requestBody =
@@ -411,7 +434,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/databases");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/databases");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             JObject requestBody =
@@ -438,7 +461,7 @@
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/databases?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/databases{?marker,limit}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -486,7 +509,7 @@
             if (databaseName == null)
                 throw new ArgumentNullException("databaseName");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/databases/{databaseName}");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/databases/{databaseName}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value }, { "databaseName", EscapeDatabaseName(databaseName) } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -508,7 +531,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/users");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/users");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             JObject requestBody =
@@ -535,7 +558,7 @@
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/users?marker={marker}&limit={limit}");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/users{?marker,limit}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
             if (marker != null)
                 parameters.Add("marker", marker.Value);
@@ -587,7 +610,7 @@
             if (string.IsNullOrEmpty(password))
                 throw new ArgumentException("password cannot be empty");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/users");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/users");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             JObject requestBody =
@@ -618,7 +641,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/users/{name}");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/users/{name}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value }, { "name", EscapeUserName(userName) } };
 
             JObject requestBody =
@@ -644,7 +667,7 @@
             if (userName == null)
                 throw new ArgumentNullException("userName");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/users/{name}");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/users/{name}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value }, { "name", EscapeUserName(userName) } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -681,7 +704,7 @@
             if (userName == null)
                 throw new ArgumentNullException("userName");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/users/{name}");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/users/{name}");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value }, { "name", EscapeUserName(userName) } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -703,7 +726,7 @@
             if (userName == null)
                 throw new ArgumentNullException("userName");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/users/{name}/databases");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/users/{name}/databases");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value }, { "name", EscapeUserName(userName) } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -727,7 +750,7 @@
                     foreach (JObject @obj in databases)
                         names.Add(@obj["name"].ToObject<DatabaseName>());
 
-                    return names.AsReadOnly();
+                    return new ReadOnlyCollection<DatabaseName>(names);
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -746,7 +769,7 @@
             if (userName == null)
                 throw new ArgumentNullException("userName");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/users/{name}/databases");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/users/{name}/databases");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value }, { "name", EscapeUserName(userName) } };
 
             JObject requestBody =
@@ -776,7 +799,7 @@
             if (userName == null)
                 throw new ArgumentNullException("userName");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/users/{name}/databases/{databaseName}");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/users/{name}/databases/{databaseName}");
             var parameters = new Dictionary<string, string>
             {
                 { "instanceId", instanceId.Value },
@@ -798,7 +821,7 @@
         /// <inheritdoc/>
         public Task<ReadOnlyCollection<DatabaseFlavor>> ListFlavorsAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/flavors");
+            UriTemplate template = new UriTemplate("flavors");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -833,7 +856,7 @@
             if (flavorId == null)
                 throw new ArgumentNullException("flavorId");
 
-            UriTemplate template = new UriTemplate("/flavors/{flavorId}");
+            UriTemplate template = new UriTemplate("flavors/{flavorId}");
             var parameters = new Dictionary<string, string> { { "flavorId", flavorId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -868,7 +891,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/backups");
+            UriTemplate template = new UriTemplate("backups");
             var parameters = new Dictionary<string, string>();
 
             JObject requestBody =
@@ -920,7 +943,7 @@
         /// <inheritdoc/>
         public Task<ReadOnlyCollection<Backup>> ListBackupsAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/backups");
+            UriTemplate template = new UriTemplate("backups");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -955,7 +978,7 @@
             if (backupId == null)
                 throw new ArgumentNullException("backupId");
 
-            UriTemplate template = new UriTemplate("/backups/{backupId}");
+            UriTemplate template = new UriTemplate("backups/{backupId}");
             var parameters = new Dictionary<string, string> { { "backupId", backupId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -990,7 +1013,7 @@
             if (backupId == null)
                 throw new ArgumentNullException("backupId");
 
-            UriTemplate template = new UriTemplate("/backups/{backupId}");
+            UriTemplate template = new UriTemplate("backups/{backupId}");
             var parameters = new Dictionary<string, string> { { "backupId", backupId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1010,7 +1033,7 @@
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
 
-            UriTemplate template = new UriTemplate("/instances/{instanceId}/backups");
+            UriTemplate template = new UriTemplate("instances/{instanceId}/backups");
             var parameters = new Dictionary<string, string> { { "instanceId", instanceId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1132,7 +1155,7 @@
         /// <exception cref="ArgumentNullException">If <paramref name="databaseName"/> is <see langword="null"/>.</exception>
         protected static string EscapeDatabaseName(DatabaseName databaseName)
         {
-            return databaseName.Value.Replace(".", "%252e");
+            return databaseName.Value.Replace(".", "%2e");
         }
 
         /// <summary>
@@ -1144,7 +1167,7 @@
         /// <exception cref="ArgumentNullException">If <paramref name="username"/> is <see langword="null"/>.</exception>
         protected static string EscapeUserName(UserName username)
         {
-            return username.Value.Replace(".", "%252e");
+            return username.Value.Replace(".", "%2e");
         }
 
         /// <summary>
@@ -1172,9 +1195,9 @@
                         AggregateException flattened = task.Exception.Flatten();
                         if (flattened.InnerExceptions.Count == 1)
                         {
-                            WebException webException = flattened.InnerExceptions[0] as WebException;
-                            HttpWebResponse httpWebResponse = webException != null ? webException.Response as HttpWebResponse : null;
-                            if (httpWebResponse != null && httpWebResponse.StatusCode == HttpStatusCode.NotFound)
+                            HttpWebException webException = flattened.InnerExceptions[0] as HttpWebException;
+                            HttpResponseMessage responseMessage = webException != null ? webException.ResponseMessage : null;
+                            if (responseMessage != null && responseMessage.StatusCode == HttpStatusCode.NotFound)
                                 return null;
                         }
                     }
@@ -1215,7 +1238,11 @@
                 () =>
                 {
                     Endpoint endpoint = GetServiceEndpoint(null, "rax:database", "cloudDatabases", null);
-                    _baseUri = new Uri(endpoint.PublicURL);
+                    string uri = endpoint.PublicURL;
+                    if (!uri.EndsWith("/"))
+                        uri += "/";
+
+                    _baseUri = new Uri(uri);
                     return _baseUri;
                 });
         }

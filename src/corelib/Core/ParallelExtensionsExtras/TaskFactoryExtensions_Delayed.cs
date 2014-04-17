@@ -28,6 +28,9 @@ namespace System.Threading.Tasks
         /// <returns>A Task that will be completed after the specified duration and that's cancelable with the specified token.</returns>
         public static Task StartNewDelayed(this TaskFactory factory, int millisecondsDelay, CancellationToken cancellationToken)
         {
+#if PORTABLE && NET45PLUS
+            return Task.Delay(millisecondsDelay, cancellationToken);
+#else
             // Validate arguments
             if (factory == null) throw new ArgumentNullException("factory");
             if (millisecondsDelay < 0) throw new ArgumentOutOfRangeException("millisecondsDelay");
@@ -42,6 +45,16 @@ namespace System.Threading.Tasks
 
             // Create the timer but don't start it yet.  If we start it now,
             // it might fire before ctr has been set to the right registration.
+#if PORTABLE
+            Timer timer = null;
+            timer = new Timer(_ =>
+            {
+                // Clean up both the cancellation token and the timer, and try to transition to completed
+                ctr.Dispose();
+                timer.Dispose();
+                tcs.TrySetResult(null);
+            }, null, Timeout.Infinite, Timeout.Infinite);
+#else
             var timer = new Timer(self =>
             {
                 // Clean up both the cancellation token and the timer, and try to transition to completed
@@ -49,6 +62,7 @@ namespace System.Threading.Tasks
                 ((Timer)self).Dispose();
                 tcs.TrySetResult(null);
             });
+#endif
 
             // Register with the cancellation token.
             if (cancellationToken.CanBeCanceled)
@@ -67,6 +81,7 @@ namespace System.Threading.Tasks
             catch(ObjectDisposedException) {} // in case there's a race with cancellation; this is benign
 
             return tcs.Task;
+#endif
         }
         #endregion
 
@@ -289,6 +304,9 @@ namespace System.Threading.Tasks
             if (function == null) throw new ArgumentNullException("function");
             if (scheduler == null) throw new ArgumentNullException("scheduler");
 
+#if PORTABLE && NET45PLUS
+            return Task.Delay(millisecondsDelay).ContinueWith(_ => function(), cancellationToken, ContinuationOptionsFromCreationOptions(creationOptions), scheduler);
+#else
             // Create the trigger and the timer to start it
             var tcs = new TaskCompletionSource<object>();
             var timer = new Timer(obj => ((TaskCompletionSource<object>)obj).SetResult(null),
@@ -300,8 +318,10 @@ namespace System.Threading.Tasks
                 timer.Dispose();
                 return function();
             }, cancellationToken, ContinuationOptionsFromCreationOptions(creationOptions), scheduler);
+#endif
         }
 
+#if !PORTABLE
         /// <summary>Creates and schedules a task for execution after the specified time delay.</summary>
         /// <param name="factory">The factory to use to create the task.</param>
         /// <param name="millisecondsDelay">The delay after which the task will be scheduled.</param>
@@ -387,6 +407,7 @@ namespace System.Threading.Tasks
 
             return result.Task;
         }
+#endif
         #endregion
     }
 }

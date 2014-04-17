@@ -19,11 +19,16 @@
     using Formatting = Newtonsoft.Json.Formatting;
     using HttpWebRequest = System.Net.HttpWebRequest;
     using HttpWebResponse = System.Net.HttpWebResponse;
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
     using JsonConvert = Newtonsoft.Json.JsonConvert;
     using Path = System.IO.Path;
     using WebException = System.Net.WebException;
     using WebResponse = System.Net.WebResponse;
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#else
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
+#endif
 
     [TestClass]
     public class UserDatabaseTests
@@ -441,7 +446,7 @@
         protected class TestCloudDatabasesProvider : CloudDatabasesProvider
         {
             public TestCloudDatabasesProvider(CloudIdentity defaultIdentity, string defaultRegion, IIdentityProvider identityProvider)
-                : base(defaultIdentity, defaultRegion, identityProvider, null, null)
+                : base(defaultIdentity, defaultRegion, identityProvider)
             {
             }
 

@@ -46,6 +46,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Rackspace.Net.UriTemplate">
+      <HintPath>..\packages\Rackspace.Net.UriTemplate.1.0.0-dev\lib\net40\Rackspace.Net.UriTemplate.dll</HintPath>
+    </Reference>
     <Reference Include="SimpleRESTServices, Version=1.3.0.0, Culture=neutral, PublicKeyToken=8965cea5c205d3a3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SimpleRESTServices.1.3.0.1\lib\net40\SimpleRESTServices.dll</HintPath>
@@ -73,7 +76,6 @@
       <HintPath>..\packages\Microsoft.Bcl.1.1.8\lib\net40\System.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Threading.Tasks">
       <HintPath>..\packages\Microsoft.Bcl.1.1.8\lib\net40\System.Threading.Tasks.dll</HintPath>
     </Reference>
@@ -86,6 +88,7 @@
     <Compile Include="Core\AsyncCompletionOption.cs" />
     <Compile Include="Core\Caching\ICache`1.cs" />
     <Compile Include="Core\Caching\NamespaceDoc.cs" />
+    <Compile Include="Core\Collections\ArrayExtensions.cs" />
     <Compile Include="Core\Collections\BasicReadOnlyCollectionPage`1.cs" />
     <Compile Include="Core\Collections\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\ReadOnlyCollectionPage`1.cs" />
@@ -95,6 +98,7 @@
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\AuthenticationType.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />
+    <Compile Include="Core\Domain\Converters\HttpMethodConverter.cs" />
     <Compile Include="Core\Domain\Converters\NamespaceDoc.cs" />
     <Compile Include="Core\Domain\Converters\PhysicalAddressSimpleConverter.cs" />
     <Compile Include="Core\Domain\Converters\SimpleStringJsonConverter`1.cs" />
@@ -651,6 +655,7 @@
     <None Include="..\..\..\keys\openstacknetsdk.snk">
       <Link>openstacknetsdk.snk</Link>
     </None>
+    <None Include="app.config" />
     <None Include="corelib.nuspec" />
     <None Include="packages.corelib.v4.0.config" />
   </ItemGroup>

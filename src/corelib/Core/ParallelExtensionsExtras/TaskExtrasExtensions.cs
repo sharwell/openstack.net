@@ -7,7 +7,9 @@
 //--------------------------------------------------------------------------
 
 using System.Linq;
+#if !PORTABLE
 using System.Windows.Threading;
+#endif
 
 namespace System.Threading.Tasks
 {
@@ -128,6 +130,7 @@ namespace System.Threading.Tasks
             return (Task<T>)((Task)task).IgnoreExceptions();
         }
 
+#if !PORTABLE || NET45PLUS
         /// <summary>Fails immediately when an exception is encountered.</summary>
         /// <param name="task">The Task to be monitored.</param>
         /// <returns>The original Task.</returns>
@@ -153,6 +156,7 @@ namespace System.Threading.Tasks
         {
             return (Task<T>)((Task)task).FailFastOnException();
         }
+#endif
 
         /// <summary>Propagates any exceptions that occurred on the specified task.</summary>
         /// <param name="task">The Task whose exceptions are to be propagated.</param>
@@ -173,7 +177,7 @@ namespace System.Threading.Tasks
         }
         #endregion
 
-#if !NET35
+#if !NET35 && (!PORTABLE || NET45PLUS)
         #region Observables
         /// <summary>Creates an IObservable that represents the completion of a Task.</summary>
         /// <typeparam name="TResult">Specifies the type of data returned by the Task.</typeparam>
@@ -234,6 +238,7 @@ namespace System.Threading.Tasks
 #endif
 
         #region Timeouts
+#if !PORTABLE
         /// <summary>Creates a new Task that mirrors the supplied task but that will be canceled after the specified timeout.</summary>
         /// <param name="task">The task.</param>
         /// <param name="timeout">The timeout.</param>
@@ -266,6 +271,7 @@ namespace System.Threading.Tasks
             }, TaskContinuationOptions.ExecuteSynchronously);
             return result.Task;
         }
+#endif
         #endregion
 
         #region Children
@@ -285,6 +291,7 @@ namespace System.Threading.Tasks
         #endregion
 
         #region Waiting
+#if !PORTABLE
         /// <summary>Waits for the task to complete execution, pumping in the meantime.</summary>
         /// <param name="task">The task for which to wait.</param>
         /// <remarks>This method is intended for usage with Windows Presentation Foundation.</remarks>
@@ -296,6 +303,7 @@ namespace System.Threading.Tasks
             Dispatcher.PushFrame(nestedFrame);
             task.Wait();
         }
+#endif
 
         /// <summary>Waits for the task to complete execution, returning the task's final status.</summary>
         /// <param name="task">The task for which to wait.</param>

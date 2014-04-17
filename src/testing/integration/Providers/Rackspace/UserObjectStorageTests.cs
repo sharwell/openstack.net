@@ -1234,6 +1234,45 @@
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.ObjectStorage)]
+        public void TestCreateObjectIfNoneMatch()
+        {
+            IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
+            string containerName = TestContainerPrefix + Path.GetRandomFileName();
+            string objectName = Path.GetRandomFileName();
+            // another random name counts as random content
+            string fileData = Path.GetRandomFileName();
+
+            ObjectStore containerResult = provider.CreateContainer(containerName);
+            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+
+            using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
+            {
+                provider.CreateObject(containerName, uploadStream, objectName);
+
+                Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "If-None-Match", "*" },
+                    { "X-Newest", "True" }
+                };
+
+                // it's ok to create the same file twice
+                uploadStream.Position = 0;
+                ProgressMonitor progressMonitor = new ProgressMonitor(uploadStream.Length);
+                provider.CreateObject(containerName, uploadStream, objectName, headers: headers, progressUpdated: progressMonitor.Updated);
+                Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+            }
+
+            string actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
+            Assert.AreEqual(fileData, actualData);
+
+            /* Cleanup
+             */
+            provider.DeleteContainer(containerName, deleteObjects: true);
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
         public void TestCreateObjectWithMetadata()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();

@@ -57,6 +57,7 @@
         {
         }
 
+#if !PORTABLE
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeConfiguration"/> class.
         /// </summary>
@@ -92,6 +93,7 @@
             _type = type;
             _weight = weight;
         }
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeConfiguration"/> class.

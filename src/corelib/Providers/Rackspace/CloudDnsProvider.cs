@@ -14,11 +14,22 @@
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using Newtonsoft.Json.Linq;
     using OpenStack.Threading;
+    using global::Rackspace.Net;
     using CancellationToken = System.Threading.CancellationToken;
+
+#if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
+#endif
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+    using IPAddress = System.String;
+#else
+    using IPAddress = System.Net.IPAddress;
+#endif
 
     /// <summary>
     /// Provides an implementation of <see cref="IDnsService"/> for operating
@@ -41,6 +52,21 @@
         /// <seealso cref="GetBaseUriAsync"/>
         private Uri _baseUri;
 
+#if PORTABLE
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudDnsProvider"/> class with
+        /// the specified values.
+        /// </summary>
+        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, no default identity is available so all calls must specify an explicit identity.</param>
+        /// <param name="defaultRegion">The default region to use for calls that do not explicitly specify a region. If this value is <see langword="null"/>, the default region for the user will be used; otherwise if the service uses region-specific endpoints all calls must specify an explicit region.</param>
+        /// <param name="internalUrl"><see langword="true"/> to use the endpoint's <see cref="Endpoint.InternalURL"/>; otherwise <see langword="false"/> to use the endpoint's <see cref="Endpoint.PublicURL"/>.</param>
+        /// <param name="identityProvider">The identity provider to use for authenticating requests to this provider. If this value is <see langword="null"/>, a new instance of <see cref="CloudIdentityProvider"/> is created using <paramref name="defaultIdentity"/> as the default identity.</param>
+        public CloudDnsProvider(CloudIdentity defaultIdentity, string defaultRegion, bool internalUrl, IIdentityProvider identityProvider)
+            : base(defaultIdentity, defaultRegion, identityProvider)
+        {
+            _internalUrl = internalUrl;
+        }
+#else
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudDnsProvider"/> class with
         /// the specified values.
@@ -69,13 +95,14 @@
         {
             _internalUrl = internalUrl;
         }
+#endif
 
         #region IDnsService Members
 
         /// <inheritdoc/>
         public Task<DnsServiceLimits> ListLimitsAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/limits");
+            UriTemplate template = new UriTemplate("limits");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -107,7 +134,7 @@
         /// <inheritdoc/>
         public Task<ReadOnlyCollection<LimitType>> ListLimitTypesAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/limits/types");
+            UriTemplate template = new UriTemplate("limits/types");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -139,7 +166,7 @@
         /// <inheritdoc/>
         public Task<DnsServiceLimits> ListLimitsAsync(LimitType type, CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/limits/{type}");
+            UriTemplate template = new UriTemplate("limits/{type}");
             var parameters = new Dictionary<string, string>
                 {
                     { "type", type.Name.ToLowerInvariant() }
@@ -177,7 +204,7 @@
             if (job == null)
                 throw new ArgumentNullException("job");
 
-            UriTemplate template = new UriTemplate("/status/{jobId}?showDetails={showDetails}");
+            UriTemplate template = new UriTemplate("status/{jobId}{?showDetails}");
             var parameters = new Dictionary<string, string>
                 {
                     { "jobId", job.Id.Value },
@@ -212,7 +239,7 @@
             if (job == null)
                 throw new ArgumentNullException("job");
 
-            UriTemplate template = new UriTemplate("/status/{jobId}?showDetails={showDetails}");
+            UriTemplate template = new UriTemplate("status/{jobId}{?showDetails}");
             var parameters = new Dictionary<string, string>
                 {
                     { "jobId", job.Id.Value },
@@ -244,7 +271,7 @@
         /// <inheritdoc/>
         public Task<Tuple<ReadOnlyCollectionPage<DnsDomain>, int?>> ListDomainsAsync(string domainName, int? offset, int? limit, CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/domains/?name={name}&offset={offset}&limit={limit}");
+            UriTemplate template = new UriTemplate("domains/{?name,offset,limit}");
             var parameters = new Dictionary<string, string>();
             if (domainName != null)
                 parameters.Add("name", domainName);
@@ -301,7 +328,7 @@
         /// <inheritdoc/>
         public Task<DnsDomain> ListDomainDetailsAsync(DomainId domainId, bool showRecords, bool showSubdomains, CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/domains/{domainId}?showRecords={showRecords}&showSubdomains={showSubdomains}");
+            UriTemplate template = new UriTemplate("domains/{domainId}{?showRecords,showSubdomains}");
             var parameters = new Dictionary<string, string>()
             {
                 { "domainId", domainId.Value },
@@ -334,7 +361,7 @@
         /// <inheritdoc/>
         public Task<DnsDomainChanges> ListDomainChangesAsync(DomainId domainId, DateTimeOffset? since, CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/domains/{domainId}/changes?since={since}");
+            UriTemplate template = new UriTemplate("domains/{domainId}/changes{?since}");
             var parameters = new Dictionary<string, string>()
                 {
                     { "domainId", domainId.Value },
@@ -367,7 +394,7 @@
         /// <inheritdoc/>
         public Task<DnsJob<ExportedDomain>> ExportDomainAsync(DomainId domainId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<ExportedDomain>> progress)
         {
-            UriTemplate template = new UriTemplate("/domains/{domainId}/export");
+            UriTemplate template = new UriTemplate("domains/{domainId}/export");
             var parameters = new Dictionary<string, string>()
                 {
                     { "domainId", domainId.Value },
@@ -405,7 +432,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/domains");
+            UriTemplate template = new UriTemplate("domains");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -440,7 +467,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/domains");
+            UriTemplate template = new UriTemplate("domains");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
@@ -472,7 +499,7 @@
         /// <inheritdoc/>
         public Task<DnsJob<DnsDomains>> CloneDomainAsync(DomainId domainId, string cloneName, bool? cloneSubdomains, bool? modifyRecordData, bool? modifyEmailAddress, bool? modifyComment, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsDomains>> progress)
         {
-            UriTemplate template = new UriTemplate("/domains/{domainId}/clone?cloneName={cloneName}&cloneSubdomains={cloneSubdomains}&modifyRecordData={modifyRecordData}&modifyEmailAddress={modifyEmailAddress}&modifyComment={modifyComment}");
+            UriTemplate template = new UriTemplate("domains/{domainId}/clone{?cloneName,cloneSubdomains,modifyRecordData,modifyEmailAddress,modifyComment}");
             var parameters = new Dictionary<string, string> { { "domainId", domainId.Value }, { "cloneName", cloneName } };
             if (cloneSubdomains != null)
                 parameters.Add("cloneSubdomains", cloneSubdomains.Value ? "true" : "false");
@@ -515,7 +542,7 @@
             if (serializedDomains == null)
                 throw new ArgumentNullException("serializedDomains");
 
-            UriTemplate template = new UriTemplate("/domains/import");
+            UriTemplate template = new UriTemplate("domains/import");
             var parameters = new Dictionary<string, string>();
 
             JObject request = new JObject(new JProperty("domains", JArray.FromObject(serializedDomains)));
@@ -548,7 +575,7 @@
         /// <inheritdoc/>
         public Task<DnsJob> RemoveDomainsAsync(IEnumerable<DomainId> domainIds, bool deleteSubdomains, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
-            UriTemplate template = new UriTemplate("/domains?deleteSubdomains={deleteSubdomains}");
+            UriTemplate template = new UriTemplate("domains{?deleteSubdomains}");
             var parameters = new Dictionary<string, string>()
             {
                 { "deleteSubdomains", deleteSubdomains ? "true" : "false" },
@@ -591,7 +618,7 @@
         /// <inheritdoc/>
         public Task<Tuple<ReadOnlyCollectionPage<DnsSubdomain>, int?>> ListSubdomainsAsync(DomainId domainId, int? offset, int? limit, CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/domains/{domainId}/subdomains?offset={offset}&limit={limit}");
+            UriTemplate template = new UriTemplate("domains/{domainId}/subdomains{?offset,limit}");
             var parameters = new Dictionary<string, string>
                 {
                     { "domainId", domainId.Value }
@@ -649,17 +676,17 @@
         /// <inheritdoc/>
         public Task<Tuple<ReadOnlyCollectionPage<DnsRecord>, int?>> ListRecordsAsync(DomainId domainId, DnsRecordType recordType, string recordName, string recordData, int? offset, int? limit, CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/domains/{domainId}/records?type={recordType}&name={recordName}&data={recordData}&offset={offset}&limit={limit}");
+            UriTemplate template = new UriTemplate("domains/{domainId}/records{?type,name,data,offset,limit}");
             var parameters = new Dictionary<string, string>
                 {
                     { "domainId", domainId.Value }
                 };
             if (recordType != null)
-                parameters.Add("recordType", recordType.Name);
+                parameters.Add("type", recordType.Name);
             if (recordName != null)
-                parameters.Add("recordName", recordName);
+                parameters.Add("name", recordName);
             if (recordData != null)
-                parameters.Add("recordData", recordData);
+                parameters.Add("data", recordData);
             if (offset != null)
                 parameters.Add("offset", offset.ToString());
             if (limit != null)
@@ -713,7 +740,7 @@
         /// <inheritdoc/>
         public Task<DnsRecord> ListRecordDetailsAsync(DomainId domainId, RecordId recordId, CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/domains/{domainId}/records/{recordId}");
+            UriTemplate template = new UriTemplate("domains/{domainId}/records/{recordId}");
             var parameters = new Dictionary<string, string>
                 {
                     { "domainId", domainId.Value },
@@ -745,7 +772,7 @@
         /// <inheritdoc/>
         public Task<DnsJob<DnsRecordsList>> AddRecordsAsync(DomainId domainId, IEnumerable<DnsDomainRecordConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob<DnsRecordsList>> progress)
         {
-            UriTemplate template = new UriTemplate("/domains/{domainId}/records");
+            UriTemplate template = new UriTemplate("domains/{domainId}/records");
             var parameters = new Dictionary<string, string>()
                 {
                     { "domainId", domainId.Value }
@@ -781,7 +808,7 @@
         /// <inheritdoc/>
         public Task<DnsJob> UpdateRecordsAsync(DomainId domainId, IEnumerable<DnsDomainRecordUpdateConfiguration> recordConfigurations, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
-            UriTemplate template = new UriTemplate("/domains/{domainId}/records");
+            UriTemplate template = new UriTemplate("domains/{domainId}/records");
             var parameters = new Dictionary<string, string>()
                 {
                     { "domainId", domainId.Value }
@@ -817,7 +844,7 @@
         /// <inheritdoc/>
         public Task<DnsJob> RemoveRecordsAsync(DomainId domainId, IEnumerable<RecordId> recordIds, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
-            UriTemplate template = new UriTemplate("/domains/{domainId}/records");
+            UriTemplate template = new UriTemplate("domains/{domainId}/records");
             var parameters = new Dictionary<string, string>()
             {
                 { "domainId", domainId.Value },
@@ -860,11 +887,11 @@
         /// <inheritdoc/>
         public Task<Tuple<ReadOnlyCollectionPage<DnsRecord>, int?>> ListPtrRecordsAsync(string serviceName, Uri deviceResourceUri, int? offset, int? limit, CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/rdns/{serviceName}?href={deviceResourceUri}&offset={offset}&limit={limit}");
+            UriTemplate template = new UriTemplate("rdns/{serviceName}{?href,offset,limit}");
             var parameters = new Dictionary<string, string>
                 {
                     { "serviceName", serviceName },
-                    { "deviceResourceUri", deviceResourceUri.AbsoluteUri },
+                    { "href", deviceResourceUri.AbsoluteUri },
                 };
             if (offset != null)
                 parameters.Add("offset", offset.ToString());
@@ -919,11 +946,11 @@
         /// <inheritdoc/>
         public Task<DnsRecord> ListPtrRecordDetailsAsync(string serviceName, Uri deviceResourceUri, RecordId recordId, CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/rdns/{serviceName}/{recordId}?href={deviceResourceUri}");
+            UriTemplate template = new UriTemplate("rdns/{serviceName}/{recordId}{?href}");
             var parameters = new Dictionary<string, string>
                 {
                     { "serviceName", serviceName },
-                    { "deviceResourceUri", deviceResourceUri.AbsoluteUri },
+                    { "href", deviceResourceUri.AbsoluteUri },
                     { "recordId", recordId.Value },
                 };
 
@@ -959,7 +986,7 @@
             if (string.IsNullOrEmpty(serviceName))
                 throw new ArgumentException("serviceName cannot be empty");
 
-            UriTemplate template = new UriTemplate("/rdns");
+            UriTemplate template = new UriTemplate("rdns");
             var parameters = new Dictionary<string, string>();
 
             JObject request = new JObject(
@@ -1005,7 +1032,7 @@
             if (string.IsNullOrEmpty(serviceName))
                 throw new ArgumentException("serviceName cannot be empty");
 
-            UriTemplate template = new UriTemplate("/rdns");
+            UriTemplate template = new UriTemplate("rdns");
             var parameters = new Dictionary<string, string>();
 
             JObject request = new JObject(
@@ -1044,14 +1071,14 @@
         /// <inheritdoc/>
         public Task<DnsJob> RemovePtrRecordsAsync(string serviceName, Uri deviceResourceUri, IPAddress ipAddress, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DnsJob> progress)
         {
-            UriTemplate template = new UriTemplate("/rdns/{serviceName}?href={deviceResourceUri}&ip={ipAddress}");
+            UriTemplate template = new UriTemplate("rdns/{serviceName}{?href,ip}");
             var parameters = new Dictionary<string, string>()
                 {
                     { "serviceName", serviceName },
-                    { "deviceResourceUri", deviceResourceUri.AbsoluteUri },
+                    { "href", deviceResourceUri.AbsoluteUri },
                 };
             if (ipAddress != null)
-                parameters.Add("ipAddress", ipAddress.ToString());
+                parameters.Add("ip", ipAddress.ToString());
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
@@ -1276,7 +1303,11 @@
                 () =>
                 {
                     Endpoint endpoint = GetServiceEndpoint(null, "rax:dns", "cloudDNS", null);
-                    Uri baseUri = new Uri(_internalUrl ? endpoint.InternalURL : endpoint.PublicURL);
+                    string uri = _internalUrl ? endpoint.InternalURL : endpoint.PublicURL;
+                    if (!uri.EndsWith("/"))
+                        uri += "/";
+
+                    Uri baseUri = new Uri(uri);
                     _baseUri = baseUri;
                     return baseUri;
                 });

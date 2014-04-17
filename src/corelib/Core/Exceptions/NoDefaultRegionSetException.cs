@@ -21,6 +21,7 @@ namespace net.openstack.Core.Exceptions
         {
         }
 
+#if !PORTABLE
         /// <summary>
         /// Initializes a new instance of the <see cref="NoDefaultRegionSetException"/> class with
         /// serialized data.
@@ -32,5 +33,6 @@ namespace net.openstack.Core.Exceptions
             : base(info, context)
         {
         }
+#endif
     }
 }

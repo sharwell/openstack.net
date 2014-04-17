@@ -11,6 +11,12 @@
     using net.openstack.Core.Collections;
 #endif
 
+#if PORTABLE
+    using IPAddress = System.String;
+#else
+    using IPAddress = System.Net.IPAddress;
+#endif
+
     /// <summary>
     /// This class models the configurable properties of the JSON representation of
     /// an Entity resource in the <see cref="IMonitoringService"/>.
@@ -40,7 +46,11 @@
         /// <summary>
         /// This is the backing field for the <see cref="IPAddresses"/> property.
         /// </summary>
+#if PORTABLE
+        [JsonProperty("ip_addresses", DefaultValueHandling = DefaultValueHandling.Ignore)]
+#else
         [JsonProperty("ip_addresses", ItemConverterType = typeof(IPAddressSimpleConverter), DefaultValueHandling = DefaultValueHandling.Ignore)]
+#endif
         private IDictionary<string, IPAddress> _ipAddresses;
 
         /// <summary>

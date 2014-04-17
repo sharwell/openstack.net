@@ -37,6 +37,7 @@
         /// </summary>
         public const string UnitTestInterfacePrefix = "UnitTestInterface-";
 
+#if !PORTABLE
         public static IEnumerable<SimpleServer> ListAllServers(IComputeProvider provider, int? blockSize = null, string imageId = null, string flavorId = null, string name = null, ServerState status = null, DateTimeOffset? changesSince = null, string region = null, CloudIdentity identity = null)
         {
             if (blockSize <= 0)
@@ -441,5 +442,6 @@
             if (hadMetadata == 0)
                 Assert.Inconclusive("None of the images contained metadata.");
         }
+#endif
     }
 }

@@ -28,6 +28,7 @@
         [JsonProperty("type")]
         private string _type;
 
+#if !PORTABLE
         /// <summary>
         /// This is the backing field for the <see cref="IPAddress"/> property.
         /// </summary>
@@ -55,6 +56,7 @@
         [JsonProperty("hwaddr")]
         [JsonConverter(typeof(PhysicalAddressSimpleConverter))]
         private PhysicalAddress _physicalAddress;
+#endif
 
         /// <summary>
         /// This is the backing field for the <see cref="NetworkMask"/> property.
@@ -184,6 +186,7 @@
             }
         }
 
+#if !PORTABLE
         /// <summary>
         /// Gets the IP V4 address of the network interface.
         /// </summary>
@@ -227,6 +230,7 @@
                 return _physicalAddress;
             }
         }
+#endif
 
         /// <summary>
         /// Gets the network mask as a string.

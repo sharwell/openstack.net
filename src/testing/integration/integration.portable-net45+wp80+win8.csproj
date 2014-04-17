@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4A2E23A7-2A9B-4103-BE8F-2D7ADD744BBA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Net.OpenStack.Testing.Integration</RootNamespace>
+    <AssemblyName>OpenStackNet.Testing.Integration</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile />
+    <BaseIntermediateOutputPath>obj\portable-net45+wp80+win8\</BaseIntermediateOutputPath>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\portable-net45+wp80+win8\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;PORTABLE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\portable-net45+wp80+win8\Release\</OutputPath>
+    <DefineConstants>TRACE;PORTABLE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SDKTestingKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\portable-net45+wp80+win8\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Rackspace.Net.UriTemplate, Version=1.0.0.0, Culture=neutral, PublicKeyToken=541c51dcbcf0ec3c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Rackspace.Net.UriTemplate.1.0.0-dev\lib\net40\Rackspace.Net.UriTemplate.dll</HintPath>
+    </Reference>
+    <Reference Include="Security.Cryptography">
+      <HintPath>..\..\lib\Security.Cryptography\Security.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDependentAssemblyPaths Condition=" '$(VS100COMNTOOLS)' != '' " Include="$(VS100COMNTOOLS)..\IDE\PrivateAssemblies">
+      <Visible>False</Visible>
+    </CodeAnalysisDependentAssemblyPaths>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Providers\Rackspace\CloudNetworksTests.cs" />
+    <None Include="Providers\Rackspace\CloudServersTests.cs" />
+    <None Include="Providers\Rackspace\CloudBlockStorageTests.cs" />
+    <Compile Include="Providers\Rackspace\TestHelpers.cs" />
+    <Compile Include="Providers\Rackspace\UserAutoScaleTests.cs" />
+    <Compile Include="Providers\Rackspace\UserDatabaseTests.cs" />
+    <Compile Include="Providers\Rackspace\UserDatabaseUserTests.cs" />
+    <Compile Include="Providers\Rackspace\UserMonitoringTests.cs" />
+    <None Include="Providers\Rackspace\UserQueuesTestsSynchronous.cs" />
+    <None Include="Providers\Rackspace\IdentityTests.cs" />
+    <None Include="Providers\Rackspace\ExtendedIdentityTests.cs" />
+    <None Include="Providers\Rackspace\CloudFilesTests.cs" />
+    <Compile Include="Providers\Rackspace\TestCategories.cs" />
+    <None Include="Providers\Rackspace\UserBlockStorageTests.cs" />
+    <Compile Include="Providers\Rackspace\UserComputeTests.cs" />
+    <Compile Include="Providers\Rackspace\UserDnsTests.cs" />
+    <None Include="Providers\Rackspace\UserIdentityTests.cs" />
+    <Compile Include="Providers\Rackspace\UserLoadBalancerTests.cs" />
+    <None Include="Providers\Rackspace\UserNetworksTests.cs" />
+    <None Include="Providers\Rackspace\UserObjectStorageTests.cs" />
+    <Compile Include="Providers\Rackspace\UserQueuesTests.cs" />
+    <None Include="Providers\Rackspace\UserServerTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\SDKTestingKey.snk">
+      <Link>SDKTestingKey.snk</Link>
+    </None>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.integration.portable-net45+wp80+win8.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Providers\Rackspace\CloudFiles\DarkKnightRises.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\corelib\corelib.portable-net45+wp80+win8.csproj">
+      <Project>{f2e9ed5b-48de-4824-9b19-cdd38d4fd60b}</Project>
+      <Name>corelib.portable-net45+wp80+win8</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\OpenStack.Threading\OpenStack.Threading.portable-net45+wp80+win8.csproj">
+      <Project>{5c1d10f9-a716-4ec0-bc10-1e3654666799}</Project>
+      <Name>OpenStack.Threading.portable-net45+wp80+win8</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

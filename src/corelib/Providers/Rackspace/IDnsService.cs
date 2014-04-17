@@ -15,6 +15,12 @@
     using OpenStack.Threading;
 #endif
 
+#if PORTABLE
+    using IPAddress = System.String;
+#else
+    using IPAddress = System.Net.IPAddress;
+#endif
+
     /// <summary>
     /// Represents a provider for the Rackspace Cloud DNS service.
     /// </summary>

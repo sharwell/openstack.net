@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
-using JSIStudios.SimpleRESTServices.Client;
-using JSIStudios.SimpleRESTServices.Client.Json;
 using net.openstack.Core;
 using net.openstack.Core.Caching;
 using net.openstack.Core.Domain;
@@ -16,7 +15,14 @@ using net.openstack.Providers.Rackspace.Objects.Response;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenStack.Threading;
+using global::Rackspace.Net;
 using CancellationToken = System.Threading.CancellationToken;
+
+#if !PORTABLE
+using JSIStudios.SimpleRESTServices.Client;
+using JSIStudios.SimpleRESTServices.Client.Json;
+using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
+#endif
 
 namespace net.openstack.Providers.Rackspace
 {
@@ -27,7 +33,13 @@ namespace net.openstack.Providers.Rackspace
     /// <seealso href="http://docs.openstack.org/api/openstack-identity-service/2.0/content/">OpenStack Identity Service API v2.0 Reference</seealso>
     /// <seealso href="http://docs.rackspace.com/auth/api/v2.0/auth-client-devguide/content/index.html">Rackspace Cloud Identity Client Developer Guide - API v2.0</seealso>
     /// <threadsafety static="true" instance="false"/>
-    public class CloudIdentityProvider : ProviderBase<IIdentityProvider>, IExtendedCloudIdentityProvider, IIdentityProvider, IIdentityService
+    public class CloudIdentityProvider
+        : ProviderBase<IIdentityProvider>,
+#if !PORTABLE
+        IExtendedCloudIdentityProvider,
+        IIdentityProvider,
+#endif
+        IIdentityService
     {
         /// <summary>
         /// This is the backing field for the <see cref="TokenCache"/> property.
@@ -39,6 +51,83 @@ namespace net.openstack.Providers.Rackspace
         /// </summary>
         private readonly Uri _urlBase;
 
+#if PORTABLE
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudIdentityProvider"/> class
+        /// with no default identity, and the default base URL, REST service implementation,
+        /// and token cache.
+        /// </summary>
+        public CloudIdentityProvider() : this(null, null, null)
+        {}
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudIdentityProvider"/> class
+        /// with the specified default identity, and the default base URL, REST service
+        /// implementation, and token cache.
+        /// </summary>
+        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, no default identity is available so all calls must specify an explicit identity.</param>
+        public CloudIdentityProvider(CloudIdentity defaultIdentity)
+            : this(defaultIdentity, null, null)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudIdentityProvider"/> class
+        /// with no default identity, the specified base URL, and the default REST service
+        /// implementation and token cache.
+        /// </summary>
+        /// <param name="urlBase">The base URL for the cloud instance. If this value is <see langword="null"/>, the provider will use <c>https://identity.api.rackspacecloud.com</c>.</param>
+        public CloudIdentityProvider(Uri urlBase)
+            : this(null, null, urlBase)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudIdentityProvider"/> class
+        /// with the specified default identity and base URL, and the default REST service
+        /// implementation and token cache.
+        /// </summary>
+        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, no default identity is available so all calls must specify an explicit identity.</param>
+        /// <param name="urlBase">The base URL for the cloud instance. If this value is <see langword="null"/>, the provider will use <c>https://identity.api.rackspacecloud.com</c>.</param>
+        public CloudIdentityProvider(CloudIdentity defaultIdentity, Uri urlBase)
+            : this(defaultIdentity, null, urlBase)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudIdentityProvider"/> class
+        /// with no default identity, and the specified base URL, REST service
+        /// implementation, and token cache.
+        /// </summary>
+        /// <param name="restService">The implementation of <see cref="IRestService"/> to use for executing REST requests. If this value is <see langword="null"/>, the provider will use a new instance of <see cref="JsonRestServices"/>.</param>
+        /// <param name="tokenCache">The cache to use for caching user access tokens. If this value is <see langword="null"/>, the provider will use <see cref="UserAccessCache.Instance"/>.</param>
+        /// <param name="urlBase">The base URL for the cloud instance. If this value is <see langword="null"/>, the provider will use <c>https://identity.api.rackspacecloud.com</c>.</param>
+        public CloudIdentityProvider(ICache<UserAccess> tokenCache, Uri urlBase)
+            : this(null, tokenCache, urlBase)
+        {}
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudIdentityProvider"/> class
+        /// with no default identity, the default base URL, the default REST service
+        /// implementation, and the specified token cache.
+        /// </summary>
+        /// <param name="tokenCache">The cache to use for caching user access tokens. If this value is <see langword="null"/>, the provider will use <see cref="UserAccessCache.Instance"/>.</param>
+        public CloudIdentityProvider(ICache<UserAccess> tokenCache)
+            : this(null, tokenCache, null)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudIdentityProvider"/> class
+        /// using the provided values.
+        /// </summary>
+        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, no default identity is available so all calls must specify an explicit identity.</param>
+        /// <param name="restService">The implementation of <see cref="IRestService"/> to use for executing REST requests. If this value is <see langword="null"/>, the provider will use a new instance of <see cref="JsonRestServices"/>.</param>
+        /// <param name="tokenCache">The cache to use for caching user access tokens. If this value is <see langword="null"/>, the provider will use <see cref="UserAccessCache.Instance"/>.</param>
+        /// <param name="urlBase">The base URL for the cloud instance. If this value is <see langword="null"/>, the provider will use <c>https://identity.api.rackspacecloud.com</c>.</param>
+        public CloudIdentityProvider(CloudIdentity defaultIdentity, ICache<UserAccess> tokenCache, Uri urlBase)
+            : base(defaultIdentity, null, null)
+        {
+            _userAccessCache = tokenCache ?? UserAccessCache.Instance;
+            _urlBase = urlBase ?? new Uri("https://identity.api.rackspacecloud.com");
+        }
+#else
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudIdentityProvider"/> class
         /// with no default identity, and the default base URL, REST service implementation,
@@ -136,6 +225,7 @@ namespace net.openstack.Providers.Rackspace
             _userAccessCache = tokenCache ?? UserAccessCache.Instance;
             _urlBase = urlBase ?? new Uri("https://identity.api.rackspacecloud.com");
         }
+#endif
 
         /// <summary>
         /// Gets the cache to use for caching user access tokens.
@@ -161,6 +251,7 @@ namespace net.openstack.Providers.Rackspace
 
         #region Roles
 
+#if !PORTABLE
         /// <inheritdoc/>
         public virtual IEnumerable<Role> ListRoles(string serviceId = null, int? marker = null, int? limit = null, CloudIdentity identity = null)
         {
@@ -315,11 +406,13 @@ namespace net.openstack.Providers.Rackspace
 
             return response.Data.Users;
         }
+#endif
 
         #endregion
 
         #region Credentials
 
+#if !PORTABLE
         /// <inheritdoc/>
         public virtual bool SetUserPassword(string userId, string password, CloudIdentity identity)
         {
@@ -518,11 +611,13 @@ namespace net.openstack.Providers.Rackspace
 
             return true;
         }
+#endif
 
         #endregion
 
         #region Users
 
+#if !PORTABLE
         /// <inheritdoc/>
         public virtual IEnumerable<User> ListUsers(CloudIdentity identity)
         {
@@ -672,11 +767,13 @@ namespace net.openstack.Providers.Rackspace
 
             return false;
         }
+#endif
 
         #endregion
 
         #region Tenants
 
+#if !PORTABLE
         /// <inheritdoc/>
         public virtual IEnumerable<Tenant> ListTenants(CloudIdentity identity)
         {
@@ -689,11 +786,13 @@ namespace net.openstack.Providers.Rackspace
 
             return response.Data.Tenants;
         }
+#endif
 
         #endregion
 
         #region Token and Authentication
 
+#if !PORTABLE
         /// <inheritdoc/>
         public virtual IdentityToken GetToken(CloudIdentity identity, bool forceCacheRefresh = false)
         {
@@ -706,6 +805,7 @@ namespace net.openstack.Providers.Rackspace
 
             return auth.Token;
         }
+#endif
 
         /// <inheritdoc/>
         public virtual Task<IdentityToken> GetTokenAsync(CloudIdentity identity, CancellationToken cancellationToken)
@@ -714,6 +814,7 @@ namespace net.openstack.Providers.Rackspace
                 .Select(task => task.Result.Token);
         }
 
+#if !PORTABLE
         /// <inheritdoc/>
         public virtual UserAccess Authenticate(CloudIdentity identity)
         {
@@ -721,6 +822,7 @@ namespace net.openstack.Providers.Rackspace
 
             return GetUserAccess(identity, true);
         }
+#endif
 
         /// <inheritdoc/>
         public virtual Task<UserAccess> AuthenticateAsync(CloudIdentity identity, CancellationToken cancellationToken)
@@ -748,6 +850,28 @@ namespace net.openstack.Providers.Rackspace
             var userAccess = TokenCache.Get(string.Format("{0}:{1}/{2}", UrlBase, rackspaceCloudIdentity.Domain, rackspaceCloudIdentity.Username), () =>
                             {
                                 var auth = new AuthRequest(identity);
+
+#if PORTABLE
+                                UriTemplate template = new UriTemplate("v2.0/tokens");
+                                var parameters = new Dictionary<string, string>();
+
+                                Func<Task<Tuple<IdentityToken, Uri>>, Task<HttpRequestMessage>> prepareRequest =
+                                    PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, auth);
+
+                                Func<Task<HttpRequestMessage>, Task<AuthenticationResponse>> requestResource =
+                                    GetResponseAsyncFunc<AuthenticationResponse>(CancellationToken.None);
+
+                                IdentityToken authenticationRequestToken = JsonConvert.DeserializeObject<IdentityToken>("{\"id\":\"AuthenticationRequestToken\"}");
+                                Task<Tuple<IdentityToken, Uri>> input = CompletedTask.FromResult(Tuple.Create(authenticationRequestToken, _urlBase));
+                                var response = prepareRequest(input)
+                                    .Then(requestResource)
+                                    .Result;
+
+                                if (response == null || response.UserAccess == null || response.UserAccess.Token == null)
+                                    return null;
+
+                                return response.UserAccess;
+#else
                                 var response = ExecuteRESTRequest<AuthenticationResponse>(identity, new Uri(UrlBase, "/v2.0/tokens"), HttpMethod.POST, auth, isTokenRequest: true);
 
 
@@ -755,9 +879,19 @@ namespace net.openstack.Providers.Rackspace
                                     return null;
 
                                 return response.Data.UserAccess;
+#endif
                             }, forceCacheRefresh);
 
             return userAccess;
+        }
+
+        protected override HttpRequestMessage PrepareRequestImpl(System.Net.Http.HttpMethod method, IdentityToken identityToken, UriTemplate template, Uri baseUri, IDictionary<string, string> parameters, Func<Uri, Uri> uriTransform)
+        {
+            HttpRequestMessage message = base.PrepareRequestImpl(method, identityToken, template, baseUri, parameters, uriTransform);
+            if (message.Headers.GetValues("X-Auth-Token").FirstOrDefault() == "AuthenticationRequestToken")
+                message.Headers.Remove("X-Auth-Token");
+
+            return message;
         }
 
         /// <inheritdoc/>
@@ -785,6 +919,9 @@ namespace net.openstack.Providers.Rackspace
         /// <exception cref="ResponseException">If the authentication request failed.</exception>
         protected virtual UserAccess Impersonate(RackspaceImpersonationIdentity identity, bool forceCacheRefresh)
         {
+#if PORTABLE
+            throw  new NotImplementedException();
+#else
             if (identity == null)
                 throw new ArgumentNullException("identity");
 
@@ -813,6 +950,7 @@ namespace net.openstack.Providers.Rackspace
             }, forceCacheRefresh);
 
             return impToken;
+#endif
         }
 
         /// <summary>
@@ -845,6 +983,7 @@ namespace net.openstack.Providers.Rackspace
             return serviceCatalog.ToArray();
         }
 
+#if !PORTABLE
         /// <inheritdoc/>
         public virtual UserAccess ValidateToken(string token, string tenantId = null, CloudIdentity identity = null)
         {
@@ -883,6 +1022,7 @@ namespace net.openstack.Providers.Rackspace
 
             return response.Data.Endpoints;
         }
+#endif
 
         /// <summary>
         /// Constructs the JSON representation used for an impersonation request.

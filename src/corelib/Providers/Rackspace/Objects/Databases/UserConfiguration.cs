@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using net.openstack.Core.Collections;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -114,7 +115,7 @@
                 if (databases.Length == 1)
                     _database = databases[0];
                 else
-                    _databases = Array.ConvertAll(databases, i => new WrappedDatabaseName(i));
+                    _databases = databases.ConvertAll(i => new WrappedDatabaseName(i));
             }
         }
 
@@ -153,7 +154,7 @@
             {
                 if (_databases != null)
                 {
-                    return new ReadOnlyCollection<DatabaseName>(Array.ConvertAll(_databases, i => i.Name));
+                    return new ReadOnlyCollection<DatabaseName>(_databases.ConvertAll(i => i.Name));
                 }
                 else if (_database != null)
                 {

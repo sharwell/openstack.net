@@ -2,9 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Net.Http;
+    using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
-    using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
 #if NET45PLUS
     using System.Collections.ObjectModel;
 #else
@@ -67,8 +68,8 @@
         /// This is the backing field for the <see cref="Method"/> property.
         /// </summary>
         [JsonProperty("method", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        private HttpMethod? _method;
+        [JsonConverter(typeof(HttpMethodConverter))]
+        private HttpMethod _method;
 
         /// <summary>
         /// This is the backing field for the <see cref="Payload"/> property.
@@ -104,7 +105,7 @@
         /// <para>-or-</para>
         /// <para>If <paramref name="headers"/> contains any empty keys.</para>
         /// </exception>
-        public HttpCheckDetails(Uri url, string authUser, string authPassword, string body, IDictionary<string, string> bodyMatches, bool? followRedirects, IDictionary<string, string> headers, HttpMethod? method, string payload)
+        public HttpCheckDetails(Uri url, string authUser, string authPassword, string body, IDictionary<string, string> bodyMatches, bool? followRedirects, IDictionary<string, string> headers, HttpMethod method, string payload)
         {
             if (url == null)
                 throw new ArgumentNullException("url");
@@ -231,7 +232,7 @@
         /// <summary>
         /// Gets the HTTP method to use for the request.
         /// </summary>
-        public HttpMethod? Method
+        public HttpMethod Method
         {
             get
             {

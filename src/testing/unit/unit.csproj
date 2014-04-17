@@ -91,6 +91,10 @@
       <Project>{c9aae5d1-6a4b-4e97-8a7f-012d835b60bb}</Project>
       <Name>corelib.v4.5</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\OpenStack.Threading\OpenStack.Threading.net45.csproj">
+      <Project>{808f5d89-ff4f-43d5-8ba7-e558ad4945d7}</Project>
+      <Name>OpenStack.Threading.net45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

@@ -41,6 +41,7 @@
             }
         }
 
+#if !PORTABLE
         /// <summary>
         /// Initializes a new instance of the <see cref="UserName"/> class
         /// with the specified name and host address.
@@ -60,6 +61,7 @@
             _name = id;
             _host = hostAddress != null ? hostAddress.ToString() : "%";
         }
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserName"/> class

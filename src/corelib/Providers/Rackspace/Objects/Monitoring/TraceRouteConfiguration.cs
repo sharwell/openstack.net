@@ -2,8 +2,10 @@
 {
     using System;
     using System.Net;
-    using System.Net.Sockets;
     using Newtonsoft.Json;
+#if !PORTABLE
+    using System.Net.Sockets;
+#endif
 
     /// <summary>
     /// This class models the JSON representation of a request to perform a traceroute
@@ -36,6 +38,7 @@
         {
         }
 
+#if !PORTABLE
         /// <summary>
         /// Initializes a new instance of the <see cref="TraceRouteConfiguration"/> class
         /// with the specified target address.
@@ -52,6 +55,7 @@
 
             _target = target.ToString();
         }
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TraceRouteConfiguration"/> class

@@ -18,10 +18,22 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using OpenStack.Threading;
+    using global::Rackspace.Net;
+
+#if PORTABLE && !NET45PLUS
+    using net.openstack.Core.Compat;
+#endif
+
+#if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
+#endif
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#endif
 
     /// <summary>
     /// Provides an implementation of <see cref="IQueueingService"/> for operating
@@ -54,6 +66,27 @@
         /// </summary>
         private HomeDocument _homeDocument;
 
+#if PORTABLE
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudQueuesProvider"/> class with
+        /// the specified values.
+        /// </summary>
+        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, the <paramref name="identityProvider"/> provides the default identity.</param>
+        /// <param name="defaultRegion">The default region to use for calls that do not explicitly specify a region. If this value is <see langword="null"/>, the default region for the user will be used; otherwise if the service uses region-specific endpoints all calls must specify an explicit region.</param>
+        /// <param name="clientId">The value of the <strong>Client-Id</strong> header to send with message requests from this service.</param>
+        /// <param name="internalUrl"><see langword="true"/> to use the endpoint's <see cref="Endpoint.InternalURL"/>; otherwise <see langword="false"/> to use the endpoint's <see cref="Endpoint.PublicURL"/>.</param>
+        /// <param name="identityProvider">The identity provider to use for authenticating requests to this provider. If this value is <see langword="null"/>, a new instance of <see cref="CloudIdentityProvider"/> is created using <paramref name="defaultIdentity"/> as the default identity.</param>
+        /// <exception cref="ArgumentException">If both <paramref name="defaultIdentity"/> and <paramref name="identityProvider"/> are <see langword="null"/>.</exception>
+        public CloudQueuesProvider(CloudIdentity defaultIdentity, string defaultRegion, Guid clientId, bool internalUrl, IIdentityProvider identityProvider)
+            : base(defaultIdentity, defaultRegion, identityProvider)
+        {
+            if (defaultIdentity == null && identityProvider == null)
+                throw new ArgumentException("defaultIdentity and identityProvider cannot both be null");
+
+            _clientId = clientId;
+            _internalUrl = internalUrl;
+        }
+#else
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudQueuesProvider"/> class with
         /// the specified values.
@@ -98,6 +131,7 @@
             _clientId = clientId;
             _internalUrl = internalUrl;
         }
+#endif
 
         #region IQueueingService Members
 
@@ -109,7 +143,7 @@
                 return CompletedTask.FromResult(_homeDocument);
             }
 
-            UriTemplate template = new UriTemplate("/");
+            UriTemplate template = new UriTemplate("/v1");
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Get, template, new Dictionary<string, string>());
 
@@ -132,7 +166,7 @@
         /// <inheritdoc/>
         public Task GetNodeHealthAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/health");
+            UriTemplate template = new UriTemplate("health");
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Head, template, new Dictionary<string, string>());
 
@@ -150,7 +184,7 @@
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}");
             var parameters = new Dictionary<string, string>
                 {
                     { "queue_name", queueName.Value }
@@ -182,7 +216,7 @@
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/queues?marker={marker}&limit={limit}&detailed={detailed}");
+            UriTemplate template = new UriTemplate("queues{?marker,limit,detailed}");
             var parameters = new Dictionary<string, string>
                 {
                     { "detailed", detailed.ToString().ToLowerInvariant() },
@@ -226,7 +260,7 @@
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}");
             var parameters = new Dictionary<string, string>() { { "queue_name", queueName.Value } };
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Head, template, parameters);
@@ -261,7 +295,11 @@
             if (message.Method != HttpMethod.Head)
                 return false;
 
+#if PORTABLE && !NET45PLUS
+            string[] uriSegments = message.RequestUri.GetSegments();
+#else
             string[] uriSegments = message.RequestUri.Segments;
+#endif
             if (uriSegments.Length < 2 || !string.Equals("queues/", uriSegments[uriSegments.Length - 2], StringComparison.Ordinal))
                 return false;
 
@@ -274,7 +312,7 @@
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}");
             var parameters = new Dictionary<string, string>
                 {
                     { "queue_name", queueName.Value }
@@ -298,7 +336,7 @@
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/metadata");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/metadata");
             var parameters = new Dictionary<string, string>
                 {
                     { "queue_name", queueName.Value }
@@ -331,7 +369,7 @@
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/metadata");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/metadata");
             var parameters = new Dictionary<string, string>
                 {
                     { "queue_name", queueName.Value }
@@ -354,7 +392,7 @@
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/stats");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/stats");
             var parameters = new Dictionary<string, string>() { { "queue_name", queueName.Value } };
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
@@ -375,7 +413,7 @@
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/messages?marker={marker}&limit={limit}&echo={echo}&include_claimed={include_claimed}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/messages{?marker,limit,echo,include_claimed}");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -416,8 +454,8 @@
                                 absoluteUri = new Uri(baseUri, nextLink.Href);
 
                             UriTemplateMatch match = template.Match(baseUri, absoluteUri);
-                            if (!string.IsNullOrEmpty(match.BoundVariables["marker"]))
-                                nextMarker = new QueuedMessageListId(match.BoundVariables["marker"]);
+                            if (match != null && !string.IsNullOrEmpty((string)match.Bindings["marker"].Value))
+                                nextMarker = new QueuedMessageListId((string)match.Bindings["marker"].Value);
                         }
                     }
 
@@ -453,7 +491,7 @@
             if (messageId == null)
                 throw new ArgumentNullException("messageId");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/messages/{message_id}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/messages/{message_id}");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -483,7 +521,7 @@
             if (messageIds.Contains(null))
                 throw new ArgumentException("messageIds cannot contain any null values");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/messages?ids={ids}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/messages{?ids}");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -493,7 +531,13 @@
                 };
 
             Func<Uri, Uri> uriTransform =
-                uri => new Uri(uri.GetLeftPart(UriPartial.Path) + uri.Query.Replace("%2c", ","));
+                uri =>
+                {
+                    UriBuilder uriBuilder = new UriBuilder(uri);
+                    uriBuilder.Query = null;
+                    uriBuilder.Fragment = null;
+                    return new Uri(uriBuilder.Uri.AbsoluteUri + uri.Query.Replace("%2c", ",").Replace("%2C", ","));
+                };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, uriTransform);
@@ -530,7 +574,7 @@
             if (messages.Length == 0)
                 return QueueExistsAsync(queueName, cancellationToken);
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/messages");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/messages");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -573,7 +617,7 @@
             if (messages.Length == 0)
                 return QueueExistsAsync(queueName, cancellationToken);
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/messages");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/messages");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -600,7 +644,7 @@
             if (messageId == null)
                 throw new ArgumentNullException("messageId");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/messages/{message_id}?claim_id={claim_id}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/messages/{message_id}{?claim_id}");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -632,7 +676,7 @@
             if (messageIds.Contains(null))
                 throw new ArgumentException("messageIds cannot contain any null values");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/messages?ids={ids}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/messages{?ids}");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -642,7 +686,13 @@
                 };
 
             Func<Uri, Uri> uriTransform =
-                uri => new Uri(uri.GetLeftPart(UriPartial.Path) + uri.Query.Replace("%2c", ","));
+                uri =>
+                {
+                    UriBuilder uriBuilder = new UriBuilder(uri);
+                    uriBuilder.Query = null;
+                    uriBuilder.Fragment = null;
+                    return new Uri(uriBuilder.Uri.AbsoluteUri + uri.Query.Replace("%2c", ",").Replace("%2C", ","));
+                };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, uriTransform);
@@ -667,7 +717,7 @@
             if (gracePeriod < TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException("gracePeriod");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/claims?limit={limit}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/claims{?limit}");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -718,7 +768,7 @@
             if (claim == null)
                 throw new ArgumentNullException("claim");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/claims/{claim_id}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/claims/{claim_id}");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -765,7 +815,7 @@
             if (timeToLive <= TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException("timeToLive");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/claims/{claim_id}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/claims/{claim_id}");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -794,7 +844,7 @@
             if (claim == null)
                 throw new ArgumentNullException("claim");
 
-            UriTemplate template = new UriTemplate("/queues/{queue_name}/claims/{claim_id}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/claims/{claim_id}");
 
             var parameters =
                 new Dictionary<string, string>()
@@ -849,7 +899,11 @@
                 () =>
                 {
                     Endpoint endpoint = GetServiceEndpoint(null, "rax:queues", "cloudQueues", null);
-                    Uri baseUri = new Uri(_internalUrl ? endpoint.InternalURL : endpoint.PublicURL);
+                    string uri = _internalUrl ? endpoint.InternalURL : endpoint.PublicURL;
+                    if (!uri.EndsWith("/"))
+                        uri += "/";
+
+                    Uri baseUri = new Uri(uri);
                     _baseUri = baseUri;
                     return baseUri;
                 });

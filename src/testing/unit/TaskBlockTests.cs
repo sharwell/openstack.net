@@ -3,7 +3,7 @@
     using System;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core;
+    using OpenStack.Threading;
 
     [TestClass]
     public class TaskBlockTests
@@ -19,9 +19,9 @@
         {
             DisposableObject disposableObject = new DisposableObject(false);
             Func<Task<IDisposable>> acquire =
-                () => InternalTaskExtensions.CompletedTask<IDisposable>(disposableObject);
+                () => CompletedTask.FromResult<IDisposable>(disposableObject);
             Func<Task<IDisposable>, Task<int>> body =
-                resourceTask => InternalTaskExtensions.CompletedTask(3);
+                resourceTask => CompletedTask.FromResult(3);
             int result = await CoreTaskExtensions.Using(acquire, body);
             Assert.AreEqual(3, result);
             Assert.AreEqual(1, disposableObject.DisposeCount);
@@ -32,9 +32,9 @@
         public async Task TestUsingBlockNullResource()
         {
             Func<Task<IDisposable>> acquire =
-                () => InternalTaskExtensions.CompletedTask(default(IDisposable));
+                () => CompletedTask.FromResult(default(IDisposable));
             Func<Task<IDisposable>, Task<int>> body =
-                resourceTask => InternalTaskExtensions.CompletedTask(3);
+                resourceTask => CompletedTask.FromResult(3);
             int result = await CoreTaskExtensions.Using(acquire, body);
             Assert.AreEqual(3, result);
         }
@@ -45,7 +45,7 @@
         {
             DisposableObject disposableObject = new DisposableObject(false);
             Func<Task<IDisposable>> acquire =
-                () => InternalTaskExtensions.CompletedTask<IDisposable>(disposableObject);
+                () => CompletedTask.FromResult<IDisposable>(disposableObject);
             Func<Task<IDisposable>, Task<int>> body =
                 resourceTask =>
                 {
@@ -70,9 +70,9 @@
         {
             DisposableObject disposableObject = new DisposableObject(true);
             Func<Task<IDisposable>> acquire =
-                () => InternalTaskExtensions.CompletedTask<IDisposable>(disposableObject);
+                () => CompletedTask.FromResult<IDisposable>(disposableObject);
             Func<Task<IDisposable>, Task<int>> body =
-                resourceTask => InternalTaskExtensions.CompletedTask(3);
+                resourceTask => CompletedTask.FromResult(3);
 
             try
             {
@@ -92,7 +92,7 @@
         {
             DisposableObject disposableObject = new DisposableObject(true);
             Func<Task<IDisposable>> acquire =
-                () => InternalTaskExtensions.CompletedTask<IDisposable>(disposableObject);
+                () => CompletedTask.FromResult<IDisposable>(disposableObject);
             Func<Task<IDisposable>, Task<int>> body =
                 resourceTask =>
                 {
@@ -125,9 +125,9 @@
         {
             DisposableObject disposableObject = new DisposableObject(false);
             Func<Task<IDisposable>> acquire =
-                () => InternalTaskExtensions.CompletedTask<IDisposable>(disposableObject);
+                () => CompletedTask.FromResult<IDisposable>(disposableObject);
             Func<Task<IDisposable>, Task> body =
-                resourceTask => InternalTaskExtensions.CompletedTask();
+                resourceTask => CompletedTask.Default;
             await CoreTaskExtensions.Using(acquire, body);
             Assert.AreEqual(1, disposableObject.DisposeCount);
         }
@@ -137,9 +137,9 @@
         public async Task TestVoidUsingBlockNullResource()
         {
             Func<Task<IDisposable>> acquire =
-                () => InternalTaskExtensions.CompletedTask(default(IDisposable));
+                () => CompletedTask.FromResult(default(IDisposable));
             Func<Task<IDisposable>, Task> body =
-                resourceTask => InternalTaskExtensions.CompletedTask();
+                resourceTask => CompletedTask.Default;
             await CoreTaskExtensions.Using(acquire, body);
         }
 
@@ -149,7 +149,7 @@
         {
             DisposableObject disposableObject = new DisposableObject(false);
             Func<Task<IDisposable>> acquire =
-                () => InternalTaskExtensions.CompletedTask<IDisposable>(disposableObject);
+                () => CompletedTask.FromResult<IDisposable>(disposableObject);
             Func<Task<IDisposable>, Task> body =
                 resourceTask =>
                 {
@@ -174,9 +174,9 @@
         {
             DisposableObject disposableObject = new DisposableObject(true);
             Func<Task<IDisposable>> acquire =
-                () => InternalTaskExtensions.CompletedTask<IDisposable>(disposableObject);
+                () => CompletedTask.FromResult<IDisposable>(disposableObject);
             Func<Task<IDisposable>, Task> body =
-                resourceTask => InternalTaskExtensions.CompletedTask();
+                resourceTask => CompletedTask.Default;
 
             try
             {
@@ -196,7 +196,7 @@
         {
             DisposableObject disposableObject = new DisposableObject(true);
             Func<Task<IDisposable>> acquire =
-                () => InternalTaskExtensions.CompletedTask<IDisposable>(disposableObject);
+                () => CompletedTask.FromResult<IDisposable>(disposableObject);
             Func<Task<IDisposable>, Task> body =
                 resourceTask =>
                 {
@@ -240,7 +240,7 @@
                 () =>
                 {
                     iterations++;
-                    return InternalTaskExtensions.CompletedTask();
+                    return CompletedTask.Default;
                 };
 
             await CoreTaskExtensions.While(condition, body);
@@ -265,7 +265,7 @@
                 () =>
                 {
                     iterations++;
-                    return InternalTaskExtensions.CompletedTask();
+                    return CompletedTask.Default;
                 };
 
             try
@@ -331,7 +331,7 @@
                 () =>
                 {
                     iterations++;
-                    return InternalTaskExtensions.CompletedTask().Select(
+                    return CompletedTask.Default.Select(
                         task =>
                         {
                             throw new ArgumentException(ArgumentExceptionMessage);
@@ -364,7 +364,7 @@
                 () =>
                 {
                     count++;
-                    return InternalTaskExtensions.CompletedTask(count <= 3);
+                    return CompletedTask.FromResult(count <= 3);
                 };
 
             int iterations = 0;
@@ -372,7 +372,7 @@
                 () =>
                 {
                     iterations++;
-                    return InternalTaskExtensions.CompletedTask();
+                    return CompletedTask.Default;
                 };
 
             await CoreTaskExtensions.While(condition, body);
@@ -397,7 +397,7 @@
                 () =>
                 {
                     iterations++;
-                    return InternalTaskExtensions.CompletedTask();
+                    return CompletedTask.Default;
                 };
 
             try
@@ -422,7 +422,7 @@
                 () =>
                 {
                     count++;
-                    return InternalTaskExtensions.CompletedTask().Select<bool>(
+                    return CompletedTask.Default.Select<bool>(
                         task =>
                         {
                             throw new ArgumentException(ArgumentExceptionMessage);
@@ -434,7 +434,7 @@
                 () =>
                 {
                     iterations++;
-                    return InternalTaskExtensions.CompletedTask();
+                    return CompletedTask.Default;
                 };
 
             try
@@ -459,7 +459,7 @@
                 () =>
                 {
                     count++;
-                    return InternalTaskExtensions.CompletedTask(count <= 3);
+                    return CompletedTask.FromResult(count <= 3);
                 };
 
             int iterations = 0;
@@ -492,7 +492,7 @@
                 () =>
                 {
                     count++;
-                    return InternalTaskExtensions.CompletedTask(count <= 3);
+                    return CompletedTask.FromResult(count <= 3);
                 };
 
             int iterations = 0;
@@ -500,7 +500,7 @@
                 () =>
                 {
                     iterations++;
-                    return InternalTaskExtensions.CompletedTask().Select(
+                    return CompletedTask.Default.Select(
                         task =>
                         {
                             throw new ArgumentException(ArgumentExceptionMessage);

@@ -2,9 +2,15 @@
 {
     using System;
     using System.Net;
-    using System.Net.Sockets;
     using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
+
+#if PORTABLE
+    using IPAddress = System.String;
+#else
+    using System.Net.Sockets;
+    using IPAddress = System.Net.IPAddress;
+#endif
 
     /// <summary>
     /// This class represents a virtual address which is assigned to a load balancer,
@@ -21,7 +27,9 @@
         /// This is the backing field for the <see cref="Address"/> property.
         /// </summary>
         [JsonProperty("address", DefaultValueHandling = DefaultValueHandling.Ignore)]
+#if !PORTABLE
         [JsonConverter(typeof(IPAddressSimpleConverter))]
+#endif
         private IPAddress _address;
 
         /// <summary>
@@ -52,6 +60,37 @@
         {
         }
 
+#if PORTABLE
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LoadBalancerVirtualAddress"/> class
+        /// with the specified virtual address type.
+        /// </summary>
+        /// <param name="type">The virtual address type.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="type"/> is <see langword="null"/>.</exception>
+        public LoadBalancerVirtualAddress(LoadBalancerVirtualAddressType type)
+            : this(type, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LoadBalancerVirtualAddress"/> class
+        /// with the specified virtual address type and family.
+        /// </summary>
+        /// <param name="type">The virtual address type.</param>
+        /// <param name="version">The address family for this virtual address, or <see langword="null"/> to not specify the address family.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="type"/> is <see langword="null"/>.</exception>
+        /// <exception cref="NotSupportedException">If <paramref name="version"/> is not <c>IPV4</c> or <c>IPV6</c>.</exception>
+        public LoadBalancerVirtualAddress(LoadBalancerVirtualAddressType type, string version)
+        {
+            if (type == null)
+                throw new ArgumentNullException("type");
+            if (version != null && version != "IPV4" && version != "IPV6")
+                throw new NotSupportedException("The specified address family is not supported by this service.");
+
+            _type = type;
+            _ipVersion = version;
+        }
+#else
         /// <summary>
         /// Initializes a new instance of the <see cref="LoadBalancerVirtualAddress"/> class
         /// with the specified virtual address type.
@@ -94,6 +133,7 @@
                 }
             }
         }
+#endif
 
         /// <summary>
         /// Gets the unique ID representing this virtual address within the load balancers service.
@@ -140,6 +180,34 @@
             }
         }
 
+#if PORTABLE
+        /// <summary>
+        /// Gets the address family for this virtual address.
+        /// </summary>
+        /// <value>
+        /// An <see cref="AddressFamily"/> describing the address family for this virtual address,
+        /// or <see langword="null"/> if the JSON response from the server did not include this property or
+        /// the value was unrecognized.
+        /// </value>
+        public string IPVersion
+        {
+            get
+            {
+                if (_ipVersion == null)
+                    return null;
+
+                switch (_ipVersion.ToLowerInvariant())
+                {
+                case "ipv4":
+                    return "IPV4";
+                case "ipv6":
+                    return "IPV6";
+                default:
+                    return null;
+                }
+            }
+        }
+#else
         /// <summary>
         /// Gets the address family for this virtual address.
         /// </summary>
@@ -166,5 +234,6 @@
                 }
             }
         }
+#endif
     }
 }

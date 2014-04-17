@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Net;
-    using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
     using net.openstack.Core;
@@ -12,6 +11,12 @@
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
 #if NET35
     using OpenStack.Threading;
+#endif
+#if !PORTABLE
+    using System.Net.Sockets;
+#endif
+#if PORTABLE
+    using AddressFamily = System.String;
 #endif
 
     /// <summary>

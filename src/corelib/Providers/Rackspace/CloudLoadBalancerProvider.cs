@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Net;
     using System.Net.Http;
-    using System.Net.Sockets;
     using System.Threading.Tasks;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
@@ -18,10 +17,20 @@
     using net.openstack.Providers.Rackspace.Validators;
     using Newtonsoft.Json.Linq;
     using OpenStack.Threading;
+    using global::Rackspace.Net;
     using CancellationToken = System.Threading.CancellationToken;
+
+#if !PORTABLE
+    using System.Net.Sockets;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
+#endif
+
+#if PORTABLE
+    using AddressFamily = System.String;
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#endif
 
     /// <summary>
     /// Provides an implementation of <see cref="ILoadBalancerService"/> for operating
@@ -38,6 +47,19 @@
         /// <seealso cref="GetBaseUriAsync"/>
         private Uri _baseUri;
 
+#if PORTABLE
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudLoadBalancerProvider"/> class with
+        /// the specified values.
+        /// </summary>
+        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, no default identity is available so all calls must specify an explicit identity.</param>
+        /// <param name="defaultRegion">The default region to use for calls that do not explicitly specify a region. If this value is <see langword="null"/>, the default region for the user will be used; otherwise if the service uses region-specific endpoints all calls must specify an explicit region.</param>
+        /// <param name="identityProvider">The identity provider to use for authenticating requests to this provider. If this value is <see langword="null"/>, a new instance of <see cref="CloudIdentityProvider"/> is created using <paramref name="defaultIdentity"/> as the default identity.</param>
+        public CloudLoadBalancerProvider(CloudIdentity defaultIdentity, string defaultRegion, IIdentityProvider identityProvider)
+            : base(defaultIdentity, defaultRegion, identityProvider)
+        {
+        }
+#else
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudLoadBalancerProvider"/> class with
         /// the specified values.
@@ -63,6 +85,7 @@
             : base(defaultIdentity, defaultRegion, identityProvider, restService, httpStatusCodeValidator)
         {
         }
+#endif
 
         #region ILoadBalancerService Members
 
@@ -72,10 +95,10 @@
             if (limit < 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/loadbalancers?marker={markerId}&limit={limit}");
+            UriTemplate template = new UriTemplate("loadbalancers{?marker,limit}");
             var parameters = new Dictionary<string, string>();
             if (markerId != null)
-                parameters.Add("markerId", markerId.Value);
+                parameters.Add("marker", markerId.Value);
             if (limit != null)
             {
                 if (markerId != null)
@@ -107,7 +130,7 @@
                             throw new InvalidOperationException("Expected the pagination result to include the marked load balancer.");
 
                         // remove the marker so pagination behaves normally
-                        result = new List<LoadBalancer>(result.Skip(1)).AsReadOnly();
+                        result = new ReadOnlyCollection<LoadBalancer>(new List<LoadBalancer>(result.Skip(1)));
                     }
 
                     if (!result.Any())
@@ -131,7 +154,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
@@ -154,7 +177,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/loadbalancers");
+            UriTemplate template = new UriTemplate("loadbalancers");
             var parameters = new Dictionary<string, string>();
 
             CreateLoadBalancerRequest requestBody = new CreateLoadBalancerRequest(configuration);
@@ -188,7 +211,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
 
             UpdateLoadBalancerRequest requestBody = new UpdateLoadBalancerRequest(configuration);
@@ -219,7 +242,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
@@ -294,14 +317,17 @@
             }
             else
             {
-                UriTemplate template = new UriTemplate("/loadbalancers?id={id}");
-                var parameters = new Dictionary<string, string> { { "id", string.Join(",", Array.ConvertAll(loadBalancerIds, i => i.Value)) } };
+                UriTemplate template = new UriTemplate("loadbalancers{?id}");
+                var parameters = new Dictionary<string, string> { { "id", string.Join(",", loadBalancerIds.ConvertAll(i => i.Value)) } };
 
                 Func<Uri, Uri> uriTransform =
                     uri =>
                     {
-                        string path = uri.GetLeftPart(UriPartial.Path);
-                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=");
+                        UriBuilder uriBuilder = new UriBuilder(uri);
+                        uriBuilder.Query = null;
+                        uriBuilder.Fragment = null;
+                        string path = uriBuilder.Uri.AbsoluteUri;
+                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=").Replace("%2C", "&id=");
                         return new Uri(path + query);
                     };
 
@@ -333,7 +359,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/errorpage");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/errorpage");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -364,7 +390,7 @@
             if (string.IsNullOrEmpty(content))
                 throw new ArgumentException("content cannot be empty");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/errorpage");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/errorpage");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -398,7 +424,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/errorpage");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/errorpage");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -431,7 +457,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/stats");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/stats");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -454,7 +480,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -480,7 +506,7 @@
             if (nodeId == null)
                 throw new ArgumentNullException("nodeId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes/{nodeId}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value }, { "nodeId", nodeId.Value } };
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
@@ -560,7 +586,7 @@
             }
             else
             {
-                UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes");
+                UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes");
                 var parameters = new Dictionary<string, string>()
                 {
                     { "loadBalancerId", loadBalancerId.Value },
@@ -602,7 +628,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes/{nodeId}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value }, { "nodeId", nodeId.Value } };
 
             UpdateLoadBalancerNodeRequest requestBody = new UpdateLoadBalancerNodeRequest(configuration);
@@ -635,7 +661,7 @@
             if (nodeId == null)
                 throw new ArgumentNullException("nodeId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes/{nodeId}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value }, { "nodeId", nodeId.Value } };
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters);
@@ -707,14 +733,17 @@
             }
             else
             {
-                UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes?id={id}");
-                var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value }, { "id", string.Join(",", Array.ConvertAll(nodeIds, i => i.Value)) } };
+                UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes{?id}");
+                var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value }, { "id", string.Join(",", nodeIds.ConvertAll(i => i.Value)) } };
 
                 Func<Uri, Uri> uriTransform =
                     uri =>
                     {
-                        string path = uri.GetLeftPart(UriPartial.Path);
-                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=");
+                        UriBuilder uriBuilder = new UriBuilder(uri);
+                        uriBuilder.Query = null;
+                        uriBuilder.Fragment = null;
+                        string path = uriBuilder.Uri.AbsoluteUri;
+                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=").Replace("%2C", "&id=");
                         return new Uri(path + query);
                     };
 
@@ -748,10 +777,10 @@
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/events?marker={markerId}&limit={limit}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes/events{?marker,limit}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
             if (markerId != null)
-                parameters.Add("markerId", markerId.Value);
+                parameters.Add("marker", markerId.Value);
             if (limit != null)
             {
                 if (markerId != null)
@@ -784,7 +813,7 @@
                             throw new InvalidOperationException("Expected the pagination result to include the marked node service event.");
 
                         // remove the marker so pagination behaves normally
-                        result = new List<NodeServiceEvent>(result.Skip(1)).AsReadOnly();
+                        result = new ReadOnlyCollection<NodeServiceEvent>(new List<NodeServiceEvent>(result.Skip(1)));
                     }
 
                     if (!result.Any())
@@ -808,7 +837,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/virtualips");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/virtualips");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -833,10 +862,15 @@
                 throw new ArgumentNullException("loadBalancerId");
             if (type == null)
                 throw new ArgumentNullException("type");
+#if PORTABLE
+            if (addressFamily != "IPV4" && addressFamily != "IPV6")
+                throw new ArgumentException("Unsupported address family.", "addressFamily");
+#else
             if (addressFamily != AddressFamily.InterNetwork && addressFamily != AddressFamily.InterNetworkV6)
                 throw new ArgumentException("Unsupported address family.", "addressFamily");
+#endif
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/virtualips");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/virtualips");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -870,7 +904,7 @@
         /// <inheritdoc/>
         public Task RemoveVirtualAddressAsync(LoadBalancerId loadBalancerId, VirtualAddressId virtualAddressId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<LoadBalancer> progress)
         {
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/virtualips/{virtualipId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/virtualips/{virtualipId}");
             var parameters = new Dictionary<string, string>()
                 {
                     { "loadBalancerId", loadBalancerId.Value },
@@ -951,18 +985,21 @@
             }
             else
             {
-                UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/virtualips?id={id}");
+                UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/virtualips{?id}");
                 var parameters = new Dictionary<string, string>()
                 {
                     { "loadBalancerId", loadBalancerId.Value },
-                    { "id", string.Join(",", Array.ConvertAll(virtualAddressIds, i => i.Value)) }
+                    { "id", string.Join(",", virtualAddressIds.ConvertAll(i => i.Value)) }
                 };
 
                 Func<Uri, Uri> uriTransform =
                     uri =>
                     {
-                        string path = uri.GetLeftPart(UriPartial.Path);
-                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=");
+                        UriBuilder uriBuilder = new UriBuilder(uri);
+                        uriBuilder.Query = null;
+                        uriBuilder.Fragment = null;
+                        string path = uriBuilder.Uri.AbsoluteUri;
+                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=").Replace("%2C", "&id=");
                         return new Uri(path + query);
                     };
 
@@ -991,7 +1028,7 @@
         /// <inheritdoc/>
         public Task<ReadOnlyCollection<string>> ListAllowedDomainsAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/loadbalancers/alloweddomains");
+            UriTemplate template = new UriTemplate("loadbalancers/alloweddomains");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
                 PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters);
@@ -1018,7 +1055,7 @@
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/billable?startTime={startTime}&endTime={endTime}&offset={offset}&limit={limit}");
+            UriTemplate template = new UriTemplate("loadbalancers/billable{?startTime,endTime,offset,limit}");
             var parameters = new Dictionary<string, string>();
             if (startTime != null)
                 parameters.Add("startTime", startTime.Value.ToString("yyyy-MM-dd"));
@@ -1062,7 +1099,7 @@
             if (endTime < startTime)
                 throw new ArgumentOutOfRangeException("endTime");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/usage?startTime={startTime}&endTime={endTime}");
+            UriTemplate template = new UriTemplate("loadbalancers/usage{?startTime,endTime}");
             var parameters = new Dictionary<string, string>();
             if (startTime != null)
                 parameters.Add("startTime", startTime.Value.ToString("yyyy-MM-dd"));
@@ -1092,7 +1129,7 @@
             if (endTime < startTime)
                 throw new ArgumentOutOfRangeException("endTime");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/usage?startTime={startTime}&endTime={endTime}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/usage{?startTime,endTime}");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
             if (startTime != null)
                 parameters.Add("startTime", startTime.Value.ToString("yyyy-MM-dd"));
@@ -1120,7 +1157,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/usage/current");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/usage/current");
             var parameters = new Dictionary<string, string> { { "loadBalancerId", loadBalancerId.Value } };
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1144,7 +1181,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/accesslist");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/accesslist");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1224,7 +1261,7 @@
             }
             else
             {
-                UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/accesslist");
+                UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/accesslist");
                 var parameters = new Dictionary<string, string>()
                 {
                     { "loadBalancerId", loadBalancerId.Value },
@@ -1261,7 +1298,7 @@
             if (networkItemId == null)
                 throw new ArgumentNullException("networkItemId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/accesslist/{networkItemId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/accesslist/{networkItemId}");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -1338,18 +1375,21 @@
             }
             else
             {
-                UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/accesslist?id={id}");
+                UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/accesslist{?id}");
                 var parameters = new Dictionary<string, string>
                 {
                     { "loadBalancerId", loadBalancerId.Value },
-                    { "id", string.Join(",", Array.ConvertAll(networkItemIds, i => i.Value)) }
+                    { "id", string.Join(",", networkItemIds.ConvertAll(i => i.Value)) }
                 };
 
                 Func<Uri, Uri> uriTransform =
                     uri =>
                     {
-                        string path = uri.GetLeftPart(UriPartial.Path);
-                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=");
+                        UriBuilder uriBuilder = new UriBuilder(uri);
+                        uriBuilder.Query = null;
+                        uriBuilder.Fragment = null;
+                        string path = uriBuilder.Uri.AbsoluteUri;
+                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=").Replace("%2C", "&id=");
                         return new Uri(path + query);
                     };
 
@@ -1381,7 +1421,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/accesslist");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/accesslist");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -1414,7 +1454,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/healthmonitor");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/healthmonitor");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1453,7 +1493,7 @@
             if (monitor == null)
                 throw new ArgumentNullException("monitor");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/healthmonitor");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/healthmonitor");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1486,7 +1526,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/healthmonitor");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/healthmonitor");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -1519,7 +1559,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/sessionpersistence");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/sessionpersistence");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1544,7 +1584,7 @@
             if (sessionPersistence == null)
                 throw new ArgumentNullException("sessionPersistence");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/sessionpersistence");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/sessionpersistence");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1577,7 +1617,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/sessionpersistence");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/sessionpersistence");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1610,7 +1650,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/connectionlogging");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/connectionlogging");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1637,7 +1677,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/connectionlogging");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/connectionlogging");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1671,7 +1711,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/connectionthrottle");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/connectionthrottle");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1700,7 +1740,7 @@
             if (throttleConfiguration == null)
                 throw new ArgumentNullException("throttleConfiguration");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/connectionthrottle");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/connectionthrottle");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1733,7 +1773,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/connectionthrottle");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/connectionthrottle");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1766,7 +1806,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/contentcaching");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/contentcaching");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1793,7 +1833,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/contentcaching");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/contentcaching");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1824,7 +1864,7 @@
         /// <inheritdoc/>
         public Task<ReadOnlyCollection<LoadBalancingProtocol>> ListProtocolsAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/loadbalancers/protocols");
+            UriTemplate template = new UriTemplate("loadbalancers/protocols");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1846,7 +1886,7 @@
         /// <inheritdoc/>
         public Task<ReadOnlyCollection<LoadBalancingAlgorithm>> ListAlgorithmsAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("/loadbalancers/algorithms");
+            UriTemplate template = new UriTemplate("loadbalancers/algorithms");
             var parameters = new Dictionary<string, string>();
 
             Func<Task<Tuple<IdentityToken, Uri>>, HttpRequestMessage> prepareRequest =
@@ -1871,7 +1911,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/ssltermination");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/ssltermination");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1900,7 +1940,7 @@
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/ssltermination");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/ssltermination");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1934,7 +1974,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/ssltermination");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/ssltermination");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value }
@@ -1967,7 +2007,7 @@
             if (loadBalancerId == null)
                 throw new ArgumentNullException("loadBalancerId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/metadata");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/metadata");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -1996,7 +2036,7 @@
             if (metadataId == null)
                 throw new ArgumentNullException("metadataId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/metadata/{metaId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/metadata/{metaId}");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -2026,7 +2066,7 @@
             if (nodeId == null)
                 throw new ArgumentNullException("nodeId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -2058,7 +2098,7 @@
             if (metadataId == null)
                 throw new ArgumentNullException("metadataId");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata/{metaId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata/{metaId}");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -2089,7 +2129,7 @@
             if (metadata == null)
                 throw new ArgumentNullException("metadata");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/metadata");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/metadata");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -2121,7 +2161,7 @@
             if (metadata == null)
                 throw new ArgumentNullException("metadata");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -2154,7 +2194,7 @@
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/metadata/{metaId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/metadata/{metaId}");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -2185,7 +2225,7 @@
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata/{metaId}");
+            UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata/{metaId}");
             var parameters = new Dictionary<string, string>()
             {
                 { "loadBalancerId", loadBalancerId.Value },
@@ -2246,7 +2286,7 @@
             }
             else if (metadataIds.Length == 1)
             {
-                UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/metadata/{metaId}");
+                UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/metadata/{metaId}");
                 var parameters = new Dictionary<string, string>()
                 {
                     { "loadBalancerId", loadBalancerId.Value },
@@ -2265,18 +2305,21 @@
             }
             else
             {
-                UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/metadata?id={id}");
+                UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/metadata{?id}");
                 var parameters = new Dictionary<string, string>()
                 {
                     { "loadBalancerId", loadBalancerId.Value },
-                    { "id", string.Join(",", Array.ConvertAll(metadataIds, i => i.Value)) }
+                    { "id", string.Join(",", metadataIds.ConvertAll(i => i.Value)) }
                 };
 
                 Func<Uri, Uri> uriTransform =
                     uri =>
                     {
-                        string path = uri.GetLeftPart(UriPartial.Path);
-                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=");
+                        UriBuilder uriBuilder = new UriBuilder(uri);
+                        uriBuilder.Query = null;
+                        uriBuilder.Fragment = null;
+                        string path = uriBuilder.Uri.AbsoluteUri;
+                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=").Replace("%2C", "&id=");
                         return new Uri(path + query);
                     };
 
@@ -2338,7 +2381,7 @@
             }
             else if (metadataIds.Length == 1)
             {
-                UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata/{metaId}");
+                UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata/{metaId}");
                 var parameters = new Dictionary<string, string>()
                 {
                     { "loadBalancerId", loadBalancerId.Value },
@@ -2358,19 +2401,22 @@
             }
             else
             {
-                UriTemplate template = new UriTemplate("/loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata?id={id}");
+                UriTemplate template = new UriTemplate("loadbalancers/{loadBalancerId}/nodes/{nodeId}/metadata{?id}");
                 var parameters = new Dictionary<string, string>()
                 {
                     { "loadBalancerId", loadBalancerId.Value },
                     { "nodeId", nodeId.Value },
-                    { "id", string.Join(",", Array.ConvertAll(metadataIds, i => i.Value)) }
+                    { "id", string.Join(",", metadataIds.ConvertAll(i => i.Value)) }
                 };
 
                 Func<Uri, Uri> uriTransform =
                     uri =>
                     {
-                        string path = uri.GetLeftPart(UriPartial.Path);
-                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=");
+                        UriBuilder uriBuilder = new UriBuilder(uri);
+                        uriBuilder.Query = null;
+                        uriBuilder.Fragment = null;
+                        string path = uriBuilder.Uri.AbsoluteUri;
+                        string query = uri.Query.Replace(",", "&id=").Replace("%2c", "&id=").Replace("%2C", "&id=");
                         return new Uri(path + query);
                     };
 
@@ -2548,8 +2594,8 @@
             Func<Task<LoadBalancer[]>> pollLoadBalancers =
                 () =>
                 {
-                    Task<LoadBalancer>[] tasks = Array.ConvertAll(
-                        loadBalancerIds,
+                    Task<LoadBalancer>[] tasks =
+                        loadBalancerIds.ConvertAll(
                         loadBalancerId =>
                         {
                             return PollLoadBalancerStateAsync(loadBalancerId, cancellationToken, null);
@@ -2558,7 +2604,7 @@
                     return Task.Factory.WhenAll(tasks).Select(
                         completedTasks =>
                         {
-                            LoadBalancer[] loadBalancers = Array.ConvertAll(completedTasks.Result, completedTask => completedTask.Result);
+                            LoadBalancer[] loadBalancers = completedTasks.Result.ConvertAll(completedTask => completedTask.Result);
                             if (progress != null)
                                 progress.Report(loadBalancers);
 
@@ -2631,7 +2677,11 @@
                 () =>
                 {
                     Endpoint endpoint = GetServiceEndpoint(null, "rax:load-balancer", "cloudLoadBalancers", null);
-                    _baseUri = new Uri(endpoint.PublicURL);
+                    string uri = endpoint.PublicURL;
+                    if (!uri.EndsWith("/"))
+                        uri += "/";
+
+                    _baseUri = new Uri(uri);
                     return _baseUri;
                 });
         }

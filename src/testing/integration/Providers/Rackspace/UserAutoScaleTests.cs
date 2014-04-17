@@ -15,16 +15,22 @@
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.AutoScale;
     using Newtonsoft.Json.Linq;
+    using global::OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using HttpWebRequest = System.Net.HttpWebRequest;
     using HttpWebResponse = System.Net.HttpWebResponse;
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
     using Path = System.IO.Path;
     using StreamReader = System.IO.StreamReader;
     using WebRequest = System.Net.WebRequest;
     using WebResponse = System.Net.WebResponse;
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#else
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
+#endif
 
     [TestClass]
     public class UserAutoScaleTests
@@ -57,7 +63,7 @@
                     if (group.State.ActiveCapacity > 0)
                         prepTask = provider.SetGroupConfigurationAsync(group.Id, new GroupConfiguration(group.State.Name, TimeSpan.FromSeconds(60), 0, 0, new JObject()), cancellationTokenSource.Token);
                     else
-                        prepTask = InternalTaskExtensions.CompletedTask();
+                        prepTask = CompletedTask.Default;
 
                     cleanupTasks.Add(prepTask.ContinueWith(task => provider.DeleteGroupAsync(group.Id, false, cancellationTokenSource.Token)).Unwrap());
                 }
@@ -745,14 +751,15 @@
                 Link capabilityLink = webhook.Links.FirstOrDefault(i => string.Equals(i.Rel, "capability", StringComparison.OrdinalIgnoreCase));
                 Assert.IsNotNull(capabilityLink);
                 Uri capability = new Uri(capabilityLink.Href, UriKind.Absolute);
-                HttpWebRequest request = WebRequest.CreateHttp(capability);
-                request.Method = "POST";
-                Console.Error.WriteLine("{0} (Request) {1} {2}", DateTime.Now, request.Method, request.RequestUri);
-                WebResponse response = await request.GetResponseAsync(cancellationTokenSource.Token);
-                Console.Error.WriteLine("{0} (Result {1}) {2}", DateTime.Now, ((HttpWebResponse)response).StatusCode, response.ResponseUri);
-                foreach (string header in response.Headers)
-                    Console.Error.WriteLine(string.Format("{0}: {1}", header, response.Headers[header]));
-                string result = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                HttpClient httpClient = new HttpClient();
+                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, capability);
+                Console.Error.WriteLine("{0} (Request) {1} {2}", DateTime.Now, requestMessage.Method, requestMessage.RequestUri);
+                HttpResponseMessage responseMessage = await httpClient.SendAsync(requestMessage, cancellationTokenSource.Token);
+                Console.Error.WriteLine("{0} (Result {1})", DateTime.Now, responseMessage.StatusCode);
+                foreach (KeyValuePair<string, IEnumerable<string>> header in responseMessage.Headers)
+                    Console.Error.WriteLine(string.Format("{0}: {1}", header.Key, string.Join(", ", header.Value)));
+                string result = await responseMessage.Content.ReadAsStringAsync();
                 if (!string.IsNullOrEmpty(result))
                     Console.Error.WriteLine("==> " + result);
 
@@ -1009,6 +1016,9 @@
 
         private Task<FlavorId> GetDefaultFlavorIdAsync(IAutoScaleService provider, CancellationToken cancellationToken)
         {
+#if PORTABLE
+            throw new NotImplementedException();
+#else
             IComputeProvider computeProvider = Bootstrapper.CreateComputeProvider();
             return Task.Run(
                 () =>
@@ -1025,10 +1035,14 @@
                     // otherwise find the smallest
                     return new FlavorId(flavors[0].Id);
                 }, cancellationToken);
+#endif
         }
 
         private Task<ImageId> GetDefaultImageIdAsync(IAutoScaleService provider, CancellationToken cancellationToken)
         {
+#if PORTABLE
+            throw new NotImplementedException();
+#else
             IComputeProvider computeProvider = Bootstrapper.CreateComputeProvider();
             return Task.Run(
                 () =>
@@ -1045,6 +1059,7 @@
                     // otherwise find the first CentOS image
                     return new ImageId(images.First(i => i.Name.Contains("CentOS")).Id);
                 }, cancellationToken);
+#endif
         }
 
         private TimeSpan TestTimeout(TimeSpan timeout)
@@ -1077,7 +1092,9 @@
             var provider = new TestCloudAutoScaleProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
+#if !PORTABLE
             provider.ConnectionLimit = 20;
+#endif
             return provider;
         }
 

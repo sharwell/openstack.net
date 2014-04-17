@@ -3,10 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Net.Http;
     using net.openstack.Core.Domain;
+    using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
-    using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
 #if NET45PLUS
     using System.Collections.ObjectModel;
 #else
@@ -84,7 +85,7 @@
         /// This is the backing field for the <see cref="Method"/> property.
         /// </summary>
         [JsonProperty("method")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(HttpMethodConverter))]
         private HttpMethod _method;
 
         /// <summary>

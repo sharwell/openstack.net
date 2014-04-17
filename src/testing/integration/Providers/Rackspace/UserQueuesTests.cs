@@ -26,6 +26,10 @@
     using WebExceptionStatus = System.Net.WebExceptionStatus;
     using WebResponse = System.Net.WebResponse;
 
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#endif
+
     /// <preliminary/>
     [TestClass]
     public class UserQueuesTests
@@ -821,7 +825,9 @@
             var provider = new TestCloudQueuesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, Guid.NewGuid(), false, null);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
+#if !PORTABLE
             provider.ConnectionLimit = 80;
+#endif
             return provider;
         }
 

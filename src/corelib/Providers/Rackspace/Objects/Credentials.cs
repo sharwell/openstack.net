@@ -16,19 +16,19 @@ namespace net.openstack.Providers.Rackspace.Objects
         /// <summary>
         /// Gets or sets the username to use for authentication.
         /// </summary>
-        [JsonProperty("username", DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty("username", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Username { get; private set; }
 
         /// <summary>
         /// Gets or sets the password to use for authentication.
         /// </summary>
-        [JsonProperty("password", DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty("password", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Password { get; private set; }
 
         /// <summary>
         /// Gets or sets the API key to use for authentication.
         /// </summary>
-        [JsonProperty("apiKey", DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty("apiKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string APIKey { get; private set; }
 
         /// <summary>

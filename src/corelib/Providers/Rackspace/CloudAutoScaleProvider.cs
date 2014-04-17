@@ -6,17 +6,26 @@
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.AutoScale;
     using Newtonsoft.Json.Linq;
     using OpenStack.Threading;
+    using global::Rackspace.Net;
     using CancellationToken = System.Threading.CancellationToken;
+
+#if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
+#endif
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#endif
 
     /// <summary>
     /// Provides an implementation of <see cref="IAutoScaleService"/> for operating
@@ -33,6 +42,19 @@
         /// <seealso cref="GetBaseUriAsync"/>
         private Uri _baseUri;
 
+#if PORTABLE
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudAutoScaleProvider"/> class with
+        /// the specified values.
+        /// </summary>
+        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, no default identity is available so all calls must specify an explicit identity.</param>
+        /// <param name="defaultRegion">The default region to use for calls that do not explicitly specify a region. If this value is <see langword="null"/>, the default region for the user will be used; otherwise if the service uses region-specific endpoints all calls must specify an explicit region.</param>
+        /// <param name="identityProvider">The identity provider to use for authenticating requests to this provider. If this value is <see langword="null"/>, a new instance of <see cref="CloudIdentityProvider"/> is created using <paramref name="defaultIdentity"/> as the default identity.</param>
+        public CloudAutoScaleProvider(CloudIdentity defaultIdentity, string defaultRegion, IIdentityProvider identityProvider)
+            : base(defaultIdentity, defaultRegion, identityProvider)
+        {
+        }
+#else
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudAutoScaleProvider"/> class with
         /// the specified values.
@@ -58,6 +80,7 @@
             : base(defaultIdentity, defaultRegion, identityProvider, restService, httpStatusCodeValidator)
         {
         }
+#endif
 
         #region IAutoScaleService Members
 
@@ -830,7 +853,11 @@
                 () =>
                 {
                     Endpoint endpoint = GetServiceEndpoint(null, "rax:autoscale", "autoscale", null);
-                    _baseUri = new Uri(endpoint.PublicURL);
+                    string uri = endpoint.PublicURL;
+                    if (!uri.EndsWith("/"))
+                        uri += "/";
+
+                    _baseUri = new Uri(uri);
                     return _baseUri;
                 });
         }
