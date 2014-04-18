@@ -1,8 +1,13 @@
 ﻿namespace net.openstack.Core.Domain.Converters
 {
-    using System.Net.NetworkInformation;
-    using System.Text.RegularExpressions;
     using Newtonsoft.Json;
+
+#if PORTABLE
+    using PhysicalAddress = System.String;
+#else
+    using System.Text.RegularExpressions;
+    using PhysicalAddress = System.Net.NetworkInformation.PhysicalAddress;
+#endif
 
     /// <summary>
     /// This implementation of <see cref="JsonConverter"/> allows for JSON serialization
@@ -14,8 +19,10 @@
     /// <threadsafety static="true" instance="false"/>
     public class PhysicalAddressSimpleConverter : SimpleStringJsonConverter<PhysicalAddress>
     {
+#if !PORTABLE
         private static readonly Regex Ieee802Expression =
             new Regex(@"^[a-fA-F0-9]{2}(?:[\-\:][a-fA-F0-9]{2}){5}$", RegexOptions.Compiled);
+#endif
 
         /// <remarks>
         /// If <paramref name="str"/> is an empty string, this method returns <see langword="null"/>.
@@ -33,6 +40,9 @@
         /// <inheritdoc/>
         protected override PhysicalAddress ConvertToObject(string str)
         {
+#if PORTABLE
+            return str;
+#else
             if (string.IsNullOrEmpty(str))
                 return null;
 
@@ -41,6 +51,7 @@
                 str = str.Replace("-", string.Empty).Replace(":", string.Empty);
 
             return PhysicalAddress.Parse(str);
+#endif
         }
     }
 }

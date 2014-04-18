@@ -1,4 +1,6 @@
-﻿namespace net.openstack.Core.Providers
+﻿#if !PORTABLE
+
+namespace net.openstack.Core.Providers
 {
     using System;
     using net.openstack.Core.Caching;
@@ -119,3 +121,5 @@
         }
     }
 }
+
+#endif

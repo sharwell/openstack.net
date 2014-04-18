@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\netcore45\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;WINRT;NET45;NET45PLUS;NET40PLUS;NET35PLUS</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;WINRT;PORTABLE;NET45;NET45PLUS;NET40PLUS;NET35PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\netcore45\Debug\openstacknet.xml</DocumentationFile>
@@ -30,7 +30,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\netcore45\Release\</OutputPath>
-    <DefineConstants>TRACE;WINRT;NET45;NET45PLUS;NET40PLUS;NET35PLUS</DefineConstants>
+    <DefineConstants>TRACE;WINRT;PORTABLE;NET45;NET45PLUS;NET40PLUS;NET35PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\netcore45\Release\openstacknet.xml</DocumentationFile>
@@ -57,13 +57,30 @@
     <Compile Include="Core\AsyncCompletionOption.cs" />
     <Compile Include="Core\Caching\ICache`1.cs" />
     <Compile Include="Core\Caching\NamespaceDoc.cs" />
+    <Compile Include="Core\Collections\ArrayExtensions.cs" />
     <Compile Include="Core\Collections\BasicReadOnlyCollectionPage`1.cs" />
+    <Compile Include="Core\Collections\CollectionDebuggerView`2.cs" />
+    <Compile Include="Core\Collections\ConcurrentDictionary`2.cs" />
+    <Compile Include="Core\Collections\ListExtensions.cs" />
     <Compile Include="Core\Collections\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\ReadOnlyCollectionPage`1.cs" />
     <Compile Include="Core\BackoffPolicy.cs" />
+    <Compile Include="Core\Collections\ReadOnlyDictionary`2.cs" />
+    <Compile Include="Core\Collections\SplitOrderedList`2.cs" />
+    <Compile Include="Core\Compat\CustomAttributeExtensions.cs" />
+    <Compile Include="Core\Compat\Funcs.cs" />
+    <Compile Include="Core\Compat\ISafeSerializationData.cs" />
+    <Compile Include="Core\Compat\IStructuralComparable.cs" />
+    <Compile Include="Core\Compat\IStructuralEquatable.cs" />
+    <Compile Include="Core\Compat\NonSerialized.cs" />
+    <Compile Include="Core\Compat\SerializableAttribute.cs" />
+    <Compile Include="Core\Compat\Tuple.cs" />
+    <Compile Include="Core\Compat\Tuples.cs" />
+    <Compile Include="Core\Compat\UriExtensions.cs" />
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\AuthenticationType.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />
+    <Compile Include="Core\Domain\Converters\HttpMethodConverter.cs" />
     <Compile Include="Core\Domain\Converters\NamespaceDoc.cs" />
     <Compile Include="Core\Domain\Converters\PhysicalAddressSimpleConverter.cs" />
     <Compile Include="Core\Domain\Converters\SimpleStringJsonConverter`1.cs" />

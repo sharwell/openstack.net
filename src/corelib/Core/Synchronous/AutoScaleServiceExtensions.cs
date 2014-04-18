@@ -1,4 +1,6 @@
-﻿namespace net.openstack.Core.Synchronous
+﻿#if !PORTABLE
+
+namespace net.openstack.Core.Synchronous
 {
     using System;
     using System.Collections.Generic;
@@ -790,3 +792,5 @@
         #endregion Webhooks
     }
 }
+
+#endif

@@ -1,4 +1,6 @@
-﻿namespace net.openstack.Core
+﻿#if !PORTABLE
+
+namespace net.openstack.Core
 {
     using System;
     using System.Linq;
@@ -83,3 +85,5 @@
         }
     }
 }
+
+#endif

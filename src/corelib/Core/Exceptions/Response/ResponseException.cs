@@ -1,3 +1,5 @@
+#if !PORTABLE
+
 using System;
 using System.Runtime.Serialization;
 using System.Security;
@@ -100,3 +102,5 @@ namespace net.openstack.Core.Exceptions.Response
         }
     }
 }
+
+#endif

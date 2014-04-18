@@ -1,7 +1,9 @@
 ﻿namespace net.openstack.Core
 {
+#if !PORTABLE
     extern alias web;
     using HttpUtility = web.System.Web.HttpUtility;
+#endif
 
     /// <summary>
     /// Represents a specific part of a URI.

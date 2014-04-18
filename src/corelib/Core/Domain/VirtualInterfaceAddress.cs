@@ -1,8 +1,13 @@
 namespace net.openstack.Core.Domain
 {
-    using System.Net;
     using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
+
+#if PORTABLE
+    using IPAddress = System.String;
+#else
+    using IPAddress = System.Net.IPAddress;
+#endif
 
     /// <summary>
     /// Represents the IP address of a virtual interface on a specific network.

@@ -1,8 +1,13 @@
 ﻿namespace net.openstack.Core.Domain
 {
-    using System.Net.NetworkInformation;
     using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
+
+#if PORTABLE
+    using PhysicalAddress = System.String;
+#else
+    using PhysicalAddress = System.Net.NetworkInformation.PhysicalAddress;
+#endif
 
     /// <summary>
     /// Represents the detailed configuration of a virtual network interface.

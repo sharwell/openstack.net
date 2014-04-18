@@ -1,3 +1,5 @@
+#if !PORTABLE
+
 namespace net.openstack.Core.Domain
 {
     using System.Collections.Generic;
@@ -48,3 +50,5 @@ namespace net.openstack.Core.Domain
         }
     }
 }
+
+#endif

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !PORTABLE
+
+using System;
 using System.Collections.Generic;
 using net.openstack.Core.Domain;
 using net.openstack.Core.Exceptions;
@@ -491,3 +493,5 @@ namespace net.openstack.Core.Providers
         #endregion
     }
 }
+
+#endif

@@ -40,7 +40,7 @@ namespace net.openstack.Core.Exceptions
                 throw new ArgumentNullException("status");
 
             _state.Status = status.Name;
-#if !NET35
+#if !NET35 && !PORTABLE
             SerializeObjectState += (ex, args) => args.AddSerializedState(_state);
 #endif
         }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !PORTABLE
+
+using System;
 using System.Collections.Generic;
 using net.openstack.Core;
 using net.openstack.Core.Domain;
@@ -351,3 +353,5 @@ namespace net.openstack.Providers.Rackspace
         UserCredential UpdateUserCredentials(string userId, string username, string apiKey, CloudIdentity identity = null);
     }
 }
+
+#endif
