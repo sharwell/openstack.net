@@ -61,9 +61,7 @@
         /// This is the backing field for the <see cref="AgentAddress"/> property.
         /// </summary>
         [JsonProperty("agent_ip")]
-#if !PORTABLE
         [JsonConverter(typeof(IPAddressSimpleConverter))]
-#endif
         private IPAddress _agentIp;
 #pragma warning restore 649
 
