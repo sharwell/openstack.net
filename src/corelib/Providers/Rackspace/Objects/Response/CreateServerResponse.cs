@@ -1,4 +1,6 @@
-﻿namespace net.openstack.Providers.Rackspace.Objects.Response
+﻿#if !PORTABLE
+
+namespace net.openstack.Providers.Rackspace.Objects.Response
 {
     using net.openstack.Core.Domain;
     using Newtonsoft.Json;
@@ -18,3 +20,5 @@
         public NewServer Server { get; private set; }
     }
 }
+
+#endif

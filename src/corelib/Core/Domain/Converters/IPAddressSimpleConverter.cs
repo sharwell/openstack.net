@@ -3,6 +3,12 @@
     using System.Net;
     using Newtonsoft.Json;
 
+#if PORTABLE
+    using IPAddress = System.String;
+#else
+    using IPAddress = System.Net.IPAddress;
+#endif
+
     /// <summary>
     /// This implementation of <see cref="JsonConverter"/> allows for JSON serialization
     /// and deserialization of <see cref="IPAddress"/> objects using a simple string
@@ -21,10 +27,14 @@
         /// <inheritdoc/>
         protected override IPAddress ConvertToObject(string str)
         {
+#if PORTABLE
+            return str;
+#else
             if (string.IsNullOrEmpty(str))
                 return null;
 
             return IPAddress.Parse(str);
+#endif
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !PORTABLE
+
+using System;
 using System.Net;
 using net.openstack.Core.Exceptions;
 using net.openstack.Core.Validators;
@@ -72,3 +74,5 @@ namespace net.openstack.Providers.Rackspace.Validators
 
     }
 }
+
+#endif

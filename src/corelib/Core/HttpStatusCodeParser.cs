@@ -57,7 +57,13 @@ namespace net.openstack.Core
             if (pattern == null)
                 throw new ArgumentNullException("pattern");
 
-            _expression = new Regex(pattern, RegexOptions.Compiled);
+            _expression = new Regex(pattern,
+#if PORTABLE
+                RegexOptions.None
+#else
+                RegexOptions.Compiled
+#endif
+                );
 
             string[] groupNames = _expression.GetGroupNames();
             if (!groupNames.Contains("StatusCode", StringComparer.Ordinal))

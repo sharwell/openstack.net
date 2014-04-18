@@ -1,3 +1,5 @@
+#if !PORTABLE
+
 namespace net.openstack.Providers.Rackspace.Objects.Response
 {
     using net.openstack.Core.Domain;
@@ -18,3 +20,5 @@ namespace net.openstack.Providers.Rackspace.Objects.Response
         public ServerImage[] Images { get; private set; }
     }
 }
+
+#endif

@@ -1,3 +1,5 @@
+#if !PORTABLE
+
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -485,3 +487,5 @@ namespace net.openstack.Core.Domain
         }
     }
 }
+
+#endif

@@ -17,6 +17,7 @@ namespace net.openstack.Providers.Rackspace.Exceptions
         {
         }
 
+#if !PORTABLE
         /// <summary>
         /// Initializes a new instance of the <see cref="InvalidETagException"/> class with
         /// serialized data.
@@ -28,5 +29,6 @@ namespace net.openstack.Providers.Rackspace.Exceptions
             : base(info, context)
         {
         }
+#endif
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace System.Reflection
+﻿#if !NET45PLUS
+
+namespace System.Reflection
 {
     using System.Linq;
 
@@ -24,3 +26,5 @@
         }
     }
 }
+
+#endif

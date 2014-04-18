@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !PORTABLE
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -1539,3 +1541,5 @@ namespace net.openstack.Providers.Rackspace
         #endregion
     }
 }
+
+#endif

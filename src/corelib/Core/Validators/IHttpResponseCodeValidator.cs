@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !PORTABLE
+
+using System;
 using JSIStudios.SimpleRESTServices.Client;
 using net.openstack.Core.Exceptions.Response;
 
@@ -21,3 +23,5 @@ namespace net.openstack.Core.Validators
         void Validate(Response response);
     }
 }
+
+#endif

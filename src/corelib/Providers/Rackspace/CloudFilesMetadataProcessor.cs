@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !PORTABLE
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using JSIStudios.SimpleRESTServices.Client;
@@ -88,3 +90,5 @@ namespace net.openstack.Providers.Rackspace
         }
     }
 }
+
+#endif

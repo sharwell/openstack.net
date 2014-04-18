@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !PORTABLE
+
+using System;
 using System.Collections.Generic;
 using JSIStudios.SimpleRESTServices.Client;
 
@@ -35,3 +37,5 @@ namespace net.openstack.Core
         Dictionary<string, Dictionary<string, string>> ProcessMetadata(IList<HttpHeader> httpHeaders);
     }
 }
+
+#endif

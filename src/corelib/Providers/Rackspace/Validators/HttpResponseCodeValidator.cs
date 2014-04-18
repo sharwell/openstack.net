@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !PORTABLE
+
+using System;
 using System.Net;
 using JSIStudios.SimpleRESTServices.Client;
 using net.openstack.Core.Exceptions.Response;
@@ -64,3 +66,5 @@ namespace net.openstack.Providers.Rackspace.Validators
         }
     }
 }
+
+#endif

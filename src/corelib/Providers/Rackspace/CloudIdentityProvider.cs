@@ -26,6 +26,10 @@ using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
 
 namespace net.openstack.Providers.Rackspace
 {
+#if PORTABLE
+    using IIdentityProvider = IIdentityService;
+#endif
+
     /// <summary>
     /// Provides an implementation of <see cref="IIdentityProvider"/> and <see cref="IExtendedCloudIdentityProvider"/>
     /// for operating with Rackspace's Cloud Identity product.

@@ -1,3 +1,5 @@
+#if !PORTABLE
+
 namespace net.openstack.Providers.Rackspace.Objects.Request
 {
     using System;
@@ -32,3 +34,5 @@ namespace net.openstack.Providers.Rackspace.Objects.Request
         }
     }
 }
+
+#endif

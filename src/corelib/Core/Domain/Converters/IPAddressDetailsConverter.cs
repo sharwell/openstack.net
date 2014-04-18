@@ -1,4 +1,6 @@
-﻿namespace net.openstack.Core.Domain.Converters
+﻿#if !PORTABLE
+
+namespace net.openstack.Core.Domain.Converters
 {
     using System;
     using System.Globalization;
@@ -135,3 +137,5 @@
         }
     }
 }
+
+#endif

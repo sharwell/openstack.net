@@ -1,3 +1,5 @@
+#if !PORTABLE
+
 namespace net.openstack.Core.Domain
 {
     using System;
@@ -310,3 +312,5 @@ namespace net.openstack.Core.Domain
         }
     }
 }
+
+#endif

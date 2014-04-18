@@ -1,4 +1,6 @@
-﻿namespace net.openstack.Core.Collections
+﻿#if !NET45PLUS
+
+namespace net.openstack.Core.Collections
 {
     using System.Collections.Generic;
     using ArgumentException = System.ArgumentException;
@@ -681,3 +683,5 @@
         }
     }
 }
+
+#endif

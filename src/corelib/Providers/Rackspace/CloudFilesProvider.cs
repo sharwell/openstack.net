@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !PORTABLE
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -2232,3 +2234,5 @@ namespace net.openstack.Providers.Rackspace
  
     }
 }
+
+#endif

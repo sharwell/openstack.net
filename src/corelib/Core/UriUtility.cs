@@ -1,6 +1,7 @@
 ﻿namespace net.openstack.Core
 {
     using System;
+    using net.openstack.Core.Collections;
     using BitArray = System.Collections.BitArray;
     using Encoding = System.Text.Encoding;
     using MatchEvaluator = System.Text.RegularExpressions.MatchEvaluator;
@@ -30,7 +31,13 @@
         /// <summary>
         /// This is the regular expression for a single percent-encoded character.
         /// </summary>
-        private static readonly Regex _percentEncodedPattern = new Regex(@"%([0-9A-Fa-f][0-9A-Fa-f])", RegexOptions.Compiled);
+        private static readonly Regex _percentEncodedPattern = new Regex(@"%([0-9A-Fa-f][0-9A-Fa-f])",
+#if PORTABLE
+            RegexOptions.None
+#else
+            RegexOptions.Compiled
+#endif
+            );
 
         static UriUtility()
         {
@@ -122,8 +129,8 @@
                     return ((char)byte.Parse(hexValue, NumberStyles.HexNumber)).ToString();
                 };
             string decodedText = _percentEncodedPattern.Replace(text, matchEvaluator);
-            byte[] data = Array.ConvertAll(decodedText.ToCharArray(), c => (byte)c);
-            return encoding.GetString(data);
+            byte[] data = decodedText.ToCharArray().ConvertAll(c => (byte)c);
+            return encoding.GetString(data, 0, data.Length);
         }
 
         /// <summary>
