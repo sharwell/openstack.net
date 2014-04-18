@@ -655,7 +655,6 @@
     <None Include="..\..\..\keys\openstacknetsdk.snk">
       <Link>openstacknetsdk.snk</Link>
     </None>
-    <None Include="app.config" />
     <None Include="corelib.nuspec" />
     <None Include="packages.corelib.v4.0.config" />
   </ItemGroup>
