@@ -47,11 +47,7 @@
         /// <summary>
         /// This is the backing field for the <see cref="IPAddresses"/> property.
         /// </summary>
-#if PORTABLE
-        [JsonProperty("ip_addresses", DefaultValueHandling = DefaultValueHandling.Ignore)]
-#else
         [JsonProperty("ip_addresses", ItemConverterType = typeof(IPAddressSimpleConverter), DefaultValueHandling = DefaultValueHandling.Ignore)]
-#endif
         private IDictionary<string, IPAddress> _ipAddresses;
 
         /// <summary>

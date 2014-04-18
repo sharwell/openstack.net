@@ -27,9 +27,7 @@
         /// This is the backing field for the <see cref="Address"/> property.
         /// </summary>
         [JsonProperty("address", DefaultValueHandling = DefaultValueHandling.Ignore)]
-#if !PORTABLE
         [JsonConverter(typeof(IPAddressSimpleConverter))]
-#endif
         private IPAddress _address;
 
         /// <summary>
