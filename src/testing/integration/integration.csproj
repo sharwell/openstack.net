@@ -114,10 +114,6 @@
       <Project>{bd12ad92-10be-4380-a5a0-f5062e9b8e35}</Project>
       <Name>corelib.v4.5</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\OpenStack.Threading\OpenStack.Threading.net45.csproj">
-      <Project>{808f5d89-ff4f-43d5-8ba7-e558ad4945d7}</Project>
-      <Name>OpenStack.Threading.net45</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SDKTestingKey.snk">

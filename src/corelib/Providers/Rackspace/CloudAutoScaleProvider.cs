@@ -14,6 +14,7 @@
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.AutoScale;
     using Newtonsoft.Json.Linq;
+    using global::Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
 
 #if !PORTABLE
