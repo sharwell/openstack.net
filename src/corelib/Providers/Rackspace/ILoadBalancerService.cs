@@ -10,7 +10,7 @@
     using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
 #if NET35
-    using OpenStack.Threading;
+    using global::Rackspace.Threading;
 #endif
 #if !PORTABLE
     using System.Net.Sockets;

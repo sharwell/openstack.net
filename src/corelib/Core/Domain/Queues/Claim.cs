@@ -6,7 +6,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using net.openstack.Core.Providers;
-    using OpenStack.Threading;
+    using Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
 
     /// <summary>

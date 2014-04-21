@@ -49,6 +49,9 @@
     <Reference Include="Rackspace.Net.UriTemplate">
       <HintPath>..\packages\Rackspace.Net.UriTemplate.1.0.0-beta001\lib\portable-net40+sl4+wp7+win8\Rackspace.Net.UriTemplate.dll</HintPath>
     </Reference>
+    <Reference Include="Rackspace.Threading">
+      <HintPath>..\packages\Rackspace.Threading.1.0.0-beta001\lib\netcore45\Rackspace.Threading.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\AsyncCompletionOption.cs" />
@@ -639,12 +642,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Icons\openstack_net_logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenStack.Threading\OpenStack.Threading.netcore45.csproj">
-      <Project>{0a5117fd-5e6d-4538-a749-17358bb796ba}</Project>
-      <Name>OpenStack.Threading.netcore45</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

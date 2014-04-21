@@ -3,7 +3,7 @@
     using System;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using OpenStack.Threading;
+    using Rackspace.Threading;
 
     [TestClass]
     public class TaskBlockTests

@@ -28,7 +28,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using OpenStack.Threading;
+using Rackspace.Threading;
 
 namespace System.Net.Http
 {

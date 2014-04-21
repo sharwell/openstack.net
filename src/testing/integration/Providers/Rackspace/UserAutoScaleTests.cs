@@ -15,7 +15,7 @@
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.AutoScale;
     using Newtonsoft.Json.Linq;
-    using global::OpenStack.Threading;
+    using global::Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;

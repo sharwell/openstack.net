@@ -38,9 +38,13 @@
     <AssemblyOriginatorKeyFile>..\..\..\keys\openstacknetsdk.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Rackspace.Threading">
+      <HintPath>..\packages\Rackspace.Threading.1.0.0-beta001\lib\net35\Rackspace.Threading.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Threading">
+    <Reference Include="System.Threading, Version=1.0.2856.102, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
@@ -110,12 +114,6 @@
       <Link>openstacknetsdk.snk</Link>
     </None>
     <None Include="HttpClientNet35.nuspec" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenStack.Threading\OpenStack.Threading.net35.csproj">
-      <Project>{52ca4a3b-f296-4489-b5f0-ad375d039b35}</Project>
-      <Name>OpenStack.Threading.net35</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

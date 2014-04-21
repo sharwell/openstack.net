@@ -52,6 +52,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Rackspace.Threading">
+      <HintPath>..\..\packages\Rackspace.Threading.1.0.0-beta001\lib\net45\Rackspace.Threading.dll</HintPath>
+    </Reference>
     <Reference Include="SimpleRESTServices, Version=1.3.0.0, Culture=neutral, PublicKeyToken=8965cea5c205d3a3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\SimpleRESTServices.1.3.0.1\lib\net40\SimpleRESTServices.dll</HintPath>
@@ -90,10 +93,6 @@
     <ProjectReference Include="..\..\corelib\corelib.v4.5.csproj">
       <Project>{c9aae5d1-6a4b-4e97-8a7f-012d835b60bb}</Project>
       <Name>corelib.v4.5</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\OpenStack.Threading\OpenStack.Threading.net45.csproj">
-      <Project>{808f5d89-ff4f-43d5-8ba7-e558ad4945d7}</Project>
-      <Name>OpenStack.Threading.net45</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

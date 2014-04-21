@@ -12,7 +12,7 @@
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
 #if NET35
-    using OpenStack.Threading;
+    using global::Rackspace.Threading;
 #endif
 
 #if PORTABLE

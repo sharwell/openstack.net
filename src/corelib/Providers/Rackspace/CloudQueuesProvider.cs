@@ -17,8 +17,8 @@
     using net.openstack.Providers.Rackspace.Objects.Queues.Response;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using OpenStack.Threading;
     using global::Rackspace.Net;
+    using global::Rackspace.Threading;
 
 #if PORTABLE && !NET45PLUS
     using net.openstack.Core.Compat;

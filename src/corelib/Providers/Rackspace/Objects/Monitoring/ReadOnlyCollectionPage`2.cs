@@ -7,7 +7,7 @@
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using Newtonsoft.Json.Linq;
-    using OpenStack.Threading;
+    using global::Rackspace.Threading;
 #if NET45PLUS
     using System.Collections.ObjectModel;
 #endif

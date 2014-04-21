@@ -9,7 +9,7 @@
     using CancellationToken = System.Threading.CancellationToken;
     using WebException = System.Net.WebException;
 #if NET35
-    using OpenStack.Threading;
+    using global::Rackspace.Threading;
 #endif
 
     /// <summary>

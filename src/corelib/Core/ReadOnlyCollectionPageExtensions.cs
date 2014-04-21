@@ -6,7 +6,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using net.openstack.Core.Collections;
-    using OpenStack.Threading;
+    using Rackspace.Threading;
 
     /// <summary>
     /// This class provides extension methods for the <see cref="ReadOnlyCollectionPage{T}"/> class.

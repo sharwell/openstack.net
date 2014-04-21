@@ -34,7 +34,7 @@ using System.Globalization;
 using System.Net.Http.Headers;
 using System.Linq;
 using System.Text;
-using OpenStack.Threading;
+using Rackspace.Threading;
 
 namespace System.Net.Http
 {

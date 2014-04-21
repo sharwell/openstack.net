@@ -51,6 +51,9 @@
     <Reference Include="Rackspace.Net.UriTemplate">
       <HintPath>..\packages\Rackspace.Net.UriTemplate.1.0.0-beta001\lib\portable-net40+sl4+wp7+win8\Rackspace.Net.UriTemplate.dll</HintPath>
     </Reference>
+    <Reference Include="Rackspace.Threading">
+      <HintPath>..\packages\Rackspace.Threading.1.0.0-beta001\lib\portable-net40+sl4+wp7+win8\Rackspace.Threading.dll</HintPath>
+    </Reference>
     <Reference Include="System.IO">
       <HintPath>..\packages\Microsoft.Bcl.1.1.8\lib\portable-net40+sl5+win8+wp8+wpa81\System.IO.dll</HintPath>
     </Reference>
@@ -659,12 +662,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Icons\openstack_net_logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenStack.Threading\OpenStack.Threading.portable-net40+sl4+wp7+win8.csproj">
-      <Project>{ea68b8fe-dbb5-453b-a6d8-95541935ec86}</Project>
-      <Name>OpenStack.Threading.portable-net40+sl4+wp7+win8</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

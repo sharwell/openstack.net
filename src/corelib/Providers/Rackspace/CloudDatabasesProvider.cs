@@ -13,8 +13,8 @@
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using Newtonsoft.Json.Linq;
-    using OpenStack.Threading;
     using global::Rackspace.Net;
+    using global::Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using FlavorId = net.openstack.Providers.Rackspace.Objects.Databases.FlavorId;
 

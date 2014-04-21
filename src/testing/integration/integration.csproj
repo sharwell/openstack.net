@@ -60,6 +60,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Rackspace.Net.UriTemplate.1.0.0-beta001\lib\net40-client\Rackspace.Net.UriTemplate.dll</HintPath>
     </Reference>
+    <Reference Include="Rackspace.Threading">
+      <HintPath>..\..\packages\Rackspace.Threading.1.0.0-beta001\lib\net45\Rackspace.Threading.dll</HintPath>
+    </Reference>
     <Reference Include="Security.Cryptography">
       <HintPath>..\..\lib\Security.Cryptography\Security.Cryptography.dll</HintPath>
     </Reference>
@@ -110,10 +113,6 @@
     <ProjectReference Include="..\..\corelib\corelib.v4.5.csproj">
       <Project>{c9aae5d1-6a4b-4e97-8a7f-012d835b60bb}</Project>
       <Name>corelib.v4.5</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\OpenStack.Threading\OpenStack.Threading.net45.csproj">
-      <Project>{808f5d89-ff4f-43d5-8ba7-e558ad4945d7}</Project>
-      <Name>OpenStack.Threading.net45</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
