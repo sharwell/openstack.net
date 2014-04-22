@@ -1057,7 +1057,7 @@ namespace net.openstack.Providers.Rackspace
         /// </item>
         /// <item>
         /// <description><see cref="HttpRequestHeaders.Accept"/></description>
-        /// <description><see cref="JsonRequestSettings.JsonContentType"/></description>
+        /// <description><c>application/json</c></description>
         /// </item>
         /// <item>
         /// <description><see cref="WebRequest.Headers"/><literal>["X-Auth-Token"]</literal></description>
@@ -1066,10 +1066,6 @@ namespace net.openstack.Providers.Rackspace
         /// <item>
         /// <description><see cref="HttpRequestHeaders.UserAgent"/></description>
         /// <description><see cref="UserAgentGenerator.UserAgent"/></description>
-        /// </item>
-        /// <item>
-        /// <description><see cref="WebRequest.Timeout"/></description>
-        /// <description>14400 seconds (4 hours)</description>
         /// </item>
         /// <item>
         /// <description><see cref="ServicePoint.ConnectionLimit"/></description>
