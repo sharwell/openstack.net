@@ -7,17 +7,16 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
-    using System.Net;
     using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Monitoring;
     using Newtonsoft.Json.Linq;
+    using global::OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;

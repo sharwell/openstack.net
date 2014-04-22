@@ -24,6 +24,7 @@ using net.openstack.Providers.Rackspace.Objects.Monitoring;
 using net.openstack.Providers.Rackspace.Objects.Response;
 using net.openstack.Providers.Rackspace.Validators;
 using Newtonsoft.Json;
+using OpenStack.Net;
 using global::Rackspace.Net;
 
 #if NET45PLUS

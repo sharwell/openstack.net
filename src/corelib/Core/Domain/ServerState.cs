@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using net.openstack.Core.Providers;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents the state of a compute server.

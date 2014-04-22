@@ -2,6 +2,7 @@
 {
     using System;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents the unique identifier of an image.

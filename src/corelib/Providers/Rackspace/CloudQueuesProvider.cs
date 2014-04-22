@@ -10,7 +10,6 @@
     using System.Threading.Tasks;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Domain.Queues;
     using net.openstack.Core.Providers;
@@ -18,6 +17,11 @@
     using net.openstack.Providers.Rackspace.Objects.Queues.Response;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Collections;
+
+#if NET35
+    using net.openstack.Core;
+#endif
 
 #if PORTABLE && !NET45PLUS
     using net.openstack.Core.Compat;
@@ -32,10 +36,6 @@
 
 #if PORTABLE
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
-#endif
-
-#if NET35
-    using net.openstack.Core;
 #endif
 
     /// <summary>

@@ -1,9 +1,9 @@
 ﻿namespace net.openstack.Core.Domain.Queues
 {
     using System;
-    using net.openstack.Core;
     using net.openstack.Core.Providers;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents the unique identifier of a message list page in the <see cref="IQueueingService"/>.

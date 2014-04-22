@@ -2,8 +2,8 @@
 {
     using System;
     using System.Net;
-    using net.openstack.Core;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents the unique name of a user in the <see cref="IDatabaseService"/>.

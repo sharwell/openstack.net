@@ -3,9 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Net.Http;
-    using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
+    using OpenStack.ObjectModel.Converters;
 
 #if NET45PLUS
     using System.Collections.ObjectModel;

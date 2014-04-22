@@ -10,8 +10,8 @@ namespace net.openstack.Providers.Rackspace
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
+    using OpenStack.Collections;
 
 #if !PORTABLE
     using System.Net.Sockets;

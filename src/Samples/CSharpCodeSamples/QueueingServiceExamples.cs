@@ -5,11 +5,11 @@
     using System.Threading;
     using System.Threading.Tasks;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Domain.Queues;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
+    using OpenStack.Collections;
 
     public class QueueingServiceExamples
     {

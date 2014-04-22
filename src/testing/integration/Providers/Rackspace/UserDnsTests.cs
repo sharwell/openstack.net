@@ -7,7 +7,6 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
-    using System.Net;
     using System.Net.Http;
     using System.Text.RegularExpressions;
     using System.Threading;
@@ -15,13 +14,13 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
     using Newtonsoft.Json;
+    using global::OpenStack.Collections;
     using Path = System.IO.Path;
 
 #if PORTABLE

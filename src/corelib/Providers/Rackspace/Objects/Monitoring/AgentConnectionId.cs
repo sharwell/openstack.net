@@ -1,8 +1,8 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Monitoring
 {
     using System;
-    using net.openstack.Core;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents the unique identifier of an agent connection in the <see cref="IMonitoringService"/>.

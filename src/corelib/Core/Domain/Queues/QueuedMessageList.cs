@@ -4,8 +4,8 @@
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Providers;
+    using OpenStack.Collections;
 
     /// <summary>
     /// This class extends the <see cref="ReadOnlyCollectionPage{T}"/> class

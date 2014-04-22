@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents the type of a reboot operation.

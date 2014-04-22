@@ -11,17 +11,14 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Databases;
+    using global::OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using Debugger = System.Diagnostics.Debugger;
-    using HttpWebRequest = System.Net.HttpWebRequest;
-    using HttpWebResponse = System.Net.HttpWebResponse;
     using Path = System.IO.Path;
-    using WebResponse = System.Net.WebResponse;
 
 #if PORTABLE
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;

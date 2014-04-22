@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using Newtonsoft.Json;
+using OpenStack.ObjectModel;
 
 namespace net.openstack.Core.Domain
 {

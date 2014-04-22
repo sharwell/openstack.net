@@ -9,13 +9,17 @@
     using System.Threading.Tasks;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.AutoScale;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Collections;
     using global::Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
+
+#if NET35
+    using net.openstack.Core;
+#endif
 
 #if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;

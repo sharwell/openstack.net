@@ -2,8 +2,8 @@
 {
     using System;
     using System.Net.Http;
-    using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel.Converters;
 
     /// <summary>
     /// This class models the detailed parameters of a specific single rate limit within

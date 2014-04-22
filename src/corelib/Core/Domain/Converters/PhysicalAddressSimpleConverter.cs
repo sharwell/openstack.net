@@ -1,6 +1,7 @@
 ﻿namespace net.openstack.Core.Domain.Converters
 {
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel.Converters;
 
 #if PORTABLE
     using PhysicalAddress = System.String;

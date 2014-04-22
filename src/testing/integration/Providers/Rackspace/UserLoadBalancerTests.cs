@@ -16,11 +16,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Exceptions;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
     using Newtonsoft.Json;
+    using global::OpenStack.Collections;
     using global::Rackspace.Net;
     using Security.Cryptography;
     using Security.Cryptography.X509Certificates;

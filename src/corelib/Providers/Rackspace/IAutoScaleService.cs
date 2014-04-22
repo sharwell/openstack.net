@@ -6,8 +6,8 @@
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-    using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace.Objects.AutoScale;
+    using OpenStack.Collections;
 
     /// <summary>
     /// Represents a provider for the Rackspace Cloud Auto Scale service.

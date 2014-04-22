@@ -6,7 +6,7 @@ namespace net.openstack.Core.Synchronous
     using System.Collections.ObjectModel;
     using System.Net;
     using System.Threading;
-    using net.openstack.Core.Collections;
+    using OpenStack.Collections;
 
     /// <summary>
     /// Provides extension methods to allow synchronous calls to the methods in <see cref="ReadOnlyCollectionPage{T}"/>,

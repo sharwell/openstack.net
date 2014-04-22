@@ -2,9 +2,9 @@
 {
     using System;
     using System.Net.Http;
-    using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using OpenStack.ObjectModel.Converters;
 
     /// <summary>
     /// Represents the job resource associated with a server-side asynchronous

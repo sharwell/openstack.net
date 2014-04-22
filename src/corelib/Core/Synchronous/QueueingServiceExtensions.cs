@@ -6,9 +6,9 @@ namespace net.openstack.Core.Synchronous
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Domain.Queues;
+    using OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
     using IQueueingService = net.openstack.Core.Providers.IQueueingService;
     using JObject = Newtonsoft.Json.Linq.JObject;

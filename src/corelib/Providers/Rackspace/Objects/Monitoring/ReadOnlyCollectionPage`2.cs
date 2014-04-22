@@ -5,12 +5,14 @@
     using System.Threading;
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
-    using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Collections;
+    using OpenStack.ObjectModel;
 
 #if NET45PLUS
     using System.Collections.ObjectModel;
+#else
+    using net.openstack.Core.Collections;
 #endif
 
     /// <summary>

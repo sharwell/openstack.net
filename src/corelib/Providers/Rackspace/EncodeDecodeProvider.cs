@@ -1,6 +1,7 @@
 ﻿namespace net.openstack.Providers.Rackspace
 {
     using net.openstack.Core;
+    using OpenStack.Net;
 
     /// <summary>
     /// Provides a default implementation of <see cref="IEncodeDecodeProvider"/> for

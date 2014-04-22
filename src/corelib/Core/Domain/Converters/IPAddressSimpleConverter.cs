@@ -2,6 +2,7 @@
 {
     using System.Net;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel.Converters;
 
 #if PORTABLE
     using IPAddress = System.String;

@@ -10,9 +10,9 @@ namespace net.openstack.Providers.Rackspace
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Providers.Rackspace.Objects.Dns;
+    using OpenStack.Collections;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
 
 #if PORTABLE
