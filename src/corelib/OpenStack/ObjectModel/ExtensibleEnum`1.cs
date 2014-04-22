@@ -1,8 +1,8 @@
-﻿namespace net.openstack.Core
+﻿namespace OpenStack.ObjectModel
 {
     using System;
     using System.Collections.Concurrent;
-    using net.openstack.Core.Domain.Converters;
+    using OpenStack.ObjectModel.Converters;
 
     /// <summary>
     /// Represents the base class for extensible enumeration types used

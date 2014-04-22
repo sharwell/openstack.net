@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Core
+﻿namespace OpenStack.Net
 {
 #if !PORTABLE
     extern alias web;
