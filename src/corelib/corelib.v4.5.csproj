@@ -170,6 +170,7 @@
     <Compile Include="Core\Validators\NamespaceDoc.cs" />
     <Compile Include="OpenStack\Collections\BasicReadOnlyCollectionPage`1.cs" />
     <Compile Include="OpenStack\Collections\ReadOnlyCollectionPage`1.cs" />
+    <Compile Include="OpenStack\Net\HttpApiCall`1.cs" />
     <Compile Include="OpenStack\Net\UriPart.cs" />
     <Compile Include="OpenStack\Net\UriUtility.cs" />
     <Compile Include="OpenStack\ObjectModel\Converters\HttpMethodConverter.cs" />
