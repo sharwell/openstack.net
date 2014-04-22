@@ -15,6 +15,7 @@ using net.openstack.Core.Validators;
 using net.openstack.Providers.Rackspace.Validators;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenStack.Threading;
 using Rackspace.Net;
 using Rackspace.Threading;
 using CancellationToken = System.Threading.CancellationToken;
@@ -208,7 +209,7 @@ namespace net.openstack.Providers.Rackspace
         /// Gets the default back-off policy for the current provider.
         /// </summary>
         /// <remarks>
-        /// The default implementation returns <see cref="net.openstack.Core.BackoffPolicy.Default"/>.
+        /// The default implementation returns <see cref="OpenStack.Threading.BackoffPolicy.Default"/>.
         /// Providers may override this property to change the default back-off policy.
         /// </remarks>
         /// <preliminary/>
@@ -216,7 +217,7 @@ namespace net.openstack.Providers.Rackspace
         {
             get
             {
-                return net.openstack.Core.BackoffPolicy.Default;
+                return OpenStack.Threading.BackoffPolicy.Default;
             }
         }
 

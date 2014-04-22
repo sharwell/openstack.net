@@ -4,8 +4,8 @@
     using System.Collections.ObjectModel;
     using System.Threading.Tasks;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace.Objects.Databases;
+    using OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
     using WebException = System.Net.WebException;
 #if NET35

@@ -5,9 +5,9 @@
     using System.Collections.ObjectModel;
     using System.Net.Http;
     using System.Net.Http.Headers;
-    using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using OpenStack.ObjectModel.Converters;
 
     /// <summary>
     /// This class models the Resource Hints of the home document described by

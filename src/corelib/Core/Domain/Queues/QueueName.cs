@@ -1,8 +1,9 @@
 ﻿namespace net.openstack.Core.Domain.Queues
 {
     using System;
-    using Newtonsoft.Json;
     using net.openstack.Core.Providers;
+    using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents the name of a queue in the <see cref="IQueueingService"/>.

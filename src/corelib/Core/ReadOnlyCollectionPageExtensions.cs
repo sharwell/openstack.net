@@ -5,8 +5,12 @@
     using System.Collections.ObjectModel;
     using System.Threading;
     using System.Threading.Tasks;
-    using net.openstack.Core.Collections;
+    using OpenStack.Collections;
     using Rackspace.Threading;
+
+#if PORTABLE
+    using net.openstack.Core.Collections;
+#endif
 
     /// <summary>
     /// This class provides extension methods for the <see cref="ReadOnlyCollectionPage{T}"/> class.

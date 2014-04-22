@@ -8,8 +8,6 @@
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
-    using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Domain.Queues;
     using net.openstack.Core.Providers;
@@ -17,8 +15,13 @@
     using net.openstack.Providers.Rackspace.Objects.Queues.Response;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Collections;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
+
+#if NET35
+    using net.openstack.Core;
+#endif
 
 #if PORTABLE && !NET45PLUS
     using net.openstack.Core.Compat;

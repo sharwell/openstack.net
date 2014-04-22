@@ -7,9 +7,9 @@
     using System.Threading;
     using System.Threading.Tasks;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Providers.Rackspace.Objects.Dns;
+    using OpenStack.Collections;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
 #if NET35
     using global::Rackspace.Threading;

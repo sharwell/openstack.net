@@ -8,7 +8,6 @@
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Exceptions;
     using net.openstack.Core.Exceptions.Response;
@@ -17,6 +16,7 @@
     using net.openstack.Providers.Rackspace.Objects;
     using net.openstack.Providers.Rackspace.Objects.Response;
     using Newtonsoft.Json;
+    using global::OpenStack.Net;
     using Container = net.openstack.Core.Domain.Container;
     using File = System.IO.File;
     using FileInfo = System.IO.FileInfo;

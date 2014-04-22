@@ -4,9 +4,9 @@ namespace net.openstack.Core.Synchronous
 {
     using System;
     using System.Collections.ObjectModel;
-    using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Databases;
+    using OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
     using WebException = System.Net.WebException;
 

@@ -1,7 +1,7 @@
 ﻿using System;
-using net.openstack.Core;
 using net.openstack.Core.Exceptions;
 using net.openstack.Core.Validators;
+using OpenStack.Net;
 
 namespace net.openstack.Providers.Rackspace.Validators
 {

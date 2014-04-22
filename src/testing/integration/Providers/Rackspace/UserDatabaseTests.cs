@@ -8,21 +8,14 @@
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Databases;
+    using global::OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using Debugger = System.Diagnostics.Debugger;
-    using Encoding = System.Text.Encoding;
-    using Formatting = Newtonsoft.Json.Formatting;
-    using HttpWebRequest = System.Net.HttpWebRequest;
-    using HttpWebResponse = System.Net.HttpWebResponse;
-    using JsonConvert = Newtonsoft.Json.JsonConvert;
     using Path = System.IO.Path;
-    using WebException = System.Net.WebException;
-    using WebResponse = System.Net.WebResponse;
 
 #if PORTABLE
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;

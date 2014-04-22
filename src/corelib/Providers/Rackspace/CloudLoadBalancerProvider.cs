@@ -16,6 +16,7 @@
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers.Response;
     using net.openstack.Providers.Rackspace.Validators;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Collections;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;

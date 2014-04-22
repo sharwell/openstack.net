@@ -23,6 +23,7 @@ using net.openstack.Providers.Rackspace.Objects.Mapping;
 using net.openstack.Providers.Rackspace.Objects.Response;
 using net.openstack.Providers.Rackspace.Validators;
 using Newtonsoft.Json;
+using OpenStack.Net;
 using global::Rackspace.Net;
 
 namespace net.openstack.Providers.Rackspace

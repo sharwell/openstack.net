@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents the virtual machine (VM) state of a server.

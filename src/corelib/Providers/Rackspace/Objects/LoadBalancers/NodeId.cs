@@ -1,8 +1,8 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.LoadBalancers
 {
     using System;
-    using net.openstack.Core;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents the unique identifier of a load balancer node in the <see cref="ILoadBalancerService"/>.

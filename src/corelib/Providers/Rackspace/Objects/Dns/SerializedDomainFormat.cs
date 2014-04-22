@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Concurrent;
-    using net.openstack.Core;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents a format for domains exported by the DNS service.

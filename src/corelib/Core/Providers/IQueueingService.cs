@@ -5,10 +5,10 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Threading.Tasks;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Domain.Queues;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
     using CloudQueuesProvider = net.openstack.Providers.Rackspace.CloudQueuesProvider;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;

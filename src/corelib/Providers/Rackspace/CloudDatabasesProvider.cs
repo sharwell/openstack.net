@@ -7,12 +7,12 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Exceptions;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Collections;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;

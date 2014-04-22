@@ -7,9 +7,9 @@ namespace net.openstack.Core.Synchronous
     using System.Collections.ObjectModel;
     using System.Net;
     using System.Net.Sockets;
-    using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
+    using OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
 
     /// <summary>

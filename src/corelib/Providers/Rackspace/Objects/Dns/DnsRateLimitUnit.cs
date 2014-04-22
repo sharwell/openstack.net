@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Concurrent;
-    using net.openstack.Core;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents the time unit used for measuring a rate limit in the DNS service.
