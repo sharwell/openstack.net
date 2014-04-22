@@ -1,10 +1,5 @@
 ﻿namespace OpenStack.Net
 {
-#if !PORTABLE
-    extern alias web;
-    using HttpUtility = web.System.Web.HttpUtility;
-#endif
-
     /// <summary>
     /// Represents a specific part of a URI.
     /// </summary>
@@ -20,7 +15,7 @@
         /// Represents a non-specific URL part, where all characters except unreserved characters and the characters <c>(</c>, <c>)</c>, <c>!</c>, and <c>*</c> are percent-encoded.
         /// </summary>
         /// <remarks>
-        /// When used with <see cref="UriUtility.UriEncode(string, UriPart)"/>, this URI part matches the behavior of <see cref="HttpUtility.UrlEncode(string)"/>, with the exception of space characters (this method percent-encodes space characters as <c>%20</c>).
+        /// When used with <see cref="UriUtility.UriEncode(string, UriPart)"/>, this URI part matches the behavior of <see cref="M:System.Web.HttpUtility.UrlEncode(string)"/>, with the exception of space characters (this method percent-encodes space characters as <c>%20</c>).
         /// </remarks>
         AnyUrl,
 
