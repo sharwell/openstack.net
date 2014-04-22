@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Core.Domain.Converters
+﻿namespace OpenStack.ObjectModel.Converters
 {
     using System;
     using System.Globalization;

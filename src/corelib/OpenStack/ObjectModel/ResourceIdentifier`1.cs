@@ -1,7 +1,7 @@
-﻿namespace net.openstack.Core
+﻿namespace OpenStack.ObjectModel
 {
     using System;
-    using net.openstack.Core.Domain.Converters;
+    using OpenStack.ObjectModel.Converters;
 
     /// <summary>
     /// Represents a unique identifier within the context of a cloud services provider.
