@@ -52,58 +52,30 @@
             if (page == null)
                 throw new ArgumentNullException("page");
 
-            if (progress != null)
-                progress.Report(page);
-
-            if (!page.CanHaveNextPage || page.Count == 0)
-            {
-                return CompletedTask.FromResult<ReadOnlyCollection<T>>(page);
-            }
-
-            TaskCompletionSource<ReadOnlyCollection<T>> taskCompletionSource = new TaskCompletionSource<ReadOnlyCollection<T>>();
-
             List<T> result = new List<T>(page);
             ReadOnlyCollectionPage<T> currentPage = page;
-            Func<Task<ReadOnlyCollectionPage<T>>> getNextPage = () => currentPage.GetNextPageAsync(cancellationToken);
-            Task<ReadOnlyCollectionPage<T>> currentTask = getNextPage();
-            Action<Task<ReadOnlyCollectionPage<T>>> continuation = null;
-            continuation =
-                previousTask =>
+            Func<bool> condition = () => currentPage != null;
+            Func<Task> body =
+                () =>
                 {
-                    if (previousTask.Status != TaskStatus.RanToCompletion)
-                    {
-                        taskCompletionSource.SetFromTask(previousTask);
-                        return;
-                    }
-
-                    currentPage = previousTask.Result;
-                    if (currentPage == null)
-                    {
-                        // TODO: should we throw an exception instead?
-                        taskCompletionSource.SetResult(result.AsReadOnly());
-                        return;
-                    }
-
                     if (progress != null)
                         progress.Report(currentPage);
 
                     result.AddRange(currentPage);
-                    if (!currentPage.CanHaveNextPage || currentPage.Count == 0)
+                    if (currentPage.CanHaveNextPage && currentPage.Count > 0)
                     {
-                        taskCompletionSource.SetResult(result.AsReadOnly());
-                        return;
+                        return currentPage.GetNextPageAsync(cancellationToken)
+                            .Select(task => currentPage = task.Result);
                     }
-
-                    // continue with the next page
-                    currentTask = getNextPage();
-                    // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-                    currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
+                    else
+                    {
+                        currentPage = null;
+                        return CompletedTask.Default;
+                    }
                 };
-            // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-            currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
 
-
-            return taskCompletionSource.Task;
+            return CoreTaskExtensions.While(condition, body)
+                .Select(_ => result.AsReadOnly());
         }
     }
 }
