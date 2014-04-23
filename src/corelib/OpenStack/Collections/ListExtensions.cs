@@ -4,8 +4,18 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
+    /// <summary>
+    /// Provides extension methods for the <see cref="List{T}"/> class.
+    /// </summary>
     public static class ListExtensions
     {
+        /// <summary>
+        /// Returns a read-only <see cref="IList{T}"/> wrapper for a specified collection.
+        /// </summary>
+        /// <typeparam name="T">The type of element stored in the list.</typeparam>
+        /// <param name="list">The list to provide a read-only wrapper for.</param>
+        /// <returns>A <see cref="ReadOnlyCollection{T}"/> that acts as a read-only wrapper around the specified <paramref name="list"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="list"/> is <see langword="null"/>.</exception>
         public static ReadOnlyCollection<T> AsReadOnly<T>(this List<T> list)
         {
             if (list == null)
