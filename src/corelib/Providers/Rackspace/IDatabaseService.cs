@@ -6,7 +6,6 @@ namespace net.openstack.Providers.Rackspace
     using System.Collections.ObjectModel;
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
-    using net.openstack.Core;
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;

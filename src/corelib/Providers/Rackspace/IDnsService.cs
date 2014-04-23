@@ -13,6 +13,7 @@ namespace net.openstack.Providers.Rackspace
     using net.openstack.Core.Domain;
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using OpenStack.Collections;
+    using OpenStack.Threading;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
 
 #if PORTABLE

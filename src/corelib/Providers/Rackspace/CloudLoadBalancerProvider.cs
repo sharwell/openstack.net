@@ -12,7 +12,6 @@ namespace net.openstack.Providers.Rackspace
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
@@ -21,6 +20,7 @@ namespace net.openstack.Providers.Rackspace
     using net.openstack.Providers.Rackspace.Validators;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
+    using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
 
 #if !PORTABLE

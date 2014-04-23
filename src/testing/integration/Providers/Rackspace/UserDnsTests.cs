@@ -13,7 +13,6 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
@@ -21,6 +20,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
     using Newtonsoft.Json;
     using global::OpenStack.Collections;
+    using global::OpenStack.Threading;
     using Path = System.IO.Path;
 
 #if PORTABLE

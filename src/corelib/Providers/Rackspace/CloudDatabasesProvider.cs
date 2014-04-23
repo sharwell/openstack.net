@@ -17,6 +17,7 @@ namespace net.openstack.Providers.Rackspace
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
+    using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using FlavorId = net.openstack.Providers.Rackspace.Objects.Databases.FlavorId;
 

@@ -17,6 +17,7 @@ namespace net.openstack.Providers.Rackspace
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
+    using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
 
 #if !PORTABLE

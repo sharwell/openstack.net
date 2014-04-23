@@ -2,14 +2,13 @@
 {
     using System;
     using System.Collections.ObjectModel;
-    using System.Net;
-    using net.openstack.Core.Collections;
-    using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
+    using OpenStack.Collections;
 
 #if PORTABLE
     using IPAddress = System.String;
 #else
+    using net.openstack.Core.Domain.Converters;
     using IPAddress = System.Net.IPAddress;
 #endif
 
