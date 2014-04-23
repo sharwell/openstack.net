@@ -8,10 +8,10 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core;
     using net.openstack.Core.Exceptions;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Databases;
+    using global::OpenStack.Threading;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
 
 #if PORTABLE

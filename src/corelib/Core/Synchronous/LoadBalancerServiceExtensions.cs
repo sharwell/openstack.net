@@ -10,6 +10,7 @@ namespace net.openstack.Core.Synchronous
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
     using OpenStack.Collections;
+    using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
 
     /// <summary>

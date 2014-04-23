@@ -2,8 +2,11 @@
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using net.openstack.Core.Collections;
     using Newtonsoft.Json;
+
+#if PORTABLE
+    using OpenStack.Collections;
+#endif
 
     /// <summary>
     /// This class models the JSON response to an Extract Archive operation.

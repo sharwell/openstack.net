@@ -13,6 +13,7 @@
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
+    using OpenStack.Threading;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;

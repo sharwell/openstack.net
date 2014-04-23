@@ -7,6 +7,7 @@ namespace net.openstack.Core.Synchronous
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using OpenStack.Collections;
+    using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using WebException = System.Net.WebException;
 

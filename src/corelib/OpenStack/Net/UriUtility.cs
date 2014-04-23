@@ -1,7 +1,7 @@
 ﻿namespace OpenStack.Net
 {
     using System;
-    using net.openstack.Core.Collections;
+    using OpenStack.Collections;
     using BitArray = System.Collections.BitArray;
     using Encoding = System.Text.Encoding;
     using MatchEvaluator = System.Text.RegularExpressions.MatchEvaluator;

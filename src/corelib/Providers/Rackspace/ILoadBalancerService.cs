@@ -6,9 +6,9 @@
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-    using net.openstack.Core;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
     using OpenStack.Collections;
+    using OpenStack.Threading;
 #if NET35
     using global::Rackspace.Threading;
 #endif

@@ -4,8 +4,8 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using net.openstack.Core.Collections;
     using Newtonsoft.Json;
+    using OpenStack.Collections;
 
     /// <summary>
     /// This class describes the configuration for a new database user in the <see cref="IDatabaseService"/>.

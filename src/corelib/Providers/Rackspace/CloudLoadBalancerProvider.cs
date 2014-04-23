@@ -8,7 +8,6 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using net.openstack.Core;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
@@ -17,6 +16,7 @@
     using net.openstack.Providers.Rackspace.Validators;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
+    using OpenStack.Threading;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
