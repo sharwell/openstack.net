@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Core
+﻿namespace OpenStack.Threading
 {
     using System.Threading.Tasks;
 

@@ -1,10 +1,10 @@
-﻿Imports net.openstack.Core
-Imports net.openstack.Core.Domain
-Imports net.openstack.Core.Providers
-Imports net.openstack.Core.Domain.Queues
-Imports net.openstack.Providers.Rackspace
-Imports System.Threading
+﻿Imports System.Threading
 Imports System.Threading.Tasks
+Imports net.openstack.Core.Domain
+Imports net.openstack.Core.Domain.Queues
+Imports net.openstack.Core.Providers
+Imports net.openstack.Providers.Rackspace
+Imports OpenStack.Collections
 
 Public Class QueueingServiceExamples
 

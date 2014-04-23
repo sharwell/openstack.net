@@ -12,13 +12,13 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.AutoScale;
     using Newtonsoft.Json.Linq;
+    using global::OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;

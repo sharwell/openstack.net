@@ -66,13 +66,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\AsyncCompletionOption.cs" />
     <Compile Include="Core\Caching\ICache`1.cs" />
     <Compile Include="Core\Caching\NamespaceDoc.cs" />
-    <Compile Include="Core\Collections\ArrayExtensions.cs" />
     <Compile Include="Core\Collections\CollectionDebuggerView`2.cs" />
     <Compile Include="Core\Collections\ConcurrentDictionary`2.cs" />
-    <Compile Include="Core\Collections\ListExtensions.cs" />
     <Compile Include="Core\Collections\NamespaceDoc.cs" />
     <Compile Include="Core\Collections\ReadOnlyDictionary`2.cs" />
     <Compile Include="Core\Collections\SplitOrderedList`2.cs" />
@@ -155,7 +152,6 @@
     <Compile Include="Core\Providers\IQueueingService.cs" />
     <Compile Include="Core\Providers\NamespaceDoc.cs" />
     <Compile Include="Core\Providers\OpenStackIdentityProvider.cs" />
-    <Compile Include="Core\ReadOnlyCollectionPageExtensions.cs" />
     <Compile Include="Core\ResponseExtensions.cs" />
     <Compile Include="Core\RestWebHeaderCollection.cs" />
     <Compile Include="Core\Synchronous\AutoScaleServiceExtensions.cs" />
@@ -168,7 +164,10 @@
     <Compile Include="Core\Synchronous\QueueingServiceExtensions.cs" />
     <Compile Include="Core\Synchronous\ReadOnlyCollectionPageSynchronousExtensions.cs" />
     <Compile Include="Core\Validators\NamespaceDoc.cs" />
+    <Compile Include="OpenStack\Collections\ArrayExtensions.cs" />
     <Compile Include="OpenStack\Collections\BasicReadOnlyCollectionPage`1.cs" />
+    <Compile Include="OpenStack\Collections\ListExtensions.cs" />
+    <Compile Include="OpenStack\Collections\ReadOnlyCollectionPageExtensions.cs" />
     <Compile Include="OpenStack\Collections\ReadOnlyCollectionPage`1.cs" />
     <Compile Include="OpenStack\Net\HttpApiCall`1.cs" />
     <Compile Include="OpenStack\Net\UriPart.cs" />
@@ -177,6 +176,7 @@
     <Compile Include="OpenStack\ObjectModel\Converters\SimpleStringJsonConverter`1.cs" />
     <Compile Include="OpenStack\ObjectModel\ExtensibleEnum`1.cs" />
     <Compile Include="OpenStack\ObjectModel\ResourceIdentifier`1.cs" />
+    <Compile Include="OpenStack\Threading\AsyncCompletionOption.cs" />
     <Compile Include="OpenStack\Threading\BackoffPolicy.cs" />
     <Compile Include="OpenStack\Threading\IBackoffPolicy.cs" />
     <Compile Include="Providers\Hp\HpIdentityProvider.cs" />

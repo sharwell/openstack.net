@@ -1,13 +1,12 @@
 ﻿// Intentionally placed in the outer scope to avoid naming collisions between System.IProgress<T> and Rackspace.Threading.IProgress<T>
 using System;
 
-namespace net.openstack.Core
+namespace OpenStack.Collections
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Threading;
     using System.Threading.Tasks;
-    using OpenStack.Collections;
     using Rackspace.Threading;
 
 #if PORTABLE
