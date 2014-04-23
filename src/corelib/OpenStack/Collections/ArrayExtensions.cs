@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Core.Collections
+﻿namespace OpenStack.Collections
 {
     using System;
 

@@ -1,11 +1,10 @@
-﻿namespace net.openstack.Core
+﻿namespace OpenStack.Collections
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Threading;
     using System.Threading.Tasks;
-    using OpenStack.Collections;
     using Rackspace.Threading;
 
 #if PORTABLE
