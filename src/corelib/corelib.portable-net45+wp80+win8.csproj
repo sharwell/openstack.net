@@ -53,7 +53,7 @@
       <HintPath>..\packages\Rackspace.Net.UriTemplate.1.0.0-beta001\lib\portable-net40+sl4+wp7+win8\Rackspace.Net.UriTemplate.dll</HintPath>
     </Reference>
     <Reference Include="Rackspace.Threading">
-      <HintPath>..\packages\Rackspace.Threading.1.0.0-beta001\lib\portable-net45+wp80+win8\Rackspace.Threading.dll</HintPath>
+      <HintPath>..\packages\Rackspace.Threading.1.0.0-beta002\lib\portable-net45+wp80+win8\Rackspace.Threading.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http">
       <HintPath>..\packages\Microsoft.Net.Http.2.2.20\lib\portable-net40+sl4+win8+wp71+wpa81\System.Net.Http.dll</HintPath>

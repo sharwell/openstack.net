@@ -54,8 +54,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Rackspace.Net.UriTemplate.1.0.0-beta001\lib\net40-client\Rackspace.Net.UriTemplate.dll</HintPath>
     </Reference>
-    <Reference Include="Rackspace.Threading">
-      <HintPath>..\..\packages\Rackspace.Threading.1.0.0-beta001\lib\net45\Rackspace.Threading.dll</HintPath>
+    <Reference Include="Rackspace.Threading, Version=1.0.0.0, Culture=neutral, PublicKeyToken=541c51dcbcf0ec3c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Rackspace.Threading.1.0.0-beta002\lib\net45\Rackspace.Threading.dll</HintPath>
     </Reference>
     <Reference Include="Security.Cryptography">
       <HintPath>..\..\lib\Security.Cryptography\Security.Cryptography.dll</HintPath>
