@@ -24,10 +24,9 @@
     {
         /// <summary>
         /// An empty, and thus immutable, value which is the default return value
-        /// for <see cref="ExtensionData"/> when <see cref="_extensionData"/> is
-        /// <see langword="null"/>.
+        /// for <see cref="ExtensionData"/> when the backing field is <see langword="null"/>.
         /// </summary>
-        private static readonly ReadOnlyDictionary<string, JToken> EmptyExtensionData =
+        protected static readonly ReadOnlyDictionary<string, JToken> EmptyExtensionData =
             new ReadOnlyDictionary<string, JToken>(new Dictionary<string, JToken>());
 
         /// <summary>
@@ -56,7 +55,8 @@
             if (extensionData == null)
                 throw new ArgumentNullException("extensionData");
 
-            _extensionData = new Dictionary<string, JToken>(extensionData);
+            if (extensionData.Count > 0)
+                _extensionData = new Dictionary<string, JToken>(extensionData);
         }
 
         /// <summary>
@@ -83,13 +83,16 @@
             if (extensionData == null)
                 throw new ArgumentNullException("extensionData");
 
-            _extensionData = new Dictionary<string, JToken>();
-            foreach (JProperty property in extensionData)
+            if (extensionData.Length > 0)
             {
-                if (property == null)
-                    throw new ArgumentException("extensionData cannot contain any null values");
+                _extensionData = new Dictionary<string, JToken>();
+                foreach (JProperty property in extensionData)
+                {
+                    if (property == null)
+                        throw new ArgumentException("extensionData cannot contain any null values");
 
-                _extensionData[property.Name] = property.Value;
+                    _extensionData[property.Name] = property.Value;
+                }
             }
         }
 
