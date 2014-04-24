@@ -31,7 +31,7 @@
 using System;
 using System.Collections;
 
-namespace net.openstack.Core
+namespace OpenStack.Compat
 {
 	/// <summary>
 	/// Supports the structural comparison of collection objects.

@@ -30,7 +30,7 @@
 
 using System;
 
-namespace net.openstack.Core
+namespace OpenStack.Compat
 {
 	/// <summary>
 	/// Provides static methods for creating tuple objects.

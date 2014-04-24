@@ -68,16 +68,6 @@
   <ItemGroup>
     <Compile Include="Core\Caching\ICache`1.cs" />
     <Compile Include="Core\Caching\NamespaceDoc.cs" />
-    <Compile Include="Core\Compat\CustomAttributeExtensions.cs" />
-    <Compile Include="Core\Compat\Funcs.cs" />
-    <Compile Include="Core\Compat\ISafeSerializationData.cs" />
-    <Compile Include="Core\Compat\IStructuralComparable.cs" />
-    <Compile Include="Core\Compat\IStructuralEquatable.cs" />
-    <Compile Include="Core\Compat\NonSerialized.cs" />
-    <Compile Include="Core\Compat\SerializableAttribute.cs" />
-    <Compile Include="Core\Compat\Tuple.cs" />
-    <Compile Include="Core\Compat\Tuples.cs" />
-    <Compile Include="Core\Compat\UriExtensions.cs" />
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\AuthenticationType.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />
@@ -135,7 +125,6 @@
     <Compile Include="Core\Domain\Flavor.cs" />
     <Compile Include="Core\Domain\FlavorDetails.cs" />
     <Compile Include="Core\Exceptions\ContainerNotEmptyException.cs" />
-    <Compile Include="Core\Exceptions\HttpWebException.cs" />
     <Compile Include="Core\Exceptions\ImageEnteredErrorStateException.cs" />
     <Compile Include="Core\Exceptions\NamespaceDoc.cs" />
     <Compile Include="Core\Exceptions\Response\NamespaceDoc.cs" />
@@ -175,7 +164,18 @@
     <Compile Include="OpenStack\Collections\ReadOnlyCollectionPage`1.cs" />
     <Compile Include="OpenStack\Collections\ReadOnlyDictionary`2.cs" />
     <Compile Include="OpenStack\Collections\SplitOrderedList`2.cs" />
+    <Compile Include="OpenStack\Compat\CustomAttributeExtensions.cs" />
+    <Compile Include="OpenStack\Compat\Funcs.cs" />
+    <Compile Include="OpenStack\Compat\ISafeSerializationData.cs" />
+    <Compile Include="OpenStack\Compat\IStructuralComparable.cs" />
+    <Compile Include="OpenStack\Compat\IStructuralEquatable.cs" />
+    <Compile Include="OpenStack\Compat\NonSerialized.cs" />
+    <Compile Include="OpenStack\Compat\SerializableAttribute.cs" />
+    <Compile Include="OpenStack\Compat\Tuple.cs" />
+    <Compile Include="OpenStack\Compat\Tuples.cs" />
+    <Compile Include="OpenStack\Compat\UriExtensions.cs" />
     <Compile Include="OpenStack\Net\HttpApiCall`1.cs" />
+    <Compile Include="OpenStack\Net\HttpWebException.cs" />
     <Compile Include="OpenStack\Net\UriPart.cs" />
     <Compile Include="OpenStack\Net\UriUtility.cs" />
     <Compile Include="OpenStack\ObjectModel\Converters\HttpMethodConverter.cs" />
