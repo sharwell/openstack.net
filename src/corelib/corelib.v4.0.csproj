@@ -88,7 +88,6 @@
   <ItemGroup>
     <Compile Include="Core\Caching\ICache`1.cs" />
     <Compile Include="Core\Caching\NamespaceDoc.cs" />
-    <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\AuthenticationType.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />
     <Compile Include="Core\Domain\Converters\NamespaceDoc.cs" />
@@ -103,8 +102,6 @@
     <Compile Include="Core\Domain\NetworkId.cs" />
     <Compile Include="Core\Domain\PowerState.cs" />
     <Compile Include="Core\Domain\ProjectId.cs" />
-    <Compile Include="Core\Domain\ResourceHints.cs" />
-    <Compile Include="Core\Domain\ResourceObject.cs" />
     <Compile Include="Core\Domain\ServerId.cs" />
     <Compile Include="Core\Domain\SnapshotState.cs" />
     <Compile Include="Core\Domain\Converters\IPAddressDetailsConverter.cs" />
@@ -137,7 +134,6 @@
     <Compile Include="Core\Exceptions\SnapshotEnteredErrorStateException.cs" />
     <Compile Include="Core\Exceptions\VolumeEnteredErrorStateException.cs" />
     <Compile Include="Core\NamespaceDoc.cs" />
-    <Compile Include="Core\Domain\HomeDocument.cs" />
     <Compile Include="Core\Providers\IIdentityService.cs" />
     <Compile Include="Core\Providers\NamespaceDoc.cs" />
     <Compile Include="Core\Providers\OpenStackIdentityProvider.cs" />
@@ -180,6 +176,10 @@
     <Compile Include="OpenStack\ObjectModel\Converters\HttpMethodConverter.cs" />
     <Compile Include="OpenStack\ObjectModel\Converters\SimpleStringJsonConverter`1.cs" />
     <Compile Include="OpenStack\ObjectModel\ExtensibleEnum`1.cs" />
+    <Compile Include="OpenStack\ObjectModel\JsonHome\AuthenticationRequirement.cs" />
+    <Compile Include="OpenStack\ObjectModel\JsonHome\HomeDocument.cs" />
+    <Compile Include="OpenStack\ObjectModel\JsonHome\ResourceHints.cs" />
+    <Compile Include="OpenStack\ObjectModel\JsonHome\ResourceObject.cs" />
     <Compile Include="OpenStack\ObjectModel\ResourceIdentifier`1.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Claim.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\ClaimId.cs" />

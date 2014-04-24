@@ -8,6 +8,7 @@
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
     using OpenStack.Collections;
+    using OpenStack.ObjectModel.JsonHome;
     using OpenStack.Services.Queues.V1;
 
     public class QueueingServiceExamples

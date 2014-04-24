@@ -6,10 +6,10 @@
     using System.Diagnostics;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core.Domain;
     using net.openstack.Core.Synchronous;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using global::OpenStack.ObjectModel.JsonHome;
     using global::OpenStack.Services.Queues.V1;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;

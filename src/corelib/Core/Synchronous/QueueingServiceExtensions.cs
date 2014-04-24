@@ -8,6 +8,7 @@ namespace net.openstack.Core.Synchronous
     using System.ComponentModel;
     using net.openstack.Core.Domain;
     using OpenStack.Collections;
+    using OpenStack.ObjectModel.JsonHome;
     using OpenStack.Services.Queues.V1;
     using CancellationToken = System.Threading.CancellationToken;
     using JObject = Newtonsoft.Json.Linq.JObject;
