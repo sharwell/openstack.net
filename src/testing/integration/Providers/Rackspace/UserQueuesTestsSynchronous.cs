@@ -39,7 +39,7 @@
         [TestCategory(TestCategories.Cleanup)]
         public void SynchronousCleanupTestQueues()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
             CloudQueue[] allQueues = ListAllQueues(provider, null, false).ToArray();
@@ -55,7 +55,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestGetHome()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             HomeDocument document = provider.GetHome();
             Assert.IsNotNull(document);
             Console.WriteLine(JsonConvert.SerializeObject(document, Formatting.Indented));
@@ -66,7 +66,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestGetNodeHealth()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             provider.GetNodeHealth();
         }
 
@@ -75,7 +75,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestCreateQueue()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
             bool created = provider.CreateQueue(queueName);
@@ -92,7 +92,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestListQueues()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
             provider.CreateQueue(queueName);
@@ -108,7 +108,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueExists()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
             provider.CreateQueue(queueName);
@@ -122,7 +122,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueMetadataStatic()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
             provider.CreateQueue(queueName);
@@ -144,7 +144,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueMetadataDynamic()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
             provider.CreateQueue(queueName);
@@ -190,7 +190,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueStatistics()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
             provider.CreateQueue(queueName);
@@ -235,7 +235,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestListAllQueueMessagesWithUpdates()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
             provider.CreateQueue(queueName);
@@ -284,7 +284,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestListAllQueueMessages()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
             provider.CreateQueue(queueName);
@@ -324,7 +324,7 @@
             QueueName requestQueueName = CreateRandomQueueName();
             QueueName[] responseQueueNames = Enumerable.Range(0, clientCount).Select(i => CreateRandomQueueName()).ToArray();
 
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
 
             Stopwatch initializationTimer = Stopwatch.StartNew();
             Console.WriteLine("Creating request queue...");
@@ -426,7 +426,7 @@
 
         private void PublishMessages(QueueName requestQueueName, QueueName replyQueueName, ref int processedMessages, CancellationToken token)
         {
-            IQueueingService queueingService = CreateProvider();
+            IQueuesService queuesService = CreateProvider();
             processedMessages = 0;
             Random random = new Random();
 
@@ -436,13 +436,13 @@
                 long y = random.Next();
 
                 Message<CalculatorOperation> message = new Message<CalculatorOperation>(TimeSpan.FromMinutes(5), new CalculatorOperation(replyQueueName, "+", x, y));
-                queueingService.PostMessages(requestQueueName, message);
+                queuesService.PostMessages(requestQueueName, message);
 
                 bool handled = false;
                 while (true)
                 {
                     // process reply messages
-                    using (Claim claim = queueingService.ClaimMessage(replyQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1)))
+                    using (Claim claim = queuesService.ClaimMessage(replyQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1)))
                     {
                         foreach (QueuedMessage queuedMessage in claim.Messages)
                         {
@@ -452,7 +452,7 @@
                                 // this is the reply to this thread's operation
                                 Assert.AreEqual(message.Body._operand1 + message.Body._operand2, result._result);
                                 Assert.AreEqual(x + y, result._result);
-                                queueingService.DeleteMessage(replyQueueName, queuedMessage.Id, claim);
+                                queuesService.DeleteMessage(replyQueueName, queuedMessage.Id, claim);
                                 processedMessages++;
                                 handled = true;
                             }
@@ -484,13 +484,13 @@
 
         private void SubscribeMessages(QueueName requestQueueName, ref int processedMessages, CancellationToken token)
         {
-            IQueueingService queueingService = CreateProvider();
+            IQueuesService queuesService = CreateProvider();
             processedMessages = 0;
 
             while (true)
             {
                 // process request messages
-                using (Claim claim = queueingService.ClaimMessage(requestQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1)))
+                using (Claim claim = queuesService.ClaimMessage(requestQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1)))
                 {
                     List<QueuedMessage> messagesToDelete = new List<QueuedMessage>();
 
@@ -527,12 +527,12 @@
 
                         messagesToDelete.Add(queuedMessage);
 
-                        queueingService.PostMessages(operation._replyQueueName, new Message<CalculatorResult>(TimeSpan.FromMinutes(5), result));
+                        queuesService.PostMessages(operation._replyQueueName, new Message<CalculatorResult>(TimeSpan.FromMinutes(5), result));
                         processedMessages++;
                     }
 
                     if (messagesToDelete.Count > 0)
-                        queueingService.DeleteMessages(requestQueueName, messagesToDelete.Select(i => i.Id));
+                        queuesService.DeleteMessages(requestQueueName, messagesToDelete.Select(i => i.Id));
                 }
 
                 if (token.IsCancellationRequested)
@@ -599,7 +599,7 @@
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueClaims()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
             provider.CreateQueue(queueName);
@@ -646,7 +646,7 @@
         /// <exception cref="ArgumentNullException">If <paramref name="provider"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        private static ReadOnlyCollection<CloudQueue> ListAllQueues(IQueueingService provider, int? limit, bool detailed)
+        private static ReadOnlyCollection<CloudQueue> ListAllQueues(IQueuesService provider, int? limit, bool detailed)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");
@@ -674,7 +674,7 @@
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        private static ReadOnlyCollection<QueuedMessage> ListAllMessages(IQueueingService provider, QueueName queueName, int? limit, bool echo, bool includeClaimed)
+        private static ReadOnlyCollection<QueuedMessage> ListAllMessages(IQueuesService provider, QueueName queueName, int? limit, bool echo, bool includeClaimed)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");
@@ -696,11 +696,11 @@
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="IQueueingService"/> for testing using
+        /// Creates an instance of <see cref="IQueuesService"/> for testing using
         /// the <see cref="OpenstackNetSetings.TestIdentity"/>.
         /// </summary>
-        /// <returns>An instance of <see cref="IQueueingService"/> for integration testing.</returns>
-        private IQueueingService CreateProvider()
+        /// <returns>An instance of <see cref="IQueuesService"/> for integration testing.</returns>
+        private IQueuesService CreateProvider()
         {
             return UserQueuesTests.CreateProvider();
         }

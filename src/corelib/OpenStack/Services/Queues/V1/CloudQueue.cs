@@ -5,9 +5,9 @@
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents a named queue in the <see cref="IQueueingService"/>.
+    /// Represents a named queue in the <see cref="IQueuesService"/>.
     /// </summary>
-    /// <seealso cref="IQueueingService"/>
+    /// <seealso cref="IQueuesService"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]

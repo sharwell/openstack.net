@@ -8,7 +8,6 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
     using Newtonsoft.Json;
@@ -18,6 +17,7 @@
     using global::OpenStack.Services.Queues.V1;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
+    using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using Path = System.IO.Path;
     using WebException = System.Net.WebException;
     using WebExceptionStatus = System.Net.WebExceptionStatus;
@@ -57,7 +57,7 @@
         [TestCategory(TestCategories.Cleanup)]
         public async Task CleanupTestQueues()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(60)));
             QueueName queueName = CreateRandomQueueName();
 
@@ -75,7 +75,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestGetHome()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10)));
             HomeDocument document = await provider.GetHomeAsync(cancellationTokenSource.Token);
             Assert.IsNotNull(document);
@@ -87,7 +87,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestGetNodeHealth()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10)));
             await provider.GetNodeHealthAsync(cancellationTokenSource.Token);
         }
@@ -97,7 +97,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestCreateQueue()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10)));
             QueueName queueName = CreateRandomQueueName();
 
@@ -115,7 +115,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestListQueues()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10)));
             QueueName queueName = CreateRandomQueueName();
 
@@ -134,7 +134,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestQueueExists()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10)));
             QueueName queueName = CreateRandomQueueName();
 
@@ -149,7 +149,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestQueueMetadataStatic()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10)));
             QueueName queueName = CreateRandomQueueName();
 
@@ -172,7 +172,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestQueueMetadataDynamic()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10)));
             QueueName queueName = CreateRandomQueueName();
 
@@ -219,7 +219,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestQueueStatistics()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10)));
             QueueName queueName = CreateRandomQueueName();
 
@@ -265,7 +265,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestListAllQueueMessagesWithUpdates()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
             {
                 QueueName queueName = CreateRandomQueueName();
@@ -320,7 +320,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestListAllQueueMessages()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(20))))
             {
                 QueueName queueName = CreateRandomQueueName();
@@ -352,15 +352,15 @@
         }
 
         /// <summary>
-        /// This method tests each of the overloads of <see cref="O:IQueueingService.PostMessagesAsync"/>
-        /// and <see cref="O:IQueueingService.PostMessagesAsync{T}"/> for basic functionality.
+        /// This method tests each of the overloads of <see cref="O:IQueuesService.PostMessagesAsync"/>
+        /// and <see cref="O:IQueuesService.PostMessagesAsync{T}"/> for basic functionality.
         /// </summary>
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.Queues)]
         public async Task TestPostQueueMessages()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
             {
                 QueueName queueName = CreateRandomQueueName();
@@ -412,7 +412,7 @@
             QueueName requestQueueName = CreateRandomQueueName();
             QueueName[] responseQueueNames = Enumerable.Range(0, clientCount).Select(i => CreateRandomQueueName()).ToArray();
 
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource testCancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300)));
 
             Stopwatch initializationTimer = Stopwatch.StartNew();
@@ -467,7 +467,7 @@
 
         private async Task<int> PublishMessages(QueueName requestQueueName, QueueName replyQueueName, CancellationToken token)
         {
-            IQueueingService queueingService = CreateProvider();
+            IQueuesService queuesService = CreateProvider();
             int processedMessages = 0;
             try
             {
@@ -479,13 +479,13 @@
                     long y = random.Next();
 
                     Message<CalculatorOperation> message = new Message<CalculatorOperation>(TimeSpan.FromMinutes(5), new CalculatorOperation(replyQueueName, "+", x, y));
-                    await queueingService.PostMessagesAsync(requestQueueName, token, message);
+                    await queuesService.PostMessagesAsync(requestQueueName, token, message);
 
                     bool handled = false;
                     while (true)
                     {
                         // process reply messages
-                        using (Claim claim = await queueingService.ClaimMessageAsync(replyQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1), token))
+                        using (Claim claim = await queuesService.ClaimMessageAsync(replyQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1), token))
                         {
                             foreach (QueuedMessage queuedMessage in claim.Messages)
                             {
@@ -495,7 +495,7 @@
                                     // this is the reply to this thread's operation
                                     Assert.AreEqual(message.Body._operand1 + message.Body._operand2, result._result);
                                     Assert.AreEqual(x + y, result._result);
-                                    await queueingService.DeleteMessageAsync(replyQueueName, queuedMessage.Id, claim, token);
+                                    await queuesService.DeleteMessageAsync(replyQueueName, queuedMessage.Id, claim, token);
                                     processedMessages++;
                                     handled = true;
                                 }
@@ -550,14 +550,14 @@
 
         private async Task<int> SubscribeMessages(QueueName requestQueueName, CancellationToken token)
         {
-            IQueueingService queueingService = CreateProvider();
+            IQueuesService queuesService = CreateProvider();
             int processedMessages = 0;
             try
             {
                 while (true)
                 {
                     // process request messages
-                    using (Claim claim = await queueingService.ClaimMessageAsync(requestQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1), token))
+                    using (Claim claim = await queuesService.ClaimMessageAsync(requestQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1), token))
                     {
                         List<QueuedMessage> messagesToDelete = new List<QueuedMessage>();
 
@@ -591,12 +591,12 @@
 
                             // Assigning result to a local suppresses a warning about calling an asynchronous operation.
                             // In this case, we do not need to wait for the task to finish.
-                            Task postTask = queueingService.PostMessagesAsync(operation._replyQueueName, token, new Message<CalculatorResult>(TimeSpan.FromMinutes(5), result));
+                            Task postTask = queuesService.PostMessagesAsync(operation._replyQueueName, token, new Message<CalculatorResult>(TimeSpan.FromMinutes(5), result));
                             processedMessages++;
                         }
 
                         if (messagesToDelete.Count > 0)
-                            await queueingService.DeleteMessagesAsync(requestQueueName, messagesToDelete.Select(i => i.Id), token);
+                            await queuesService.DeleteMessagesAsync(requestQueueName, messagesToDelete.Select(i => i.Id), token);
 
                         // start the dispose process using DisposeAsync so the CancellationToken is honored
                         Task disposeTask = claim.DisposeAsync(token);
@@ -697,7 +697,7 @@
         [TestCategory(TestCategories.Queues)]
         public async Task TestQueueClaims()
         {
-            IQueueingService provider = CreateProvider();
+            IQueuesService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10)));
             QueueName queueName = CreateRandomQueueName();
 
@@ -750,7 +750,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="provider"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
-        private static async Task<ReadOnlyCollection<CloudQueue>> ListAllQueuesAsync(IQueueingService provider, int? limit, bool detailed, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<CloudQueue>> progress)
+        private static async Task<ReadOnlyCollection<CloudQueue>> ListAllQueuesAsync(IQueuesService provider, int? limit, bool detailed, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<CloudQueue>> progress)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");
@@ -782,7 +782,7 @@
         /// <para>If <paramref name="queueName"/> is <see langword="null"/>.</para>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
-        private static async Task<ReadOnlyCollection<QueuedMessage>> ListAllMessagesAsync(IQueueingService provider, QueueName queueName, int? limit, bool echo, bool includeClaimed, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<QueuedMessage>> progress)
+        private static async Task<ReadOnlyCollection<QueuedMessage>> ListAllMessagesAsync(IQueuesService provider, QueueName queueName, int? limit, bool echo, bool includeClaimed, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<QueuedMessage>> progress)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");
@@ -812,11 +812,11 @@
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="IQueueingService"/> for testing using
+        /// Creates an instance of <see cref="IQueuesService"/> for testing using
         /// the <see cref="OpenstackNetSetings.TestIdentity"/>.
         /// </summary>
-        /// <returns>An instance of <see cref="IQueueingService"/> for integration testing.</returns>
-        internal static IQueueingService CreateProvider()
+        /// <returns>An instance of <see cref="IQueuesService"/> for integration testing.</returns>
+        internal static IQueuesService CreateProvider()
         {
             var provider = new TestCloudQueuesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, Guid.NewGuid(), false, null);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;

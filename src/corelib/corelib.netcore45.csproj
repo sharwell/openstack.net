@@ -158,7 +158,7 @@
     <Compile Include="OpenStack\Services\Queues\V1\Claim.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\ClaimId.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\CloudQueue.cs" />
-    <Compile Include="OpenStack\Services\Queues\V1\IQueueingService.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\IQueuesService.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Message.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\MessageId.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\MessageStatistics.cs" />

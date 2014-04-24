@@ -5,9 +5,9 @@
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the unique identifier of a message list page in the <see cref="IQueueingService"/>.
+    /// Represents the unique identifier of a message list page in the <see cref="IQueuesService"/>.
     /// </summary>
-    /// <seealso cref="IQueueingService.ListMessagesAsync"/>
+    /// <seealso cref="IQueuesService.ListMessagesAsync"/>
     /// <seealso cref="QueuedMessageList.NextPageId"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>

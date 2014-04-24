@@ -31,13 +31,13 @@
 #endif
 
     /// <summary>
-    /// Provides an implementation of <see cref="IQueueingService"/> for operating
+    /// Provides an implementation of <see cref="IQueuesService"/> for operating
     /// with Rackspace's Cloud Queues product.
     /// </summary>
     /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1">OpenStack Marconi API v1 Blueprint</seealso>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    public class CloudQueuesProvider : ProviderBase<IQueueingService>, IQueueingService
+    public class CloudQueuesProvider : ProviderBase<IQueuesService>, IQueuesService
     {
         /// <summary>
         /// Specifies whether the <see cref="Endpoint.PublicURL"/> or <see cref="Endpoint.InternalURL"/>
@@ -128,7 +128,7 @@
         }
 #endif
 
-        #region IQueueingService Members
+        #region IQueuesService Members
 
         /// <inheritdoc/>
         public Task<HomeDocument> GetHomeAsync(CancellationToken cancellationToken)
