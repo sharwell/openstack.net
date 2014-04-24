@@ -6,12 +6,12 @@
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using net.openstack.Providers.Rackspace;
     using Newtonsoft.Json;
+    using global::OpenStack.Net;
 
     internal static class TestHelpers
     {
-        public static void HandleBeforeAsyncWebRequest(object sender, WebRequestEventArgs e)
+        public static void HandleBeforeAsyncWebRequest(object sender, HttpRequestEventArgs e)
         {
             HttpRequestMessage request = e.Request;
 
@@ -33,7 +33,7 @@
             }
         }
 
-        public static void HandleAfterAsyncWebRequest(object sender, WebResponseEventArgs e)
+        public static void HandleAfterAsyncWebRequest(object sender, HttpResponseEventArgs e)
         {
             Console.Error.WriteLine("{0} (Result {1})", DateTime.Now, e.Response.StatusCode);
         }

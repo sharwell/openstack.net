@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Providers.Rackspace
+﻿namespace OpenStack.Net
 {
     using System;
     using System.Net;
@@ -10,7 +10,7 @@
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    public class WebResponseEventArgs : EventArgs
+    public class HttpResponseEventArgs : EventArgs
     {
         /// <summary>
         /// This is the backing field for the <see cref="Response"/> property.
@@ -18,12 +18,12 @@
         private readonly HttpResponseMessage _response;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WebResponseEventArgs"/> class
+        /// Initializes a new instance of the <see cref="HttpResponseEventArgs"/> class
         /// with the specified web response.
         /// </summary>
         /// <param name="response">The HTTP web response.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
-        public WebResponseEventArgs(HttpResponseMessage response)
+        public HttpResponseEventArgs(HttpResponseMessage response)
         {
             if (response == null)
                 throw new ArgumentNullException("response");
