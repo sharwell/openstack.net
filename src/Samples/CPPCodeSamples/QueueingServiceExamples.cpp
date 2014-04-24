@@ -25,42 +25,42 @@ public:
 	void GetHome()
 	{
 #pragma region GetHomeAsync (TPL)
-		IQueueingService^ queueingService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-		Task<HomeDocument^>^ task = queueingService->GetHomeAsync(CancellationToken::None);
+		IQueuesService^ queuesService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+		Task<HomeDocument^>^ task = queuesService->GetHomeAsync(CancellationToken::None);
 #pragma endregion
 	}
 
 	void GetNodeHealth()
 	{
 #pragma region GetNodeHealthAsync (TPL)
-		IQueueingService^ queueingService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-		Task^ task = queueingService->GetNodeHealthAsync(CancellationToken::None);
+		IQueuesService^ queuesService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+		Task^ task = queuesService->GetNodeHealthAsync(CancellationToken::None);
 #pragma endregion
 	}
 
 	void CreateQueue()
 	{
 #pragma region CreateQueueAsync (TPL)
-		IQueueingService^ queueingService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+		IQueuesService^ queuesService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
 		QueueName^ queueName = gcnew QueueName("ExampleQueue");
-		Task<bool>^ task = queueingService->CreateQueueAsync(queueName, CancellationToken::None);
+		Task<bool>^ task = queuesService->CreateQueueAsync(queueName, CancellationToken::None);
 #pragma endregion
 	}
 
 	void DeleteQueue()
 	{
 #pragma region DeleteQueueAsync (TPL)
-		IQueueingService^ queueingService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+		IQueuesService^ queuesService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
 		QueueName^ queueName = gcnew QueueName("ExampleQueue");
-		Task^ task = queueingService->DeleteQueueAsync(queueName, CancellationToken::None);
+		Task^ task = queuesService->DeleteQueueAsync(queueName, CancellationToken::None);
 #pragma endregion
 	}
 
 #pragma region ListQueuesAsync (TPL)
 	void ListQueues()
 	{
-		IQueueingService^ queueingService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-		Task<ReadOnlyCollectionPage<CloudQueue^>^>^ queuesPageTask = queueingService->ListQueuesAsync(nullptr, Nullable<int>(), true, CancellationToken::None);
+		IQueuesService^ queuesService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+		Task<ReadOnlyCollectionPage<CloudQueue^>^>^ queuesPageTask = queuesService->ListQueuesAsync(nullptr, Nullable<int>(), true, CancellationToken::None);
 		auto func = gcnew Func<Task<ReadOnlyCollectionPage<CloudQueue^>^>^, Task<ReadOnlyCollection<CloudQueue^>^>^>(GetAllPagesContinuationAsync<CloudQueue^>);
 		Task<ReadOnlyCollection<CloudQueue^>^>^ queuesTask = TaskExtensions::Unwrap(queuesPageTask->ContinueWith(func));
 	}
@@ -75,9 +75,9 @@ public:
 	void QueueExists()
 	{
 #pragma region QueueExistsAsync (TPL)
-		IQueueingService^ queueingService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+		IQueuesService^ queuesService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
 		QueueName^ queueName = gcnew QueueName("ExampleQueue");
-		Task<bool>^ task = queueingService->QueueExistsAsync(queueName, CancellationToken::None);
+		Task<bool>^ task = queuesService->QueueExistsAsync(queueName, CancellationToken::None);
 #pragma endregion
 	}
 };

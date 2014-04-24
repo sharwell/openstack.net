@@ -7,7 +7,7 @@
     using OpenStack.Compat;
 
     /// <summary>
-    /// Represents a message which is queued in the <see cref="IQueueingService"/>.
+    /// Represents a message which is queued in the <see cref="IQueuesService"/>.
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>

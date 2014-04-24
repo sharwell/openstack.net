@@ -25,7 +25,7 @@
     /// </summary>
     /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1&amp;oldid=30943">OpenStack Marconi API v1 Blueprint</seealso>
     /// <preliminary/>
-    public interface IQueueingService
+    public interface IQueuesService
     {
         #region Base endpoints
 
@@ -37,7 +37,7 @@
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
-        /// implementation of the <see cref="IQueueingService"/>. For more information about creating the provider, see
+        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
         /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="GetHomeAsync (await)" language="cs"/>
@@ -65,7 +65,7 @@
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
-        /// implementation of the <see cref="IQueueingService"/>. For more information about creating the provider, see
+        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
         /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="GetNodeHealthAsync (await)" language="cs"/>
@@ -94,7 +94,7 @@
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
-        /// implementation of the <see cref="IQueueingService"/>. For more information about creating the provider, see
+        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
         /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="CreateQueueAsync (await)" language="cs"/>
@@ -121,7 +121,7 @@
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
-        /// implementation of the <see cref="IQueueingService"/>. For more information about creating the provider, see
+        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
         /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="ListQueuesAsync (await)" language="cs"/>
@@ -146,7 +146,7 @@
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
-        /// implementation of the <see cref="IQueueingService"/>. For more information about creating the provider, see
+        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
         /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="QueueExistsAsync (await)" language="cs"/>
@@ -174,7 +174,7 @@
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
-        /// implementation of the <see cref="IQueueingService"/>. For more information about creating the provider, see
+        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
         /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="DeleteQueueAsync (await)" language="cs"/>

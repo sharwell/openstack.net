@@ -5,7 +5,7 @@
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the name of a queue in the <see cref="IQueueingService"/>.
+    /// Represents the name of a queue in the <see cref="IQueuesService"/>.
     /// </summary>
     /// <seealso cref="CloudQueue.Name"/>
     /// <threadsafety static="true" instance="false"/>

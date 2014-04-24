@@ -20,76 +20,76 @@ Public Class QueueingServiceExamples
 
     Public Async Function GetHomeAsyncAwait() As Task
         ' #Region "GetHomeAsync (await)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
-        Dim homeDocument = Await queueingService.GetHomeAsync(CancellationToken.None)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim homeDocument = Await queuesService.GetHomeAsync(CancellationToken.None)
         ' #End Region
     End Function
 
     Public Sub GetHome()
         ' #Region "GetHomeAsync (TPL)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
-        Dim task = queueingService.GetHomeAsync(CancellationToken.None)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim task = queuesService.GetHomeAsync(CancellationToken.None)
         ' #End Region
     End Sub
 
     Public Async Function GetNodeHealthAsyncAwait() As Task
         ' #Region "GetNodeHealthAsync (await)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
-        Await queueingService.GetNodeHealthAsync(CancellationToken.None)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Await queuesService.GetNodeHealthAsync(CancellationToken.None)
         ' #End Region
     End Function
 
     Public Sub GetNodeHealth()
         ' #Region "GetNodeHealthAsync (TPL)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
-        Dim task = queueingService.GetNodeHealthAsync(CancellationToken.None)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim task = queuesService.GetNodeHealthAsync(CancellationToken.None)
         ' #End Region
     End Sub
 
     Public Async Function CreateQueueAsyncAwait() As Task
         ' #Region "CreateQueueAsync (await)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
         Dim queueName = New QueueName("ExampleQueue")
-        Dim createdQueue = Await queueingService.CreateQueueAsync(queueName, CancellationToken.None)
+        Dim createdQueue = Await queuesService.CreateQueueAsync(queueName, CancellationToken.None)
         ' #End Region
     End Function
 
     Public Sub CreateQueue()
         ' #Region "CreateQueueAsync (TPL)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
         Dim queueName = New QueueName("ExampleQueue")
-        Dim task = queueingService.CreateQueueAsync(queueName, CancellationToken.None)
+        Dim task = queuesService.CreateQueueAsync(queueName, CancellationToken.None)
         ' #End Region
     End Sub
 
     Public Async Function DeleteQueueAsyncAwait() As Task
         ' #Region "DeleteQueueAsync (await)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
         Dim queueName = New QueueName("ExampleQueue")
-        Await queueingService.DeleteQueueAsync(queueName, CancellationToken.None)
+        Await queuesService.DeleteQueueAsync(queueName, CancellationToken.None)
         ' #End Region
     End Function
 
     Public Sub DeleteQueue()
         ' #Region "DeleteQueueAsync (TPL)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
         Dim queueName = New QueueName("ExampleQueue")
-        Dim task = queueingService.DeleteQueueAsync(queueName, CancellationToken.None)
+        Dim task = queuesService.DeleteQueueAsync(queueName, CancellationToken.None)
         ' #End Region
     End Sub
 
     Public Async Function ListQueuesAsyncAwait() As Task
         ' #Region "ListQueuesAsync (await)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
-        Dim queuesPage = Await queueingService.ListQueuesAsync(Nothing, Nothing, True, CancellationToken.None)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim queuesPage = Await queuesService.ListQueuesAsync(Nothing, Nothing, True, CancellationToken.None)
         Dim queues = Await queuesPage.GetAllPagesAsync(CancellationToken.None, Nothing)
         ' #End Region
     End Function
 
     Public Sub ListQueues()
         ' #Region "ListQueuesAsync (TPL)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
-        Dim queuesPageTask = queueingService.ListQueuesAsync(Nothing, Nothing, True, CancellationToken.None)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim queuesPageTask = queuesService.ListQueuesAsync(Nothing, Nothing, True, CancellationToken.None)
         Dim queuesTask = queuesPageTask _
             .ContinueWith(Function(task) task.Result.GetAllPagesAsync(CancellationToken.None, Nothing)) _
             .Unwrap()
@@ -98,17 +98,17 @@ Public Class QueueingServiceExamples
 
     Public Async Function QueueExistsAsyncAwait() As Task
         ' #Region "QueueExistsAsync (await)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
         Dim queueName = New QueueName("ExampleQueue")
-        Dim exists = Await queueingService.QueueExistsAsync(queueName, CancellationToken.None)
+        Dim exists = Await queuesService.QueueExistsAsync(queueName, CancellationToken.None)
         ' #End Region
     End Function
 
     Public Sub QueueExists()
         ' #Region "QueueExistsAsync (TPL)"
-        Dim queueingService As IQueueingService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        Dim queuesService As IQueuesService = New CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
         Dim queueName = New QueueName("ExampleQueue")
-        Dim task = queueingService.QueueExistsAsync(queueName, CancellationToken.None)
+        Dim task = queuesService.QueueExistsAsync(queueName, CancellationToken.None)
         ' #End Region
     End Sub
 

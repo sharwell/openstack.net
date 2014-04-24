@@ -9,7 +9,7 @@
     /// <summary>
     /// This class extends the <see cref="ReadOnlyCollectionPage{T}"/> class
     /// to provide access to the opaque marker used for paginating messages
-    /// in the <see cref="IQueueingService"/> (via the <see cref="NextPageId"/>
+    /// in the <see cref="IQueuesService"/> (via the <see cref="NextPageId"/>
     /// property.
     /// </summary>
     /// <threadsafety static="true" instance="false"/>

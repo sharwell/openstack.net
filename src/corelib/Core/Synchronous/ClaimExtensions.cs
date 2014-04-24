@@ -19,7 +19,7 @@ namespace net.openstack.Core.Synchronous
         /// Refreshes the current claim.
         /// </summary>
         /// <remarks>
-        /// This method calls <see cref="IQueueingService.QueryClaimAsync"/> to obtain updated
+        /// This method calls <see cref="IQueuesService.QueryClaimAsync"/> to obtain updated
         /// information about the current claim, and then synchronously invokes <see cref="Claim.RefreshAsync"/>
         /// to update the current instance to match the results.
         /// </remarks>
@@ -49,7 +49,7 @@ namespace net.openstack.Core.Synchronous
         /// Renews the claim by resetting the age and updating the TTL for the claim.
         /// </summary>
         /// <remarks>
-        /// This method calls <see cref="IQueueingService.UpdateClaimAsync"/> to renew the
+        /// This method calls <see cref="IQueuesService.UpdateClaimAsync"/> to renew the
         /// current claim, and then synchronously updates the current instance to reflect
         /// the new age and time-to-live values.
         /// </remarks>

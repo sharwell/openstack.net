@@ -5,7 +5,7 @@
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the unique identifier of a claim in the <see cref="IQueueingService"/>.
+    /// Represents the unique identifier of a claim in the <see cref="IQueuesService"/>.
     /// </summary>
     /// <seealso cref="Claim.Id"/>
     /// <threadsafety static="true" instance="false"/>

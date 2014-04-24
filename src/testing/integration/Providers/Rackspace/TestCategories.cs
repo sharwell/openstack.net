@@ -79,7 +79,7 @@
         /// <summary>
         /// Queueing service tests.
         /// </summary>
-        /// <seealso cref="IQueueingService"/>
+        /// <seealso cref="IQueuesService"/>
         public const string Queues = "Queues" + CategorySuffix;
 
         /// <summary>

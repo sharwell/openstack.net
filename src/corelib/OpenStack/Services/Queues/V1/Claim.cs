@@ -16,10 +16,10 @@
     /// is called. At that time, any messages belonging to this claim which have not
     /// been deleted will be eligible for claiming by another node in the system.
     /// Messages belonging to this claim may be deleted by calling
-    /// <see cref="IQueueingService.DeleteMessageAsync"/> or
-    /// <see cref="IQueueingService.DeleteMessagesAsync"/>.
+    /// <see cref="IQueuesService.DeleteMessageAsync"/> or
+    /// <see cref="IQueuesService.DeleteMessagesAsync"/>.
     /// </remarks>
-    /// <seealso cref="IQueueingService"/>
+    /// <seealso cref="IQueuesService"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     public class Claim : IDisposable
@@ -33,7 +33,7 @@
         /// <summary>
         /// The queueing service instance used for commands related to this claim.
         /// </summary>
-        private readonly IQueueingService _service;
+        private readonly IQueuesService _service;
 
         /// <summary>
         /// The name of the queue this claim belongs to.
@@ -84,7 +84,7 @@
         /// <para>-or-</para>
         /// <para>If <paramref name="messages"/> is <see langword="null"/>.</para>
         /// </exception>
-        public Claim(IQueueingService service, QueueName queueName, Uri location, TimeSpan timeToLive, TimeSpan age, bool owner, IEnumerable<QueuedMessage> messages)
+        public Claim(IQueuesService service, QueueName queueName, Uri location, TimeSpan timeToLive, TimeSpan age, bool owner, IEnumerable<QueuedMessage> messages)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -147,7 +147,7 @@
         /// </summary>
         /// <remarks>
         /// This value does not automatically update. To obtain the age of a claim after a period of time elapses,
-        /// use <see cref="IQueueingService.QueryClaimAsync"/>.
+        /// use <see cref="IQueuesService.QueryClaimAsync"/>.
         /// </remarks>
         public TimeSpan Age
         {
@@ -188,7 +188,7 @@
         /// Refreshes the current claim.
         /// </summary>
         /// <remarks>
-        /// This method calls <see cref="IQueueingService.QueryClaimAsync"/> to obtain updated
+        /// This method calls <see cref="IQueuesService.QueryClaimAsync"/> to obtain updated
         /// information about the current claim, and then synchronously invokes <see cref="RefreshImpl"/>
         /// to update the current instance to match the results.
         /// </remarks>
@@ -204,7 +204,7 @@
         /// Renews the claim by resetting the age and updating the TTL for the claim.
         /// </summary>
         /// <remarks>
-        /// This method calls <see cref="IQueueingService.UpdateClaimAsync"/> to renew the
+        /// This method calls <see cref="IQueuesService.UpdateClaimAsync"/> to renew the
         /// current claim, and then synchronously updates the current instance to reflect
         /// the new age and time-to-live values.
         /// </remarks>
@@ -233,11 +233,11 @@
 
         /// <inheritdoc/>
         /// <remarks>
-        /// This method calls <see cref="IQueueingService.ReleaseClaimAsync"/> to release messages
+        /// This method calls <see cref="IQueuesService.ReleaseClaimAsync"/> to release messages
         /// claimed by this claim. To prevent other subscribers from re-claiming the messages, make
         /// sure to delete the messages before calling <see cref="Dispose()"/>.
         /// </remarks>
-        /// <seealso cref="IQueueingService.ReleaseClaimAsync"/>
+        /// <seealso cref="IQueuesService.ReleaseClaimAsync"/>
         public void Dispose()
         {
             Dispose(true);
@@ -248,7 +248,7 @@
         /// Asynchronously releases resources owned by this <see cref="Claim"/>.
         /// </summary>
         /// <remarks>
-        /// This method calls <see cref="IQueueingService.ReleaseClaimAsync"/> to release messages
+        /// This method calls <see cref="IQueuesService.ReleaseClaimAsync"/> to release messages
         /// claimed by this claim. To prevent other subscribers from re-claiming the messages, make
         /// sure to delete the messages before calling <see cref="DisposeAsync"/>.
         /// </remarks>

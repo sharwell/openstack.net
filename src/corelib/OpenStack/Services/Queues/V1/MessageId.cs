@@ -5,7 +5,7 @@
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the unique identifier of a message in the <see cref="IQueueingService"/>.
+    /// Represents the unique identifier of a message in the <see cref="IQueuesService"/>.
     /// </summary>
     /// <seealso cref="QueuedMessage.Id"/>
     /// <threadsafety static="true" instance="false"/>

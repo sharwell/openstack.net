@@ -31,76 +31,76 @@
         public async Task GetHomeAsyncAwait()
         {
             #region GetHomeAsync (await)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-            HomeDocument createdQueue = await queueingService.GetHomeAsync(CancellationToken.None);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            HomeDocument createdQueue = await queuesService.GetHomeAsync(CancellationToken.None);
             #endregion
         }
 
         public void GetHome()
         {
             #region GetHomeAsync (TPL)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-            Task<HomeDocument> task = queueingService.GetHomeAsync(CancellationToken.None);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            Task<HomeDocument> task = queuesService.GetHomeAsync(CancellationToken.None);
             #endregion
         }
 
         public async Task GetNodeHealthAsyncAwait()
         {
             #region GetNodeHealthAsync (await)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-            await queueingService.GetNodeHealthAsync(CancellationToken.None);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            await queuesService.GetNodeHealthAsync(CancellationToken.None);
             #endregion
         }
 
         public void GetNodeHealth()
         {
             #region GetNodeHealthAsync (TPL)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-            Task task = queueingService.GetNodeHealthAsync(CancellationToken.None);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            Task task = queuesService.GetNodeHealthAsync(CancellationToken.None);
             #endregion
         }
 
         public async Task CreateQueueAsyncAwait()
         {
             #region CreateQueueAsync (await)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
             QueueName queueName = new QueueName("ExampleQueue");
-            bool createdQueue = await queueingService.CreateQueueAsync(queueName, CancellationToken.None);
+            bool createdQueue = await queuesService.CreateQueueAsync(queueName, CancellationToken.None);
             #endregion
         }
 
         public void CreateQueue()
         {
             #region CreateQueueAsync (TPL)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
             QueueName queueName = new QueueName("ExampleQueue");
-            Task<bool> task = queueingService.CreateQueueAsync(queueName, CancellationToken.None);
+            Task<bool> task = queuesService.CreateQueueAsync(queueName, CancellationToken.None);
             #endregion
         }
 
         public async Task DeleteQueueAsyncAwait()
         {
             #region DeleteQueueAsync (await)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
             QueueName queueName = new QueueName("ExampleQueue");
-            await queueingService.DeleteQueueAsync(queueName, CancellationToken.None);
+            await queuesService.DeleteQueueAsync(queueName, CancellationToken.None);
             #endregion
         }
 
         public void DeleteQueue()
         {
             #region DeleteQueueAsync (TPL)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
             QueueName queueName = new QueueName("ExampleQueue");
-            Task task = queueingService.DeleteQueueAsync(queueName, CancellationToken.None);
+            Task task = queuesService.DeleteQueueAsync(queueName, CancellationToken.None);
             #endregion
         }
 
         public async Task ListQueuesAsyncAwait()
         {
             #region ListQueuesAsync (await)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-            ReadOnlyCollectionPage<CloudQueue> queuesPage = await queueingService.ListQueuesAsync(null, null, true, CancellationToken.None);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            ReadOnlyCollectionPage<CloudQueue> queuesPage = await queuesService.ListQueuesAsync(null, null, true, CancellationToken.None);
             ReadOnlyCollection<CloudQueue> queues = await queuesPage.GetAllPagesAsync(CancellationToken.None, null);
             #endregion
         }
@@ -108,8 +108,8 @@
         public void ListQueues()
         {
             #region ListQueuesAsync (TPL)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-            Task<ReadOnlyCollectionPage<CloudQueue>> queuesPageTask = queueingService.ListQueuesAsync(null, null, true, CancellationToken.None);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            Task<ReadOnlyCollectionPage<CloudQueue>> queuesPageTask = queuesService.ListQueuesAsync(null, null, true, CancellationToken.None);
             Task<ReadOnlyCollection<CloudQueue>> queuesTask =
                 queuesPageTask
                 .ContinueWith(task => task.Result.GetAllPagesAsync(CancellationToken.None, null))
@@ -120,18 +120,18 @@
         public async Task QueueExistsAsyncAwait()
         {
             #region QueueExistsAsync (await)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
             QueueName queueName = new QueueName("ExampleQueue");
-            bool exists = await queueingService.QueueExistsAsync(queueName, CancellationToken.None);
+            bool exists = await queuesService.QueueExistsAsync(queueName, CancellationToken.None);
             #endregion
         }
 
         public void QueueExists()
         {
             #region QueueExistsAsync (TPL)
-            IQueueingService queueingService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
+            IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
             QueueName queueName = new QueueName("ExampleQueue");
-            Task<bool> task = queueingService.QueueExistsAsync(queueName, CancellationToken.None);
+            Task<bool> task = queuesService.QueueExistsAsync(queueName, CancellationToken.None);
             #endregion
         }
     }
