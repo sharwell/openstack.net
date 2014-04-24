@@ -1,7 +1,9 @@
 ﻿namespace OpenStack.Services.Databases.V1
 {
     using System;
+    using System.Collections.Generic;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using ExtensibleJsonObject = OpenStack.ObjectModel.ExtensibleJsonObject;
 
     /// <summary>
@@ -54,6 +56,57 @@
         /// <para>If <paramref name="volumeConfiguration"/> is <see langword="null"/>.</para>
         /// </exception>
         public DatabaseInstanceConfiguration(FlavorRef flavorRef, DatabaseVolumeConfiguration volumeConfiguration, string name)
+            : this(flavorRef, volumeConfiguration, name, EmptyExtensionData)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseInstanceConfiguration"/> class
+        /// with the specified values.
+        /// </summary>
+        /// <param name="flavorRef">A <see cref="FlavorRef"/> object describing the flavor of the database instance.</param>
+        /// <param name="volumeConfiguration">A <see cref="DatabaseVolumeConfiguration"/> object containing additional information about
+        /// the database instance storage volume.</param>
+        /// <param name="name">The name of the database instance, or <see langword="null"/> if the database instance is not named.</param>
+        /// <param name="extensionData">The extension data to include in the JSON representation of this resource.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="flavorRef"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="volumeConfiguration"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="extensionData"/> is <see langword="null"/>.</para>
+        /// </exception>
+        public DatabaseInstanceConfiguration(FlavorRef flavorRef, DatabaseVolumeConfiguration volumeConfiguration, string name, params JProperty[] extensionData)
+            : base(extensionData)
+        {
+            if (flavorRef == null)
+                throw new ArgumentNullException("flavorRef");
+            if (volumeConfiguration == null)
+                throw new ArgumentNullException("volumeConfiguration");
+
+            _flavorRef = flavorRef;
+            _volume = volumeConfiguration;
+            _name = name;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseInstanceConfiguration"/> class
+        /// with the specified values.
+        /// </summary>
+        /// <param name="flavorRef">A <see cref="FlavorRef"/> object describing the flavor of the database instance.</param>
+        /// <param name="volumeConfiguration">A <see cref="DatabaseVolumeConfiguration"/> object containing additional information about
+        /// the database instance storage volume.</param>
+        /// <param name="name">The name of the database instance, or <see langword="null"/> if the database instance is not named.</param>
+        /// <param name="extensionData">The extension data to include in the JSON representation of this resource.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="flavorRef"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="volumeConfiguration"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="extensionData"/> is <see langword="null"/>.</para>
+        /// </exception>
+        public DatabaseInstanceConfiguration(FlavorRef flavorRef, DatabaseVolumeConfiguration volumeConfiguration, string name, IDictionary<string, JToken> extensionData)
+            : base(extensionData)
         {
             if (flavorRef == null)
                 throw new ArgumentNullException("flavorRef");

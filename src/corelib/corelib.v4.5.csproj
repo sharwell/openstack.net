@@ -639,7 +639,6 @@
     <Compile Include="Rackspace\Services\Databases\V1\BackupId.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\BackupStatus.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\DatabaseBackupExtension.cs" />
-    <Compile Include="Rackspace\Services\Databases\V1\RestoreDatabaseInstanceConfiguration.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\IDatabaseBackupExtension.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\RestorePoint.cs" />
   </ItemGroup>

@@ -363,7 +363,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 ReadOnlyCollection<Backup> instanceBackupsAfterRemove = await backupExtension.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
                 Assert.AreEqual(instanceBackups.Count, instanceBackupsAfterRemove.Count);
 
-                configuration = new RestoreDatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName, new RestorePoint(backup.Id));
+                configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName).WithRestorePoint(new RestorePoint(backup.Id));
                 instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.AreEqual(false, await provider.CheckRootEnabledStatusAsync(instance.Id, cancellationTokenSource.Token));
 
