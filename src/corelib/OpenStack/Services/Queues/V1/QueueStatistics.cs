@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Core.Domain.Queues
+﻿namespace OpenStack.Services.Queues.V1
 {
     using Newtonsoft.Json;
 

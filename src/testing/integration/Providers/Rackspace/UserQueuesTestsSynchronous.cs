@@ -7,11 +7,10 @@
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core.Domain;
-    using net.openstack.Core.Domain.Queues;
-    using net.openstack.Core.Providers;
     using net.openstack.Core.Synchronous;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using global::OpenStack.Services.Queues.V1;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using Path = System.IO.Path;

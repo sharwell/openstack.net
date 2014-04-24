@@ -4,10 +4,8 @@ namespace net.openstack.Core.Synchronous
 {
     using System;
     using System.Collections.ObjectModel;
-    using net.openstack.Core.Domain;
-    using net.openstack.Core.Domain.Queues;
+    using OpenStack.Services.Queues.V1;
     using CancellationToken = System.Threading.CancellationToken;
-    using IQueueingService = net.openstack.Core.Providers.IQueueingService;
     using WebException = System.Net.WebException;
 
     /// <summary>

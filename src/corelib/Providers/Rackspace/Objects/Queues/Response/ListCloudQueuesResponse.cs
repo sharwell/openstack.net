@@ -1,8 +1,8 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Queues.Response
 {
     using net.openstack.Core.Domain;
-    using net.openstack.Core.Domain.Queues;
     using Newtonsoft.Json;
+    using OpenStack.Services.Queues.V1;
 
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>

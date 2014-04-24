@@ -7,10 +7,9 @@ namespace net.openstack.Core.Synchronous
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using net.openstack.Core.Domain;
-    using net.openstack.Core.Domain.Queues;
     using OpenStack.Collections;
+    using OpenStack.Services.Queues.V1;
     using CancellationToken = System.Threading.CancellationToken;
-    using IQueueingService = net.openstack.Core.Providers.IQueueingService;
     using JObject = Newtonsoft.Json.Linq.JObject;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
     using WebException = System.Net.WebException;

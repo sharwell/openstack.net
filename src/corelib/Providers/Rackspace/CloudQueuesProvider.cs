@@ -9,25 +9,23 @@
     using System.Threading;
     using System.Threading.Tasks;
     using net.openstack.Core.Domain;
-    using net.openstack.Core.Domain.Queues;
-    using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.Queues.Request;
     using net.openstack.Providers.Rackspace.Objects.Queues.Response;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
     using OpenStack.Compat;
+    using OpenStack.Services.Queues.V1;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
 
 #if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
-#endif
-
-#if PORTABLE
+#else
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
 #endif
 

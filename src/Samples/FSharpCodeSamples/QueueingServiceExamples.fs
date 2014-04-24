@@ -3,12 +3,11 @@
 open System
 open System.Threading
 open System.Threading.Tasks
-open net.openstack.Core
 open net.openstack.Core.Domain
-open net.openstack.Core.Domain.Queues
 open net.openstack.Core.Providers
 open net.openstack.Providers.Rackspace
 open OpenStack.Collections
+open OpenStack.Services.Queues.V1
 
 let identity = new CloudIdentity (Username = "MyUser", APIKey = "API_KEY_HERE")
 let region : string = null

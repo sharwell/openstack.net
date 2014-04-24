@@ -1,8 +1,7 @@
-﻿namespace net.openstack.Core.Domain.Queues
+﻿namespace OpenStack.Services.Queues.V1
 {
     using System;
     using System.Linq;
-    using net.openstack.Core.Providers;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using OpenStack.Compat;
