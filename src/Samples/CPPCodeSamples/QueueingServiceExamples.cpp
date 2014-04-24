@@ -4,6 +4,7 @@ using namespace net::openstack::Core::Domain;
 using namespace net::openstack::Core::Providers;
 using namespace net::openstack::Providers::Rackspace;
 using namespace OpenStack::Collections;
+using namespace OpenStack::ObjectModel::JsonHome;
 using namespace OpenStack::Services::Queues::V1;
 using namespace System;
 using namespace System::Collections::ObjectModel;

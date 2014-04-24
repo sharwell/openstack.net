@@ -8,6 +8,7 @@
     using net.openstack.Core.Domain;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
+    using OpenStack.ObjectModel.JsonHome;
     using CancellationToken = System.Threading.CancellationToken;
     using CloudQueuesProvider = net.openstack.Providers.Rackspace.CloudQueuesProvider;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;

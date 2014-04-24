@@ -15,6 +15,7 @@
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
     using OpenStack.Compat;
+    using OpenStack.ObjectModel.JsonHome;
     using OpenStack.Services.Queues.V1;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;

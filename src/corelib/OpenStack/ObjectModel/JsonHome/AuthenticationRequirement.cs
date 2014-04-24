@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Core.Domain
+﻿namespace OpenStack.ObjectModel.JsonHome
 {
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;

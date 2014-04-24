@@ -14,6 +14,7 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using global::OpenStack.Collections;
+    using global::OpenStack.ObjectModel.JsonHome;
     using global::OpenStack.Services.Queues.V1;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
