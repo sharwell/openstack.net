@@ -6,13 +6,14 @@
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-    using net.openstack.Core;
     using net.openstack.Core.Domain;
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using OpenStack.Collections;
     using OpenStack.Threading;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
-#if NET35
+
+#if !NET40PLUS
+    using OpenStack.Compat;
     using global::Rackspace.Threading;
 #endif
 

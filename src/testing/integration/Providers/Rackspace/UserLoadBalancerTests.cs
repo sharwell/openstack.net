@@ -12,11 +12,11 @@
     using System.Security.Cryptography.X509Certificates;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core.Exceptions;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
     using Newtonsoft.Json;
     using global::OpenStack.Collections;
+    using global::OpenStack.Net;
     using global::OpenStack.Threading;
     using global::Rackspace.Net;
     using Security.Cryptography;

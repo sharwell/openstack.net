@@ -7,7 +7,6 @@
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using net.openstack.Core;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
@@ -20,6 +19,10 @@
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
+
+#if !NET40PLUS
+    using OpenStack.Compat;
+#endif
 
 #if !PORTABLE
     using System.Net.Sockets;

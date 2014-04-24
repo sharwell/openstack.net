@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using net.openstack.Core;
 using net.openstack.Core.Caching;
 using net.openstack.Core.Domain;
 using net.openstack.Core.Exceptions.Response;
@@ -17,6 +16,10 @@ using Newtonsoft.Json.Linq;
 using global::Rackspace.Net;
 using global::Rackspace.Threading;
 using CancellationToken = System.Threading.CancellationToken;
+
+#if !NET40PLUS
+using OpenStack.Compat;
+#endif
 
 #if !PORTABLE
 using JSIStudios.SimpleRESTServices.Client;

@@ -16,16 +16,9 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
+    using OpenStack.Compat;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
-
-#if NET35
-    using net.openstack.Core;
-#endif
-
-#if PORTABLE && !NET45PLUS
-    using net.openstack.Core.Compat;
-#endif
 
 #if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
@@ -298,11 +291,7 @@
             if (message.Method != HttpMethod.Head)
                 return false;
 
-#if PORTABLE && !NET45PLUS
             string[] uriSegments = message.RequestUri.GetSegments();
-#else
-            string[] uriSegments = message.RequestUri.Segments;
-#endif
             if (uriSegments.Length < 2 || !string.Equals("queues/", uriSegments[uriSegments.Length - 2], StringComparison.Ordinal))
                 return false;
 

@@ -7,7 +7,7 @@
     using System.Threading.Tasks;
 
 #if NET35
-    using net.openstack.Core;
+    using OpenStack.Compat;
 #endif
 
     /// <summary>
