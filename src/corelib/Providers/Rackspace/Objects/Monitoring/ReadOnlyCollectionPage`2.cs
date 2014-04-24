@@ -10,8 +10,6 @@
     using global::Rackspace.Threading;
 #if NET45PLUS
     using System.Collections.ObjectModel;
-#else
-    using net.openstack.Core.Collections;
 #endif
 
     /// <summary>

@@ -8,7 +8,7 @@
     using Rackspace.Threading;
 
 #if PORTABLE
-    using net.openstack.Core.Collections;
+    using OpenStack.Collections;
 #endif
 
     /// <summary>
