@@ -9,7 +9,7 @@
 #if NET45PLUS
     using System.Collections.ObjectModel;
 #else
-    using net.openstack.Core.Collections;
+    using OpenStack.Collections;
 #endif
 
 #if PORTABLE

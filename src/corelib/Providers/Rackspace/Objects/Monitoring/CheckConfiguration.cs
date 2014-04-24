@@ -4,9 +4,9 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using net.openstack.Core.Collections;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using OpenStack.Collections;
 
     /// <summary>
     /// This class models the configurable properties of the JSON representation of
