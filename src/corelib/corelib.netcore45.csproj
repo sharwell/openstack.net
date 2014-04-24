@@ -56,11 +56,6 @@
   <ItemGroup>
     <Compile Include="Core\Caching\ICache`1.cs" />
     <Compile Include="Core\Caching\NamespaceDoc.cs" />
-    <Compile Include="Core\Collections\CollectionDebuggerView`2.cs" />
-    <Compile Include="Core\Collections\ConcurrentDictionary`2.cs" />
-    <Compile Include="Core\Collections\NamespaceDoc.cs" />
-    <Compile Include="Core\Collections\ReadOnlyDictionary`2.cs" />
-    <Compile Include="Core\Collections\SplitOrderedList`2.cs" />
     <Compile Include="Core\Compat\CustomAttributeExtensions.cs" />
     <Compile Include="Core\Compat\Funcs.cs" />
     <Compile Include="Core\Compat\ISafeSerializationData.cs" />
@@ -160,9 +155,14 @@
     <Compile Include="Core\Validators\NamespaceDoc.cs" />
     <Compile Include="OpenStack\Collections\ArrayExtensions.cs" />
     <Compile Include="OpenStack\Collections\BasicReadOnlyCollectionPage`1.cs" />
+    <Compile Include="OpenStack\Collections\CollectionDebuggerView`2.cs" />
+    <Compile Include="OpenStack\Collections\ConcurrentDictionary`2.cs" />
     <Compile Include="OpenStack\Collections\ListExtensions.cs" />
+    <Compile Include="OpenStack\Collections\NamespaceDoc.cs" />
     <Compile Include="OpenStack\Collections\ReadOnlyCollectionPageExtensions.cs" />
     <Compile Include="OpenStack\Collections\ReadOnlyCollectionPage`1.cs" />
+    <Compile Include="OpenStack\Collections\ReadOnlyDictionary`2.cs" />
+    <Compile Include="OpenStack\Collections\SplitOrderedList`2.cs" />
     <Compile Include="OpenStack\Net\HttpApiCall`1.cs" />
     <Compile Include="OpenStack\Net\UriPart.cs" />
     <Compile Include="OpenStack\Net\UriUtility.cs" />

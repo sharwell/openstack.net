@@ -1,9 +1,9 @@
-﻿namespace net.openstack.Core.Collections
+﻿namespace OpenStack.Collections
 {
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// The <see cref="net.openstack.Core.Collections"/> namespace contains interfaces and
+    /// The <see cref="OpenStack.Collections"/> namespace contains interfaces and
     /// classes that extend the collections support provided by the base class library.
     /// </summary>
     [CompilerGenerated]

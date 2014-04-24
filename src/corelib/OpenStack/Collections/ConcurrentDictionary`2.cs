@@ -37,7 +37,7 @@ namespace System.Collections.Concurrent
 {
 	[DebuggerDisplay ("Count={Count}")]
 	[DebuggerTypeProxy (typeof (CollectionDebuggerView<,>))]
-	public class ConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TValue>,
+	internal class ConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TValue>,
 	  ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>,
 	  IDictionary, ICollection, IEnumerable
 	{

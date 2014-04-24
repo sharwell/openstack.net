@@ -1,6 +1,6 @@
 ﻿#if !NET45PLUS
 
-namespace net.openstack.Core.Collections
+namespace OpenStack.Collections
 {
     using System.Collections.Generic;
     using ArgumentException = System.ArgumentException;
