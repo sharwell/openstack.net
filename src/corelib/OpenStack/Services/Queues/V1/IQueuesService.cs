@@ -5,20 +5,13 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Threading.Tasks;
-    using net.openstack.Core.Domain;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
     using OpenStack.ObjectModel.JsonHome;
+    using OpenStack.Security.Authentication;
     using CancellationToken = System.Threading.CancellationToken;
-    using CloudQueuesProvider = net.openstack.Providers.Rackspace.CloudQueuesProvider;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
     using WebException = System.Net.WebException;
-
-#if PORTABLE
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
-#else
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
-#endif
 
     /// <summary>
     /// Represents a provider for asynchronous operations on the OpenStack Marconi (Cloud Queues) Service.
@@ -36,9 +29,9 @@
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain a <see cref="HomeDocument"/> object describing the operations supported by the service.</returns>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
-        /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
+        /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
         /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
-        /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
+        /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="GetHomeAsync (await)" language="cs"/>
         /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="GetHomeAsync (await)" language="vbnet"/>
@@ -64,9 +57,9 @@
         /// </returns>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
-        /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
+        /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
         /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
-        /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
+        /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="GetNodeHealthAsync (await)" language="cs"/>
         /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="GetNodeHealthAsync (await)" language="vbnet"/>
@@ -93,9 +86,9 @@
         /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
-        /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
+        /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
         /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
-        /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
+        /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="CreateQueueAsync (await)" language="cs"/>
         /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="CreateQueueAsync (await)" language="vbnet"/>
@@ -120,9 +113,9 @@
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
-        /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
+        /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
         /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
-        /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
+        /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="ListQueuesAsync (await)" language="cs"/>
         /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="ListQueuesAsync (await)" language="vbnet"/>
@@ -145,9 +138,9 @@
         /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
-        /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
+        /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
         /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
-        /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
+        /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="QueueExistsAsync (await)" language="cs"/>
         /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="QueueExistsAsync (await)" language="vbnet"/>
@@ -173,9 +166,9 @@
         /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <example>
-        /// <para>The following example demonstrates the use of this method using the <see cref="CloudQueuesProvider"/>
+        /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
         /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
-        /// <see cref="CloudQueuesProvider.CloudQueuesProvider(CloudIdentity, string, Guid, bool, IIdentityProvider)"/>.</para>
+        /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
         /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="DeleteQueueAsync (await)" language="cs"/>
         /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="DeleteQueueAsync (await)" language="vbnet"/>
