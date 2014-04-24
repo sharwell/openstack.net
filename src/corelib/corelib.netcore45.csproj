@@ -158,6 +158,7 @@
     <Compile Include="OpenStack\ObjectModel\JsonHome\ResourceHints.cs" />
     <Compile Include="OpenStack\ObjectModel\JsonHome\ResourceObject.cs" />
     <Compile Include="OpenStack\ObjectModel\ResourceIdentifier`1.cs" />
+    <Compile Include="OpenStack\Security\Authentication\IAuthenticationService.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\Database.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\DatabaseConfiguration.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\DatabaseFlavor.cs" />
@@ -190,7 +191,9 @@
     <Compile Include="OpenStack\Services\Queues\V1\QueuedMessageListId.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueMessagesStatistics.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueName.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\QueuesClient.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueStatistics.cs" />
+    <Compile Include="OpenStack\Services\ServiceClient.cs" />
     <Compile Include="OpenStack\Threading\AsyncCompletionOption.cs" />
     <Compile Include="OpenStack\Threading\BackoffPolicy.cs" />
     <Compile Include="OpenStack\Threading\IBackoffPolicy.cs" />
