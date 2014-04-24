@@ -9,12 +9,15 @@ namespace net.openstack.Providers.Rackspace
     using System.Threading;
     using System.Threading.Tasks;
     using global::Rackspace.Threading;
-    using net.openstack.Core;
     using net.openstack.Core.Domain;
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using OpenStack.Collections;
     using OpenStack.Threading;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
+
+#if !NET40PLUS
+    using OpenStack.Compat;
+#endif
 
 #if PORTABLE
     using IPAddress = System.String;

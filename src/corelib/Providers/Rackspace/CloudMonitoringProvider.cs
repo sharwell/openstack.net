@@ -15,6 +15,10 @@
     using Newtonsoft.Json.Linq;
     using CancellationToken = System.Threading.CancellationToken;
 
+#if !NET40PLUS
+    using OpenStack.Compat;
+#endif
+
 #if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;

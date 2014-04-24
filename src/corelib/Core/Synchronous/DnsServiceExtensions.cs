@@ -10,6 +10,7 @@ namespace net.openstack.Core.Synchronous
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using Newtonsoft.Json;
     using OpenStack.Collections;
+    using OpenStack.Compat;
     using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using ServiceCatalog = net.openstack.Core.Domain.ServiceCatalog;

@@ -2,13 +2,10 @@
 {
     using System;
     using System.Linq;
+    using net.openstack.Core.Providers;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using net.openstack.Core.Providers;
-
-#if PORTABLE && !NET45PLUS
-    using net.openstack.Core.Compat;
-#endif
+    using OpenStack.Compat;
 
     /// <summary>
     /// Represents a message which is queued in the <see cref="IQueueingService"/>.
@@ -70,11 +67,7 @@
                 if (!href.IsAbsoluteUri)
                     href = new Uri(new Uri("http://example.com"), href);
 
-#if PORTABLE && !NET45PLUS
                 string[] segments = href.GetSegments();
-#else
-                string[] segments = href.Segments;
-#endif
                 if (segments.Length == 0)
                     return null;
 

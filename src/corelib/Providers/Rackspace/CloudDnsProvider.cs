@@ -11,7 +11,6 @@ namespace net.openstack.Providers.Rackspace
     using System.Threading.Tasks;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
-    using net.openstack.Core;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.Dns;
@@ -19,6 +18,10 @@ namespace net.openstack.Providers.Rackspace
     using OpenStack.Collections;
     using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
+
+#if !NET40PLUS
+    using OpenStack.Compat;
+#endif
 
 #if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;

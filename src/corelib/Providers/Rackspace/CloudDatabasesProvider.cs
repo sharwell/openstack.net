@@ -10,16 +10,19 @@ namespace net.openstack.Providers.Rackspace
     using System.Threading.Tasks;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
-    using net.openstack.Core;
     using net.openstack.Core.Domain;
-    using net.openstack.Core.Exceptions;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace.Objects.Databases;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
+    using OpenStack.Net;
     using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using FlavorId = net.openstack.Providers.Rackspace.Objects.Databases.FlavorId;
+
+#if !NET40PLUS
+    using OpenStack.Compat;
+#endif
 
 #if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;

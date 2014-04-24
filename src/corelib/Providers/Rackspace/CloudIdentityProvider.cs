@@ -17,8 +17,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using CancellationToken = System.Threading.CancellationToken;
 
-#if NET35
-using net.openstack.Core;
+#if !NET40PLUS
+using OpenStack.Compat;
 #endif
 
 #if !PORTABLE
