@@ -11,9 +11,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Providers.Rackspace;
-    using net.openstack.Providers.Rackspace.Objects.Databases;
     using global::OpenStack.Collections;
+    using global::OpenStack.Services.Databases.V1;
     using global::OpenStack.Threading;
+    using global::Rackspace.Services.Databases.V1;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
@@ -68,10 +69,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         [TestCategory(TestCategories.Cleanup)]
         public async Task CleanupTestDatabaseBackups()
         {
-            IDatabaseService provider = CreateProvider();
+            IDatabaseBackupExtension backupExtension = (IDatabaseBackupExtension)CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(600))))
             {
-                ReadOnlyCollection<Backup> backups = await provider.ListBackupsAsync(cancellationTokenSource.Token);
+                ReadOnlyCollection<Backup> backups = await backupExtension.ListBackupsAsync(cancellationTokenSource.Token);
                 List<Task> tasks = new List<Task>();
                 foreach (Backup backup in backups)
                 {
@@ -79,7 +80,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                         continue;
 
                     Console.WriteLine("Deleting database backup '{0}' ({1})...", backup.Name, backup.Id);
-                    tasks.Add(provider.RemoveBackupAsync(backup.Id, cancellationTokenSource.Token));
+                    tasks.Add(backupExtension.RemoveBackupAsync(backup.Id, cancellationTokenSource.Token));
                 }
 
                 if (tasks.Count > 0)
@@ -322,6 +323,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         public async Task TestCreateBackup()
         {
             IDatabaseService provider = CreateProvider();
+            IDatabaseBackupExtension backupExtension = (IDatabaseBackupExtension)provider;
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(600))))
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = await provider.ListFlavorsAsync(cancellationTokenSource.Token);
@@ -333,21 +335,21 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 DatabaseInstanceConfiguration configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
                 DatabaseInstance instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
-                ReadOnlyCollection<Backup> initialBackups = await provider.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
+                ReadOnlyCollection<Backup> initialBackups = await backupExtension.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
                 Assert.IsNotNull(initialBackups);
                 Assert.AreEqual(0, initialBackups.Count);
 
                 string backupName = CreateRandomBackupName();
                 string backupDescription = "My backup";
                 BackupConfiguration backupConfiguration = new BackupConfiguration(instance.Id, backupName, backupDescription);
-                Backup backup = await provider.CreateBackupAsync(backupConfiguration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
+                Backup backup = await backupExtension.CreateBackupAsync(backupConfiguration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.AreEqual(BackupStatus.Completed, backup.Status);
 
-                Backup backupCopy = await provider.GetBackupAsync(backup.Id, cancellationTokenSource.Token);
+                Backup backupCopy = await backupExtension.GetBackupAsync(backup.Id, cancellationTokenSource.Token);
                 Assert.AreEqual(backup.Id, backupCopy.Id);
 
-                ReadOnlyCollection<Backup> allBackups = await provider.ListBackupsAsync(cancellationTokenSource.Token);
-                ReadOnlyCollection<Backup> instanceBackups = await provider.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
+                ReadOnlyCollection<Backup> allBackups = await backupExtension.ListBackupsAsync(cancellationTokenSource.Token);
+                ReadOnlyCollection<Backup> instanceBackups = await backupExtension.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
                 Assert.IsTrue(allBackups.Count >= instanceBackups.Count);
                 Assert.AreEqual(1, instanceBackups.Count);
                 Assert.AreEqual(backupName, instanceBackups[0].Name);
@@ -358,14 +360,14 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 await provider.RemoveDatabaseInstanceAsync(instance.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
-                ReadOnlyCollection<Backup> instanceBackupsAfterRemove = await provider.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
+                ReadOnlyCollection<Backup> instanceBackupsAfterRemove = await backupExtension.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
                 Assert.AreEqual(instanceBackups.Count, instanceBackupsAfterRemove.Count);
 
-                configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName, new RestorePoint(backup.Id));
+                configuration = new RestoreDatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName, new RestorePoint(backup.Id));
                 instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.AreEqual(false, await provider.CheckRootEnabledStatusAsync(instance.Id, cancellationTokenSource.Token));
 
-                await provider.RemoveBackupAsync(backup.Id, cancellationTokenSource.Token);
+                await backupExtension.RemoveBackupAsync(backup.Id, cancellationTokenSource.Token);
 
                 /* Cleanup
                  */

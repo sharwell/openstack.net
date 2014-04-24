@@ -4,10 +4,10 @@ namespace net.openstack.Core.Synchronous
 {
     using System;
     using System.Collections.ObjectModel;
-    using net.openstack.Providers.Rackspace;
-    using net.openstack.Providers.Rackspace.Objects.Databases;
     using OpenStack.Collections;
+    using OpenStack.Services.Databases.V1;
     using OpenStack.Threading;
+    using Rackspace.Services.Databases.V1;
     using CancellationToken = System.Threading.CancellationToken;
     using WebException = System.Net.WebException;
 
@@ -836,7 +836,7 @@ namespace net.openstack.Core.Synchronous
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/POST_createBackup__version___accountId__backups_.html">Create Backup (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        public static Backup CreateBackup(this IDatabaseService service, BackupConfiguration configuration)
+        public static Backup CreateBackup(this IDatabaseBackupExtension service, BackupConfiguration configuration)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -865,7 +865,7 @@ namespace net.openstack.Core.Synchronous
         /// <exception cref="ArgumentNullException">If <paramref name="service"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/GET_getBackups__version___accountId__backups_.html">List Backups (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        public static ReadOnlyCollection<Backup> ListBackups(this IDatabaseService service)
+        public static ReadOnlyCollection<Backup> ListBackups(this IDatabaseBackupExtension service)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -896,7 +896,7 @@ namespace net.openstack.Core.Synchronous
         /// <exception cref="ArgumentNullException">If <paramref name="backupId"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/GET_getBackupById__version___accountId__backups__backupId__.html">List Backup by ID (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        public static Backup GetBackup(this IDatabaseService service, BackupId backupId)
+        public static Backup GetBackup(this IDatabaseBackupExtension service, BackupId backupId)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -924,7 +924,7 @@ namespace net.openstack.Core.Synchronous
         /// <exception cref="ArgumentNullException">If <paramref name="backupId"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/DELETE_deleteBackup__version___accountId__backups__backupId__.html">Delete Backup (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        public static void RemoveBackup(this IDatabaseService service, BackupId backupId)
+        public static void RemoveBackup(this IDatabaseBackupExtension service, BackupId backupId)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -956,7 +956,7 @@ namespace net.openstack.Core.Synchronous
         /// <exception cref="ArgumentNullException">If <paramref name="instanceId"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/GET_getBackups__version___accountId__backups_.html">List Backups (Rackspace Cloud Databases Developer Guide - API v1.0)</seealso>
-        public static ReadOnlyCollection<Backup> ListBackupsForInstance(this IDatabaseService service, DatabaseInstanceId instanceId)
+        public static ReadOnlyCollection<Backup> ListBackupsForInstance(this IDatabaseBackupExtension service, DatabaseInstanceId instanceId)
         {
             if (service == null)
                 throw new ArgumentNullException("service");

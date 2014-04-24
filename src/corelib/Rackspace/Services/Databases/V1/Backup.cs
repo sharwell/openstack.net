@@ -1,7 +1,8 @@
-﻿namespace net.openstack.Providers.Rackspace.Objects.Databases
+﻿namespace Rackspace.Services.Databases.V1
 {
     using System;
     using Newtonsoft.Json;
+    using OpenStack.Services.Databases.V1;
 
     /// <summary>
     /// This class models the JSON representation of a database instance backup in the <see cref="IDatabaseService"/>.

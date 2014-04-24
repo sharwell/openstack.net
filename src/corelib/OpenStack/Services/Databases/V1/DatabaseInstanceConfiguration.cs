@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Providers.Rackspace.Objects.Databases
+﻿namespace OpenStack.Services.Databases.V1
 {
     using System;
     using Newtonsoft.Json;
@@ -31,12 +31,6 @@
         private string _name;
 
         /// <summary>
-        /// This is the backing field for the <see cref="RestorePoint"/> property.
-        /// </summary>
-        [JsonProperty("restorePoint", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private RestorePoint _restorePoint;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseInstanceConfiguration"/> class
         /// during JSON deserialization.
         /// </summary>
@@ -59,25 +53,6 @@
         /// <para>If <paramref name="volumeConfiguration"/> is <see langword="null"/>.</para>
         /// </exception>
         public DatabaseInstanceConfiguration(FlavorRef flavorRef, DatabaseVolumeConfiguration volumeConfiguration, string name)
-            : this(flavorRef, volumeConfiguration, name, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DatabaseInstanceConfiguration"/> class
-        /// with a restore point for restoring a database instance from a backup.
-        /// </summary>
-        /// <param name="flavorRef">A <see cref="FlavorRef"/> object describing the flavor of the database instance.</param>
-        /// <param name="volumeConfiguration">A <see cref="DatabaseVolumeConfiguration"/> object containing additional information about
-        /// the database instance storage volume.</param>
-        /// <param name="name">The name of the database instance, or <see langword="null"/> if the database instance is not named.</param>
-        /// <param name="restorePoint">A <see cref="RestorePoint"/> object describing the backup from which this database instance was restored, or null if the restore point is not available.</param>
-        /// <exception cref="ArgumentNullException">
-        /// If <paramref name="flavorRef"/> is <see langword="null"/>.
-        /// <para>-or-</para>
-        /// <para>If <paramref name="volumeConfiguration"/> is <see langword="null"/>.</para>
-        /// </exception>
-        public DatabaseInstanceConfiguration(FlavorRef flavorRef, DatabaseVolumeConfiguration volumeConfiguration, string name, RestorePoint restorePoint)
         {
             if (flavorRef == null)
                 throw new ArgumentNullException("flavorRef");
@@ -87,7 +62,6 @@
             _flavorRef = flavorRef;
             _volume = volumeConfiguration;
             _name = name;
-            _restorePoint = restorePoint;
         }
 
         /// <summary>
@@ -121,17 +95,6 @@
             get
             {
                 return _name;
-            }
-        }
-
-        /// <summary>
-        /// Gets a <see cref="RestorePoint"/> object describing the backup from which this database instance was restored.
-        /// </summary>
-        public RestorePoint RestorePoint
-        {
-            get
-            {
-                return _restorePoint;
             }
         }
     }

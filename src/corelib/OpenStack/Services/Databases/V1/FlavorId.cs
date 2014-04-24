@@ -1,41 +1,41 @@
-﻿namespace net.openstack.Providers.Rackspace.Objects.Databases
+﻿namespace OpenStack.Services.Databases.V1
 {
     using System;
     using Newtonsoft.Json;
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the unique identifier of a database instance in the <see cref="IDatabaseService"/>.
+    /// Represents the unique identifier of a flavor in the <see cref="IDatabaseService"/>.
     /// </summary>
-    /// <seealso cref="DatabaseInstance.Id"/>
+    /// <seealso cref="DatabaseFlavor.Id"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    [JsonConverter(typeof(DatabaseInstanceId.Converter))]
-    public sealed class DatabaseInstanceId : ResourceIdentifier<DatabaseInstanceId>
+    [JsonConverter(typeof(FlavorId.Converter))]
+    public sealed class FlavorId : ResourceIdentifier<FlavorId>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DatabaseInstanceId"/> class
+        /// Initializes a new instance of the <see cref="FlavorId"/> class
         /// with the specified identifier value.
         /// </summary>
-        /// <param name="id">The database instance identifier value.</param>
+        /// <param name="id">The flavor identifier value.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="id"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="id"/> is empty.</exception>
-        public DatabaseInstanceId(string id)
+        public FlavorId(string id)
             : base(id)
         {
         }
 
         /// <summary>
-        /// Provides support for serializing and deserializing <see cref="DatabaseInstanceId"/>
+        /// Provides support for serializing and deserializing <see cref="FlavorId"/>
         /// objects to JSON string values.
         /// </summary>
         /// <threadsafety static="true" instance="false"/>
         private sealed class Converter : ConverterBase
         {
             /// <inheritdoc/>
-            protected override DatabaseInstanceId FromValue(string id)
+            protected override FlavorId FromValue(string id)
             {
-                return new DatabaseInstanceId(id);
+                return new FlavorId(id);
             }
         }
     }

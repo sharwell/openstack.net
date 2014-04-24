@@ -1,41 +1,41 @@
-﻿namespace net.openstack.Providers.Rackspace.Objects.Databases
+﻿namespace OpenStack.Services.Databases.V1
 {
     using System;
     using Newtonsoft.Json;
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the unique identifier of a backup in the <see cref="IDatabaseService"/>.
+    /// Represents the unique URI reference to a flavor in the <see cref="IDatabaseService"/>.
     /// </summary>
-    /// <seealso cref="Backup.Id"/>
+    /// <seealso cref="DatabaseFlavor.Href"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    [JsonConverter(typeof(BackupId.Converter))]
-    public sealed class BackupId : ResourceIdentifier<BackupId>
+    [JsonConverter(typeof(FlavorRef.Converter))]
+    public sealed class FlavorRef : ResourceIdentifier<FlavorRef>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BackupId"/> class
+        /// Initializes a new instance of the <see cref="FlavorRef"/> class
         /// with the specified identifier value.
         /// </summary>
-        /// <param name="id">The backup identifier value.</param>
+        /// <param name="id">The URI reference for the flavor.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="id"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="id"/> is empty.</exception>
-        public BackupId(string id)
+        public FlavorRef(string id)
             : base(id)
         {
         }
 
         /// <summary>
-        /// Provides support for serializing and deserializing <see cref="BackupId"/>
+        /// Provides support for serializing and deserializing <see cref="FlavorRef"/>
         /// objects to JSON string values.
         /// </summary>
         /// <threadsafety static="true" instance="false"/>
         private sealed class Converter : ConverterBase
         {
             /// <inheritdoc/>
-            protected override BackupId FromValue(string id)
+            protected override FlavorRef FromValue(string id)
             {
-                return new BackupId(id);
+                return new FlavorRef(id);
             }
         }
     }

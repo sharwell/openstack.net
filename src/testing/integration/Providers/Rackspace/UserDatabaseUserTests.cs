@@ -9,8 +9,8 @@
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Providers.Rackspace;
-    using net.openstack.Providers.Rackspace.Objects.Databases;
     using global::OpenStack.Net;
+    using global::OpenStack.Services.Databases.V1;
     using global::OpenStack.Threading;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
 

@@ -12,13 +12,14 @@ namespace net.openstack.Providers.Rackspace
     using global::Rackspace.Threading;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
-    using net.openstack.Providers.Rackspace.Objects.Databases;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
     using OpenStack.Net;
+    using OpenStack.Services.Databases.V1;
     using OpenStack.Threading;
+    using global::Rackspace.Services.Databases.V1;
     using CancellationToken = System.Threading.CancellationToken;
-    using FlavorId = net.openstack.Providers.Rackspace.Objects.Databases.FlavorId;
+    using FlavorId = OpenStack.Services.Databases.V1.FlavorId;
 
 #if !NET40PLUS
     using OpenStack.Compat;
@@ -42,7 +43,7 @@ namespace net.openstack.Providers.Rackspace
     /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/overview.html">Rackspace Cloud Databases Developer Guide - API v1.0</seealso>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    public class CloudDatabasesProvider : ProviderBase<IDatabaseService>, IDatabaseService
+    public class CloudDatabasesProvider : ProviderBase<IDatabaseService>, IDatabaseService, IDatabaseBackupExtension
     {
         /// <summary>
         /// This field caches the base URI used for accessing the Cloud Databases service.

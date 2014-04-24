@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Providers.Rackspace.Objects.Databases
+﻿namespace OpenStack.Services.Databases.V1
 {
     using System;
     using System.Net;
