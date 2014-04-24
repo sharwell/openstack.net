@@ -1,9 +1,9 @@
-﻿namespace net.openstack.Providers.Rackspace.Objects.Databases
+﻿namespace OpenStack.Services.Databases.V1
 {
     using System;
     using System.Collections.ObjectModel;
-    using net.openstack.Core.Domain;
     using Newtonsoft.Json;
+    using Link = net.openstack.Core.Domain.Link;
 
     /// <summary>
     /// This class models the JSON representation of a database instance within the <see cref="IDatabaseService"/>.
