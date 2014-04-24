@@ -33,7 +33,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace net.openstack.Core
+namespace OpenStack.Compat
 {
 	public partial class Tuple<T1, T2, T3, T4, T5, T6, T7, TRest>
 	{

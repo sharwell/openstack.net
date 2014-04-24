@@ -1,3 +1,5 @@
+#if NET35
+
 //
 // System.Func.cs
 //
@@ -27,9 +29,8 @@
 
 using System.Runtime.CompilerServices;
 
-namespace net.openstack.Core {
+namespace OpenStack.Compat {
 
-#if NET35
     /// <summary>
     /// Encapsulates a method that has six parameters and returns a value of the type specified by the <typeparamref name="TResult"/> parameter.
     /// </summary>
@@ -48,6 +49,7 @@ namespace net.openstack.Core {
     /// <param name="arg6">The sixth parameter of the method that this delegate encapsulates.</param>
     /// <returns>The return value of the method that this delegate encapsulates.</returns>
     public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
-#endif
 
 }
+
+#endif

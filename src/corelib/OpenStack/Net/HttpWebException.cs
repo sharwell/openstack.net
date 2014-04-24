@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Core.Exceptions
+﻿namespace OpenStack.Net
 {
     using System;
     using System.Net;

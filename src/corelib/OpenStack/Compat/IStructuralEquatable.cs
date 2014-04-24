@@ -31,7 +31,7 @@
 using System;
 using System.Collections;
 
-namespace net.openstack.Core
+namespace OpenStack.Compat
 {
 	/// <summary>
 	/// Defines methods to support the comparison of objects for structural equality.

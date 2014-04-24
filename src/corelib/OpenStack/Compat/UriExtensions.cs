@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Core.Compat
+﻿namespace OpenStack.Compat
 {
     using System;
     using System.Collections.Generic;
