@@ -142,13 +142,13 @@ namespace net.openstack.Providers.Rackspace
         /// This event is fired immediately before sending an asynchronous web request.
         /// </summary>
         /// <preliminary/>
-        public event EventHandler<WebRequestEventArgs> BeforeAsyncWebRequest;
+        public event EventHandler<HttpRequestEventArgs> BeforeAsyncWebRequest;
 
         /// <summary>
         /// This event is fired when the result of an asynchronous web request is received.
         /// </summary>
         /// <preliminary/>
-        public event EventHandler<WebResponseEventArgs> AfterAsyncWebResponse;
+        public event EventHandler<HttpResponseEventArgs> AfterAsyncWebResponse;
 
 #if !PORTABLE
         /// <summary>
@@ -1182,7 +1182,7 @@ namespace net.openstack.Providers.Rackspace
         {
             var handler = BeforeAsyncWebRequest;
             if (handler != null)
-                handler(this, new WebRequestEventArgs(request));
+                handler(this, new HttpRequestEventArgs(request));
         }
 
         /// <summary>
@@ -1198,7 +1198,7 @@ namespace net.openstack.Providers.Rackspace
 
             var handler = AfterAsyncWebResponse;
             if (handler != null)
-                handler(this, new WebResponseEventArgs(response));
+                handler(this, new HttpResponseEventArgs(response));
         }
 
         /// <summary>

@@ -155,6 +155,8 @@
     <Compile Include="OpenStack\Compat\Tuples.cs" />
     <Compile Include="OpenStack\Compat\UriExtensions.cs" />
     <Compile Include="OpenStack\Net\HttpApiCall`1.cs" />
+    <Compile Include="OpenStack\Net\HttpRequestEventArgs.cs" />
+    <Compile Include="OpenStack\Net\HttpResponseEventArgs.cs" />
     <Compile Include="OpenStack\Net\HttpWebException.cs" />
     <Compile Include="OpenStack\Net\UriPart.cs" />
     <Compile Include="OpenStack\Net\UriUtility.cs" />
@@ -638,8 +640,6 @@
     <Compile Include="Providers\Rackspace\Objects\Response\UserImpersonationResponse.cs" />
     <Compile Include="Providers\Rackspace\Validators\HttpResponseCodeValidator.cs" />
     <Compile Include="Providers\Rackspace\Validators\NamespaceDoc.cs" />
-    <Compile Include="Providers\Rackspace\WebRequestEventArgs.cs" />
-    <Compile Include="Providers\Rackspace\WebResponseEventArgs.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\Backup.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\BackupConfiguration.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\BackupId.cs" />
