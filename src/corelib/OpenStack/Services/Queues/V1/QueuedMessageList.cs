@@ -1,10 +1,9 @@
-﻿namespace net.openstack.Core.Domain.Queues
+﻿namespace OpenStack.Services.Queues.V1
 {
     using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-    using net.openstack.Core.Providers;
     using OpenStack.Collections;
 
     /// <summary>

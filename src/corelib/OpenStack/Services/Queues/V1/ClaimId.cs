@@ -1,42 +1,41 @@
-﻿namespace net.openstack.Core.Domain.Queues
+﻿namespace OpenStack.Services.Queues.V1
 {
     using System;
-    using net.openstack.Core.Providers;
     using Newtonsoft.Json;
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the name of a queue in the <see cref="IQueueingService"/>.
+    /// Represents the unique identifier of a claim in the <see cref="IQueueingService"/>.
     /// </summary>
-    /// <seealso cref="CloudQueue.Name"/>
+    /// <seealso cref="Claim.Id"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    [JsonConverter(typeof(QueueName.Converter))]
-    public sealed class QueueName : ResourceIdentifier<QueueName>
+    [JsonConverter(typeof(ClaimId.Converter))]
+    public sealed class ClaimId : ResourceIdentifier<ClaimId>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="QueueName"/> class
+        /// Initializes a new instance of the <see cref="ClaimId"/> class
         /// with the specified identifier value.
         /// </summary>
-        /// <param name="id">The queue name.</param>
+        /// <param name="id">The claim identifier value.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="id"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="id"/> is empty.</exception>
-        public QueueName(string id)
+        public ClaimId(string id)
             : base(id)
         {
         }
 
         /// <summary>
-        /// Provides support for serializing and deserializing <see cref="QueueName"/>
+        /// Provides support for serializing and deserializing <see cref="ClaimId"/>
         /// objects to JSON string values.
         /// </summary>
         /// <threadsafety static="true" instance="false"/>
         private sealed class Converter : ConverterBase
         {
             /// <inheritdoc/>
-            protected override QueueName FromValue(string id)
+            protected override ClaimId FromValue(string id)
             {
-                return new QueueName(id);
+                return new ClaimId(id);
             }
         }
     }

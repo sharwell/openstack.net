@@ -1,4 +1,4 @@
-﻿namespace net.openstack.Core.Providers
+﻿namespace OpenStack.Services.Queues.V1
 {
     using System;
     using System.Collections.Generic;
@@ -6,13 +6,18 @@
     using System.ComponentModel;
     using System.Threading.Tasks;
     using net.openstack.Core.Domain;
-    using net.openstack.Core.Domain.Queues;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
     using CloudQueuesProvider = net.openstack.Providers.Rackspace.CloudQueuesProvider;
     using JsonSerializationException = Newtonsoft.Json.JsonSerializationException;
     using WebException = System.Net.WebException;
+
+#if PORTABLE
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
+#else
+    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
+#endif
 
     /// <summary>
     /// Represents a provider for asynchronous operations on the OpenStack Marconi (Cloud Queues) Service.

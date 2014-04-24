@@ -1,11 +1,10 @@
-﻿namespace net.openstack.Core.Domain.Queues
+﻿namespace OpenStack.Services.Queues.V1
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading.Tasks;
-    using net.openstack.Core.Providers;
     using Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
 
