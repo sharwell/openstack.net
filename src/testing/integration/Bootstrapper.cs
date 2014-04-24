@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
+using JSIStudios.SimpleRESTServices.Client;
+using JSIStudios.SimpleRESTServices.Client.Json;
 using net.openstack.Core.Domain;
 using net.openstack.Core.Providers;
 using net.openstack.Providers.Rackspace;
@@ -75,7 +79,8 @@ namespace Net.OpenStack.Testing.Integration
 
         public static IObjectStorageProvider CreateObjectStorageProvider()
         {
-            return new CloudFilesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null, null);
+            IRestService restService = new ExtendedJsonRestServices();
+            return new ExtendedCloudFilesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null, restService);
         }
     }
 
@@ -119,6 +124,68 @@ namespace Net.OpenStack.Testing.Integration
             this.Username = cloudIdentity.Username;
             this.TenantId = cloudIdentity.TenantId;
             this.Domain = string.IsNullOrEmpty(cloudIdentity.Domain) ? null : new Domain(cloudIdentity.Domain);
+        }
+    }
+
+    public class ExtendedJsonRestServices : JsonRestServices
+    {
+        public override Response Stream(Uri url, HttpMethod method, Func<HttpWebResponse, bool, Response> responseBuilderCallback, Stream content, int bufferSize, long maxReadLength, Dictionary<string, string> headers, Dictionary<string, string> queryStringParameters, RequestSettings settings, Action<long> progressUpdated)
+        {
+            if (url == null)
+                throw new ArgumentNullException("url");
+            if (content == null)
+                throw new ArgumentNullException("content");
+            if (bufferSize <= 0)
+                throw new ArgumentOutOfRangeException("bufferSize");
+            if (maxReadLength < 0)
+                throw new ArgumentOutOfRangeException("maxReadLength");
+
+            return ExecuteRequest(url, method, responseBuilderCallback, headers, queryStringParameters, settings, (req) =>
+            {
+                long bytesWritten = 0;
+
+                if (settings.ChunkRequest || maxReadLength > 0)
+                {
+                    req.SendChunked = settings.ChunkRequest;
+                    req.AllowWriteStreamBuffering = false;
+                    req.ContentLength = maxReadLength > 0 && content.Length > maxReadLength ? maxReadLength : content.Length;
+                }
+
+                using (Stream stream = req.GetRequestStream())
+                {
+                    var buffer = new byte[bufferSize];
+                    int count;
+                    while (!req.HaveResponse && (count = content.Read(buffer, 0, maxReadLength > 0 ? (int)Math.Min(bufferSize, maxReadLength - bytesWritten) : bufferSize)) > 0)
+                    {
+                        bytesWritten += count;
+                        stream.Write(buffer, 0, count);
+
+                        if (progressUpdated != null)
+                            progressUpdated(bytesWritten);
+
+                        if (maxReadLength > 0 && bytesWritten >= maxReadLength)
+                            break;
+                    }
+                }
+
+                return "[STREAM CONTENT]";
+            });
+        }
+    }
+
+    public class ExtendedCloudFilesProvider : CloudFilesProvider
+    {
+        public ExtendedCloudFilesProvider(CloudIdentity defaultIdentity, string defaultRegion, IIdentityProvider identityProvider, IRestService restService)
+            : base(defaultIdentity, defaultRegion, identityProvider, restService)
+        {
+        }
+
+        protected override RequestSettings BuildDefaultRequestSettings(IEnumerable<HttpStatusCode> non200SuccessCodes = null)
+        {
+            RequestSettings result = base.BuildDefaultRequestSettings(non200SuccessCodes);
+            // Do not implicitly retry the operation if a failure occurs.
+            result.RetryCount = 0;
+            return result;
         }
     }
 }
