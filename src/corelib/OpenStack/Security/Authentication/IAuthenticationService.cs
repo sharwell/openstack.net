@@ -1,4 +1,4 @@
-﻿namespace OpenStack.Authentication
+﻿namespace OpenStack.Security.Authentication
 {
     using System;
     using System.Net.Http;
