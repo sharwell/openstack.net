@@ -9,7 +9,8 @@
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>net.openstack</RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <AssemblyName>openstacknet</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <BaseIntermediateOutputPath>obj\netcore45\</BaseIntermediateOutputPath>
