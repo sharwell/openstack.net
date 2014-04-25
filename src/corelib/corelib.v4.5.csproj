@@ -8,7 +8,8 @@
     <ProjectGuid>{C9AAE5D1-6A4B-4E97-8A7F-012D835B60BB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>net.openstack</RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <AssemblyName>openstacknet</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
