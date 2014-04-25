@@ -170,6 +170,7 @@
     <Compile Include="OpenStack\ObjectModel\JsonHome\ResourceObject.cs" />
     <Compile Include="OpenStack\ObjectModel\ResourceIdentifier`1.cs" />
     <Compile Include="OpenStack\Security\Authentication\IAuthenticationService.cs" />
+    <Compile Include="OpenStack\Security\Authentication\IdentityV2AuthenticationClient.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\Database.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\DatabaseConfiguration.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\DatabaseFlavor.cs" />
@@ -188,6 +189,23 @@
     <Compile Include="OpenStack\Services\Databases\V1\UpdateUserConfiguration.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\UserConfiguration.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\UserName.cs" />
+    <Compile Include="OpenStack\Services\Identity\ProjectId.cs" />
+    <Compile Include="OpenStack\Services\Identity\TokenId.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\AdminEndpoint.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\AuthenticationRequest.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\Endpoint.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\EndpointId.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\ExtensionData.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\IdentityClient.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\IdentityToken.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\IIdentityService.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\Role.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\RoleId.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\ServiceCatalogEntry.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\Tenant.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\UserAccess.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\UserDetails.cs" />
+    <Compile Include="OpenStack\Services\Identity\V2\UserId.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Claim.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\ClaimId.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\CloudQueue.cs" />
@@ -643,6 +661,7 @@
     <Compile Include="Providers\Rackspace\Objects\Response\UserImpersonationResponse.cs" />
     <Compile Include="Providers\Rackspace\Validators\HttpResponseCodeValidator.cs" />
     <Compile Include="Providers\Rackspace\Validators\NamespaceDoc.cs" />
+    <Compile Include="Rackspace\Security\Authentication\RackspaceAuthenticationClient.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\Backup.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\BackupConfiguration.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\BackupId.cs" />
@@ -650,6 +669,7 @@
     <Compile Include="Rackspace\Services\Databases\V1\DatabaseBackupExtension.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\IDatabaseBackupExtension.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\RestorePoint.cs" />
+    <Compile Include="Rackspace\Services\Identity\V2\DefaultRegionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\keys\openstacknetsdk.snk">
