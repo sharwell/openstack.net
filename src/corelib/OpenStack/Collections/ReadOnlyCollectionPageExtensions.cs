@@ -51,7 +51,7 @@
             if (page == null)
                 throw new ArgumentNullException("page");
 
-            List<T> result = new List<T>(page);
+            List<T> result = new List<T>();
             ReadOnlyCollectionPage<T> currentPage = page;
             Func<bool> condition = () => currentPage != null;
             Func<Task> body =
