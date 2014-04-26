@@ -11,7 +11,7 @@
 #endif
 
     /// <summary>
-    /// This class represents a call to a HTTP API. It provides clients the opportunity to inspect
+    /// This class represents a call to an HTTP API. It provides clients the opportunity to inspect
     /// and/or modify the <see cref="RequestMessage"/> prior to sending the request, without losing
     /// the ability to obtain a strongly-typed result from <see cref="SendAsync"/>.
     /// </summary>
@@ -21,9 +21,19 @@
     public abstract class HttpApiCall<T> : IDisposable
     {
         /// <summary>
+        /// This is the backing field for the <see cref="HttpClient"/> property.
+        /// </summary>
+        private HttpClient _httpClient;
+
+        /// <summary>
         /// This is the backing field for the <see cref="RequestMessage"/> property.
         /// </summary>
         private readonly HttpRequestMessage _requestMessage;
+
+        /// <summary>
+        /// This is the backing field for the <see cref="CompletionOption"/> property.
+        /// </summary>
+        private HttpCompletionOption _completionOption;
 
         /// <summary>
         /// This value controls whether or not <see cref="IDisposable.Dispose"/> is call on the
@@ -37,8 +47,8 @@
         /// </summary>
         /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP API request.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
-        public HttpApiCall(HttpRequestMessage requestMessage)
-            : this(requestMessage, true)
+        public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
+            : this(httpClient, requestMessage, completionOption, true)
         {
         }
 
@@ -49,13 +59,36 @@
         /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP API request.</param>
         /// <param name="disposeMessage"><see langword="true"/> to call <see cref="IDisposable.Dispose"/> on the <paramref name="requestMessage"/> object when this object is disposed; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
-        public HttpApiCall(HttpRequestMessage requestMessage, bool disposeMessage)
+        public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, bool disposeMessage)
         {
+            if (httpClient == null)
+                throw new ArgumentNullException("httpClient");
             if (requestMessage == null)
                 throw new ArgumentNullException("requestMessage");
 
+            _httpClient = httpClient;
             _requestMessage = requestMessage;
             _disposeMessage = disposeMessage;
+            _completionOption = completionOption;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="HttpClient"/> to use for sending the request.
+        /// </summary>
+        public HttpClient HttpClient
+        {
+            get
+            {
+                return _httpClient;
+            }
+
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
+                _httpClient = value;
+            }
         }
 
         /// <summary>
@@ -70,9 +103,26 @@
         }
 
         /// <summary>
+        /// Gets or sets the <see cref="HttpCompletionOption"/> to use for the HTTP request.
+        /// </summary>
+        public HttpCompletionOption CompletionOption
+        {
+            get
+            {
+                return _completionOption;
+            }
+
+            set
+            {
+                _completionOption = value;
+            }
+        }
+
+        /// <summary>
         /// Asynchronously send the HTTP API request, and return the result as a strongly-typed
         /// deserialized value.
         /// </summary>
+        /// <param name="httpClient">The <see cref="HttpClient"/> to use for sending the request.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> the task will observe.</param>
         /// <returns>
         /// A <see cref="Task"/> instance representing the asynchronous operation. When the task

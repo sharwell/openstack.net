@@ -14,6 +14,7 @@
     using Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
     using Encoding = System.Text.Encoding;
+    using Stream = System.IO.Stream;
 
 #if !NET40PLUS
     using OpenStack.Compat;
@@ -566,6 +567,39 @@
         protected virtual Task<T> ParseJsonResultImplAsync<T>(Task<Tuple<HttpResponseMessage, string>> task, CancellationToken cancellationToken)
         {
             return CompletedTask.FromResult(JsonConvert.DeserializeObject<T>(task.Result.Item2));
+        }
+
+        /// <summary>
+        /// This method creates an instance of <see cref="HttpApiCall{T}"/> representing a call
+        /// to an HTTP API that returns a JSON response. The response body is deserialized to an
+        /// instance of <typeparamref name="T"/> using <see cref="JsonConvert"/>.
+        /// </summary>
+        /// <typeparam name="T">The type modeling the JSON body of the response.</typeparam>
+        /// <param name="requestMessage">The request message.</param>
+        /// <returns>
+        /// An instance of <see cref="HttpApiCall{T}"/> representing an HTTP API call that
+        /// returns a JSON body.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
+        protected virtual HttpApiCall<T> CreateJsonApiCall<T>(HttpRequestMessage requestMessage)
+        {
+            return new JsonHttpApiCall<T>(HttpClient, requestMessage, HttpCompletionOption.ResponseContentRead);
+        }
+
+        /// <summary>
+        /// This method creates an instance of <see cref="HttpApiCall{T}"/> representing a call
+        /// to an HTTP API that returns streaming content. An instance of <see cref="Stream"/>
+        /// is provided for reading the content.
+        /// </summary>
+        /// <param name="requestMessage">The request message.</param>
+        /// <returns>
+        /// An instance of <see cref="HttpApiCall{T}"/> representing an HTTP API call that
+        /// returns a <see cref="Stream"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
+        protected virtual HttpApiCall<Stream> CreateStreamingApiCall<T>(HttpRequestMessage requestMessage)
+        {
+            return new StreamingHttpApiCall(HttpClient, requestMessage);
         }
     }
 }
