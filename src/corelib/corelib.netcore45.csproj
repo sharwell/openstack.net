@@ -193,6 +193,16 @@
     <Compile Include="OpenStack\Services\Identity\V2\UserAccess.cs" />
     <Compile Include="OpenStack\Services\Identity\V2\UserDetails.cs" />
     <Compile Include="OpenStack\Services\Identity\V2\UserId.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\AccountMetadata.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\Container.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerMetadata.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerName.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\IObjectStorageService.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ObjectMetadata.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ObjectName.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ObjectStorageClient.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ObjectStorageServiceExtensions.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\StorageMetadata.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Claim.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\ClaimId.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\CloudQueue.cs" />
