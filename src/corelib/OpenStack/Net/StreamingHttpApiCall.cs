@@ -18,15 +18,19 @@
         {
         }
 
-        public StreamingHttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, bool disposeMessage)
-            : base(httpClient, requestMessage, HttpCompletionOption.ResponseHeadersRead, disposeMessage)
+        public StreamingHttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate)
+            : base(httpClient, requestMessage, HttpCompletionOption.ResponseHeadersRead, validate)
         {
         }
 
-        public override Task<Tuple<HttpResponseMessage, Stream>> SendAsync(CancellationToken cancellationToken)
+        public StreamingHttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate, bool disposeMessage)
+            : base(httpClient, requestMessage, HttpCompletionOption.ResponseHeadersRead, validate, disposeMessage)
         {
-            return HttpClient.SendAsync(RequestMessage, CompletionOption, cancellationToken)
-                .Then(task => task.Result.Content.ReadAsStreamAsync().Select(innerTask => Tuple.Create(task.Result, innerTask.Result)));
+        }
+
+        protected override Task<Stream> DeserializeResultImplAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+        {
+            return response.Content.ReadAsStreamAsync();
         }
     }
 }

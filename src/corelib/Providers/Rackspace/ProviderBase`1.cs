@@ -1191,7 +1191,7 @@ namespace net.openstack.Providers.Rackspace
         /// <param name="response">The web response.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
         /// <preliminary/>
-        protected virtual void OnAfterAsyncWebResponse(HttpResponseMessage response)
+        protected virtual void OnAfterAsyncWebResponse(Task<HttpResponseMessage> response)
         {
             if (response == null)
                 throw new ArgumentNullException("response");
@@ -1309,7 +1309,7 @@ namespace net.openstack.Providers.Rackspace
                 throw new ArgumentNullException("task");
 
             HttpResponseMessage response = task.Result;
-            OnAfterAsyncWebResponse(response);
+            OnAfterAsyncWebResponse(task);
             return ValidateResultImplAsync(task, cancellationToken)
                 .Then(task2 => task2.Result.Content.ReadAsStringAsync())
                 .Select(t => Tuple.Create(response, t.Result));

@@ -176,6 +176,7 @@
     <Compile Include="OpenStack\Compat\Tuple.cs" />
     <Compile Include="OpenStack\Compat\Tuples.cs" />
     <Compile Include="OpenStack\Compat\UriExtensions.cs" />
+    <Compile Include="OpenStack\Net\CustomHttpApiCall`1.cs" />
     <Compile Include="OpenStack\Net\HttpApiCall.cs" />
     <Compile Include="OpenStack\Net\HttpApiCall`1.cs" />
     <Compile Include="OpenStack\Net\HttpRequestEventArgs.cs" />
@@ -235,6 +236,7 @@
     <Compile Include="OpenStack\Services\ObjectStorage\V1\Container.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerMetadata.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerName.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerObject.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\IObjectStorageService.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ObjectMetadata.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ObjectName.cs" />

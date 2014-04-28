@@ -53,6 +53,9 @@
                         headers.Add(header.Key, string.Join(", ", header.Value.ToArray()));
                 }
             }
+
+            _headers = headers;
+            _metadata = metadata;
         }
 
         protected StorageMetadata(IDictionary<string, string> headers, IDictionary<string, string> metadata)

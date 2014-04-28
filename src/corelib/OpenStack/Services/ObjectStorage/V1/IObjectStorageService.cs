@@ -43,7 +43,7 @@
 
         Task<HttpApiCall> PrepareRemoveContainerAsync(ContainerName container, CancellationToken cancellationToken);
 
-        Task<HttpApiCall<Tuple<ContainerMetadata, ReadOnlyCollectionPage<Object>>>> PrepareListObjectsAsync(ContainerName container, CancellationToken cancellationToken);
+        Task<HttpApiCall<Tuple<ContainerMetadata, ReadOnlyCollectionPage<ContainerObject>>>> PrepareListObjectsAsync(ContainerName container, int? pageSize, CancellationToken cancellationToken);
 
         Task<HttpApiCall<ContainerMetadata>> PrepareGetContainerMetadataAsync(ContainerName container, CancellationToken cancellationToken);
 

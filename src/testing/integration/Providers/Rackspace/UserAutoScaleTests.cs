@@ -1089,26 +1089,13 @@
         /// <returns>An instance of <see cref="IAutoScaleService"/> for integration testing.</returns>
         internal static IAutoScaleService CreateProvider()
         {
-            var provider = new TestCloudAutoScaleProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
+            var provider = new CloudAutoScaleProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
 #if !PORTABLE
             provider.ConnectionLimit = 20;
 #endif
             return provider;
-        }
-
-        internal class TestCloudAutoScaleProvider : CloudAutoScaleProvider
-        {
-            public TestCloudAutoScaleProvider(CloudIdentity defaultIdentity, string defaultRegion, IIdentityProvider identityProvider)
-                : base(defaultIdentity, defaultRegion, identityProvider)
-            {
-            }
-
-            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
-            {
-                return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
-            }
         }
     }
 }

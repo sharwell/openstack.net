@@ -432,23 +432,10 @@
 
         internal static IDatabaseService CreateProvider()
         {
-            CloudDatabasesProvider provider = new TestCloudDatabasesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
+            CloudDatabasesProvider provider = new CloudDatabasesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
             return provider;
-        }
-
-        protected class TestCloudDatabasesProvider : CloudDatabasesProvider
-        {
-            public TestCloudDatabasesProvider(CloudIdentity defaultIdentity, string defaultRegion, IIdentityProvider identityProvider)
-                : base(defaultIdentity, defaultRegion, identityProvider)
-            {
-            }
-
-            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
-            {
-                return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
-            }
         }
     }
 }
