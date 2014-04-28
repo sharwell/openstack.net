@@ -29,20 +29,50 @@
                     Console.Error.WriteLine(string.Format("{0}: {1}", header.Key, string.Join(", ", header.Value)));
                 }
 
-                Console.Error.WriteLine("<== " + Encoding.UTF8.GetString(request.Content.ReadAsByteArrayAsync().Result));
+                if (request.Content is StreamContent)
+                {
+                    Console.Error.WriteLine("<== [STREAM CONTENT]");
+                }
+                else
+                {
+                    Console.Error.WriteLine("<== " + Encoding.UTF8.GetString(request.Content.ReadAsByteArrayAsync().Result));
+                }
             }
         }
 
         public static void HandleAfterAsyncWebRequest(object sender, HttpResponseEventArgs e)
         {
-            Console.Error.WriteLine("{0} (Result {1})", DateTime.Now, e.Response.StatusCode);
-        }
+            if (e.Response.Status == TaskStatus.RanToCompletion)
+            {
+                Console.Error.WriteLine("{0} (Result {1})", DateTime.Now, e.Response.Result.StatusCode);
 
-        public static Task<Tuple<HttpResponseMessage, string>> ReadResult(Task<HttpResponseMessage> task, CancellationToken cancellationToken, Func<Task<HttpResponseMessage>, CancellationToken, Task<Tuple<HttpResponseMessage, string>>> readResultImpl, bool reformat = true)
-        {
-            Task<Tuple<HttpResponseMessage, string>> result = readResultImpl(task, cancellationToken);
-            LogResult(result.Result.Item1, result.Result.Item2, reformat);
-            return result;
+                if (e.Response.Result.Content != null && e.Response.Result.Content.Headers.ContentType != null)
+                {
+                    switch (e.Response.Result.Content.Headers.ContentType.MediaType)
+                    {
+                    case "application/json":
+                        LogResult(e.Response.Result, e.Response.Result.Content.ReadAsStringAsync().Result, true);
+                        break;
+
+                    case "text/plain":
+                    case "text/html":
+                        LogResult(e.Response.Result, e.Response.Result.Content.ReadAsStringAsync().Result, false);
+                        break;
+
+                    default:
+                        LogResult(e.Response.Result, "[STREAMING CONTENT]", false);
+                        break;
+                    }
+                }
+                else
+                {
+                    LogResult(e.Response.Result, "[STREAMING CONTENT]", false);
+                }
+            }
+            else
+            {
+                Console.Error.WriteLine("{0} (Result {1})", DateTime.Now, e.Response.Status);
+            }
         }
 
         private static void LogResult(HttpResponseMessage response, string rawBody, bool reformat)

@@ -69,7 +69,7 @@
         /// <param name="restService">The implementation of <see cref="IRestService"/> to use for executing synchronous REST requests. If this value is <see langword="null"/>, the provider will use a new instance of <see cref="JsonRestServices"/>.</param>
         /// <param name="httpStatusCodeValidator">The HTTP status code validator to use for synchronous REST requests. If this value is <see langword="null"/>, the provider will use <see cref="HttpResponseCodeValidator.Default"/>.</param>
         /// <exception cref="ArgumentException">If both <paramref name="defaultIdentity"/> and <paramref name="identityProvider"/> are <see langword="null"/>.</exception>
-        protected QueuesClient(IAuthenticationService authenticationService, string defaultRegion, Guid clientId, bool internalUrl)
+        public QueuesClient(IAuthenticationService authenticationService, string defaultRegion, Guid clientId, bool internalUrl)
             : base(authenticationService, defaultRegion)
         {
             _clientId = clientId;

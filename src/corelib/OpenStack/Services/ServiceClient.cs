@@ -390,7 +390,7 @@
         /// <param name="response">The web response.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
         /// <preliminary/>
-        protected virtual void OnAfterAsyncWebResponse(HttpResponseMessage response)
+        protected virtual void OnAfterAsyncWebResponse(Task<HttpResponseMessage> response)
         {
             if (response == null)
                 throw new ArgumentNullException("response");
@@ -508,10 +508,10 @@
                 throw new ArgumentNullException("task");
 
             HttpResponseMessage response = task.Result;
-            OnAfterAsyncWebResponse(response);
+            OnAfterAsyncWebResponse(task);
             return ValidateResultImplAsync(task, cancellationToken)
-                .Then(task2 => task2.Result.Content.ReadAsStringAsync())
-                .Select(t => Tuple.Create(response, t.Result));
+                .Then(innerTask => innerTask.Result.Content.ReadAsStringAsync())
+                .Select(innerTask => Tuple.Create(response, innerTask.Result));
         }
 
         /// <summary>
@@ -583,7 +583,10 @@
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
         protected virtual HttpApiCall<T> CreateJsonApiCall<T>(HttpRequestMessage requestMessage)
         {
-            return new JsonHttpApiCall<T>(HttpClient, requestMessage, HttpCompletionOption.ResponseContentRead);
+            var result = new JsonHttpApiCall<T>(HttpClient, requestMessage, HttpCompletionOption.ResponseContentRead, ValidateResultImplAsync);
+            result.BeforeAsyncWebRequest += (sender, e) => OnBeforeAsyncWebRequest(e.Request);
+            result.AfterAsyncWebResponse += (sender, e) => OnAfterAsyncWebResponse(e.Response);
+            return result;
         }
 
         /// <summary>
@@ -597,9 +600,33 @@
         /// returns a <see cref="Stream"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
-        protected virtual HttpApiCall<Stream> CreateStreamingApiCall<T>(HttpRequestMessage requestMessage)
+        protected virtual HttpApiCall<Stream> CreateStreamingApiCall(HttpRequestMessage requestMessage)
         {
-            return new StreamingHttpApiCall(HttpClient, requestMessage);
+            var result = new StreamingHttpApiCall(HttpClient, requestMessage, ValidateResultImplAsync);
+            result.BeforeAsyncWebRequest += (sender, e) => OnBeforeAsyncWebRequest(e.Request);
+            result.AfterAsyncWebResponse += (sender, e) => OnAfterAsyncWebResponse(e.Response);
+            return result;
+        }
+
+        protected virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage)
+        {
+            return CreateBasicApiCall(requestMessage, HttpCompletionOption.ResponseContentRead);
+        }
+
+        protected virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
+        {
+            var result = new HttpApiCall(HttpClient, requestMessage, completionOption, ValidateResultImplAsync);
+            result.BeforeAsyncWebRequest += (sender, e) => OnBeforeAsyncWebRequest(e.Request);
+            result.AfterAsyncWebResponse += (sender, e) => OnAfterAsyncWebResponse(e.Response);
+            return result;
+        }
+
+        protected virtual HttpApiCall<T> CreateCustomApiCall<T>(HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<HttpResponseMessage, CancellationToken, Task<T>> deserializeResult)
+        {
+            var result = new CustomHttpApiCall<T>(HttpClient, requestMessage, completionOption, ValidateResultImplAsync, deserializeResult);
+            result.BeforeAsyncWebRequest += (sender, e) => OnBeforeAsyncWebRequest(e.Request);
+            result.AfterAsyncWebResponse += (sender, e) => OnAfterAsyncWebResponse(e.Response);
+            return result;
         }
     }
 }

@@ -85,7 +85,9 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\OpenStack\VanillaUserQueuesTests.cs" />
+    <Compile Include="Providers\OpenStack\ObjectStorageTests.cs" />
+    <Compile Include="Providers\OpenStack\QueuesTests.cs" />
+    <Compile Include="Providers\OpenStack\TestCategories.cs" />
     <Compile Include="Providers\Rackspace\CloudNetworksTests.cs" />
     <Compile Include="Providers\Rackspace\CloudServersTests.cs" />
     <Compile Include="Providers\Rackspace\CloudBlockStorageTests.cs" />

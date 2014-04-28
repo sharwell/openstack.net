@@ -821,23 +821,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
         internal static IDnsService CreateProvider()
         {
-            CloudDnsProvider provider = new TestCloudDnsProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, false, null);
+            CloudDnsProvider provider = new CloudDnsProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, false, null);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
             return provider;
-        }
-
-        private class TestCloudDnsProvider : CloudDnsProvider
-        {
-            public TestCloudDnsProvider(CloudIdentity defaultIdentity, string defaultRegion, bool internalUrl, IIdentityProvider identityProvider)
-                : base(defaultIdentity, defaultRegion, internalUrl, identityProvider)
-            {
-            }
-
-            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
-            {
-                return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
-            }
         }
     }
 }

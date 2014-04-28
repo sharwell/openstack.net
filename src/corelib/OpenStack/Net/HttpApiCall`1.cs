@@ -5,6 +5,7 @@
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
+    using Rackspace.Threading;
 
 #if NET35
     using OpenStack.Compat;
@@ -20,6 +21,9 @@
     /// <preliminary/>
     public abstract class HttpApiCall<T> : IDisposable
     {
+        private static readonly Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> DefaultResponseValidator =
+            (task, cancellationToken) => task;
+
         /// <summary>
         /// This is the backing field for the <see cref="HttpClient"/> property.
         /// </summary>
@@ -41,6 +45,20 @@
         /// </summary>
         private readonly bool _disposeMessage;
 
+        private readonly Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> _validate;
+
+        /// <summary>
+        /// This event is fired immediately before sending an asynchronous web request.
+        /// </summary>
+        /// <preliminary/>
+        public event EventHandler<HttpRequestEventArgs> BeforeAsyncWebRequest;
+
+        /// <summary>
+        /// This event is fired when the result of an asynchronous web request is received.
+        /// </summary>
+        /// <preliminary/>
+        public event EventHandler<HttpResponseEventArgs> AfterAsyncWebResponse;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpApiCall{T}"/> class
         /// with the specified request message.
@@ -48,7 +66,12 @@
         /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP API request.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
         public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
-            : this(httpClient, requestMessage, completionOption, true)
+            : this(httpClient, requestMessage, completionOption, null, true)
+        {
+        }
+
+        public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate)
+            : this(httpClient, requestMessage, completionOption, validate, true)
         {
         }
 
@@ -59,7 +82,7 @@
         /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP API request.</param>
         /// <param name="disposeMessage"><see langword="true"/> to call <see cref="IDisposable.Dispose"/> on the <paramref name="requestMessage"/> object when this object is disposed; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
-        public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, bool disposeMessage)
+        public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate, bool disposeMessage)
         {
             if (httpClient == null)
                 throw new ArgumentNullException("httpClient");
@@ -70,6 +93,7 @@
             _requestMessage = requestMessage;
             _disposeMessage = disposeMessage;
             _completionOption = completionOption;
+            _validate = validate ?? DefaultResponseValidator;
         }
 
         /// <summary>
@@ -118,6 +142,14 @@
             }
         }
 
+        protected Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> ValidateCallback
+        {
+            get
+            {
+                return _validate;
+            }
+        }
+
         /// <summary>
         /// Asynchronously send the HTTP API request, and return the result as a strongly-typed
         /// deserialized value.
@@ -131,7 +163,55 @@
         /// element is the strongly-typed result of the HTTP API call.
         /// </returns>
         /// <exception cref="WebException">If the HTTP API request does not return successfully.</exception>
-        public abstract Task<Tuple<HttpResponseMessage, T>> SendAsync(CancellationToken cancellationToken);
+        public Task<Tuple<HttpResponseMessage, T>> SendAsync(CancellationToken cancellationToken)
+        {
+            return SendImplAsync(cancellationToken)
+                .Then(task => ValidateCallback(task, cancellationToken))
+                .Then(
+                    task =>
+                    {
+                        return DeserializeResultImplAsync(task.Result, cancellationToken)
+                            .Select(innerTask => Tuple.Create(task.Result, innerTask.Result));
+                    });
+        }
+
+        /// <summary>
+        /// Invokes the <see cref="BeforeAsyncWebRequest"/> event for the specified <paramref name="request"/>.
+        /// </summary>
+        /// <param name="request">The web request.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="request"/> is <see langword="null"/>.</exception>
+        /// <preliminary/>
+        protected virtual void OnBeforeAsyncWebRequest(HttpRequestMessage request)
+        {
+            var handler = BeforeAsyncWebRequest;
+            if (handler != null)
+                handler(this, new HttpRequestEventArgs(request));
+        }
+
+        /// <summary>
+        /// Invokes the <see cref="AfterAsyncWebResponse"/> event for the specified <paramref name="response"/>.
+        /// </summary>
+        /// <param name="response">The web response.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
+        /// <preliminary/>
+        protected virtual void OnAfterAsyncWebResponse(Task<HttpResponseMessage> response)
+        {
+            if (response == null)
+                throw new ArgumentNullException("response");
+
+            var handler = AfterAsyncWebResponse;
+            if (handler != null)
+                handler(this, new HttpResponseEventArgs(response));
+        }
+
+        protected virtual Task<HttpResponseMessage> SendImplAsync(CancellationToken cancellationToken)
+        {
+            OnBeforeAsyncWebRequest(RequestMessage);
+            return HttpClient.SendAsync(RequestMessage, CompletionOption, cancellationToken)
+                .Finally(task => OnAfterAsyncWebResponse(task));
+        }
+
+        protected abstract Task<T> DeserializeResultImplAsync(HttpResponseMessage response, CancellationToken cancellationToken);
 
         /// <inheritdoc/>
         public void Dispose()

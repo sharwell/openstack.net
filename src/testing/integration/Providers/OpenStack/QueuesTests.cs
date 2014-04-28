@@ -19,14 +19,13 @@
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using Path = System.IO.Path;
-    using TestCategories = Net.OpenStack.Testing.Integration.Providers.Rackspace.TestCategories;
     using TestHelpers = Net.OpenStack.Testing.Integration.Providers.Rackspace.TestHelpers;
     using WebException = System.Net.WebException;
     using WebExceptionStatus = System.Net.WebExceptionStatus;
 
     /// <preliminary/>
     [TestClass]
-    public class VanillaUserQueuesTests
+    public class QueuesTests
     {
         /// <summary>
         /// The prefix to use for names of queues created during integration testing.
@@ -816,7 +815,7 @@
         /// <returns>An instance of <see cref="IQueuesService"/> for integration testing.</returns>
         internal static IQueuesService CreateProvider()
         {
-            var provider = new TestCloudQueuesClient(CreateAuthenticationService(), Bootstrapper.Settings.DefaultRegion, Guid.NewGuid(), false);
+            var provider = new QueuesClient(CreateAuthenticationService(), Bootstrapper.Settings.DefaultRegion, Guid.NewGuid(), false);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
 #if !PORTABLE
@@ -828,7 +827,7 @@
         private static Lazy<IAuthenticationService> _testAuthenticationService =
             new Lazy<IAuthenticationService>(() =>
             {
-                IdentityClient identityService = new TestIdentityClient(new Uri("https://identity.api.rackspacecloud.com"));
+                IdentityClient identityService = new IdentityClient(new Uri("https://identity.api.rackspacecloud.com"));
                 identityService.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
                 identityService.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
 
@@ -845,32 +844,6 @@
         internal static IAuthenticationService CreateAuthenticationService()
         {
             return _testAuthenticationService.Value;
-        }
-
-        internal class TestIdentityClient : IdentityClient
-        {
-            public TestIdentityClient(Uri baseUri)
-                : base(baseUri)
-            {
-            }
-
-            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
-            {
-                return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
-            }
-        }
-
-        internal class TestCloudQueuesClient : QueuesClient
-        {
-            public TestCloudQueuesClient(IAuthenticationService authenticationService, string defaultRegion, Guid clientId, bool internalUrl)
-                : base(authenticationService, defaultRegion, clientId, internalUrl)
-            {
-            }
-
-            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
-            {
-                return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
-            }
         }
     }
 }

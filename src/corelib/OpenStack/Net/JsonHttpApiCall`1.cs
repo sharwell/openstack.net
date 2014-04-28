@@ -1,7 +1,9 @@
 ﻿namespace OpenStack.Net
 {
     using System;
+    using System.Collections.Generic;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Threading;
     using System.Threading.Tasks;
     using Newtonsoft.Json;
@@ -18,26 +20,21 @@
         {
         }
 
-        public JsonHttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, bool disposeMessage)
-            : base(httpClient, requestMessage, completionOption, disposeMessage)
+        public JsonHttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate)
+            : base(httpClient, requestMessage, completionOption, validate)
         {
         }
 
-        public override Task<Tuple<HttpResponseMessage, T>> SendAsync(CancellationToken cancellationToken)
+        public JsonHttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate, bool disposeMessage)
+            : base(httpClient, requestMessage, completionOption, validate, disposeMessage)
         {
-            return HttpClient.SendAsync(RequestMessage, CompletionOption, cancellationToken)
-                .Then(
-                    task =>
-                    {
-                        return DeserializeResultAsync(task.Result, cancellationToken)
-                            .Select(innerTask => Tuple.Create(task.Result, innerTask.Result));
-                    });
         }
 
-        protected virtual Task<T> DeserializeResultAsync(HttpResponseMessage responseMessage, CancellationToken cancellationToken)
+        protected override Task<T> DeserializeResultImplAsync(HttpResponseMessage responseMessage, CancellationToken cancellationToken)
         {
+            bool acceptable = HttpApiCall.IsAcceptable(responseMessage);
             return responseMessage.Content.ReadAsStringAsync()
-                .Select(task => JsonConvert.DeserializeObject<T>(task.Result));
+                .Select(task => acceptable ? JsonConvert.DeserializeObject<T>(task.Result) : default(T));
         }
     }
 }

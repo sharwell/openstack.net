@@ -32,6 +32,11 @@
 
         #region Accounts
 
+        public static Task<Tuple<AccountMetadata, ReadOnlyCollectionPage<Container>>> ListContainersAsync(this IObjectStorageService service, CancellationToken cancellationToken)
+        {
+            return ListContainersAsync(service, null, cancellationToken);
+        }
+
         public static Task<Tuple<AccountMetadata, ReadOnlyCollectionPage<Container>>> ListContainersAsync(this IObjectStorageService service, int? pageSize, CancellationToken cancellationToken)
         {
             return service.PrepareListContainersAsync(pageSize, cancellationToken)
@@ -74,9 +79,14 @@
                 .Then(task => task.Result.SendAsync(cancellationToken));
         }
 
-        public static Task<Tuple<ContainerMetadata, ReadOnlyCollectionPage<Object>>> ListObjectsAsync(this IObjectStorageService service, ContainerName container, CancellationToken cancellationToken)
+        public static Task<Tuple<ContainerMetadata, ReadOnlyCollectionPage<ContainerObject>>> ListObjectsAsync(this IObjectStorageService service, ContainerName container, CancellationToken cancellationToken)
         {
-            return service.PrepareListObjectsAsync(container, cancellationToken)
+            return ListObjectsAsync(service, container, null, cancellationToken);
+        }
+
+        public static Task<Tuple<ContainerMetadata, ReadOnlyCollectionPage<ContainerObject>>> ListObjectsAsync(this IObjectStorageService service, ContainerName container, int? pageSize, CancellationToken cancellationToken)
+        {
+            return service.PrepareListObjectsAsync(container, pageSize, cancellationToken)
                 .Then(task => task.Result.SendAsync(cancellationToken))
                 .Select(task => task.Result.Item2);
         }

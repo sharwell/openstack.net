@@ -821,26 +821,13 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         /// <returns>An instance of <see cref="IQueuesService"/> for integration testing.</returns>
         internal static IQueuesService CreateProvider()
         {
-            var provider = new TestCloudQueuesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, Guid.NewGuid(), false, null);
+            var provider = new CloudQueuesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, Guid.NewGuid(), false, null);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
 #if !PORTABLE
             provider.ConnectionLimit = 80;
 #endif
             return provider;
-        }
-
-        internal class TestCloudQueuesProvider : CloudQueuesProvider
-        {
-            public TestCloudQueuesProvider(CloudIdentity defaultIdentity, string defaultRegion, Guid clientId, bool internalUrl, IIdentityProvider identityProvider)
-                : base(defaultIdentity, defaultRegion, clientId, internalUrl, identityProvider)
-            {
-            }
-
-            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
-            {
-                return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
-            }
         }
     }
 }

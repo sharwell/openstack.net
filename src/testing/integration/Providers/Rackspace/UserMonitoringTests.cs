@@ -2974,26 +2974,13 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         /// <returns>An instance of <see cref="IMonitoringService"/> for integration testing.</returns>
         internal static IMonitoringService CreateProvider()
         {
-            var provider = new TestCloudMonitoringProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
+            var provider = new CloudMonitoringProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, null);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
 #if !PORTABLE
             provider.ConnectionLimit = 20;
 #endif
             return provider;
-        }
-
-        internal class TestCloudMonitoringProvider : CloudMonitoringProvider
-        {
-            public TestCloudMonitoringProvider(CloudIdentity defaultIdentity, string defaultRegion, IIdentityProvider identityProvider)
-                : base(defaultIdentity, defaultRegion, identityProvider)
-            {
-            }
-
-            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
-            {
-                return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
-            }
         }
     }
 }

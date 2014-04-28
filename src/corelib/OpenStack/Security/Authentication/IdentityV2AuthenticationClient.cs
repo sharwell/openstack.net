@@ -144,10 +144,16 @@
             if (serviceEndpoint == null)
                 throw new UserAuthorizationException("The user does not have access to the requested service or region.");
 
+            Uri baseAddress;
             if (internalAddress)
-                return serviceEndpoint.Item2.InternalUri;
+                baseAddress = serviceEndpoint.Item2.InternalUri;
             else
-                return serviceEndpoint.Item2.PublicUri;
+                baseAddress = serviceEndpoint.Item2.PublicUri;
+
+            if (baseAddress != null && baseAddress.IsAbsoluteUri && !baseAddress.AbsoluteUri.EndsWith("/"))
+                baseAddress = new Uri(baseAddress.AbsoluteUri + "/", UriKind.Absolute);
+
+            return baseAddress;
         }
 
         protected virtual string GetEffectiveRegion(UserAccess userAccess, string region)

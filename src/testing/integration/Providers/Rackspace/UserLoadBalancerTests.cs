@@ -2111,11 +2111,6 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 Uri baseAddress = await GetBaseUriAsync(cancellationToken);
                 return template.BindByName(baseAddress, new Dictionary<string, string> { { "loadBalancerId", loadBalancer.Id.Value } });
             }
-
-            protected override Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
-            {
-                return TestHelpers.ReadResult(task, cancellationToken, base.ReadResultImpl);
-            }
         }
     }
 }
