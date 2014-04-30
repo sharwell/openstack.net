@@ -4,12 +4,10 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
-    using OpenStack.Net;
     using Rackspace.Threading;
     using Stream = System.IO.Stream;
 
