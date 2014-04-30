@@ -13,6 +13,8 @@
     using OpenStack.Security.Authentication;
     using Rackspace.Net;
     using Rackspace.Threading;
+    using Encoding = System.Text.Encoding;
+    using SeekOrigin = System.IO.SeekOrigin;
     using Stream = System.IO.Stream;
 
 #if !NET40PLUS
@@ -133,13 +135,13 @@
                         foreach (var pair in metadata.Headers)
                         {
                             requestHeaders.Remove(pair.Key);
-                            requestHeaders.Add(pair.Key, pair.Value);
+                            requestHeaders.Add(pair.Key, StorageMetadata.EncodeHeaderValue(pair.Value));
                         }
 
                         foreach (var pair in metadata.Metadata)
                         {
                             requestHeaders.Remove(AccountMetadata.AccountMetadataPrefix + pair.Key);
-                            requestHeaders.Add(AccountMetadata.AccountMetadataPrefix + pair.Key, pair.Value);
+                            requestHeaders.Add(AccountMetadata.AccountMetadataPrefix + pair.Key, StorageMetadata.EncodeHeaderValue(pair.Value));
                         }
 
                         return call;
@@ -281,13 +283,13 @@
                         foreach (var pair in metadata.Headers)
                         {
                             requestHeaders.Remove(pair.Key);
-                            requestHeaders.Add(pair.Key, pair.Value);
+                            requestHeaders.Add(pair.Key, StorageMetadata.EncodeHeaderValue(pair.Value));
                         }
 
                         foreach (var pair in metadata.Metadata)
                         {
                             requestHeaders.Remove(ContainerMetadata.ContainerMetadataPrefix + pair.Key);
-                            requestHeaders.Add(ContainerMetadata.ContainerMetadataPrefix + pair.Key, pair.Value);
+                            requestHeaders.Add(ContainerMetadata.ContainerMetadataPrefix + pair.Key, StorageMetadata.EncodeHeaderValue(pair.Value));
                         }
 
                         return call;
@@ -329,9 +331,226 @@
                     task =>
                     {
                         var call = CreateBasicApiCall(task.Result);
-                        call.RequestMessage.Content = new StreamContent(stream);
+                        Stream contentStream = stream;
+                        if (progress != null)
+                            contentStream = new ProgressStream(contentStream, progress);
+
+                        call.RequestMessage.Content = new StreamContent(contentStream);
                         return call;
                     });
+        }
+
+        private class ProgressStream : Stream
+        {
+            private readonly Stream _underlyingStream;
+            private readonly IProgress<long> _progress;
+
+            public ProgressStream(Stream underlyingStream, IProgress<long> progress)
+            {
+                if (underlyingStream == null)
+                    throw new ArgumentNullException("underlyingStream");
+                if (progress == null)
+                    throw new ArgumentNullException("progress");
+
+                _underlyingStream = underlyingStream;
+                _progress = progress;
+            }
+
+            public override bool CanRead
+            {
+                get
+                {
+                    return _underlyingStream.CanRead;
+                }
+            }
+
+            public override bool CanSeek
+            {
+                get
+                {
+                    return _underlyingStream.CanSeek;
+                }
+            }
+
+            public override bool CanTimeout
+            {
+                get
+                {
+                    return _underlyingStream.CanTimeout;
+                }
+            }
+
+            public override bool CanWrite
+            {
+                get
+                {
+                    return _underlyingStream.CanWrite;
+                }
+            }
+
+            public override long Length
+            {
+                get
+                {
+                    return _underlyingStream.Length;
+                }
+            }
+
+            public override long Position
+            {
+                get
+                {
+                    return _underlyingStream.Position;
+                }
+
+                set
+                {
+                    _underlyingStream.Position = value;
+                    _progress.Report(Position);
+                }
+            }
+
+            public override int ReadTimeout
+            {
+                get
+                {
+                    return _underlyingStream.ReadTimeout;
+                }
+
+                set
+                {
+                    _underlyingStream.ReadTimeout = value;
+                }
+            }
+
+            public override int WriteTimeout
+            {
+                get
+                {
+                    return _underlyingStream.WriteTimeout;
+                }
+
+                set
+                {
+                    _underlyingStream.WriteTimeout = value;
+                }
+            }
+
+#if NET45PLUS
+            public override Task CopyToAsync(Stream destination, int bufferSize, CancellationToken cancellationToken)
+            {
+                return
+                    _underlyingStream.CopyToAsync(destination, bufferSize, cancellationToken)
+                    .Select(task => _progress.Report(Position));
+            }
+
+            public override Task FlushAsync(CancellationToken cancellationToken)
+            {
+                return
+                    _underlyingStream.FlushAsync(cancellationToken)
+                    .Select(task => _progress.Report(Position));
+            }
+
+            public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            {
+                return
+                    _underlyingStream.ReadAsync(buffer, offset, count, cancellationToken)
+                    .Select(
+                        task =>
+                        {
+                            _progress.Report(Position);
+                            return task.Result;
+                        });
+            }
+
+            public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            {
+                return
+                    _underlyingStream.WriteAsync(buffer, offset, count, cancellationToken)
+                    .Select(task => _progress.Report(Position));
+            }
+#endif
+
+#if !PORTABLE
+            public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+            {
+                return _underlyingStream.BeginRead(buffer, offset, count, callback, state);
+            }
+
+            public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+            {
+                return _underlyingStream.BeginWrite(buffer, offset, count, callback, state);
+            }
+
+            public override void Close()
+            {
+                _underlyingStream.Close();
+            }
+
+            public override int EndRead(IAsyncResult asyncResult)
+            {
+                int result = _underlyingStream.EndRead(asyncResult);
+                _progress.Report(Position);
+                return result;
+            }
+
+            public override void EndWrite(IAsyncResult asyncResult)
+            {
+                _underlyingStream.EndWrite(asyncResult);
+                _progress.Report(Position);
+            }
+#endif
+
+            public override void Flush()
+            {
+                _underlyingStream.Flush();
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                int result = _underlyingStream.Read(buffer, offset, count);
+                _progress.Report(Position);
+                return result;
+            }
+
+            public override int ReadByte()
+            {
+                int result = _underlyingStream.ReadByte();
+                _progress.Report(Position);
+                return result;
+            }
+
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                long result = _underlyingStream.Seek(offset, origin);
+                _progress.Report(result);
+                return result;
+            }
+
+            public override void SetLength(long value)
+            {
+                _underlyingStream.SetLength(value);
+            }
+
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                _underlyingStream.Write(buffer, offset, count);
+                _progress.Report(Position);
+            }
+
+            public override void WriteByte(byte value)
+            {
+                _underlyingStream.WriteByte(value);
+                _progress.Report(Position);
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing)
+                    _underlyingStream.Dispose();
+
+                base.Dispose(disposing);
+            }
         }
 
         public Task<HttpApiCall> PrepareCopyObjectAsync(ContainerName sourceContainer, ObjectName sourceObject, ContainerName destinationContainer, ObjectName destinationObject, CancellationToken cancellationToken)
@@ -423,47 +642,76 @@
                 .Select(task => CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult));
         }
 
-        public Task<HttpApiCall> PrepareUpdateObjectMetadataAsync(ContainerName container, ObjectName @object, ObjectMetadata metadata, CancellationToken cancellationToken)
+        public Task<HttpApiCall> PrepareSetObjectMetadataAsync(ContainerName container, ObjectName @object, ObjectMetadata metadata, CancellationToken cancellationToken)
         {
+            if (container == null)
+                throw new ArgumentNullException("container");
+            if (@object == null)
+                throw new ArgumentNullException("object");
             if (metadata == null)
                 throw new ArgumentNullException("metadata");
 
-            return PrepareCopyObjectAsync(container, @object, container, @object, cancellationToken)
+            UriTemplate template = new UriTemplate("{container}/{object}");
+            Dictionary<string, string> parameters = new Dictionary<string, string> { { "container", container.Value }, { "object", @object.Value } };
+
+            return GetBaseUriAsync(cancellationToken)
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, cancellationToken))
                 .Select(
                     task =>
                     {
-                        var requestHeaders = task.Result.RequestMessage.Headers;
+                        var call = CreateBasicApiCall(task.Result);
+                        if (call.RequestMessage.Content == null)
+                            call.RequestMessage.Content = new ByteArrayContent(new byte[0]);
+                        var requestHeaders = call.RequestMessage.Headers;
+                        var contentHeaders = call.RequestMessage.Content.Headers;
                         foreach (var pair in metadata.Headers)
                         {
-                            requestHeaders.Remove(pair.Key);
-                            requestHeaders.Add(pair.Key, pair.Value);
+                            switch (pair.Key.ToLowerInvariant())
+                            {
+                            case "content-length":
+                            case "etag":
+                            case "accept-ranges":
+                            //case "x-trans-id":
+                            case "x-timestamp":
+                            case "date":
+                                continue;
+
+                            case "allow":
+                            case "last-modified":
+                                //contentHeaders.Remove(pair.Key);
+                                //contentHeaders.Add(pair.Key, pair.Value);
+                                break;
+
+                            default:
+                                if (pair.Key.ToLowerInvariant().StartsWith("content-"))
+                                {
+                                    contentHeaders.Remove(pair.Key);
+                                    if (!string.IsNullOrEmpty(pair.Value))
+                                        contentHeaders.Add(pair.Key, StorageMetadata.EncodeHeaderValue(pair.Value));
+                                }
+                                else
+                                {
+                                    requestHeaders.Remove(pair.Key);
+                                    if (!string.IsNullOrEmpty(pair.Value))
+                                        requestHeaders.Add(pair.Key, StorageMetadata.EncodeHeaderValue(pair.Value));
+                                }
+
+                                break;
+                            }
                         }
 
                         foreach (var pair in metadata.Metadata)
                         {
-                            requestHeaders.Remove(ObjectMetadata.ObjectMetadataPrefix + pair.Key);
-                            requestHeaders.Add(ObjectMetadata.ObjectMetadataPrefix + pair.Key, pair.Value);
+                            string prefix = ObjectMetadata.ObjectMetadataPrefix;
+                            string key = prefix + pair.Key;
+                            string value = pair.Value;
+                            requestHeaders.Remove(key);
+                            if (!string.IsNullOrEmpty(value))
+                                requestHeaders.Add(key, StorageMetadata.EncodeHeaderValue(value));
                         }
 
-                        return task.Result;
+                        return call;
                     });
-        }
-
-        public Task<HttpApiCall> PrepareRemoveObjectMetadataAsync(ContainerName container, ObjectName @object, IEnumerable<string> keys, CancellationToken cancellationToken)
-        {
-            if (keys == null)
-                throw new ArgumentNullException("keys");
-
-            Dictionary<string, string> metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var key in keys)
-            {
-                if (string.IsNullOrEmpty(key))
-                    throw new ArgumentException("keys cannot contain any null or empty values");
-
-                metadata.Add(key, string.Empty);
-            }
-
-            return PrepareUpdateObjectMetadataAsync(container, @object, new ObjectMetadata(new Dictionary<string, string>(), metadata), cancellationToken);
         }
 
         #endregion

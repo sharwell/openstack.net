@@ -7,6 +7,7 @@
     using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
+    using OpenStack.Collections;
 
 #if !NET45PLUS
     using OpenStack.Collections;
@@ -38,9 +39,9 @@
             foreach (KeyValuePair<string, IEnumerable<string>> header in responseMessage.Headers)
             {
                 if (header.Key.StartsWith(metadataPrefix))
-                    metadata.Add(header.Key.Substring(metadataPrefix.Length), string.Join(", ", header.Value.ToArray()));
+                    metadata.Add(header.Key.Substring(metadataPrefix.Length), DecodeHeaderValue(string.Join(", ", header.Value.ToArray())));
                 else
-                    headers.Add(header.Key, string.Join(", ", header.Value.ToArray()));
+                    headers.Add(header.Key, DecodeHeaderValue(string.Join(", ", header.Value.ToArray())));
             }
 
             if (responseMessage.Content != null)
@@ -48,9 +49,9 @@
                 foreach (KeyValuePair<string, IEnumerable<string>> header in responseMessage.Content.Headers)
                 {
                     if (header.Key.StartsWith(metadataPrefix))
-                        metadata.Add(header.Key.Substring(metadataPrefix.Length), string.Join(", ", header.Value.ToArray()));
+                        metadata.Add(header.Key.Substring(metadataPrefix.Length), DecodeHeaderValue(string.Join(", ", header.Value.ToArray())));
                     else
-                        headers.Add(header.Key, string.Join(", ", header.Value.ToArray()));
+                        headers.Add(header.Key, DecodeHeaderValue(string.Join(", ", header.Value.ToArray())));
                 }
             }
 
@@ -83,6 +84,24 @@
             {
                 return new ReadOnlyDictionary<string, string>(_metadata);
             }
+        }
+
+        public static string EncodeHeaderValue(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+
+            byte[] encodedBytes = Encoding.UTF8.GetBytes(value);
+            return new string(encodedBytes.ConvertAll(i => (char)i));
+        }
+
+        public static string DecodeHeaderValue(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+
+            byte[] encodedBytes = value.ToCharArray().ConvertAll(i => (byte)i);
+            return Encoding.UTF8.GetString(encodedBytes, 0, encodedBytes.Length);
         }
     }
 }

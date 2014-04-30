@@ -65,9 +65,7 @@
 
         Task<HttpApiCall<ObjectMetadata>> PrepareGetObjectMetadataAsync(ContainerName container, ObjectName @object, CancellationToken cancellationToken);
 
-        Task<HttpApiCall> PrepareUpdateObjectMetadataAsync(ContainerName container, ObjectName @object, ObjectMetadata metadata, CancellationToken cancellationToken);
-
-        Task<HttpApiCall> PrepareRemoveObjectMetadataAsync(ContainerName container, ObjectName @object, IEnumerable<string> keys, CancellationToken cancellationToken);
+        Task<HttpApiCall> PrepareSetObjectMetadataAsync(ContainerName container, ObjectName @object, ObjectMetadata metadata, CancellationToken cancellationToken);
 
         #endregion
     }
