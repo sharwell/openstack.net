@@ -218,6 +218,7 @@
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ObjectName.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ObjectStorageClient.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ObjectStorageServiceExtensions.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ObjectVersioningExtensions.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\StorageMetadata.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Claim.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\ClaimId.cs" />
