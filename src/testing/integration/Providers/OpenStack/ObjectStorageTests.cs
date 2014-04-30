@@ -5,25 +5,25 @@
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
+    using System.Net.Http.Headers;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Newtonsoft.Json.Linq;
     using global::OpenStack.Collections;
     using global::OpenStack.Net;
     using global::OpenStack.Security.Authentication;
     using global::OpenStack.Services.Identity.V2;
     using global::OpenStack.Services.ObjectStorage.V1;
     using global::Rackspace.Security.Authentication;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
+    using global::Rackspace.Threading;
     using Encoding = System.Text.Encoding;
-    using File = System.IO.File;
+    using HttpStatusCode = System.Net.HttpStatusCode;
     using MemoryStream = System.IO.MemoryStream;
     using Path = System.IO.Path;
-    using StreamReader = System.IO.StreamReader;
     using Stream = System.IO.Stream;
+    using StreamReader = System.IO.StreamReader;
     using TestHelpers = Net.OpenStack.Testing.Integration.Providers.Rackspace.TestHelpers;
-    using System.Net.Http.Headers;
 
     [TestClass]
     public class ObjectStorageTests
@@ -334,8 +334,8 @@
              * Cleanup
              */
 
-            await provider.RemoveContainerAsync(versionsContainerName, CancellationToken.None);
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, versionsContainerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -358,11 +358,13 @@
                 await provider.RemoveContainerAsync(containerName, CancellationToken.None);
                 Assert.Fail("Expected a HttpWebException");
             }
-            catch (HttpWebException)
+            catch (HttpWebException ex)
             {
+                Assert.IsNotNull(ex.ResponseMessage);
+                Assert.AreEqual(HttpStatusCode.Conflict, ex.ResponseMessage.StatusCode);
             }
 
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -579,7 +581,21 @@
 
             await provider.UpdateContainerMetadataAsync(containerName, new ContainerMetadata(new Dictionary<string, string>(), new Dictionary<string, string>(metadata, StringComparer.OrdinalIgnoreCase)), CancellationToken.None);
 
-            ContainerMetadata actualMetadata = await provider.GetContainerMetadataAsync(containerName, CancellationToken.None);
+            Func<Task<ContainerMetadata>> getLatestMetadataAsync =
+                () =>
+                {
+                    return
+                        CoreTaskExtensions.Using(
+                            () => provider.PrepareGetContainerMetadataAsync(containerName, CancellationToken.None),
+                            task =>
+                                {
+                                    task.Result.RequestMessage.Headers.Add("X-Newest", "true");
+                                    return task.Result.SendAsync(CancellationToken.None);
+                                })
+                        .Select(task => task.Result.Item2);
+                };
+
+            ContainerMetadata actualMetadata = await getLatestMetadataAsync();
             Console.WriteLine("Container Metadata");
             foreach (KeyValuePair<string, string> pair in actualMetadata.Metadata)
                 Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
@@ -592,7 +608,7 @@
             metadata.Remove("Key3");
             await provider.RemoveContainerMetadataAsync(containerName, new [] { "Key3" }, CancellationToken.None);
 
-            actualMetadata = await provider.GetContainerMetadataAsync(containerName, CancellationToken.None);
+            actualMetadata = await getLatestMetadataAsync();
             Console.WriteLine("Container Metadata after removing Key3");
             foreach (KeyValuePair<string, string> pair in actualMetadata.Metadata)
                 Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
@@ -605,7 +621,7 @@
             metadata.Remove("Key4");
             await provider.RemoveContainerMetadataAsync(containerName, new[] { "Key2", "Key4" }, CancellationToken.None);
 
-            actualMetadata = await provider.GetContainerMetadataAsync(containerName, CancellationToken.None);
+            actualMetadata = await getLatestMetadataAsync();
             Console.WriteLine("Container Metadata after removing Key2, Key4");
             foreach (KeyValuePair<string, string> pair in actualMetadata.Metadata)
                 Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
@@ -618,7 +634,7 @@
             metadata.Remove("Key4");
             await provider.RemoveContainerMetadataAsync(containerName, new[] { "Key2", "Key4" }, CancellationToken.None);
 
-            actualMetadata = await provider.GetContainerMetadataAsync(containerName, CancellationToken.None);
+            actualMetadata = await getLatestMetadataAsync();
             Console.WriteLine("Container Metadata after removing Key2, Key4");
             foreach (KeyValuePair<string, string> pair in actualMetadata.Metadata)
                 Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
@@ -895,7 +911,7 @@
                 Console.WriteLine("  {0}: {1}", pair.Key, pair.Value);
             }
 
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -927,7 +943,7 @@
 
             CheckMetadataCollections(metadata, actualMetadata);
 
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -970,7 +986,7 @@
             {
                 { "Key2", "Value 2" }
             };
-            await provider.UpdateObjectMetadataAsync(containerName, objectName, new ObjectMetadata(new Dictionary<string, string>(), new Dictionary<string, string>(updatedMetadata, StringComparer.OrdinalIgnoreCase)), CancellationToken.None);
+            await provider.SetObjectMetadataAsync(containerName, objectName, new ObjectMetadata(new Dictionary<string, string>(), new Dictionary<string, string>(updatedMetadata, StringComparer.OrdinalIgnoreCase)), CancellationToken.None);
             Assert.AreEqual(contentType, await GetObjectContentTypeAsync(provider, containerName, objectName, CancellationToken.None));
 
             actualMetadata = await provider.GetObjectMetadataAsync(containerName, objectName, CancellationToken.None);
@@ -980,7 +996,7 @@
 
             CheckMetadataCollections(updatedMetadata, actualMetadata);
 
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -1055,7 +1071,7 @@
 
             /* Cleanup
              */
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -1087,7 +1103,7 @@
 
             /* Cleanup
              */
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -1125,7 +1141,7 @@
 
                 /* Cleanup
                  */
-                await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+                await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
             }
         }
 
@@ -1222,9 +1238,11 @@
             using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
             {
                 await provider.CreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, null);
+            }
 
+            using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
+            {
                 // it's ok to create the same file twice
-                uploadStream.Position = 0;
                 ProgressMonitor progressMonitor = new ProgressMonitor(uploadStream.Length);
                 await provider.CreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, progressMonitor);
                 Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
@@ -1235,7 +1253,7 @@
 
             /* Cleanup
              */
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -1247,26 +1265,53 @@
             ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
             ObjectName objectName = new ObjectName(Path.GetRandomFileName());
             // another random name counts as random content
-            string fileData = Path.GetRandomFileName();
+            char[] fileDataChars = new char[5000];
+            for (int i = 0; i < fileDataChars.Length; i++)
+                fileDataChars[i] = (char)i;
+
+            string fileData = new string(fileDataChars);
 
             await provider.CreateContainerAsync(containerName, CancellationToken.None);
 
             using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
             {
                 await provider.CreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, null);
+            }
 
-                Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "If-None-Match", "*" }
-                };
-
-                // it's ok to create the same file twice
-                uploadStream.Position = 0;
+            using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
+            {
                 ProgressMonitor progressMonitor = new ProgressMonitor(uploadStream.Length);
-                var prepared = await provider.PrepareCreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, progressMonitor);
-                prepared.RequestMessage.Headers.IfNoneMatch.Add(new EntityTagHeaderValue("*"));
-                await prepared.SendAsync(CancellationToken.None);
-                Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                try
+                {
+                    HttpApiCall prepared = await provider.PrepareCreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, progressMonitor);
+                    prepared.RequestMessage.Headers.Add("If-None-Match", "*");
+                    await prepared.SendAsync(CancellationToken.None);
+                    Assert.Fail("Expected a 412 (Precondition Failed)");
+                }
+                catch (HttpWebException ex)
+                {
+                    Assert.IsNotNull(ex.ResponseMessage);
+                    Assert.AreEqual(HttpStatusCode.PreconditionFailed, ex.ResponseMessage.StatusCode);
+                    Assert.AreEqual(0, progressMonitor.CurrentValue);
+                }
+            }
+
+            using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
+            {
+                ProgressMonitor progressMonitor = new ProgressMonitor(uploadStream.Length);
+                try
+                {
+                    HttpApiCall prepared = await provider.PrepareCreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, progressMonitor);
+                    prepared.RequestMessage.Headers.Add("If-None-Match", "*");
+                    await prepared.SendAsync(CancellationToken.None);
+                    Assert.Fail("Expected a 412 (Precondition Failed)");
+                }
+                catch (HttpWebException ex)
+                {
+                    Assert.IsNotNull(ex.ResponseMessage);
+                    Assert.AreEqual(HttpStatusCode.PreconditionFailed, ex.ResponseMessage.StatusCode);
+                    Assert.AreEqual(0, progressMonitor.CurrentValue);
+                }
             }
 
             string actualData = await ReadAllObjectTextAsync(provider, containerName, objectName, Encoding.UTF8, CancellationToken.None, verifyEtag: true);
@@ -1274,7 +1319,7 @@
 
             /* Cleanup
              */
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -1314,7 +1359,7 @@
 
             /* Cleanup
              */
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
 #if false // API not yet defined
@@ -1650,6 +1695,22 @@
                 _maxValue = totalSize;
             }
 
+            public long CurrentValue
+            {
+                get
+                {
+                    return _currentValue;
+                }
+            }
+
+            public long MaxValue
+            {
+                get
+                {
+                    return _maxValue;
+                }
+            }
+
             public bool IsComplete
             {
                 get
@@ -1765,7 +1826,7 @@
 
             /* Cleanup
              */
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
 #if false // no API yet
@@ -2123,10 +2184,65 @@
             {
                 var result = await provider.GetObjectAsync(container, @object, cancellationToken).ConfigureAwait(false);
                 if (verifyEtag)
-                    throw new NotImplementedException();
+                {
+                    Console.WriteLine("ETag verification is not yet supported.");
+                }
 
                 StreamReader reader = new StreamReader(result.Item2, encoding);
                 return reader.ReadToEnd();
+            }
+        }
+
+        private static async Task RemoveContainerWithObjectsAsync(IObjectStorageService provider, ContainerName container, CancellationToken cancellationToken)
+        {
+            if (provider == null)
+                throw new ArgumentNullException("provider");
+            if (container == null)
+                throw new ArgumentNullException("container");
+
+            await RemoveAllObjectsAsync(provider, container, cancellationToken);
+            await provider.RemoveContainerAsync(container, cancellationToken);
+        }
+
+        private static async Task RemoveAllObjectsAsync(IObjectStorageService provider, ContainerName container, CancellationToken cancellationToken)
+        {
+            if (provider == null)
+                throw new ArgumentNullException("provider");
+            if (container == null)
+                throw new ArgumentNullException("container");
+
+            while (true)
+            {
+                var request = await provider.PrepareListObjectsAsync(container, null, cancellationToken);
+                request.RequestMessage.Headers.Add("X-Newest", "true");
+                var response = await request.SendAsync(cancellationToken);
+                ReadOnlyCollectionPage<ContainerObject> objects = response.Item2.Item2;
+                if (objects.Count == 0)
+                    break;
+
+                List<Task> tasks = new List<Task>();
+                tasks.AddRange(objects.Select(containerObject => RemoveObjectIfFoundAsync(provider, container, containerObject.Name, cancellationToken)));
+                await Task.WhenAll(tasks);
+            }
+        }
+
+        private static async Task RemoveObjectIfFoundAsync(IObjectStorageService provider, ContainerName container, ObjectName @object, CancellationToken cancellationToken)
+        {
+            if (provider == null)
+                throw new ArgumentNullException("provider");
+            if (container == null)
+                throw new ArgumentNullException("container");
+            if (@object == null)
+                throw new ArgumentNullException("object");
+
+            try
+            {
+                await provider.RemoveObjectAsync(container, @object, cancellationToken);
+            }
+            catch (HttpWebException ex)
+            {
+                if (ex.ResponseMessage == null || ex.ResponseMessage.StatusCode != HttpStatusCode.NotFound)
+                    throw;
             }
         }
 
