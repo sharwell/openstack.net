@@ -77,6 +77,7 @@
                                     getNextPageAsync =
                                         innerCancellationToken2 =>
                                         {
+#warning this does not preserve customized query parameters and/or headers
                                             return PrepareListContainersAsync(pageSize, innerCancellationToken2)
                                                 .Select(
                                                     _ =>
