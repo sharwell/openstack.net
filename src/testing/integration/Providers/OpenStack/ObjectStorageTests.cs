@@ -283,15 +283,11 @@
 
             await provider.CreateContainerAsync(versionsContainerName, CancellationToken.None);
 
-            var prepareCreateContainer = await provider.PrepareCreateContainerAsync(containerName, CancellationToken.None);
-            prepareCreateContainer.RequestMessage.Headers.Add(net.openstack.Providers.Rackspace.CloudFilesProvider.VersionsLocation, versionsContainerName.Value);
-            await prepareCreateContainer.SendAsync(CancellationToken.None);
+            await provider.CreateVersionedContainerAsync(containerName, versionsContainerName, CancellationToken.None);
 
             ContainerMetadata headers = await provider.GetContainerMetadataAsync(containerName, CancellationToken.None);
-            string location;
-            Assert.IsTrue(headers.Headers.TryGetValue(net.openstack.Providers.Rackspace.CloudFilesProvider.VersionsLocation, out location));
-            location = UriUtility.UriDecode(location);
-            Assert.AreEqual(versionsContainerName.Value, location);
+            ContainerName location = headers.GetVersionsLocation();
+            Assert.AreEqual(versionsContainerName, location);
 
             ObjectName objectName = new ObjectName(Path.GetRandomFileName());
             string fileData1 = "first-content";
