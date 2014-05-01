@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Net.Http.Headers;
     using System.Threading;
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
@@ -155,6 +156,19 @@
                 CoreTaskExtensions.Using(
                     () => service.PrepareGetObjectAsync(container, @object, cancellationToken),
                     task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2);
+        }
+
+        public static Task<Tuple<ObjectMetadata, Stream>> GetObjectAsync(this IObjectStorageService service, ContainerName container, ObjectName @object, RangeHeaderValue rangeHeader, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareGetObjectAsync(container, @object, cancellationToken),
+                    task =>
+                    {
+                        task.Result.RequestMessage.Headers.Range = rangeHeader;
+                        return task.Result.SendAsync(cancellationToken);
+                    })
                 .Select(task => task.Result.Item2);
         }
 
