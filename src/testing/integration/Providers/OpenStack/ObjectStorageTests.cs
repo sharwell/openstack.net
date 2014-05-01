@@ -1286,16 +1286,11 @@
                 preparedCall.RequestMessage.Headers.Range = new RangeHeaderValue(0, 2);
                 Tuple<HttpResponseMessage, Tuple<ObjectMetadata, Stream>> result = await preparedCall.SendAsync(CancellationToken.None).ConfigureAwait(false);
 
-                Tuple<ObjectMetadata, Stream> data = provider.GetObjectAsync(containerName, objectName, new RangeHeaderValue(0, 2), CancellationToken.None);
-
                 StreamReader reader = new StreamReader(result.Item2.Item2, Encoding.UTF8);
                 actualData += await reader.ReadToEndAsync().ConfigureAwait(false);
 
-                preparedCall = await provider.PrepareGetObjectAsync(containerName, objectName, CancellationToken.None).ConfigureAwait(false);
-                preparedCall.RequestMessage.Headers.Range = new RangeHeaderValue(3, null);
-                result = await preparedCall.SendAsync(CancellationToken.None).ConfigureAwait(false);
-
-                reader = new StreamReader(result.Item2.Item2, Encoding.UTF8);
+                Tuple<ObjectMetadata, Stream> data = await provider.GetObjectAsync(containerName, objectName, new RangeHeaderValue(3, null), CancellationToken.None);
+                reader = new StreamReader(data.Item2, Encoding.UTF8);
                 actualData += await reader.ReadToEndAsync().ConfigureAwait(false);
             }
 
