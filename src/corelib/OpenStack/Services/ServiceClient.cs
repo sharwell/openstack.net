@@ -141,6 +141,22 @@
             }
         }
 
+        /// <summary>
+        /// Gets the default HTTP response validation method for requests sent to this service.
+        /// </summary>
+        /// <remarks>
+        /// This property is intended to support extension methods which prepare <see cref="HttpApiCall{T}"/>
+        /// instances which are not supported by the default client. The validation behavior itself may be
+        /// customized by overriding <see cref="ValidateResultImplAsync"/> in a particular service client.
+        /// </remarks>
+        public Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> DefaultResponseValidator
+        {
+            get
+            {
+                return ValidateResultImplAsync;
+            }
+        }
+
         protected IAuthenticationService AuthenticationService
         {
             get
@@ -168,14 +184,18 @@
         /// <summary>
         /// Gets or sets the <see cref="HttpClient"/> to use for sending requests to the server.
         /// </summary>
-        protected HttpClient HttpClient
+        /// <value>
+        /// The <see cref="HttpClient"/> to use for sending HTTP requests.
+        /// </value>
+        /// <exception cref="ArgumentNullException">If <paramref name="value"/> is <see langword="null"/>.</exception>
+        public HttpClient HttpClient
         {
             get
             {
                 return _httpClient;
             }
 
-            set
+            protected set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
@@ -581,12 +601,10 @@
         /// returns a JSON body.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
-        protected virtual HttpApiCall<T> CreateJsonApiCall<T>(HttpRequestMessage requestMessage)
+        public virtual HttpApiCall<T> CreateJsonApiCall<T>(HttpRequestMessage requestMessage)
         {
             var result = new JsonHttpApiCall<T>(HttpClient, requestMessage, HttpCompletionOption.ResponseContentRead, ValidateResultImplAsync);
-            result.BeforeAsyncWebRequest += (sender, e) => OnBeforeAsyncWebRequest(e.Request);
-            result.AfterAsyncWebResponse += (sender, e) => OnAfterAsyncWebResponse(e.Response);
-            return result;
+            return RegisterApiCall(result);
         }
 
         /// <summary>
@@ -600,33 +618,38 @@
         /// returns a <see cref="Stream"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
-        protected virtual HttpApiCall<Stream> CreateStreamingApiCall(HttpRequestMessage requestMessage)
+        public virtual HttpApiCall<Stream> CreateStreamingApiCall(HttpRequestMessage requestMessage)
         {
             var result = new StreamingHttpApiCall(HttpClient, requestMessage, ValidateResultImplAsync);
-            result.BeforeAsyncWebRequest += (sender, e) => OnBeforeAsyncWebRequest(e.Request);
-            result.AfterAsyncWebResponse += (sender, e) => OnAfterAsyncWebResponse(e.Response);
-            return result;
+            return RegisterApiCall(result);
         }
 
-        protected virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage)
+        public virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage)
         {
             return CreateBasicApiCall(requestMessage, HttpCompletionOption.ResponseContentRead);
         }
 
-        protected virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
+        public virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
         {
             var result = new HttpApiCall(HttpClient, requestMessage, completionOption, ValidateResultImplAsync);
-            result.BeforeAsyncWebRequest += (sender, e) => OnBeforeAsyncWebRequest(e.Request);
-            result.AfterAsyncWebResponse += (sender, e) => OnAfterAsyncWebResponse(e.Response);
-            return result;
+            return RegisterApiCall(result);
         }
 
-        protected virtual HttpApiCall<T> CreateCustomApiCall<T>(HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<HttpResponseMessage, CancellationToken, Task<T>> deserializeResult)
+        public virtual HttpApiCall<T> CreateCustomApiCall<T>(HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<HttpResponseMessage, CancellationToken, Task<T>> deserializeResult)
         {
             var result = new CustomHttpApiCall<T>(HttpClient, requestMessage, completionOption, ValidateResultImplAsync, deserializeResult);
-            result.BeforeAsyncWebRequest += (sender, e) => OnBeforeAsyncWebRequest(e.Request);
-            result.AfterAsyncWebResponse += (sender, e) => OnAfterAsyncWebResponse(e.Response);
-            return result;
+            return RegisterApiCall(result);
+        }
+
+        protected virtual T RegisterApiCall<T>(T call)
+            where T : IHttpApiRequest
+        {
+            if (call == null)
+                throw new ArgumentNullException("call");
+
+            call.BeforeAsyncWebRequest += (sender, e) => OnBeforeAsyncWebRequest(e.Request);
+            call.AfterAsyncWebResponse += (sender, e) => OnAfterAsyncWebResponse(e.Response);
+            return call;
         }
     }
 }

@@ -1279,7 +1279,7 @@
                 ProgressMonitor progressMonitor = new ProgressMonitor(uploadStream.Length);
                 try
                 {
-                    HttpApiCall prepared = await provider.PrepareCreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, progressMonitor);
+                    CreateObjectApiCall prepared = await provider.PrepareCreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, progressMonitor);
                     prepared.RequestMessage.Headers.Add("If-None-Match", "*");
                     await prepared.SendAsync(CancellationToken.None);
                     Assert.Fail("Expected a 412 (Precondition Failed)");
@@ -1297,7 +1297,7 @@
                 ProgressMonitor progressMonitor = new ProgressMonitor(uploadStream.Length);
                 try
                 {
-                    HttpApiCall prepared = await provider.PrepareCreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, progressMonitor);
+                    CreateObjectApiCall prepared = await provider.PrepareCreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, progressMonitor);
                     prepared.RequestMessage.Headers.Add("If-None-Match", "*");
                     await prepared.SendAsync(CancellationToken.None);
                     Assert.Fail("Expected a 412 (Precondition Failed)");
