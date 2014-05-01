@@ -30,18 +30,6 @@
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HttpApiCall"/> class
-        /// with the specified request message.
-        /// </summary>
-        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP API request.</param>
-        /// <param name="disposeMessage"><see langword="true"/> to call <see cref="IDisposable.Dispose"/> on the <paramref name="requestMessage"/> object when this object is disposed; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
-        public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate, bool disposeMessage)
-            : base(httpClient, requestMessage, completionOption, validate, disposeMessage)
-        {
-        }
-
         public static bool IsAcceptable(HttpResponseMessage responseMessage)
         {
             bool acceptable = true;

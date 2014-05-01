@@ -25,11 +25,6 @@
         {
         }
 
-        public JsonHttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate, bool disposeMessage)
-            : base(httpClient, requestMessage, completionOption, validate, disposeMessage)
-        {
-        }
-
         protected override Task<T> DeserializeResultImplAsync(HttpResponseMessage responseMessage, CancellationToken cancellationToken)
         {
             bool acceptable = HttpApiCall.IsAcceptable(responseMessage);

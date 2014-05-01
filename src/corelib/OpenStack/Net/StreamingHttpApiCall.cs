@@ -23,11 +23,6 @@
         {
         }
 
-        public StreamingHttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate, bool disposeMessage)
-            : base(httpClient, requestMessage, HttpCompletionOption.ResponseHeadersRead, validate, disposeMessage)
-        {
-        }
-
         protected override Task<Stream> DeserializeResultImplAsync(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             return response.Content.ReadAsStreamAsync();
