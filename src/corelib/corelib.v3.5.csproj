@@ -216,6 +216,7 @@
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerMetadata.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerName.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerObject.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerQuotaExtensions.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\CopyObjectApiCall.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\CreateContainerApiCall.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\CreateObjectApiCall.cs" />
