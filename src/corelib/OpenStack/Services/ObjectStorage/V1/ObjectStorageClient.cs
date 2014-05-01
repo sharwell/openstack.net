@@ -43,16 +43,16 @@
 
         #region IObjectStorageService Members
 
-        public Task<HttpApiCall<ReadOnlyDictionary<string, JObject>>> PrepareGetObjectStorageInfoAsync(CancellationToken cancellationToken)
+        public Task<GetObjectStorageInfoApiCall> PrepareGetObjectStorageInfoAsync(CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate("/info");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             return GetBaseUriAsync(cancellationToken)
                 .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
-                .Select(task => CreateJsonApiCall<ReadOnlyDictionary<string, JObject>>(task.Result));
+                .Select(task => new GetObjectStorageInfoApiCall(CreateJsonApiCall<ReadOnlyDictionary<string, JObject>>(task.Result)));
         }
 
-        public Task<HttpApiCall<Tuple<AccountMetadata, ReadOnlyCollectionPage<Container>>>> PrepareListContainersAsync(int? pageSize, CancellationToken cancellationToken)
+        public Task<ListContainersApiCall> PrepareListContainersAsync(int? pageSize, CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate("{?limit}");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -105,10 +105,10 @@
 
             return GetBaseUriAsync(cancellationToken)
                 .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
-                .Select(task => CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult));
+                .Select(task => new ListContainersApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
-        public Task<HttpApiCall<AccountMetadata>> PrepareGetAccountMetadataAsync(CancellationToken cancellationToken)
+        public Task<GetAccountMetadataApiCall> PrepareGetAccountMetadataAsync(CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate(string.Empty);
             Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -118,10 +118,10 @@
 
             return GetBaseUriAsync(cancellationToken)
                 .Then(PrepareRequestAsyncFunc(HttpMethod.Head, template, parameters, cancellationToken))
-                .Select(task => CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult));
+                .Select(task => new GetAccountMetadataApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
-        public Task<HttpApiCall> PrepareUpdateAccountMetadataAsync(AccountMetadata metadata, CancellationToken cancellationToken)
+        public Task<UpdateAccountMetadataApiCall> PrepareUpdateAccountMetadataAsync(AccountMetadata metadata, CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate(string.Empty);
             Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -145,11 +145,11 @@
                             requestHeaders.Add(AccountMetadata.AccountMetadataPrefix + pair.Key, StorageMetadata.EncodeHeaderValue(pair.Value));
                         }
 
-                        return call;
+                        return new UpdateAccountMetadataApiCall(call);
                     });
         }
 
-        public Task<HttpApiCall> PrepareRemoveAccountMetadataAsync(IEnumerable<string> keys, CancellationToken cancellationToken)
+        public Task<UpdateAccountMetadataApiCall> PrepareRemoveAccountMetadataAsync(IEnumerable<string> keys, CancellationToken cancellationToken)
         {
             if (keys == null)
                 throw new ArgumentNullException("keys");
@@ -166,7 +166,7 @@
             return PrepareUpdateAccountMetadataAsync(new AccountMetadata(new Dictionary<string, string>(), metadata), cancellationToken);
         }
 
-        public Task<HttpApiCall> PrepareCreateContainerAsync(ContainerName container, CancellationToken cancellationToken)
+        public Task<CreateContainerApiCall> PrepareCreateContainerAsync(ContainerName container, CancellationToken cancellationToken)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
@@ -176,10 +176,10 @@
 
             return GetBaseUriAsync(cancellationToken)
                 .Then(PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, cancellationToken))
-                .Select(task => CreateBasicApiCall(task.Result));
+                .Select(task => new CreateContainerApiCall(CreateBasicApiCall(task.Result)));
         }
 
-        public Task<HttpApiCall> PrepareRemoveContainerAsync(ContainerName container, CancellationToken cancellationToken)
+        public Task<RemoveContainerApiCall> PrepareRemoveContainerAsync(ContainerName container, CancellationToken cancellationToken)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
@@ -189,10 +189,10 @@
 
             return GetBaseUriAsync(cancellationToken)
                 .Then(PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
-                .Select(task => CreateBasicApiCall(task.Result));
+                .Select(task => new RemoveContainerApiCall(CreateBasicApiCall(task.Result)));
         }
 
-        public Task<HttpApiCall<Tuple<ContainerMetadata, ReadOnlyCollectionPage<ContainerObject>>>> PrepareListObjectsAsync(ContainerName container, int? pageSize, CancellationToken cancellationToken)
+        public Task<ListObjectsApiCall> PrepareListObjectsAsync(ContainerName container, int? pageSize, CancellationToken cancellationToken)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
@@ -247,10 +247,10 @@
 
             return GetBaseUriAsync(cancellationToken)
                 .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
-                .Select(task => CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult));
+                .Select(task => new ListObjectsApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
-        public Task<HttpApiCall<ContainerMetadata>> PrepareGetContainerMetadataAsync(ContainerName container, CancellationToken cancellationToken)
+        public Task<GetContainerMetadataApiCall> PrepareGetContainerMetadataAsync(ContainerName container, CancellationToken cancellationToken)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
@@ -263,10 +263,10 @@
 
             return GetBaseUriAsync(cancellationToken)
                 .Then(PrepareRequestAsyncFunc(HttpMethod.Head, template, parameters, cancellationToken))
-                .Select(task => CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult));
+                .Select(task => new GetContainerMetadataApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
-        public Task<HttpApiCall> PrepareUpdateContainerMetadataAsync(ContainerName container, ContainerMetadata metadata, CancellationToken cancellationToken)
+        public Task<UpdateContainerMetadataApiCall> PrepareUpdateContainerMetadataAsync(ContainerName container, ContainerMetadata metadata, CancellationToken cancellationToken)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
@@ -293,11 +293,11 @@
                             requestHeaders.Add(ContainerMetadata.ContainerMetadataPrefix + pair.Key, StorageMetadata.EncodeHeaderValue(pair.Value));
                         }
 
-                        return call;
+                        return new UpdateContainerMetadataApiCall(call);
                     });
         }
 
-        public Task<HttpApiCall> PrepareRemoveContainerMetadataAsync(ContainerName container, IEnumerable<string> keys, CancellationToken cancellationToken)
+        public Task<UpdateContainerMetadataApiCall> PrepareRemoveContainerMetadataAsync(ContainerName container, IEnumerable<string> keys, CancellationToken cancellationToken)
         {
             if (keys == null)
                 throw new ArgumentNullException("keys");
@@ -314,7 +314,7 @@
             return PrepareUpdateContainerMetadataAsync(container, new ContainerMetadata(new Dictionary<string, string>(), metadata), cancellationToken);
         }
 
-        public Task<HttpApiCall> PrepareCreateObjectAsync(ContainerName container, ObjectName @object, Stream stream, CancellationToken cancellationToken, IProgress<long> progress)
+        public Task<CreateObjectApiCall> PrepareCreateObjectAsync(ContainerName container, ObjectName @object, Stream stream, CancellationToken cancellationToken, IProgress<long> progress)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
@@ -337,7 +337,7 @@
                             contentStream = new ProgressStream(contentStream, progress);
 
                         call.RequestMessage.Content = new StreamContent(contentStream);
-                        return call;
+                        return new CreateObjectApiCall(call);
                     });
         }
 
@@ -554,7 +554,7 @@
             }
         }
 
-        public Task<HttpApiCall> PrepareCopyObjectAsync(ContainerName sourceContainer, ObjectName sourceObject, ContainerName destinationContainer, ObjectName destinationObject, CancellationToken cancellationToken)
+        public Task<CopyObjectApiCall> PrepareCopyObjectAsync(ContainerName sourceContainer, ObjectName sourceObject, ContainerName destinationContainer, ObjectName destinationObject, CancellationToken cancellationToken)
         {
             if (sourceContainer == null)
                 throw new ArgumentNullException("sourceContainer");
@@ -584,11 +584,11 @@
                         };
 
                         requestHeaders.Add("Destination", destinationTemplate.BindByName(destinationParameters).OriginalString);
-                        return call;
+                        return new CopyObjectApiCall(call);
                     });
         }
 
-        public Task<HttpApiCall> PrepareRemoveObjectAsync(ContainerName container, ObjectName @object, CancellationToken cancellationToken)
+        public Task<RemoveObjectApiCall> PrepareRemoveObjectAsync(ContainerName container, ObjectName @object, CancellationToken cancellationToken)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
@@ -600,10 +600,10 @@
 
             return GetBaseUriAsync(cancellationToken)
                 .Then(PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
-                .Select(task => CreateBasicApiCall(task.Result));
+                .Select(task => new RemoveObjectApiCall(CreateBasicApiCall(task.Result)));
         }
 
-        public Task<HttpApiCall<Tuple<ObjectMetadata, Stream>>> PrepareGetObjectAsync(ContainerName container, ObjectName @object, CancellationToken cancellationToken)
+        public Task<GetObjectApiCall> PrepareGetObjectAsync(ContainerName container, ObjectName @object, CancellationToken cancellationToken)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
@@ -622,10 +622,10 @@
 
             return GetBaseUriAsync(cancellationToken)
                 .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
-                .Select(task => CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseHeadersRead, deserializeResult));
+                .Select(task => new GetObjectApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseHeadersRead, deserializeResult)));
         }
 
-        public Task<HttpApiCall<ObjectMetadata>> PrepareGetObjectMetadataAsync(ContainerName container, ObjectName @object, CancellationToken cancellationToken)
+        public Task<GetObjectMetadataApiCall> PrepareGetObjectMetadataAsync(ContainerName container, ObjectName @object, CancellationToken cancellationToken)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
@@ -640,10 +640,10 @@
 
             return GetBaseUriAsync(cancellationToken)
                 .Then(PrepareRequestAsyncFunc(HttpMethod.Head, template, parameters, cancellationToken))
-                .Select(task => CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult));
+                .Select(task => new GetObjectMetadataApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
-        public Task<HttpApiCall> PrepareSetObjectMetadataAsync(ContainerName container, ObjectName @object, ObjectMetadata metadata, CancellationToken cancellationToken)
+        public Task<SetObjectMetadataApiCall> PrepareSetObjectMetadataAsync(ContainerName container, ObjectName @object, ObjectMetadata metadata, CancellationToken cancellationToken)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
@@ -711,7 +711,7 @@
                                 requestHeaders.Add(key, StorageMetadata.EncodeHeaderValue(value));
                         }
 
-                        return call;
+                        return new SetObjectMetadataApiCall(call);
                     });
         }
 
