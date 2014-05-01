@@ -26,19 +26,32 @@
             return new ContainerName(location);
         }
 
-        public static Task<HttpApiCall> PrepareCreateVersionedContainerAsync(this IObjectStorageService service, ContainerName container, ContainerName versionsLocation, CancellationToken cancellationToken)
+        public static Task<CreateContainerApiCall> WithVersionsLocation(this Task<CreateContainerApiCall> task, ContainerName versionsLocation)
         {
-            return service.PrepareCreateContainerAsync(container, CancellationToken.None)
-                .WithVersionsLocation(versionsLocation);
+            if (task == null)
+                throw new ArgumentNullException("task");
+            if (versionsLocation == null)
+                throw new ArgumentNullException("versionsLocation");
+
+            return task.WithVersionsLocationImpl(versionsLocation);
         }
 
-        public static Task<HttpApiCall> PrepareSetVersionsLocationAsync(this IObjectStorageService service, ContainerName container, ContainerName versionsLocation, CancellationToken cancellationToken)
+        public static Task<UpdateContainerMetadataApiCall> WithVersionsLocation(this Task<UpdateContainerMetadataApiCall> task, ContainerName versionsLocation)
+        {
+            if (task == null)
+                throw new ArgumentNullException("task");
+            // allow location to be null as a way to remove the X-Versions-Location header
+
+            return task.WithVersionsLocationImpl(versionsLocation);
+        }
+
+        public static Task<UpdateContainerMetadataApiCall> PrepareSetVersionsLocationAsync(this IObjectStorageService service, ContainerName container, ContainerName versionsLocation, CancellationToken cancellationToken)
         {
             return service.PrepareUpdateContainerMetadataAsync(container, ContainerMetadata.Empty, CancellationToken.None)
                 .WithVersionsLocation(versionsLocation);
         }
 
-        public static Task<HttpApiCall> PrepareRemoveVersionsLocationAsync(this IObjectStorageService service, ContainerName container, CancellationToken cancellationToken)
+        public static Task<UpdateContainerMetadataApiCall> PrepareRemoveVersionsLocationAsync(this IObjectStorageService service, ContainerName container, CancellationToken cancellationToken)
         {
             return service.PrepareUpdateContainerMetadataAsync(container, ContainerMetadata.Empty, CancellationToken.None)
                 .WithVersionsLocation(null);
@@ -47,7 +60,7 @@
         public static Task CreateVersionedContainerAsync(this IObjectStorageService service, ContainerName container, ContainerName versionsLocation, CancellationToken cancellationToken)
         {
             return CoreTaskExtensions.Using(
-                () => service.PrepareCreateVersionedContainerAsync(container, versionsLocation, cancellationToken),
+                () => service.PrepareCreateContainerAsync(container, cancellationToken).WithVersionsLocation(versionsLocation),
                 task => task.Result.SendAsync(cancellationToken));
         }
 
@@ -71,12 +84,9 @@
                 task => task.Result.SendAsync(cancellationToken));
         }
 
-        private static Task<HttpApiCall> WithVersionsLocation(this Task<HttpApiCall> apiCall, ContainerName location)
+        private static Task<TCall> WithVersionsLocationImpl<TCall>(this Task<TCall> task, ContainerName location)
+            where TCall : IHttpApiRequest
         {
-            if (apiCall == null)
-                throw new ArgumentNullException("apiCall");
-            // allow location to be null as a way to remove the X-Versions-Location header
-
             string encodedLocation = string.Empty;
             if (location != null)
             {
@@ -90,12 +100,12 @@
             }
 
             return
-                apiCall
+                task
                 .Select(
-                    task =>
+                    innerTask =>
                     {
-                        task.Result.RequestMessage.Headers.Add(VersionsLocation, encodedLocation);
-                        return task.Result;
+                        innerTask.Result.RequestMessage.Headers.Add(VersionsLocation, encodedLocation);
+                        return innerTask.Result;
                     });
         }
     }
