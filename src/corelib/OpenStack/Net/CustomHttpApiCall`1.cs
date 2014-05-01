@@ -27,15 +27,6 @@
             _deserializeResult = deserializeResult;
         }
 
-        public CustomHttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate, bool disposeMessage, Func<HttpResponseMessage, CancellationToken, Task<T>> deserializeResult)
-            : base(httpClient, requestMessage, completionOption, validate, disposeMessage)
-        {
-            if (deserializeResult == null)
-                throw new ArgumentNullException("deserializeResult");
-
-            _deserializeResult = deserializeResult;
-        }
-
         protected override Task<T> DeserializeResultImplAsync(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             return _deserializeResult(response, cancellationToken);

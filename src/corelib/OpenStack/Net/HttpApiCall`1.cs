@@ -39,12 +39,6 @@
         /// </summary>
         private HttpCompletionOption _completionOption;
 
-        /// <summary>
-        /// This value controls whether or not <see cref="IDisposable.Dispose"/> is call on the
-        /// <see cref="RequestMessage"/> object when the current object is disposed.
-        /// </summary>
-        private readonly bool _disposeMessage;
-
         private readonly Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> _validate;
 
         /// <summary>
@@ -66,12 +60,7 @@
         /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP API request.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
         public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
-            : this(httpClient, requestMessage, completionOption, null, true)
-        {
-        }
-
-        public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate)
-            : this(httpClient, requestMessage, completionOption, validate, true)
+            : this(httpClient, requestMessage, completionOption, null)
         {
         }
 
@@ -82,7 +71,7 @@
         /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP API request.</param>
         /// <param name="disposeMessage"><see langword="true"/> to call <see cref="IDisposable.Dispose"/> on the <paramref name="requestMessage"/> object when this object is disposed; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
-        public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate, bool disposeMessage)
+        public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate)
         {
             if (httpClient == null)
                 throw new ArgumentNullException("httpClient");
@@ -91,7 +80,6 @@
 
             _httpClient = httpClient;
             _requestMessage = requestMessage;
-            _disposeMessage = disposeMessage;
             _completionOption = completionOption;
             _validate = validate ?? DefaultResponseValidator;
         }
@@ -226,7 +214,7 @@
         /// <param name="disposing"><see langword="true"/> if this method is called from <see cref="Dispose()"/>; otherwise, <see langword="false"/> if this method is called from a finalizer.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing && _disposeMessage)
+            if (disposing)
             {
                 _requestMessage.Dispose();
             }
