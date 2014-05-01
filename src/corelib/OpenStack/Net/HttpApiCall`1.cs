@@ -32,14 +32,14 @@
         /// <summary>
         /// This is the backing field for the <see cref="RequestMessage"/> property.
         /// </summary>
-        private readonly HttpRequestMessage _requestMessage;
+        private HttpRequestMessage _requestMessage;
 
         /// <summary>
         /// This is the backing field for the <see cref="CompletionOption"/> property.
         /// </summary>
         private HttpCompletionOption _completionOption;
 
-        private readonly Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> _validate;
+        private Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> _validate;
 
         private bool _disposed;
 
@@ -108,7 +108,7 @@
         }
 
         /// <summary>
-        /// Gets the <see cref="HttpRequestMessage"/> used by this HTTP API call.
+        /// Gets or sets the <see cref="HttpRequestMessage"/> used by this HTTP API call.
         /// </summary>
         public HttpRequestMessage RequestMessage
         {
@@ -116,6 +116,15 @@
             {
                 ThrowIfDisposed();
                 return _requestMessage;
+            }
+
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+                ThrowIfDisposed();
+
+                _requestMessage = value;
             }
         }
 
@@ -143,6 +152,12 @@
             {
                 ThrowIfDisposed();
                 return _validate;
+            }
+
+            set
+            {
+                ThrowIfDisposed();
+                _validate = value ?? DefaultResponseValidator;
             }
         }
 
