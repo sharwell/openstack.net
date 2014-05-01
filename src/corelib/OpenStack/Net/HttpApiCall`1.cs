@@ -41,6 +41,8 @@
 
         private readonly Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> _validate;
 
+        private bool _disposed;
+
         /// <summary>
         /// This event is fired immediately before sending an asynchronous web request.
         /// </summary>
@@ -91,6 +93,7 @@
         {
             get
             {
+                ThrowIfDisposed();
                 return _httpClient;
             }
 
@@ -98,6 +101,7 @@
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
+                ThrowIfDisposed();
 
                 _httpClient = value;
             }
@@ -110,6 +114,7 @@
         {
             get
             {
+                ThrowIfDisposed();
                 return _requestMessage;
             }
         }
@@ -121,11 +126,13 @@
         {
             get
             {
+                ThrowIfDisposed();
                 return _completionOption;
             }
 
             set
             {
+                ThrowIfDisposed();
                 _completionOption = value;
             }
         }
@@ -134,6 +141,7 @@
         {
             get
             {
+                ThrowIfDisposed();
                 return _validate;
             }
         }
@@ -153,6 +161,7 @@
         /// <exception cref="WebException">If the HTTP API request does not return successfully.</exception>
         public Task<Tuple<HttpResponseMessage, T>> SendAsync(CancellationToken cancellationToken)
         {
+            ThrowIfDisposed();
             return SendImplAsync(cancellationToken)
                 .Then(task => ValidateCallback(task, cancellationToken))
                 .Then(
@@ -205,6 +214,7 @@
         public void Dispose()
         {
             Dispose(true);
+            _disposed = true;
             GC.SuppressFinalize(this);
         }
 
@@ -218,6 +228,12 @@
             {
                 _requestMessage.Dispose();
             }
+        }
+
+        protected void ThrowIfDisposed()
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(GetType().FullName);
         }
     }
 }
