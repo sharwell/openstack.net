@@ -19,7 +19,7 @@
     /// <typeparam name="T">The class modeling the response returned by the call.</typeparam>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    public abstract class HttpApiCall<T> : IDisposable
+    public abstract class HttpApiCall<T> : IHttpApiCall<T>, IDisposable
     {
         private static readonly Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> DefaultResponseValidator =
             (task, cancellationToken) => task;
