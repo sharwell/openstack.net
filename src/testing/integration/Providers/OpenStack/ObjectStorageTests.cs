@@ -5,6 +5,7 @@
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
+    using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Threading;
     using System.Threading.Tasks;
@@ -1245,6 +1246,59 @@
             }
 
             string actualData = await ReadAllObjectTextAsync(provider, containerName, objectName, Encoding.UTF8, CancellationToken.None, verifyEtag: true);
+            Assert.AreEqual(fileData, actualData);
+
+            /* Cleanup
+             */
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
+        public async Task TestGetObjectWithRangeHeader()
+        {
+            IObjectStorageService provider = CreateProvider();
+            ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
+            ObjectName objectName = new ObjectName(Path.GetRandomFileName());
+            // another random name counts as random content
+            string fileData = Path.GetRandomFileName();
+
+            await provider.CreateContainerAsync(containerName, CancellationToken.None);
+
+            using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
+            {
+                await provider.CreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, null);
+            }
+
+            using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
+            {
+                // it's ok to create the same file twice
+                ProgressMonitor progressMonitor = new ProgressMonitor(uploadStream.Length);
+                await provider.CreateObjectAsync(containerName, objectName, uploadStream, CancellationToken.None, progressMonitor);
+                Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+            }
+
+            string actualData = "";
+            using (MemoryStream downloadStream = new MemoryStream())
+            {
+                GetObjectApiCall preparedCall = await provider.PrepareGetObjectAsync(containerName, objectName, CancellationToken.None).ConfigureAwait(false);
+                preparedCall.RequestMessage.Headers.Range = new RangeHeaderValue(0, 2);
+                Tuple<HttpResponseMessage, Tuple<ObjectMetadata, Stream>> result = await preparedCall.SendAsync(CancellationToken.None).ConfigureAwait(false);
+
+                Tuple<ObjectMetadata, Stream> data = provider.GetObjectAsync(containerName, objectName, new RangeHeaderValue(0, 2), CancellationToken.None);
+
+                StreamReader reader = new StreamReader(result.Item2.Item2, Encoding.UTF8);
+                actualData += await reader.ReadToEndAsync().ConfigureAwait(false);
+
+                preparedCall = await provider.PrepareGetObjectAsync(containerName, objectName, CancellationToken.None).ConfigureAwait(false);
+                preparedCall.RequestMessage.Headers.Range = new RangeHeaderValue(3, null);
+                result = await preparedCall.SendAsync(CancellationToken.None).ConfigureAwait(false);
+
+                reader = new StreamReader(result.Item2.Item2, Encoding.UTF8);
+                actualData += await reader.ReadToEndAsync().ConfigureAwait(false);
+            }
+
             Assert.AreEqual(fileData, actualData);
 
             /* Cleanup
