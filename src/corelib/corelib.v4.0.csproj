@@ -177,11 +177,14 @@
     <Compile Include="OpenStack\Compat\Tuples.cs" />
     <Compile Include="OpenStack\Compat\UriExtensions.cs" />
     <Compile Include="OpenStack\Net\CustomHttpApiCall`1.cs" />
+    <Compile Include="OpenStack\Net\DelegatingHttpApiCall`1.cs" />
     <Compile Include="OpenStack\Net\HttpApiCall.cs" />
     <Compile Include="OpenStack\Net\HttpApiCall`1.cs" />
     <Compile Include="OpenStack\Net\HttpRequestEventArgs.cs" />
     <Compile Include="OpenStack\Net\HttpResponseEventArgs.cs" />
     <Compile Include="OpenStack\Net\HttpWebException.cs" />
+    <Compile Include="OpenStack\Net\IHttpApiCall`1.cs" />
+    <Compile Include="OpenStack\Net\IHttpApiRequest.cs" />
     <Compile Include="OpenStack\Net\JsonHttpApiCall`1.cs" />
     <Compile Include="OpenStack\Net\StreamingHttpApiCall.cs" />
     <Compile Include="OpenStack\Net\UriPart.cs" />
