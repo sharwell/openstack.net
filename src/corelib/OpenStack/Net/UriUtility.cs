@@ -92,6 +92,58 @@
             _allowedFragmentCharacters.Set('?', true);
         }
 
+        public static Uri RemoveQueryParameter(Uri uri, string parameter)
+        {
+            if (uri == null)
+                throw new ArgumentNullException("uri");
+            if (parameter == null)
+                throw new ArgumentNullException("parameter");
+            if (string.IsNullOrEmpty(parameter))
+                throw new ArgumentException("parameter cannot be empty");
+            if (parameter.IndexOfAny(new[] { '&', '?', '=' }) >= 0)
+                throw new ArgumentException();
+            if (parameter.IndexOf('%') >= 0)
+                throw new NotSupportedException("This method does not yet support percent-encoded values in the parameter name");
+
+            string query = uri.Query;
+            if (string.IsNullOrEmpty(query))
+                return uri;
+
+            StringBuilder expressionBuilder = new StringBuilder();
+            byte[] encodedParameter = Encoding.UTF8.GetBytes(parameter);
+            expressionBuilder.Append("[?&]");
+            foreach (byte b in encodedParameter)
+            {
+                string escapedUpper = b.ToString("X2");
+                expressionBuilder.Append("(?:");
+                expressionBuilder.Append(Regex.Escape(((char)b).ToString()));
+                expressionBuilder.Append("|%");
+
+                foreach (var escaped in escapedUpper)
+                {
+                    if (escaped != char.ToLowerInvariant(escaped))
+                        expressionBuilder.Append('[').Append(escaped).Append(char.ToLowerInvariant(escaped)).Append(']');
+                    else
+                        expressionBuilder.Append(escaped);
+                }
+
+                expressionBuilder.Append(")");
+            }
+
+            expressionBuilder.Append("=[^?&]*");
+
+            Regex expression = new Regex(expressionBuilder.ToString());
+            UriBuilder uriBuilder = new UriBuilder(uri);
+            string modifiedQuery = expression.Replace(uriBuilder.Query, string.Empty);
+
+            // setting the UriBuilder.Query property adds a leading `?` even if one is already present in `modifiedQuery`
+            if (!string.IsNullOrEmpty(modifiedQuery))
+                modifiedQuery = modifiedQuery.Substring(1);
+
+            uriBuilder.Query = modifiedQuery;
+            return uriBuilder.Uri;
+        }
+
         /// <summary>
         /// Decodes the text of a URI by unescaping any percent-encoded character sequences and
         /// then evaluating the result using the default <see cref="Encoding.UTF8"/> encoding.
