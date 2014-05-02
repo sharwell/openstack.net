@@ -146,6 +146,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Providers\OpenStack\CloudFiles\DarkKnightRises.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Providers\Rackspace\CloudFiles\DarkKnightRises.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
