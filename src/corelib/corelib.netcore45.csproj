@@ -205,6 +205,7 @@
     <Compile Include="OpenStack\Services\Identity\V2\UserDetails.cs" />
     <Compile Include="OpenStack\Services\Identity\V2\UserId.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\AccountMetadata.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ArchiveFormat.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\Container.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerMetadata.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ContainerName.cs" />
@@ -213,6 +214,9 @@
     <Compile Include="OpenStack\Services\ObjectStorage\V1\CopyObjectApiCall.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\CreateContainerApiCall.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\CreateObjectApiCall.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ExtractArchiveError.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ExtractArchiveExtensions.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\ExtractArchiveResponse.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\GetAccountMetadataApiCall.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\GetContainerMetadataApiCall.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\GetObjectApiCall.cs" />

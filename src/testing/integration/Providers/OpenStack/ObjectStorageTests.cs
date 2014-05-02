@@ -7,8 +7,12 @@
     using System.Linq;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Security.Cryptography;
     using System.Threading;
     using System.Threading.Tasks;
+    using ICSharpCode.SharpZipLib.BZip2;
+    using ICSharpCode.SharpZipLib.GZip;
+    using ICSharpCode.SharpZipLib.Tar;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json.Linq;
     using global::OpenStack.Collections;
@@ -19,6 +23,7 @@
     using global::Rackspace.Security.Authentication;
     using global::Rackspace.Threading;
     using Encoding = System.Text.Encoding;
+    using File = System.IO.File;
     using HttpStatusCode = System.Net.HttpStatusCode;
     using MemoryStream = System.IO.MemoryStream;
     using Path = System.IO.Path;
@@ -1498,6 +1503,7 @@
                 Assert.Inconclusive("The provider does not support verifying ETags for large objects.");
             }
         }
+#endif
 
         [TestMethod]
         [TestCategory(TestCategories.User)]
@@ -1505,7 +1511,10 @@
         [DeploymentItem("DarkKnightRises.jpg")]
         public async Task TestExtractArchiveTar()
         {
-            CloudFilesProvider provider = (CloudFilesProvider)Bootstrapper.CreateObjectStorageProvider();
+            IObjectStorageService provider = CreateProvider();
+            if (!await provider.SupportsExtractArchiveAsync(CancellationToken.None))
+                Assert.Inconclusive("The Object Storage service does not appear to support the Extract Archive feature.");
+
             ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
             string sourceFileName = "DarkKnightRises.jpg";
             byte[] content = File.ReadAllBytes("DarkKnightRises.jpg");
@@ -1522,7 +1531,7 @@
 
                 outputStream.Flush();
                 outputStream.Position = 0;
-                ExtractArchiveResponse response = provider.ExtractArchive(outputStream, containerName, ArchiveFormat.Tar);
+                ExtractArchiveResponse response = await provider.ExtractArchiveAsync(containerName, outputStream, ArchiveFormat.Tar, CancellationToken.None, null);
                 Assert.IsNotNull(response);
                 Assert.AreEqual(1, response.CreatedFiles);
                 Assert.IsNotNull(response.Errors);
@@ -1531,8 +1540,9 @@
 
             using (MemoryStream downloadStream = new MemoryStream())
             {
-                provider.GetObject(containerName, sourceFileName, downloadStream, verifyEtag: true);
-                Assert.AreEqual(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
+                var data = await provider.GetObjectAsync(containerName, new ObjectName(sourceFileName), CancellationToken.None);
+                await data.Item2.CopyToAsync(downloadStream, 4096, CancellationToken.None);
+                Assert.AreEqual(content.Length, await GetContainerObjectSizeAsync(provider, containerName, new ObjectName(sourceFileName), CancellationToken.None));
 
                 downloadStream.Position = 0;
                 byte[] actualData = new byte[downloadStream.Length];
@@ -1548,7 +1558,7 @@
 
             /* Cleanup
              */
-            provider.RemoveContainer(containerName, deleteObjects: true);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -1557,9 +1567,12 @@
         [DeploymentItem("DarkKnightRises.jpg")]
         public async Task TestExtractArchiveTarGz()
         {
-            CloudFilesProvider provider = (CloudFilesProvider)Bootstrapper.CreateObjectStorageProvider();
+            IObjectStorageService provider = CreateProvider();
+            if (!await provider.SupportsExtractArchiveAsync(CancellationToken.None))
+                Assert.Inconclusive("The Object Storage service does not appear to support the Extract Archive feature.");
+
             ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
-            string sourceFileName = "DarkKnightRises.jpg";
+            ObjectName sourceFileName = new ObjectName("DarkKnightRises.jpg");
             byte[] content = File.ReadAllBytes("DarkKnightRises.jpg");
             using (MemoryStream outputStream = new MemoryStream())
             {
@@ -1570,8 +1583,8 @@
                     using (TarArchive archive = TarArchive.CreateOutputTarArchive(gzoStream))
                     {
                         archive.IsStreamOwner = false;
-                        archive.RootPath = Path.GetDirectoryName(Path.GetFullPath(sourceFileName)).Replace('\\', '/');
-                        TarEntry entry = TarEntry.CreateEntryFromFile(sourceFileName);
+                        archive.RootPath = Path.GetDirectoryName(Path.GetFullPath(sourceFileName.Value)).Replace('\\', '/');
+                        TarEntry entry = TarEntry.CreateEntryFromFile(sourceFileName.Value);
                         archive.WriteEntry(entry, true);
                         archive.Close();
                     }
@@ -1579,7 +1592,7 @@
 
                 outputStream.Flush();
                 outputStream.Position = 0;
-                ExtractArchiveResponse response = provider.ExtractArchive(outputStream, containerName, ArchiveFormat.TarGz);
+                ExtractArchiveResponse response = await provider.ExtractArchiveAsync(containerName, outputStream, ArchiveFormat.TarGz, CancellationToken.None, null);
                 Assert.IsNotNull(response);
                 Assert.AreEqual(1, response.CreatedFiles);
                 Assert.IsNotNull(response.Errors);
@@ -1588,8 +1601,9 @@
 
             using (MemoryStream downloadStream = new MemoryStream())
             {
-                provider.GetObject(containerName, sourceFileName, downloadStream, verifyEtag: true);
-                Assert.AreEqual(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
+                var data = await provider.GetObjectAsync(containerName, sourceFileName, CancellationToken.None);
+                await data.Item2.CopyToAsync(downloadStream);
+                Assert.AreEqual(content.Length, await GetContainerObjectSizeAsync(provider, containerName, sourceFileName, CancellationToken.None));
 
                 downloadStream.Position = 0;
                 byte[] actualData = new byte[downloadStream.Length];
@@ -1605,7 +1619,7 @@
 
             /* Cleanup
              */
-            provider.RemoveContainer(containerName, deleteObjects: true);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -1614,9 +1628,12 @@
         [DeploymentItem("DarkKnightRises.jpg")]
         public async Task TestExtractArchiveTarBz2()
         {
-            CloudFilesProvider provider = (CloudFilesProvider)Bootstrapper.CreateObjectStorageProvider();
+            IObjectStorageService provider = CreateProvider();
+            if (!await provider.SupportsExtractArchiveAsync(CancellationToken.None))
+                Assert.Inconclusive("The Object Storage service does not appear to support the Extract Archive feature.");
+
             ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
-            string sourceFileName = "DarkKnightRises.jpg";
+            ObjectName sourceFileName = new ObjectName("DarkKnightRises.jpg");
             byte[] content = File.ReadAllBytes("DarkKnightRises.jpg");
             using (MemoryStream outputStream = new MemoryStream())
             {
@@ -1626,8 +1643,8 @@
                     using (TarArchive archive = TarArchive.CreateOutputTarArchive(bz2Stream))
                     {
                         archive.IsStreamOwner = false;
-                        archive.RootPath = Path.GetDirectoryName(Path.GetFullPath(sourceFileName)).Replace('\\', '/');
-                        TarEntry entry = TarEntry.CreateEntryFromFile(sourceFileName);
+                        archive.RootPath = Path.GetDirectoryName(Path.GetFullPath(sourceFileName.Value)).Replace('\\', '/');
+                        TarEntry entry = TarEntry.CreateEntryFromFile(sourceFileName.Value);
                         archive.WriteEntry(entry, true);
                         archive.Close();
                     }
@@ -1635,7 +1652,7 @@
 
                 outputStream.Flush();
                 outputStream.Position = 0;
-                ExtractArchiveResponse response = provider.ExtractArchive(outputStream, containerName, ArchiveFormat.TarBz2);
+                ExtractArchiveResponse response = await provider.ExtractArchiveAsync(containerName, outputStream, ArchiveFormat.TarBz2, CancellationToken.None, null);
                 Assert.IsNotNull(response);
                 Assert.AreEqual(1, response.CreatedFiles);
                 Assert.IsNotNull(response.Errors);
@@ -1644,8 +1661,9 @@
 
             using (MemoryStream downloadStream = new MemoryStream())
             {
-                provider.GetObject(containerName, sourceFileName, downloadStream, verifyEtag: true);
-                Assert.AreEqual(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
+                var data = await provider.GetObjectAsync(containerName, sourceFileName, CancellationToken.None);
+                await data.Item2.CopyToAsync(downloadStream);
+                Assert.AreEqual(content.Length, await GetContainerObjectSizeAsync(provider, containerName, sourceFileName, CancellationToken.None));
 
                 downloadStream.Position = 0;
                 byte[] actualData = new byte[downloadStream.Length];
@@ -1661,7 +1679,7 @@
 
             /* Cleanup
              */
-            provider.RemoveContainer(containerName, deleteObjects: true);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
         [TestMethod]
@@ -1670,9 +1688,12 @@
         [DeploymentItem("DarkKnightRises.jpg")]
         public async Task TestExtractArchiveTarGzCreateContainer()
         {
-            CloudFilesProvider provider = (CloudFilesProvider)Bootstrapper.CreateObjectStorageProvider();
+            IObjectStorageService provider = CreateProvider();
+            if (!await provider.SupportsExtractArchiveAsync(CancellationToken.None))
+                Assert.Inconclusive("The Object Storage service does not appear to support the Extract Archive feature.");
+
             ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
-            string sourceFileName = "DarkKnightRises.jpg";
+            ObjectName sourceFileName = new ObjectName("DarkKnightRises.jpg");
             byte[] content = File.ReadAllBytes("DarkKnightRises.jpg");
             using (MemoryStream outputStream = new MemoryStream())
             {
@@ -1683,7 +1704,7 @@
                     using (TarOutputStream tarOutputStream = new TarOutputStream(gzoStream))
                     {
                         tarOutputStream.IsStreamOwner = false;
-                        TarEntry entry = TarEntry.CreateTarEntry(containerName + '/' + sourceFileName);
+                        TarEntry entry = TarEntry.CreateTarEntry(containerName.Value + '/' + sourceFileName);
                         entry.Size = content.Length;
                         tarOutputStream.PutNextEntry(entry);
                         tarOutputStream.Write(content, 0, content.Length);
@@ -1694,7 +1715,7 @@
 
                 outputStream.Flush();
                 outputStream.Position = 0;
-                ExtractArchiveResponse response = provider.ExtractArchive(outputStream, "", ArchiveFormat.TarGz);
+                ExtractArchiveResponse response = await provider.ExtractArchiveAsync(outputStream, ArchiveFormat.TarGz, CancellationToken.None, null);
                 Assert.IsNotNull(response);
                 Assert.AreEqual(1, response.CreatedFiles);
                 Assert.IsNotNull(response.Errors);
@@ -1703,8 +1724,9 @@
 
             using (MemoryStream downloadStream = new MemoryStream())
             {
-                provider.GetObject(containerName, sourceFileName, downloadStream, verifyEtag: true);
-                Assert.AreEqual(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
+                var data = await provider.GetObjectAsync(containerName, sourceFileName, CancellationToken.None);
+                await data.Item2.CopyToAsync(downloadStream);
+                Assert.AreEqual(content.Length, await GetContainerObjectSizeAsync(provider, containerName, sourceFileName, CancellationToken.None));
 
                 downloadStream.Position = 0;
                 byte[] actualData = new byte[downloadStream.Length];
@@ -1720,11 +1742,10 @@
 
             /* Cleanup
              */
-            provider.RemoveContainer(containerName, deleteObjects: true);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
-#endif
 
-        private static async Task<long> GetContainerObjectSize(IObjectStorageService provider, ContainerName container, ObjectName @object, CancellationToken cancellationToken)
+        private static async Task<long> GetContainerObjectSizeAsync(IObjectStorageService provider, ContainerName container, ObjectName @object, CancellationToken cancellationToken)
         {
             ObjectMetadata headers = await provider.GetObjectMetadataAsync(container, @object, cancellationToken);
             return long.Parse(headers.Headers["Content-Length"]);
