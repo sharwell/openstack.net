@@ -148,6 +148,7 @@
     <Compile Include="OpenStack\Compat\Tuple.cs" />
     <Compile Include="OpenStack\Compat\Tuples.cs" />
     <Compile Include="OpenStack\Compat\UriExtensions.cs" />
+    <Compile Include="OpenStack\IO\ProgressStream.cs" />
     <Compile Include="OpenStack\Net\CustomHttpApiCall`1.cs" />
     <Compile Include="OpenStack\Net\DelegatingHttpApiCall`1.cs" />
     <Compile Include="OpenStack\Net\HttpApiCall.cs" />
