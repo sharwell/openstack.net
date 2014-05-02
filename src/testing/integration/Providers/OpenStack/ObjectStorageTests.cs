@@ -120,7 +120,7 @@
         public async Task CleanupAllContainerMetadata()
         {
             IObjectStorageService provider = CreateProvider();
-            IEnumerable<Container> containers = await ListAllContainersAsync(provider, null, CancellationToken.None, null);
+            IEnumerable<Container> containers = await ListAllContainersAsync(provider, CancellationToken.None, null);
             foreach (Container container in containers)
             {
                 ContainerMetadata metadata = await provider.GetContainerMetadataAsync(container.Name, CancellationToken.None);
@@ -137,7 +137,7 @@
         public async Task CleanupTestContainerMetadata()
         {
             IObjectStorageService provider = CreateProvider();
-            IEnumerable<Container> containers = await ListAllContainersAsync(provider, null, CancellationToken.None, null);
+            IEnumerable<Container> containers = await ListAllContainersAsync(provider, CancellationToken.None, null);
             foreach (Container container in containers)
             {
                 Dictionary<string, string> metadata = await GetContainerMetadataWithPrefix(provider, container, TestKeyPrefix, CancellationToken.None);
@@ -154,7 +154,7 @@
         public async Task CleanupTestContainers()
         {
             IObjectStorageService provider = CreateProvider();
-            IEnumerable<Container> containers = await ListAllContainersAsync(provider, null, CancellationToken.None, null);
+            IEnumerable<Container> containers = await ListAllContainersAsync(provider, CancellationToken.None, null);
             foreach (Container container in containers)
             {
                 if (container.Name.Value.StartsWith(TestContainerPrefix))
@@ -174,7 +174,7 @@
                     {
                         // this works around a bug in bulk delete, where files with trailing whitespace
                         // in the name do not get deleted
-                        foreach (ContainerObject containerObject in await ListAllObjectsAsync(provider, container.Name, null, CancellationToken.None, null))
+                        foreach (ContainerObject containerObject in await ListAllObjectsAsync(provider, container.Name, CancellationToken.None, null))
                             await provider.RemoveObjectAsync(container.Name, containerObject.Name, CancellationToken.None);
 
                         await provider.RemoveContainerAsync(container.Name, CancellationToken.None);
@@ -182,7 +182,7 @@
                 }
                 else if (container.Name.Equals(".CDN_ACCESS_LOGS"))
                 {
-                    foreach (ContainerObject containerObject in await ListAllObjectsAsync(provider, container.Name, null, CancellationToken.None, null))
+                    foreach (ContainerObject containerObject in await ListAllObjectsAsync(provider, container.Name, CancellationToken.None, null))
                     {
                         if (containerObject.Name.Value.StartsWith(TestContainerPrefix))
                             await provider.RemoveObjectAsync(container.Name, containerObject.Name, CancellationToken.None);
@@ -197,7 +197,7 @@
         public async Task TestListContainers()
         {
             IObjectStorageService provider = CreateProvider();
-            IEnumerable<Container> containers = await ListAllContainersAsync(provider, null, CancellationToken.None, null);
+            IEnumerable<Container> containers = await ListAllContainersAsync(provider, CancellationToken.None, null);
             if (!containers.Any())
                 Assert.Inconclusive("The account does not have any containers in the region.");
 
@@ -216,7 +216,15 @@
         public async Task TestContainerProperties()
         {
             IObjectStorageService provider = CreateProvider();
-            IEnumerable<Container> containers = await ListAllContainersAsync(provider, 2, CancellationToken.None, null);
+
+            int pageSize = 2;
+            IProgress<ReadOnlyCollection<Container>> progress = new Progress<ReadOnlyCollection<Container>>(
+                page =>
+                {
+                    if (page.Count > pageSize)
+                        throw new InvalidOperationException();
+                });
+            IEnumerable<Container> containers = await ListAllContainersAsync(provider, pageSize, CancellationToken.None, progress);
             if (!containers.Any())
                 Assert.Inconclusive("The account does not have any containers in the region.");
 
@@ -238,7 +246,7 @@
 
                 long objectCount = 0;
                 long objectSize = 0;
-                foreach (var obj in await ListAllObjectsAsync(provider, container.Name, null, CancellationToken.None, null))
+                foreach (var obj in await ListAllObjectsAsync(provider, container.Name, CancellationToken.None, null))
                 {
                     objectCount++;
                     objectSize += obj.Size.Value;
@@ -588,12 +596,8 @@
                 {
                     return
                         CoreTaskExtensions.Using(
-                            () => provider.PrepareGetContainerMetadataAsync(containerName, CancellationToken.None),
-                            task =>
-                                {
-                                    task.Result.RequestMessage.Headers.Add("X-Newest", "true");
-                                    return task.Result.SendAsync(CancellationToken.None);
-                                })
+                            () => provider.PrepareGetContainerMetadataAsync(containerName, CancellationToken.None).WithNewest(),
+                            task => task.Result.SendAsync(CancellationToken.None))
                         .Select(task => task.Result.Item2);
                 };
 
@@ -829,7 +833,13 @@
         }
 #endif
 
-        private static async Task<ReadOnlyCollection<Container>> ListAllContainersAsync(IObjectStorageService provider, int? pageSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollection<Container>> progress)
+        private static async Task<ReadOnlyCollection<Container>> ListAllContainersAsync(IObjectStorageService provider, CancellationToken cancellationToken, IProgress<ReadOnlyCollection<Container>> progress)
+        {
+            var firstPage = await provider.ListContainersAsync(cancellationToken);
+            return await firstPage.Item2.GetAllPagesAsync(cancellationToken, progress);
+        }
+
+        private static async Task<ReadOnlyCollection<Container>> ListAllContainersAsync(IObjectStorageService provider, int pageSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollection<Container>> progress)
         {
             if (pageSize <= 0)
                 throw new ArgumentOutOfRangeException("pageSize");
@@ -838,7 +848,13 @@
             return await firstPage.Item2.GetAllPagesAsync(cancellationToken, progress);
         }
 
-        private static async Task<ReadOnlyCollection<ContainerObject>> ListAllObjectsAsync(IObjectStorageService provider, ContainerName container, int? pageSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollection<ContainerObject>> progress)
+        private static async Task<ReadOnlyCollection<ContainerObject>> ListAllObjectsAsync(IObjectStorageService provider, ContainerName container, CancellationToken cancellationToken, IProgress<ReadOnlyCollection<ContainerObject>> progress)
+        {
+            var firstPage = await provider.ListObjectsAsync(container, CancellationToken.None);
+            return await firstPage.Item2.GetAllPagesAsync(cancellationToken, progress);
+        }
+
+        private static async Task<ReadOnlyCollection<ContainerObject>> ListAllObjectsAsync(IObjectStorageService provider, ContainerName container, int pageSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollection<ContainerObject>> progress)
         {
             if (pageSize <= 0)
                 throw new ArgumentOutOfRangeException("pageSize");
@@ -1098,7 +1114,7 @@
             }
 
             Console.WriteLine("Objects in container {0}", containerName);
-            foreach (ContainerObject containerObject in await ListAllObjectsAsync(provider, containerName, null, CancellationToken.None, null))
+            foreach (ContainerObject containerObject in await ListAllObjectsAsync(provider, containerName, CancellationToken.None, null))
             {
                 Console.WriteLine("  {0}", containerObject.Name);
             }
@@ -1136,7 +1152,7 @@
                 }
 
                 Console.WriteLine("Objects in container {0}", containerName);
-                foreach (ContainerObject containerObject in await ListAllObjectsAsync(provider, containerName, null, CancellationToken.None, null))
+                foreach (ContainerObject containerObject in await ListAllObjectsAsync(provider, containerName, CancellationToken.None, null))
                 {
                     Console.WriteLine("  {0}", containerObject.Name);
                 }
@@ -1895,7 +1911,6 @@
             await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
 
-#if false // no API yet
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.ObjectStorage)]
@@ -1918,7 +1933,7 @@
             string actualData = await ReadAllObjectTextAsync(provider, containerName, objectName, Encoding.UTF8, CancellationToken.None, verifyEtag: true);
             Assert.AreEqual(fileData, actualData);
 
-            provider.MoveObjectAsync(containerName, objectName, containerName, movedName, CancellationToken.None);
+            await provider.MoveObjectAsync(containerName, objectName, containerName, movedName, CancellationToken.None);
 
             try
             {
@@ -1939,9 +1954,8 @@
 
             /* Cleanup
              */
-            await provider.RemoveContainerAsync(containerName, CancellationToken.None);
+            await RemoveContainerWithObjectsAsync(provider, containerName, CancellationToken.None);
         }
-#endif
 
         [TestMethod]
         [TestCategory(TestCategories.User)]
@@ -2279,7 +2293,7 @@
 
             while (true)
             {
-                var request = await provider.PrepareListObjectsAsync(container, null, cancellationToken);
+                var request = await provider.PrepareListObjectsAsync(container, cancellationToken).WithNewest();
                 request.RequestMessage.Headers.Add("X-Newest", "true");
                 var response = await request.SendAsync(cancellationToken);
                 ReadOnlyCollectionPage<ContainerObject> objects = response.Item2.Item2;

@@ -17,6 +17,28 @@
                 .Select(task => task.Result.ContainsKey("container_quotas"));
         }
 
+        public static Task<CreateContainerApiCall> WithSizeQuota(this Task<CreateContainerApiCall> task, long size)
+        {
+            return
+                task.Select(
+                    innerTask =>
+                    {
+                        task.Result.RequestMessage.Headers.Add(ContainerMetadata.ContainerMetadataPrefix + QuotaBytes, size.ToString());
+                        return task.Result;
+                    });
+        }
+
+        public static Task<CreateContainerApiCall> WithObjectCountQuota(this Task<CreateContainerApiCall> task, long count)
+        {
+            return
+                task.Select(
+                    innerTask =>
+                    {
+                        task.Result.RequestMessage.Headers.Add(ContainerMetadata.ContainerMetadataPrefix + QuotaCount, count.ToString());
+                        return task.Result;
+                    });
+        }
+
         public static Task<UpdateContainerMetadataApiCall> WithSizeQuota(this Task<UpdateContainerMetadataApiCall> task, long size)
         {
             return

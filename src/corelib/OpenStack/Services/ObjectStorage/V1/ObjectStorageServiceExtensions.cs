@@ -35,14 +35,18 @@
 
         public static Task<Tuple<AccountMetadata, ReadOnlyCollectionPage<Container>>> ListContainersAsync(this IObjectStorageService service, CancellationToken cancellationToken)
         {
-            return ListContainersAsync(service, null, cancellationToken);
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareListContainersAsync(cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2);
         }
 
-        public static Task<Tuple<AccountMetadata, ReadOnlyCollectionPage<Container>>> ListContainersAsync(this IObjectStorageService service, int? pageSize, CancellationToken cancellationToken)
+        public static Task<Tuple<AccountMetadata, ReadOnlyCollectionPage<Container>>> ListContainersAsync(this IObjectStorageService service, int pageSize, CancellationToken cancellationToken)
         {
             return
                 CoreTaskExtensions.Using(
-                    () => service.PrepareListContainersAsync(pageSize, cancellationToken),
+                    () => service.PrepareListContainersAsync(cancellationToken).WithPageSize(pageSize),
                     task => task.Result.SendAsync(cancellationToken))
                 .Select(task => task.Result.Item2);
         }
@@ -90,14 +94,18 @@
 
         public static Task<Tuple<ContainerMetadata, ReadOnlyCollectionPage<ContainerObject>>> ListObjectsAsync(this IObjectStorageService service, ContainerName container, CancellationToken cancellationToken)
         {
-            return ListObjectsAsync(service, container, null, cancellationToken);
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareListObjectsAsync(container, cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2);
         }
 
-        public static Task<Tuple<ContainerMetadata, ReadOnlyCollectionPage<ContainerObject>>> ListObjectsAsync(this IObjectStorageService service, ContainerName container, int? pageSize, CancellationToken cancellationToken)
+        public static Task<Tuple<ContainerMetadata, ReadOnlyCollectionPage<ContainerObject>>> ListObjectsAsync(this IObjectStorageService service, ContainerName container, int pageSize, CancellationToken cancellationToken)
         {
             return
                 CoreTaskExtensions.Using(
-                    () => service.PrepareListObjectsAsync(container, pageSize, cancellationToken),
+                    () => service.PrepareListObjectsAsync(container, cancellationToken).WithPageSize(pageSize),
                     task => task.Result.SendAsync(cancellationToken))
                 .Select(task => task.Result.Item2);
         }
@@ -141,6 +149,12 @@
             return CoreTaskExtensions.Using(
                 () => service.PrepareCopyObjectAsync(sourceContainer, sourceObject, destinationContainer, destinationObject, cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+        }
+
+        public static Task MoveObjectAsync(this IObjectStorageService service, ContainerName sourceContainer, ObjectName sourceObject, ContainerName destinationContainer, ObjectName destinationObject, CancellationToken cancellationToken)
+        {
+            return service.CopyObjectAsync(sourceContainer, sourceObject, destinationContainer, destinationObject, cancellationToken)
+                .Then(task => service.RemoveObjectAsync(sourceContainer, sourceObject, cancellationToken));
         }
 
         public static Task RemoveObjectAsync(this IObjectStorageService service, ContainerName container, ObjectName @object, CancellationToken cancellationToken)

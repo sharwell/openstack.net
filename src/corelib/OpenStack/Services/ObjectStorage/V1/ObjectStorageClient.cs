@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
@@ -53,16 +54,16 @@
                 .Select(task => new GetObjectStorageInfoApiCall(CreateJsonApiCall<ReadOnlyDictionary<string, JObject>>(task.Result)));
         }
 
-        public Task<ListContainersApiCall> PrepareListContainersAsync(int? pageSize, CancellationToken cancellationToken)
+        public Task<ListContainersApiCall> PrepareListContainersAsync(CancellationToken cancellationToken)
         {
-            UriTemplate template = new UriTemplate("{?limit}");
+            UriTemplate template = new UriTemplate(string.Empty);
             Dictionary<string, string> parameters = new Dictionary<string, string>();
-            if (pageSize != null)
-                parameters.Add("limit", pageSize.ToString());
 
             Func<HttpResponseMessage, CancellationToken, Task<Tuple<AccountMetadata, ReadOnlyCollectionPage<Container>>>> deserializeResult =
                 (responseMessage, innerCancellationToken) =>
                 {
+                    Uri originalUri = responseMessage.RequestMessage.RequestUri;
+
                     AccountMetadata metadata = new AccountMetadata(responseMessage);
                     if (!HttpApiCall.IsAcceptable(responseMessage))
                         throw new HttpWebException(responseMessage);
@@ -78,18 +79,17 @@
                                     getNextPageAsync =
                                         innerCancellationToken2 =>
                                         {
-#warning this does not preserve customized query parameters and/or headers
-                                            return PrepareListContainersAsync(pageSize, innerCancellationToken2)
-                                                .Select(
-                                                    _ =>
-                                                    {
-                                                        bool hasQuery = !string.IsNullOrEmpty(_.Result.RequestMessage.RequestUri.Query);
-                                                        UriTemplate nextPageTemplate = new UriTemplate(hasQuery ? "{&marker}" : "{?marker}");
-                                                        Uri boundTemplate = nextPageTemplate.BindByName(new Dictionary<string, string> { { "marker", list[list.Count - 1].Name.Value } });
-                                                        _.Result.RequestMessage.RequestUri = new Uri(_.Result.RequestMessage.RequestUri.AbsoluteUri + boundTemplate.OriginalString);
-                                                        return _.Result;
-                                                    })
-                                                .Then(
+                                            ContainerName marker = list.Last().Name;
+                                            return
+                                                CoreTaskExtensions.Using(
+                                                    () => PrepareListContainersAsync(innerCancellationToken2)
+                                                        .Select(
+                                                            _ =>
+                                                            {
+                                                                _.Result.RequestMessage.RequestUri = originalUri;
+                                                                return _.Result;
+                                                            })
+                                                        .WithMarker(marker),
                                                     _ => _.Result.SendAsync(innerCancellationToken2))
                                                 .Select(_ => _.Result.Item2.Item2);
                                         };
@@ -193,19 +193,19 @@
                 .Select(task => new RemoveContainerApiCall(CreateBasicApiCall(task.Result)));
         }
 
-        public Task<ListObjectsApiCall> PrepareListObjectsAsync(ContainerName container, int? pageSize, CancellationToken cancellationToken)
+        public Task<ListObjectsApiCall> PrepareListObjectsAsync(ContainerName container, CancellationToken cancellationToken)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
 
-            UriTemplate template = new UriTemplate("{container}{?limit}");
+            UriTemplate template = new UriTemplate("{container}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "container", container.Value } };
-            if (pageSize != null)
-                parameters.Add("limit", pageSize.ToString());
 
             Func<HttpResponseMessage, CancellationToken, Task<Tuple<ContainerMetadata, ReadOnlyCollectionPage<ContainerObject>>>> deserializeResult =
                 (responseMessage, innerCancellationToken) =>
                 {
+                    Uri originalUri = responseMessage.RequestMessage.RequestUri;
+
                     ContainerMetadata metadata = new ContainerMetadata(responseMessage);
                     if (!HttpApiCall.IsAcceptable(responseMessage))
                         throw new HttpWebException(responseMessage);
@@ -221,17 +221,17 @@
                                     getNextPageAsync =
                                         innerCancellationToken2 =>
                                         {
-                                            return PrepareListObjectsAsync(container, pageSize, innerCancellationToken2)
-                                                .Select(
-                                                    _ =>
-                                                    {
-                                                        bool hasQuery = !string.IsNullOrEmpty(_.Result.RequestMessage.RequestUri.Query);
-                                                        UriTemplate nextPageTemplate = new UriTemplate(hasQuery ? "{&marker}" : "{?marker}");
-                                                        Uri boundTemplate = nextPageTemplate.BindByName(new Dictionary<string, string> { { "marker", list[list.Count - 1].Name.Value } });
-                                                        _.Result.RequestMessage.RequestUri = new Uri(_.Result.RequestMessage.RequestUri.AbsoluteUri + boundTemplate.OriginalString);
-                                                        return _.Result;
-                                                    })
-                                                .Then(
+                                            ObjectName marker = list.Last().Name;
+                                            return
+                                                CoreTaskExtensions.Using(
+                                                    () => PrepareListObjectsAsync(container, innerCancellationToken2)
+                                                        .Select(
+                                                            _ =>
+                                                            {
+                                                                _.Result.RequestMessage.RequestUri = originalUri;
+                                                                return _.Result;
+                                                            })
+                                                        .WithMarker(marker),
                                                     _ => _.Result.SendAsync(innerCancellationToken2))
                                                 .Select(_ => _.Result.Item2.Item2);
                                         };

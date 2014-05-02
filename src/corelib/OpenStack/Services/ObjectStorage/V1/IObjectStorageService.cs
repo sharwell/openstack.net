@@ -21,7 +21,7 @@
 
         #region Accounts
 
-        Task<ListContainersApiCall> PrepareListContainersAsync(int? pageSize, CancellationToken cancellationToken);
+        Task<ListContainersApiCall> PrepareListContainersAsync(CancellationToken cancellationToken);
 
         Task<GetAccountMetadataApiCall> PrepareGetAccountMetadataAsync(CancellationToken cancellationToken);
 
@@ -37,7 +37,7 @@
 
         Task<RemoveContainerApiCall> PrepareRemoveContainerAsync(ContainerName container, CancellationToken cancellationToken);
 
-        Task<ListObjectsApiCall> PrepareListObjectsAsync(ContainerName container, int? pageSize, CancellationToken cancellationToken);
+        Task<ListObjectsApiCall> PrepareListObjectsAsync(ContainerName container, CancellationToken cancellationToken);
 
         Task<GetContainerMetadataApiCall> PrepareGetContainerMetadataAsync(ContainerName container, CancellationToken cancellationToken);
 
