@@ -21,6 +21,8 @@
     using Newtonsoft.Json;
     using global::OpenStack.Net;
     using Container = net.openstack.Core.Domain.Container;
+    using ArchiveFormat = global::OpenStack.Services.ObjectStorage.V1.ArchiveFormat;
+    using ExtractArchiveResponse = global::OpenStack.Services.ObjectStorage.V1.ExtractArchiveResponse;
     using File = System.IO.File;
     using FileInfo = System.IO.FileInfo;
     using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;

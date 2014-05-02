@@ -338,7 +338,6 @@
     <Compile Include="Providers\Rackspace\ILoadBalancerService.cs" />
     <Compile Include="Providers\Rackspace\IMonitoringService.cs" />
     <Compile Include="Providers\Rackspace\NamespaceDoc.cs" />
-    <Compile Include="Providers\Rackspace\Objects\ArchiveFormat.cs" />
     <Compile Include="Providers\Rackspace\Objects\AutoScale\ActiveServer.cs" />
     <Compile Include="Providers\Rackspace\Objects\AutoScale\GenericLaunchConfiguration.cs" />
     <Compile Include="Providers\Rackspace\Objects\AutoScale\GroupConfiguration.cs" />
@@ -609,8 +608,6 @@
     <Compile Include="Providers\Rackspace\Objects\Request\NamespaceDoc.cs" />
     <Compile Include="Providers\Rackspace\Objects\Request\PasswordCredential.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\BulkDeleteResponse.cs" />
-    <Compile Include="Providers\Rackspace\Objects\Response\ExtractArchiveError.cs" />
-    <Compile Include="Providers\Rackspace\Objects\Response\ExtractArchiveResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\ListEndpointsResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\MetadataItemResponse.cs" />
     <Compile Include="Providers\Rackspace\Objects\Response\ListVirtualInterfacesResponse.cs" />
