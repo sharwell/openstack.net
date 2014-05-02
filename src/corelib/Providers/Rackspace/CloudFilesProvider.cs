@@ -25,6 +25,8 @@ using net.openstack.Providers.Rackspace.Validators;
 using Newtonsoft.Json;
 using OpenStack.Net;
 using global::Rackspace.Net;
+using ArchiveFormat = OpenStack.Services.ObjectStorage.V1.ArchiveFormat;
+using ExtractArchiveResponse = OpenStack.Services.ObjectStorage.V1.ExtractArchiveResponse;
 
 namespace net.openstack.Providers.Rackspace
 {
