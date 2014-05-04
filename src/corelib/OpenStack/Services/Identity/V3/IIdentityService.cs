@@ -141,6 +141,12 @@
 
         Task<AddRoleApiCall> PrepareAddRoleAsync(RoleRequest request, CancellationToken cancellationToken);
 
+        Task<GetRoleApiCall> PrepareGetRoleAsync(RoleId roleId, CancellationToken cancellationToken);
+
+        Task<UpdateRoleApiCall> PrepareUpdateRoleAsync(RoleId roleId, RoleRequest request, CancellationToken cancellationToken);
+
+        Task<RemoveRoleApiCall> PrepareRemoveRoleAsync(RoleId roleId, CancellationToken cancellationToken);
+
         Task<ListRolesApiCall> PrepareListRolesAsync(CancellationToken cancellationToken);
 
         Task<AddRoleToUserApiCall> PrepareAddRoleToUserAsync(ProjectId projectId, UserId userId, RoleId roleId, CancellationToken cancellationToken);
