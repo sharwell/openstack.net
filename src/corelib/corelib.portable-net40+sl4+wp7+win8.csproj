@@ -262,6 +262,7 @@
     <Compile Include="OpenStack\Services\Identity\V3\GetDomainApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\GetPolicyApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\GetProjectApiCall.cs" />
+    <Compile Include="OpenStack\Services\Identity\V3\GetRoleApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\GetServiceApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\GetTokenApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\GetUserApiCall.cs" />
@@ -301,6 +302,7 @@
     <Compile Include="OpenStack\Services\Identity\V3\RemoveGroupUserApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\RemovePolicyApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\RemoveProjectApiCall.cs" />
+    <Compile Include="OpenStack\Services\Identity\V3\RemoveRoleApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\RemoveRoleFromUserApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\RemoveServiceApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\RemoveTokenApiCall.cs" />
@@ -311,6 +313,7 @@
     <Compile Include="OpenStack\Services\Identity\V3\RoleData.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\RoleId.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\RoleRequest.cs" />
+    <Compile Include="OpenStack\Services\Identity\V3\RoleResponse.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\Scope.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\Service.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\ServiceData.cs" />
@@ -324,6 +327,7 @@
     <Compile Include="OpenStack\Services\Identity\V3\UpdateEndpointApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\UpdatePolicyApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\UpdateProjectApiCall.cs" />
+    <Compile Include="OpenStack\Services\Identity\V3\UpdateRoleApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\UpdateServiceApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\UpdateUserApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\User.cs" />
