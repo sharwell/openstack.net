@@ -25,7 +25,7 @@
     /// </summary>
     /// <typeparam name="TProvider">The service provider interface this object implements.</typeparam>
     /// <threadsafety static="true" instance="false"/>
-    public abstract class ServiceClient
+    public abstract class ServiceClient : IHttpApiCallFactory
     {
         /// <summary>
         /// The <see cref="IAuthenticationService"/> to use for authenticating requests to this provider.
@@ -601,7 +601,7 @@
         /// returns a JSON body.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
-        public virtual HttpApiCall<T> CreateJsonApiCall<T>(HttpRequestMessage requestMessage)
+        protected virtual HttpApiCall<T> CreateJsonApiCall<T>(HttpRequestMessage requestMessage)
         {
             var result = new JsonHttpApiCall<T>(HttpClient, requestMessage, HttpCompletionOption.ResponseContentRead, ValidateResultImplAsync);
             return RegisterApiCall(result);
@@ -618,24 +618,24 @@
         /// returns a <see cref="Stream"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
-        public virtual HttpApiCall<Stream> CreateStreamingApiCall(HttpRequestMessage requestMessage)
+        protected virtual HttpApiCall<Stream> CreateStreamingApiCall(HttpRequestMessage requestMessage)
         {
             var result = new StreamingHttpApiCall(HttpClient, requestMessage, ValidateResultImplAsync);
             return RegisterApiCall(result);
         }
 
-        public virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage)
+        protected virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage)
         {
             return CreateBasicApiCall(requestMessage, HttpCompletionOption.ResponseContentRead);
         }
 
-        public virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
+        protected virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
         {
             var result = new HttpApiCall(HttpClient, requestMessage, completionOption, ValidateResultImplAsync);
             return RegisterApiCall(result);
         }
 
-        public virtual HttpApiCall<T> CreateCustomApiCall<T>(HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<HttpResponseMessage, CancellationToken, Task<T>> deserializeResult)
+        protected virtual HttpApiCall<T> CreateCustomApiCall<T>(HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<HttpResponseMessage, CancellationToken, Task<T>> deserializeResult)
         {
             var result = new CustomHttpApiCall<T>(HttpClient, requestMessage, completionOption, ValidateResultImplAsync, deserializeResult);
             return RegisterApiCall(result);
@@ -651,5 +651,29 @@
             call.AfterAsyncWebResponse += (sender, e) => OnAfterAsyncWebResponse(e.Response);
             return call;
         }
+
+        #region IHttpApiCallFactory Members
+
+        HttpApiCall<T> IHttpApiCallFactory.CreateJsonApiCall<T>(HttpRequestMessage requestMessage)
+        {
+            return CreateJsonApiCall<T>(requestMessage);
+        }
+
+        HttpApiCall<Stream> IHttpApiCallFactory.CreateStreamingApiCall(HttpRequestMessage requestMessage)
+        {
+            return CreateStreamingApiCall(requestMessage);
+        }
+
+        HttpApiCall IHttpApiCallFactory.CreateBasicApiCall(HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
+        {
+            return CreateBasicApiCall(requestMessage, completionOption);
+        }
+
+        HttpApiCall<T> IHttpApiCallFactory.CreateCustomApiCall<T>(HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<HttpResponseMessage, CancellationToken, Task<T>> deserializeResult)
+        {
+            return CreateCustomApiCall<T>(requestMessage, completionOption, deserializeResult);
+        }
+
+        #endregion
     }
 }
