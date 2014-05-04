@@ -25,7 +25,7 @@
     /// </summary>
     /// <typeparam name="TProvider">The service provider interface this object implements.</typeparam>
     /// <threadsafety static="true" instance="false"/>
-    public abstract class ServiceClient : IHttpApiCallFactory
+    public abstract class ServiceClient : IHttpApiCallFactory, IHttpService
     {
         /// <summary>
         /// The <see cref="IAuthenticationService"/> to use for authenticating requests to this provider.
@@ -222,7 +222,25 @@
         /// <para>If <paramref name="parameters"/> is <see langword="null"/>.</para>
         /// </exception>
         /// <preliminary/>
-        protected Func<Task<Uri>, Task<HttpRequestMessage>> PrepareRequestAsyncFunc(HttpMethod method, UriTemplate template, IDictionary<string, string> parameters, CancellationToken cancellationToken, Func<Uri, Uri> uriTransform = null)
+        public Func<Task<Uri>, Task<HttpRequestMessage>> PrepareRequestAsyncFunc<T>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, CancellationToken cancellationToken, Func<Uri, Uri> uriTransform)
+        {
+            var prepared = PrepareRequestAsyncFunc(method, template, parameters, cancellationToken);
+            if (uriTransform == null)
+                return prepared;
+
+            return
+                task =>
+                {
+                    return prepared(task).Select(
+                        innerTask =>
+                        {
+                            innerTask.Result.RequestUri = uriTransform(innerTask.Result.RequestUri);
+                            return innerTask.Result;
+                        });
+                };
+        }
+
+        public Func<Task<Uri>, Task<HttpRequestMessage>> PrepareRequestAsyncFunc<T>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, CancellationToken cancellationToken)
         {
             if (template == null)
                 throw new ArgumentNullException("template");
@@ -233,7 +251,7 @@
                 task =>
                 {
                     Uri baseUri = task.Result;
-                    HttpRequestMessage request = PrepareRequestImpl(method, template, baseUri, parameters, uriTransform);
+                    HttpRequestMessage request = PrepareRequestImpl(method, template, baseUri, parameters);
 
                     Func<Task<HttpRequestMessage>, Task<HttpRequestMessage>> authenticateRequest =
                         task2 => _authenticationService.AuthenticateRequestAsync(task2.Result, cancellationToken).Select(_ => task2.Result);
@@ -262,13 +280,31 @@
         /// <para>If <paramref name="parameters"/> is <see langword="null"/>.</para>
         /// </exception>
         /// <preliminary/>
-        protected Func<Task<Uri>, Task<HttpRequestMessage>> PrepareRequestAsyncFunc<TBody>(HttpMethod method, UriTemplate template, IDictionary<string, string> parameters, TBody body, CancellationToken cancellationToken, Func<Uri, Uri> uriTransform = null)
+        public Func<Task<Uri>, Task<HttpRequestMessage>> PrepareRequestAsyncFunc<T, TBody>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, TBody body, CancellationToken cancellationToken, Func<Uri, Uri> uriTransform)
+        {
+            var prepared = PrepareRequestAsyncFunc(method, template, parameters, body, cancellationToken);
+            if (uriTransform == null)
+                return prepared;
+
+            return
+                task =>
+                {
+                    return prepared(task).Select(
+                        innerTask =>
+                        {
+                            innerTask.Result.RequestUri = uriTransform(innerTask.Result.RequestUri);
+                            return innerTask.Result;
+                        });
+                };
+        }
+
+        public Func<Task<Uri>, Task<HttpRequestMessage>> PrepareRequestAsyncFunc<T, TBody>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, TBody body, CancellationToken cancellationToken)
         {
             return
                 task =>
                 {
                     Uri baseUri = task.Result;
-                    HttpRequestMessage request = PrepareRequestImpl(method, template, baseUri, parameters, uriTransform);
+                    HttpRequestMessage request = PrepareRequestImpl(method, template, baseUri, parameters);
                     request.Content = EncodeRequestBodyImpl(request, body);
 
                     Func<Task<HttpRequestMessage>, Task<HttpRequestMessage>> authenticateRequest =
@@ -359,11 +395,9 @@
         /// </exception>
         /// <exception cref="ArgumentException">If <paramref name="baseUri"/> is not an absolute URI.</exception>
         /// <preliminary/>
-        protected virtual HttpRequestMessage PrepareRequestImpl(HttpMethod method, UriTemplate template, Uri baseUri, IDictionary<string, string> parameters, Func<Uri, Uri> uriTransform)
+        protected virtual HttpRequestMessage PrepareRequestImpl<T>(HttpMethod method, UriTemplate template, Uri baseUri, IDictionary<string, T> parameters)
         {
             Uri boundUri = template.BindByName(baseUri, parameters);
-            if (uriTransform != null)
-                boundUri = uriTransform(boundUri);
 
             HttpRequestMessage request = new HttpRequestMessage(method, boundUri);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -389,7 +423,7 @@
         /// a <see cref="Uri"/> representing the base absolute URI for the service.
         /// </returns>
         /// <preliminary/>
-        protected abstract Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken);
+        public abstract Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Invokes the <see cref="BeforeAsyncWebRequest"/> event for the specified <paramref name="request"/>.

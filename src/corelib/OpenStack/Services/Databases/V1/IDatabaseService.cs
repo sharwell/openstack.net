@@ -15,7 +15,7 @@ namespace OpenStack.Services.Databases.V1
     /// </summary>
     /// <seealso href="http://docs.rackspace.com/cdb/api/v1.0/cdb-devguide/content/overview.html">Rackspace Cloud Databases Developer Guide - API v1.0</seealso>
     /// <preliminary/>
-    public interface IDatabaseService
+    public interface IDatabaseService : IHttpService
     {
         #region Database instances
 

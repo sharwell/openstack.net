@@ -20,6 +20,7 @@ namespace net.openstack.Providers.Rackspace
     using global::Rackspace.Services.Databases.V1;
     using CancellationToken = System.Threading.CancellationToken;
     using FlavorId = OpenStack.Services.Databases.V1.FlavorId;
+    using IHttpService = OpenStack.Services.IHttpService;
 
 #if !NET40PLUS
     using OpenStack.Compat;
@@ -1232,5 +1233,24 @@ namespace net.openstack.Providers.Rackspace
                     return _baseUri;
                 });
         }
+
+        #region IHttpService Members
+
+        Func<Task<Uri>, Task<HttpRequestMessage>> IHttpService.PrepareRequestAsyncFunc<T>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        Func<Task<Uri>, Task<HttpRequestMessage>> IHttpService.PrepareRequestAsyncFunc<T, TBody>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, TBody body, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Uri> IHttpService.GetBaseUriAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }

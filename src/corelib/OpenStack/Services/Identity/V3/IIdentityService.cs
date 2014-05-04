@@ -3,7 +3,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public interface IIdentityService
+    public interface IIdentityService : IHttpService
     {
         #region API Information
 
