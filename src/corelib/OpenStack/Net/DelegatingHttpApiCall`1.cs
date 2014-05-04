@@ -5,9 +5,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-#if NET40PLUS
-    using System;
-#else
+#if !NET40PLUS
     using OpenStack.Compat;
 #endif
 

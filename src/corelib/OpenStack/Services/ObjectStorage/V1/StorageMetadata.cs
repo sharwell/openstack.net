@@ -2,15 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Net.Http;
     using System.Text;
-    using System.Threading.Tasks;
     using OpenStack.Collections;
 
-#if !NET45PLUS
-    using OpenStack.Collections;
+#if NET45PLUS
+    using System.Collections.ObjectModel;
 #endif
 
     public abstract class StorageMetadata
