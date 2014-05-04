@@ -4,7 +4,7 @@
     using System.Threading.Tasks;
     using OpenStack.Collections;
 
-    public interface IIdentityService
+    public interface IIdentityService : IHttpService
     {
         #region Client API Operations
 

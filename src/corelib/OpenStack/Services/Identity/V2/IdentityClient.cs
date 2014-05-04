@@ -76,7 +76,7 @@
 
         #endregion
 
-        protected override Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken)
+        public override Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken)
         {
             return CompletedTask.FromResult(_baseUri);
         }

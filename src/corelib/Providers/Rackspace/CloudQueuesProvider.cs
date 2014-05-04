@@ -19,6 +19,7 @@
     using OpenStack.Services.Queues.V1;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
+    using IHttpService = OpenStack.Services.IHttpService;
 
 #if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
@@ -912,5 +913,24 @@
             request.Headers.Add("Client-Id", _clientId.ToString("D"));
             return request;
         }
+
+        #region IHttpService Members
+
+        Func<Task<Uri>, Task<HttpRequestMessage>> IHttpService.PrepareRequestAsyncFunc<T>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        Func<Task<Uri>, Task<HttpRequestMessage>> IHttpService.PrepareRequestAsyncFunc<T, TBody>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, TBody body, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Uri> IHttpService.GetBaseUriAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }

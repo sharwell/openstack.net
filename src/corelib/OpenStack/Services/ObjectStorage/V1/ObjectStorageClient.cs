@@ -511,7 +511,7 @@
         /// available, <see cref="ProviderBase{TProvider}.GetServiceEndpoint"/> is called to obtain
         /// an <see cref="Endpoint"/> with the type <c>??</c> and preferred type <c>??</c>.
         /// </remarks>
-        protected override Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken)
+        public override Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken)
         {
             if (_baseUri != null)
             {

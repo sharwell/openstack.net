@@ -11,7 +11,7 @@
     using Rackspace.Threading;
 #endif
 
-    public interface IObjectStorageService
+    public interface IObjectStorageService : IHttpService
     {
         #region Discoverability
 
