@@ -43,6 +43,8 @@
 
         Task<ListEndpointsApiCall> PrepareListEndpointsAsync(CancellationToken cancellationToken);
 
+        Task<GetEndpointApiCall> PrepareGetEndpointAsync(EndpointId endpointId, CancellationToken cancellationToken);
+
         Task<UpdateEndpointApiCall> PrepareUpdateEndpointAsync(EndpointId endpointId, EndpointRequest request, CancellationToken cancellationToken);
 
         Task<RemoveEndpointApiCall> PrepareRemoveEndpointAsync(EndpointId endpointId, CancellationToken cancellationToken);
