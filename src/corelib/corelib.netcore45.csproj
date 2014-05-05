@@ -238,6 +238,7 @@
     <Compile Include="OpenStack\Services\Identity\V3\EndpointResponse.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\GetCredentialApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\GetDomainApiCall.cs" />
+    <Compile Include="OpenStack\Services\Identity\V3\GetEndpointApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\GetPolicyApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\GetProjectApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\GetRoleApiCall.cs" />
@@ -248,6 +249,7 @@
     <Compile Include="OpenStack\Services\Identity\V3\GroupId.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\IdentityApiInfoApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\IdentityData.cs" />
+    <Compile Include="OpenStack\Services\Identity\V3\IdentityServiceExtensions.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\IIdentityService.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\ListCredentialsApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\ListDomainGroupRolesApiCall.cs" />

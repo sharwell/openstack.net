@@ -61,5 +61,48 @@
             _url = uri.AbsoluteUri;
             _interface = @interface;
         }
+
+        public EndpointInterface Interface
+        {
+            get
+            {
+                return _interface;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+        }
+
+        public string Region
+        {
+            get
+            {
+                return _region;
+            }
+        }
+
+        public Uri Uri
+        {
+            get
+            {
+                if (_url == null)
+                    return null;
+
+                return new Uri(_url, UriKind.Absolute);
+            }
+        }
+
+        public ServiceId ServiceId
+        {
+            get
+            {
+                return _serviceId;
+            }
+        }
     }
 }
