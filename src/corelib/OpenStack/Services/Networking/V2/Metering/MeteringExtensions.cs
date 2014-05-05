@@ -15,7 +15,7 @@
 
     public static class MeteringExtensions
     {
-#error this alias is not correct.
+#warning this alias is not correct.
         public static readonly ExtensionAlias ExtensionAlias = new ExtensionAlias("");
 
         public static Task<bool> SupportsMeteringAsync(this INetworkingService client, CancellationToken cancellationToken)
