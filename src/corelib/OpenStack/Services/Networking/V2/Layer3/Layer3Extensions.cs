@@ -12,6 +12,7 @@
     using OpenStack.Net;
     using Rackspace.Net;
     using Rackspace.Threading;
+    using QuotaData = OpenStack.Services.Networking.V2.Quotas.QuotaData;
 
     public static class Layer3Extensions
     {
@@ -331,6 +332,38 @@
             return CoreTaskExtensions.Using(
                 () => client.PrepareRemoveFloatingIpAsync(floatingIpId, cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+        }
+
+        public static int? GetRouterQuota(this QuotaData quotaData)
+        {
+            JToken value;
+            if (!quotaData.ExtensionData.TryGetValue("router", out value) || value == null)
+                return null;
+
+            return value.ToObject<int?>();
+        }
+
+        public static QuotaData WithRouterQuota(this QuotaData quotaData, int routerQuota)
+        {
+            Dictionary<string, JToken> extensionData = new Dictionary<string, JToken>(quotaData.ExtensionData);
+            extensionData["router"] = JToken.FromObject(routerQuota);
+            return new QuotaData(quotaData.Network, quotaData.Subnet, quotaData.Port, extensionData);
+        }
+
+        public static int? GetFloatingIpQuota(this QuotaData quotaData)
+        {
+            JToken value;
+            if (!quotaData.ExtensionData.TryGetValue("floatingip", out value) || value == null)
+                return null;
+
+            return value.ToObject<int?>();
+        }
+
+        public static QuotaData WithFloatingIpQuota(this QuotaData quotaData, int routerQuota)
+        {
+            Dictionary<string, JToken> extensionData = new Dictionary<string, JToken>(quotaData.ExtensionData);
+            extensionData["floatingip"] = JToken.FromObject(routerQuota);
+            return new QuotaData(quotaData.Network, quotaData.Subnet, quotaData.Port, extensionData);
         }
 
         private static IHttpApiCallFactory GetHttpApiCallFactory(INetworkingService client)

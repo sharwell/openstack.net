@@ -457,6 +457,15 @@
     <Compile Include="OpenStack\Services\Networking\V2\PortResponse.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\PortStatus.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\Provider\SegmentationId.cs" />
+    <Compile Include="OpenStack\Services\Networking\V2\Quotas\GetQuotasApiCall.cs" />
+    <Compile Include="OpenStack\Services\Networking\V2\Quotas\ListQuotasApiCall.cs" />
+    <Compile Include="OpenStack\Services\Networking\V2\Quotas\Quota.cs" />
+    <Compile Include="OpenStack\Services\Networking\V2\Quotas\QuotaData.cs" />
+    <Compile Include="OpenStack\Services\Networking\V2\Quotas\QuotaRequest.cs" />
+    <Compile Include="OpenStack\Services\Networking\V2\Quotas\QuotaResponse.cs" />
+    <Compile Include="OpenStack\Services\Networking\V2\Quotas\QuotasExtensions.cs" />
+    <Compile Include="OpenStack\Services\Networking\V2\Quotas\ResetQuotasApiCall.cs" />
+    <Compile Include="OpenStack\Services\Networking\V2\Quotas\UpdateQuotasApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\RemoveNetworkApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\RemovePortApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\RemoveSubnetApiCall.cs" />
