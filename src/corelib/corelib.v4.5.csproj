@@ -182,6 +182,7 @@
     <Compile Include="OpenStack\ObjectModel\ResourceIdentifier`1.cs" />
     <Compile Include="OpenStack\Security\Authentication\IAuthenticationService.cs" />
     <Compile Include="OpenStack\Security\Authentication\IdentityV2AuthenticationClient.cs" />
+    <Compile Include="OpenStack\Security\Authentication\IdentityV3AuthenticationClient.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\Database.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\DatabaseConfiguration.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\DatabaseFlavor.cs" />
