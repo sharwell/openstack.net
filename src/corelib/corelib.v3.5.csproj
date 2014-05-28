@@ -185,6 +185,11 @@
     <Compile Include="OpenStack\Security\Authentication\IAuthenticationService.cs" />
     <Compile Include="OpenStack\Security\Authentication\IdentityV2AuthenticationClient.cs" />
     <Compile Include="OpenStack\Security\Authentication\IdentityV3AuthenticationClient.cs" />
+    <Compile Include="OpenStack\Services\Custom\EchoApiCall.cs" />
+    <Compile Include="OpenStack\Services\Custom\EchoClient.cs" />
+    <Compile Include="OpenStack\Services\Custom\EchoResponse.cs" />
+    <Compile Include="OpenStack\Services\Custom\EchoServiceExtensions.cs" />
+    <Compile Include="OpenStack\Services\Custom\IEchoService.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\Database.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\DatabaseConfiguration.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\DatabaseFlavor.cs" />
