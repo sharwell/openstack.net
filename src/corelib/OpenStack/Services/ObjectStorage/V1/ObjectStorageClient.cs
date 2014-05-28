@@ -508,8 +508,9 @@
         /// <inheritdoc/>
         /// <remarks>
         /// This method returns a cached base address if one is available. If no cached address is
-        /// available, <see cref="ProviderBase{TProvider}.GetServiceEndpoint"/> is called to obtain
-        /// an <see cref="Endpoint"/> with the type <c>??</c> and preferred type <c>??</c>.
+        /// available, <see cref="IAuthenticationService.GetBaseAddressAsync"/> is called to obtain
+        /// a <see cref="Uri"/> with the type <c>object-store</c>. The preferred name is not
+        /// specified.
         /// </remarks>
         public override Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken)
         {
