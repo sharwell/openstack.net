@@ -1,13 +1,12 @@
 ﻿namespace OpenStack.Net
 {
     using System;
-    using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
 
     /// <summary>
-    /// This class contains data for events that happen in the context of a
-    /// <see cref="WebResponse"/>.
+    /// This class contains data for events that happen in the context of an
+    /// HTTP response.
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>

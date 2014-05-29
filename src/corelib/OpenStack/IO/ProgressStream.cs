@@ -16,11 +16,28 @@
     using Rackspace.Threading;
 #endif
 
+    /// <summary>
+    /// This class operates as a wrapper around an underlying <see cref="Stream"/> instance
+    /// which reports progress to an <see cref="IProgress{T}"/> instance.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public class ProgressStream : Stream
     {
         private readonly Stream _underlyingStream;
         private readonly IProgress<long> _progress;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProgressStream"/> class from
+        /// the specified <see cref="Stream"/> and <see cref="IProgress{T}"/> handler.
+        /// </summary>
+        /// <param name="underlyingStream">The stream to wrap.</param>
+        /// <param name="progress">The handler to report progress updates to.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="underlyingStream"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="progress"/> is <see langword="null"/>.</para>
+        /// </exception>
         public ProgressStream(Stream underlyingStream, IProgress<long> progress)
         {
             if (underlyingStream == null)
@@ -32,6 +49,7 @@
             _progress = progress;
         }
 
+        /// <inheritdoc/>
         public override bool CanRead
         {
             get
@@ -40,6 +58,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public override bool CanSeek
         {
             get
@@ -48,6 +67,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public override bool CanTimeout
         {
             get
@@ -56,6 +76,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public override bool CanWrite
         {
             get
@@ -64,6 +85,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public override long Length
         {
             get
@@ -72,6 +94,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public override long Position
         {
             get
@@ -86,6 +109,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public override int ReadTimeout
         {
             get
@@ -99,6 +123,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public override int WriteTimeout
         {
             get
@@ -113,6 +138,7 @@
         }
 
 #if NET45PLUS
+        /// <inheritdoc/>
         public override Task CopyToAsync(Stream destination, int bufferSize, CancellationToken cancellationToken)
         {
             return
@@ -120,6 +146,7 @@
                 .Select(task => _progress.Report(Position));
         }
 
+        /// <inheritdoc/>
         public override Task FlushAsync(CancellationToken cancellationToken)
         {
             return
@@ -127,6 +154,7 @@
                 .Select(task => _progress.Report(Position));
         }
 
+        /// <inheritdoc/>
         public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             return
@@ -139,6 +167,7 @@
                     });
         }
 
+        /// <inheritdoc/>
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             return
@@ -148,21 +177,25 @@
 #endif
 
 #if !PORTABLE
+        /// <inheritdoc/>
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             return _underlyingStream.BeginRead(buffer, offset, count, callback, state);
         }
 
+        /// <inheritdoc/>
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             return _underlyingStream.BeginWrite(buffer, offset, count, callback, state);
         }
 
+        /// <inheritdoc/>
         public override void Close()
         {
             _underlyingStream.Close();
         }
 
+        /// <inheritdoc/>
         public override int EndRead(IAsyncResult asyncResult)
         {
             int result = _underlyingStream.EndRead(asyncResult);
@@ -170,6 +203,7 @@
             return result;
         }
 
+        /// <inheritdoc/>
         public override void EndWrite(IAsyncResult asyncResult)
         {
             _underlyingStream.EndWrite(asyncResult);
@@ -177,11 +211,13 @@
         }
 #endif
 
+        /// <inheritdoc/>
         public override void Flush()
         {
             _underlyingStream.Flush();
         }
 
+        /// <inheritdoc/>
         public override int Read(byte[] buffer, int offset, int count)
         {
             int result = _underlyingStream.Read(buffer, offset, count);
@@ -189,6 +225,7 @@
             return result;
         }
 
+        /// <inheritdoc/>
         public override int ReadByte()
         {
             int result = _underlyingStream.ReadByte();
@@ -196,6 +233,7 @@
             return result;
         }
 
+        /// <inheritdoc/>
         public override long Seek(long offset, SeekOrigin origin)
         {
             long result = _underlyingStream.Seek(offset, origin);
@@ -203,23 +241,27 @@
             return result;
         }
 
+        /// <inheritdoc/>
         public override void SetLength(long value)
         {
             _underlyingStream.SetLength(value);
         }
 
+        /// <inheritdoc/>
         public override void Write(byte[] buffer, int offset, int count)
         {
             _underlyingStream.Write(buffer, offset, count);
             _progress.Report(Position);
         }
 
+        /// <inheritdoc/>
         public override void WriteByte(byte value)
         {
             _underlyingStream.WriteByte(value);
             _progress.Report(Position);
         }
 
+        /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
             if (disposing)

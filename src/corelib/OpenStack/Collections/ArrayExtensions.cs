@@ -2,6 +2,12 @@
 {
     using System;
 
+    /// <summary>
+    /// Provides extension methods to support consistent <see cref="Array"/> API operations
+    /// across multiple versions of the .NET framework.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     internal static class ArrayExtensions
     {
 #if PORTABLE

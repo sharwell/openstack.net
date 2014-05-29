@@ -5,8 +5,11 @@
     using System.Collections.ObjectModel;
 
     /// <summary>
-    /// Provides extension methods for the <see cref="List{T}"/> class.
+    /// Provides extension methods to support consistent <see cref="List{T}"/> API operations
+    /// across multiple versions of the .NET framework.
     /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public static class ListExtensions
     {
         /// <summary>

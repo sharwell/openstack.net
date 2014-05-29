@@ -1,7 +1,6 @@
 ﻿namespace OpenStack.ObjectModel
 {
     using System;
-    using System.Collections.Concurrent;
     using OpenStack.ObjectModel.Converters;
 
     /// <summary>
@@ -10,6 +9,7 @@
     /// </summary>
     /// <typeparam name="T">The enumeration type.</typeparam>
     /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public abstract class ExtensibleEnum<T> : IEquatable<T>
         where T : ExtensibleEnum<T>
     {
@@ -62,6 +62,7 @@
         /// objects to JSON string values.
         /// </summary>
         /// <threadsafety static="true" instance="false"/>
+        /// <preliminary/>
         protected abstract class ConverterBase : SimpleStringJsonConverter<T>
         {
             /// <remarks>

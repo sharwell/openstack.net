@@ -11,26 +11,74 @@
     using OpenStack.Compat;
 #endif
 
+    /// <summary>
+    /// This class provides an implementation of <see cref="HttpApiCall{T}"/> returns
+    /// the response body as a <see cref="string"/>.
+    /// </summary>
+    /// <remarks>
+    /// This class supports both calls that return a text body that do not require special
+    /// deserialization, as well as calls that do not return a response body at all. The
+    /// latter is simply treated as an empty string.
+    /// </remarks>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public class HttpApiCall : HttpApiCall<string>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpApiCall"/> class
-        /// with the specified request message.
+        /// with the specified <see cref="HttpClient"/>, request message, and
+        /// completion option.
         /// </summary>
-        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP API request.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
+        /// <param name="httpClient">The <see cref="HttpClient"/> to use for HTTP requests.</param>
+        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP request for the API call.</param>
+        /// <param name="completionOption">The <see cref="HttpCompletionOption"/> to specify when sending the HTTP request.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="httpClient"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="requestMessage"/> is <see langword="null"/>.</para>
+        /// </exception>
         public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
             : base(httpClient, requestMessage, completionOption)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpApiCall"/> class
+        /// with the specified <see cref="HttpClient"/>, request message,
+        /// completion option, and validation behavior.
+        /// </summary>
+        /// <param name="httpClient">The <see cref="HttpClient"/> to use for HTTP requests.</param>
+        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP request for the API call.</param>
+        /// <param name="completionOption">The <see cref="HttpCompletionOption"/> to specify when sending the HTTP request.</param>
+        /// <param name="validate">A user-defined function to validate the HTTP response, or <see langword="null"/> to use the default validation behavior.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="httpClient"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="requestMessage"/> is <see langword="null"/>.</para>
+        /// </exception>
         public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate)
             : base(httpClient, requestMessage, completionOption, validate)
         {
         }
 
+        /// <summary>
+        /// Determines if the body of an HTTP response is acceptable according to the <c>Accept</c>
+        /// header sent in the HTTP request.
+        /// </summary>
+        /// <remarks>
+        /// This method may be used by API calls that deserialize the response to avoid deserialization
+        /// exceptions in cases where the response does not match any of the supported content types.
+        /// If the HTTP request did not specify an <c>Accept</c> header, this method simply returns
+        /// <see langword="true"/>.
+        /// </remarks>
+        /// <param name="responseMessage">The <see cref="HttpResponseMessage"/> representing the HTTP response.</param>
+        /// <returns><see langword="true"/> if the content type of the response is acceptable according to the <c>Accept</c> header of the request; otherwise, <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="responseMessage"/> is <see langword="null"/>.</exception>
         public static bool IsAcceptable(HttpResponseMessage responseMessage)
         {
+            if (responseMessage == null)
+                throw new ArgumentNullException("responseMessage");
+
             bool acceptable = true;
             if (responseMessage.RequestMessage != null)
             {
@@ -53,6 +101,22 @@
             return acceptable;
         }
 
+        /// <summary>
+        /// Determines if a content type is acceptable according to a specific <c>Accept</c> header value.
+        /// </summary>
+        /// <remarks>
+        /// HTTP requests may specify multiple acceptable content types. For a more general test
+        /// of the acceptability of an HTTP response according to its request, see
+        /// <see cref="IsAcceptable(HttpResponseMessage)"/>.
+        /// </remarks>
+        /// <param name="acceptHeader">An <c>Accept</c> header value from an HTTP request.</param>
+        /// <param name="contentType">The <c>Content-Type</c> header value from an HTTP response.</param>
+        /// <returns><see langword="true"/> if the <paramref name="contentType"/> is acceptable according to the <paramref name="acceptHeader"/> value; otherwise, <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="acceptHeader"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="contentType"/> is <see langword="null"/>.</para>
+        /// </exception>
         public static bool IsAcceptable(MediaTypeHeaderValue acceptHeader, MediaTypeHeaderValue contentType)
         {
             if (acceptHeader == null)
@@ -84,6 +148,7 @@
             return StringComparer.OrdinalIgnoreCase.Equals(contentType.MediaType, acceptHeader.MediaType);
         }
 
+        /// <inheritdoc/>
         protected override Task<string> DeserializeResultImplAsync(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             if (response.Content == null)
