@@ -10,6 +10,7 @@
     /// </summary>
     /// <typeparam name="T">The deserialized object type.</typeparam>
     /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public abstract class SimpleStringJsonConverter<T> : JsonConverter
     {
         /// <remarks>

@@ -1,7 +1,14 @@
 ﻿namespace OpenStack.ObjectModel.Converters
 {
     using System.Net.Http;
+    using Newtonsoft.Json;
 
+    /// <summary>
+    /// This method provides a <see cref="JsonConverter"/> for deserializing
+    /// <see cref="HttpMethod"/> instances.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public class HttpMethodConverter : SimpleStringJsonConverter<HttpMethod>
     {
         /// <inheritdoc/>

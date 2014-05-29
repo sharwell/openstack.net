@@ -39,40 +39,53 @@
         /// </summary>
         private HttpCompletionOption _completionOption;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="ValidateCallback"/> property.
+        /// </summary>
         private Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> _validate;
 
+        /// <summary>
+        /// This field is set by <see cref="Dispose(bool)"/> and supports the <see cref="ThrowIfDisposed"/> method.
+        /// </summary>
         private bool _disposed;
 
-        /// <summary>
-        /// This event is fired immediately before sending an asynchronous web request.
-        /// </summary>
-        /// <preliminary/>
+        /// <inheritdoc/>
         public event EventHandler<HttpRequestEventArgs> BeforeAsyncWebRequest;
 
-        /// <summary>
-        /// This event is fired when the result of an asynchronous web request is received.
-        /// </summary>
-        /// <preliminary/>
+        /// <inheritdoc/>
         public event EventHandler<HttpResponseEventArgs> AfterAsyncWebResponse;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HttpApiCall{T}"/> class
-        /// with the specified request message.
+        /// Initializes a new instance of the <see cref="HttpApiCall{T}"/> class with
+        /// the specified <see cref="HttpClient"/>, request message and completion option.
         /// </summary>
-        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP API request.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
+        /// <param name="httpClient">The <see cref="HttpClient"/> to use for HTTP requests.</param>
+        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP request for the API call.</param>
+        /// <param name="completionOption">The <see cref="HttpCompletionOption"/> to specify when sending the HTTP request.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="httpClient"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="requestMessage"/> is <see langword="null"/>.</para>
+        /// </exception>
         public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
             : this(httpClient, requestMessage, completionOption, null)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HttpApiCall{T}"/> class
-        /// with the specified request message.
+        /// Initializes a new instance of the <see cref="CustomHttpApiCall{T}"/> class with
+        /// the specified <see cref="HttpClient"/>, request message, completion option, and
+        /// user-defined function to implement the response validation behavior.
         /// </summary>
-        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP API request.</param>
-        /// <param name="disposeMessage"><see langword="true"/> to call <see cref="IDisposable.Dispose"/> on the <paramref name="requestMessage"/> object when this object is disposed; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
+        /// <param name="httpClient">The <see cref="HttpClient"/> to use for HTTP requests.</param>
+        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the HTTP request for the API call.</param>
+        /// <param name="completionOption">The <see cref="HttpCompletionOption"/> to specify when sending the HTTP request.</param>
+        /// <param name="validate">A user-defined function to validate the HTTP response, or <see langword="null"/> to use the default validation behavior.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="httpClient"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="requestMessage"/> is <see langword="null"/>.</para>
+        /// </exception>
         public HttpApiCall(HttpClient httpClient, HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> validate)
         {
             if (httpClient == null)
@@ -86,9 +99,8 @@
             _validate = validate ?? DefaultResponseValidator;
         }
 
-        /// <summary>
-        /// Gets or sets the <see cref="HttpClient"/> to use for sending the request.
-        /// </summary>
+        /// <inheritdoc/>
+        /// <exception cref="ObjectDisposedException">If the current instance has been disposed.</exception>
         public HttpClient HttpClient
         {
             get
@@ -107,9 +119,8 @@
             }
         }
 
-        /// <summary>
-        /// Gets or sets the <see cref="HttpRequestMessage"/> used by this HTTP API call.
-        /// </summary>
+        /// <inheritdoc/>
+        /// <exception cref="ObjectDisposedException">If the current instance has been disposed.</exception>
         public HttpRequestMessage RequestMessage
         {
             get
@@ -128,9 +139,8 @@
             }
         }
 
-        /// <summary>
-        /// Gets or sets the <see cref="HttpCompletionOption"/> to use for the HTTP request.
-        /// </summary>
+        /// <inheritdoc/>
+        /// <exception cref="ObjectDisposedException">If the current instance has been disposed.</exception>
         public HttpCompletionOption CompletionOption
         {
             get
@@ -146,6 +156,15 @@
             }
         }
 
+        /// <summary>
+        /// Gets or sets the function to use for validating an HTTP response to the call.
+        /// </summary>
+        /// <remarks>
+        /// If this property is set to <see langword="null"/>, a default validation function
+        /// will be used instead.
+        /// </remarks>
+        /// <value>The function to use for validating an HTTP response to the call.</value>
+        /// <exception cref="ObjectDisposedException">If the current instance has been disposed.</exception>
         protected Func<Task<HttpResponseMessage>, CancellationToken, Task<HttpResponseMessage>> ValidateCallback
         {
             get
@@ -161,19 +180,13 @@
             }
         }
 
-        /// <summary>
-        /// Asynchronously send the HTTP API request, and return the result as a strongly-typed
-        /// deserialized value.
-        /// </summary>
-        /// <param name="httpClient">The <see cref="HttpClient"/> to use for sending the request.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> the task will observe.</param>
-        /// <returns>
-        /// A <see cref="Task"/> instance representing the asynchronous operation. When the task
-        /// completes successfully, the <see cref="Task{TResult}.Result"/> property will contain
-        /// the a tuple; the first element is the <see cref="HttpResponseMessage"/> and the second
-        /// element is the strongly-typed result of the HTTP API call.
-        /// </returns>
-        /// <exception cref="WebException">If the HTTP API request does not return successfully.</exception>
+        /// <inheritdoc/>
+        /// <remarks>
+        /// This implementation calls <see cref="SendImplAsync"/> to send the HTTP request, the validates the response
+        /// using <see cref="ValidateCallback"/>, and finally deserializes the result to an instance of
+        /// <typeparamref name="T"/> using <see cref="DeserializeResultImplAsync"/>.
+        /// </remarks>
+        /// <exception cref="ObjectDisposedException">If the current instance has been disposed.</exception>
         public Task<Tuple<HttpResponseMessage, T>> SendAsync(CancellationToken cancellationToken)
         {
             ThrowIfDisposed();
@@ -190,9 +203,8 @@
         /// <summary>
         /// Invokes the <see cref="BeforeAsyncWebRequest"/> event for the specified <paramref name="request"/>.
         /// </summary>
-        /// <param name="request">The web request.</param>
+        /// <param name="request">The HTTP request.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="request"/> is <see langword="null"/>.</exception>
-        /// <preliminary/>
         protected virtual void OnBeforeAsyncWebRequest(HttpRequestMessage request)
         {
             var handler = BeforeAsyncWebRequest;
@@ -203,9 +215,8 @@
         /// <summary>
         /// Invokes the <see cref="AfterAsyncWebResponse"/> event for the specified <paramref name="response"/>.
         /// </summary>
-        /// <param name="response">The web response.</param>
+        /// <param name="response">The HTTP response.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
-        /// <preliminary/>
         protected virtual void OnAfterAsyncWebResponse(Task<HttpResponseMessage> response)
         {
             if (response == null)
@@ -216,6 +227,20 @@
                 handler(this, new HttpResponseEventArgs(response));
         }
 
+        /// <summary>
+        /// This method provides the behavior for sending an HTTP request.
+        /// </summary>
+        /// <remarks>
+        /// The default implementation first calls <see cref="OnBeforeAsyncWebRequest"/>. It
+        /// then uses <see cref="HttpClient"/> to send the request, followed by calling
+        ///  <see cref="OnAfterAsyncWebResponse"/> to notify any listeners of the response.
+        /// </remarks>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property will
+        /// contain an <see cref="HttpResponseMessage"/> object describing the HTTP response.
+        /// </returns>
         protected virtual Task<HttpResponseMessage> SendImplAsync(CancellationToken cancellationToken)
         {
             OnBeforeAsyncWebRequest(RequestMessage);
@@ -223,13 +248,23 @@
                 .Finally(task => OnAfterAsyncWebResponse(task));
         }
 
+        /// <summary>
+        /// This method implements the deserialization behavior for HTTP responses.
+        /// </summary>
+        /// <param name="response">The <see cref="HttpResponseMessage"/> describing HTTP response.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property will
+        /// contain the result of the API call as an instance of <typeparamref name="T"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
         protected abstract Task<T> DeserializeResultImplAsync(HttpResponseMessage response, CancellationToken cancellationToken);
 
         /// <inheritdoc/>
         public void Dispose()
         {
             Dispose(true);
-            _disposed = true;
             GC.SuppressFinalize(this);
         }
 
@@ -243,8 +278,14 @@
             {
                 _requestMessage.Dispose();
             }
+
+            _disposed = true;
         }
 
+        /// <summary>
+        /// Throw an <see cref="ObjectDisposedException"/> if the current instance has been disposed.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">If the current instance has been disposed.</exception>
         protected void ThrowIfDisposed()
         {
             if (_disposed)

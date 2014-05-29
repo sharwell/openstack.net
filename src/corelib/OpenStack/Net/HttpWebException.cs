@@ -22,7 +22,14 @@
         /// Initializes a new instance of the <see cref="HttpResponseMessage"/> class
         /// with the specified response message.
         /// </summary>
-        /// <param name="response">The response to the web request. In most cases, the <see cref="HttpResponseMessage.IsSuccessStatusCode"/> property will return <see langword="false"/>.</param>
+        /// <remarks>
+        /// This method does not specify the reason why the HTTP response indicates a failure.
+        /// In most cases, the failure is either due to the HTTP status code indicating an
+        /// error (<see cref="HttpResponseMessage.IsSuccessStatusCode"/> is <see langword="false"/>),
+        /// or the response headers or body indicates a failure occurred with respect to a
+        /// particular API call.
+        /// </remarks>
+        /// <param name="response">The response to the web request.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
         public HttpWebException(HttpResponseMessage response)
 #if !PORTABLE

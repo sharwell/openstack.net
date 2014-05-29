@@ -1,16 +1,45 @@
 ﻿namespace Rackspace.Security.Authentication
 {
+    using System;
     using OpenStack.Security.Authentication;
     using OpenStack.Services.Identity.V2;
     using Rackspace.Services.Identity.V2;
 
+    /// <summary>
+    /// This class extends the OpenStack <see cref="IdentityV2AuthenticationClient"/> with support
+    /// for the default region supported by Cloud Identity accounts.
+    /// </summary>
+    /// <remarks>
+    /// The default region for an authenticated user is only considered when a region is not explicitly
+    /// specified in the construction of a service client.
+    /// </remarks>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public class RackspaceAuthenticationClient : IdentityV2AuthenticationClient
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RackspaceAuthenticationClient"/> class
+        /// with the specified identity service and prepared authentication request.
+        /// </summary>
+        /// <param name="identityService">The <see cref="IIdentityService"/> instance to use for authentication purposes.</param>
+        /// <param name="authenticationRequest">The authentication request, which contains the credentials to use for authenticating with the Identity Service.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="identityService"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="authenticationRequest"/> is <see langword="null"/>.</para>
+        /// </exception>
         public RackspaceAuthenticationClient(IIdentityService identityService, AuthenticationRequest authenticationRequest)
             : base(identityService, authenticationRequest)
         {
         }
 
+        /// <inheritdoc/>
+        /// <remarks>
+        /// This implementation returns <paramref name="region"/> if it is non-<see langword="null"/>.
+        /// If <paramref name="region"/> is <see langword="null"/>, the default region for the specified
+        /// <see cref="UserAccess"/> is returned if available; otherwise, this method returns
+        /// <see langword="null"/>.
+        /// </remarks>
         protected override string GetEffectiveRegion(UserAccess userAccess, string region)
         {
             string effectiveRegion = base.GetEffectiveRegion(userAccess, region);
