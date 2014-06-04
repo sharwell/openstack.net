@@ -4,7 +4,7 @@
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
     using OpenStack.ObjectModel;
-    using Link = net.openstack.Core.Domain.Link;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
     [JsonObject(MemberSerialization.OptIn)]
     public class ExtensionData : ExtensibleJsonObject

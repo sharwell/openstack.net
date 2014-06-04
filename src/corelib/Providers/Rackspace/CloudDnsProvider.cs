@@ -18,6 +18,7 @@ namespace net.openstack.Providers.Rackspace
     using OpenStack.Collections;
     using OpenStack.Threading;
     using CancellationToken = System.Threading.CancellationToken;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
 #if !NET40PLUS
     using OpenStack.Compat;
@@ -1247,7 +1248,7 @@ namespace net.openstack.Providers.Rackspace
                 return false;
 
             Link[] links = linksToken.ToObject<Link[]>();
-            return links.Any(i => string.Equals(i.Rel, "next", StringComparison.OrdinalIgnoreCase));
+            return links.Any(i => string.Equals(i.Relation, "next", StringComparison.OrdinalIgnoreCase));
         }
 
         /// <inheritdoc/>

@@ -4,6 +4,7 @@ namespace net.openstack.Providers.Rackspace.Objects.Response
 {
     using net.openstack.Core.Domain;
     using Newtonsoft.Json;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
     /// <summary>
     /// This models the JSON response used for the List Servers and List Servers with Details requests.

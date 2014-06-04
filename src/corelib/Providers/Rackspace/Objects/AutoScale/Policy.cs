@@ -1,8 +1,8 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.AutoScale
 {
     using System.Collections.ObjectModel;
-    using net.openstack.Core.Domain;
     using Newtonsoft.Json;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
     /// <summary>
     /// Represents a scaling policy in the <see cref="IAutoScaleService"/>.

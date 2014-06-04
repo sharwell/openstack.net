@@ -190,15 +190,16 @@
     <Compile Include="OpenStack\Services\Compute\V2\FlavorResponse.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\GetFlavorApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\GetImageApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\GetServerAddressesApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\GetServerApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\IComputeService.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\Image.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ImageId.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ImageResponse.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ImageStatus.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\Link.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ListFlavorsApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ListImagesApiCall.cs" />
-    <Compile Include="OpenStack\Services\Compute\V2\GetServerAddressesApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ListServersApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\RebootServerApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\RebuildServerApiCall.cs" />
@@ -654,7 +655,6 @@
     <Compile Include="Core\Domain\Status.cs" />
     <Compile Include="Core\Validators\IBlockStorageValidator.cs" />
     <Compile Include="Core\Domain\ImageType.cs" />
-    <Compile Include="Core\Domain\Link.cs" />
     <Compile Include="Core\Domain\Mapping\IJsonObjectMapper`1.cs" />
     <Compile Include="Core\Domain\Mapping\IObjectMapper`2.cs" />
     <Compile Include="Core\Domain\NewUser.cs" />

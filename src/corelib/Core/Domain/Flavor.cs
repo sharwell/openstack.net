@@ -1,6 +1,7 @@
 namespace net.openstack.Core.Domain
 {
     using Newtonsoft.Json;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
     /// <summary>
     /// Provides basic information about a flavor. A flavor is an available hardware configuration for a server.

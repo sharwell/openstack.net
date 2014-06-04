@@ -10,6 +10,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
+    using global::OpenStack.Collections;
     using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core.Collections;
@@ -18,22 +19,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.AutoScale;
     using Newtonsoft.Json.Linq;
-    using global::OpenStack.Collections;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
-    using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
-    using HttpWebRequest = System.Net.HttpWebRequest;
-    using HttpWebResponse = System.Net.HttpWebResponse;
+    using Link = global::OpenStack.Services.Compute.V2.Link;
     using Path = System.IO.Path;
-    using StreamReader = System.IO.StreamReader;
-    using WebRequest = System.Net.WebRequest;
-    using WebResponse = System.Net.WebResponse;
-
-#if PORTABLE
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
-#else
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
-#endif
 
     [TestClass]
     public class UserAutoScaleTests
@@ -751,9 +740,9 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 Webhook webhook = await provider.CreateWebhookAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhookConfiguration, cancellationTokenSource.Token);
 
                 // execute the webhook anonymously
-                Link capabilityLink = webhook.Links.FirstOrDefault(i => string.Equals(i.Rel, "capability", StringComparison.OrdinalIgnoreCase));
+                Link capabilityLink = webhook.Links.FirstOrDefault(i => string.Equals(i.Relation, "capability", StringComparison.OrdinalIgnoreCase));
                 Assert.IsNotNull(capabilityLink);
-                Uri capability = new Uri(capabilityLink.Href, UriKind.Absolute);
+                Uri capability = capabilityLink.Target;
 
                 HttpClient httpClient = new HttpClient();
                 HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, capability);

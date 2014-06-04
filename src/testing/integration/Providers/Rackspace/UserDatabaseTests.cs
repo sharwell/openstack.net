@@ -310,8 +310,8 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     Assert.AreEqual(referenceFlavor.Links.Count, individualFlavor.Links.Count);
                     for (int j = 0; j < referenceFlavor.Links.Count; j++)
                     {
-                        Assert.AreEqual(referenceFlavor.Links[j].Href, individualFlavor.Links[j].Href);
-                        Assert.AreEqual(referenceFlavor.Links[j].Rel, individualFlavor.Links[j].Rel);
+                        Assert.AreEqual(referenceFlavor.Links[j].Target, individualFlavor.Links[j].Target);
+                        Assert.AreEqual(referenceFlavor.Links[j].Relation, individualFlavor.Links[j].Relation);
                     }
                 }
             }
