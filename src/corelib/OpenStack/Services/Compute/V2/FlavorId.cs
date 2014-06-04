@@ -5,7 +5,7 @@ namespace OpenStack.Services.Compute.V2
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the unique identifier of a flavor.
+    /// Represents the unique identifier of a flavor resource.
     /// </summary>
     /// <seealso cref="Flavor.Id"/>
     /// <threadsafety static="true" instance="false"/>

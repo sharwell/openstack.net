@@ -168,7 +168,7 @@ namespace OpenStack.Services.Compute.V2
         /// Gets a collection of links to other resources associated with the server resource.
         /// </summary>
         /// <value>
-        /// An array of <see cref="Link"/> instances describing resources associated with the server resource.
+        /// A collection of <see cref="Link"/> instances describing resources associated with the server resource.
         /// <para>-or-</para>
         /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
         /// </value>

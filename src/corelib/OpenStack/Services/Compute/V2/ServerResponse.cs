@@ -5,7 +5,7 @@ namespace OpenStack.Services.Compute.V2
 
     /// <summary>
     /// This class models the JSON representation used for the result of the API calls
-    /// which return a <seealso cref="Server"/> resource.
+    /// which return a <seealso cref="V2.Server"/> resource.
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
@@ -30,10 +30,10 @@ namespace OpenStack.Services.Compute.V2
         }
 
         /// <summary>
-        /// Gets a <see cref="Server"/> instance describing the server resource.
+        /// Gets a <see cref="V2.Server"/> instance describing the server resource.
         /// </summary>
         /// <value>
-        /// A <see cref="Server"/> instance describing the server resource.
+        /// A <see cref="V2.Server"/> instance describing the server resource.
         /// <para>-or-</para>
         /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
         /// </value>
