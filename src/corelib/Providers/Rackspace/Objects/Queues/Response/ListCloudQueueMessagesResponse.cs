@@ -1,9 +1,9 @@
 ﻿namespace net.openstack.Providers.Rackspace.Objects.Queues.Response
 {
     using System.Collections.ObjectModel;
-    using net.openstack.Core.Domain;
     using Newtonsoft.Json;
     using OpenStack.Services.Queues.V1;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>

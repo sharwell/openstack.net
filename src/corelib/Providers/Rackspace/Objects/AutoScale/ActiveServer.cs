@@ -3,6 +3,7 @@
     using System.Collections.ObjectModel;
     using net.openstack.Core.Domain;
     using Newtonsoft.Json;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
     /// <summary>
     /// Represents an active server which is part of a scaling group in the <see cref="IAutoScaleService"/>.

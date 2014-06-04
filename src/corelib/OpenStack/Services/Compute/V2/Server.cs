@@ -4,7 +4,6 @@ namespace OpenStack.Services.Compute.V2
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
     using OpenStack.Services.Identity;
-    using Link = net.openstack.Core.Domain.Link;
 
     /// <summary>
     /// This class models the JSON representation of a server resource in the <see cref="IComputeService"/>.

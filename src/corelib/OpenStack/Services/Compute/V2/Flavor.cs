@@ -3,7 +3,6 @@ namespace OpenStack.Services.Compute.V2
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
     using OpenStack.ObjectModel;
-    using Link = net.openstack.Core.Domain.Link;
 
     [JsonObject(MemberSerialization.OptIn)]
     public class Flavor : ExtensibleJsonObject

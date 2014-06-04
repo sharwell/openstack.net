@@ -14,6 +14,7 @@
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
 #if !NET40PLUS
     using OpenStack.Compat;
@@ -122,7 +123,7 @@
 
                     ScalingGroup[] values = valuesToken.ToObject<ScalingGroup[]>();
 
-                    ScalingGroupId nextMarker = values.Any() && (links == null || links.Any(i => string.Equals(i.Rel, "next", StringComparison.OrdinalIgnoreCase))) ? values.Last().Id : null;
+                    ScalingGroupId nextMarker = values.Any() && (links == null || links.Any(i => string.Equals(i.Relation, "next", StringComparison.OrdinalIgnoreCase))) ? values.Last().Id : null;
                     Func<CancellationToken, Task<ReadOnlyCollectionPage<ScalingGroup>>> getNextPageAsync = null;
                     if (nextMarker != null)
                         getNextPageAsync = nextCancellationToken => ListScalingGroupsAsync(nextMarker, limit, cancellationToken);
@@ -454,7 +455,7 @@
 
                     Policy[] values = valuesToken.ToObject<Policy[]>();
 
-                    PolicyId nextMarker = values.Any() && (links == null || links.Any(i => string.Equals(i.Rel, "next", StringComparison.OrdinalIgnoreCase))) ? values.Last().Id : null;
+                    PolicyId nextMarker = values.Any() && (links == null || links.Any(i => string.Equals(i.Relation, "next", StringComparison.OrdinalIgnoreCase))) ? values.Last().Id : null;
                     Func<CancellationToken, Task<ReadOnlyCollectionPage<Policy>>> getNextPageAsync = null;
                     if (nextMarker != null)
                         getNextPageAsync = nextCancellationToken => ListPoliciesAsync(groupId, nextMarker, limit, cancellationToken);
@@ -650,7 +651,7 @@
 
                     Webhook[] values = valuesToken.ToObject<Webhook[]>();
 
-                    WebhookId nextMarker = values.Any() && (links == null || links.Any(i => string.Equals(i.Rel, "next", StringComparison.OrdinalIgnoreCase))) ? values.Last().Id : null;
+                    WebhookId nextMarker = values.Any() && (links == null || links.Any(i => string.Equals(i.Relation, "next", StringComparison.OrdinalIgnoreCase))) ? values.Last().Id : null;
                     Func<CancellationToken, Task<ReadOnlyCollectionPage<Webhook>>> getNextPageAsync = null;
                     if (nextMarker != null)
                         getNextPageAsync = nextCancellationToken => ListWebhooksAsync(groupId, policyId, nextMarker, limit, cancellationToken);

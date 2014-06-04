@@ -4,7 +4,7 @@
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
     using ExtensibleJsonObject = OpenStack.ObjectModel.ExtensibleJsonObject;
-    using Link = net.openstack.Core.Domain.Link;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
     /// <summary>
     /// This class models the JSON representation of a database instance flavor in the <see cref="IDatabaseService"/>.
@@ -66,7 +66,7 @@
         /// </summary>
         /// <remarks>
         /// The "flavorRef" is obtained from the <see cref="Links"/> property via the link
-        /// with the <see cref="Link.Rel"/> property set to <c>self</c>.
+        /// with the <see cref="Link.Relation"/> property set to <c>self</c>.
         /// </remarks>
         public FlavorRef Href
         {
@@ -77,8 +77,8 @@
 
                 foreach (Link link in _links)
                 {
-                    if (string.Equals(link.Rel, "self", StringComparison.OrdinalIgnoreCase))
-                        return new FlavorRef(link.Href);
+                    if (string.Equals(link.Relation, "self", StringComparison.OrdinalIgnoreCase))
+                        return new FlavorRef(link.Target.OriginalString);
                 }
 
                 return null;

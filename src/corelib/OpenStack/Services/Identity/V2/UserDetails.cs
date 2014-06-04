@@ -4,7 +4,7 @@ namespace OpenStack.Services.Identity.V2
     using net.openstack.Core.Providers;
     using Newtonsoft.Json;
     using OpenStack.ObjectModel;
-    using Link = net.openstack.Core.Domain.Link;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
     /// <summary>
     /// Contains additional information about an authenticated user.

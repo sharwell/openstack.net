@@ -351,8 +351,8 @@
                 for (int i = 0; i < image.Links.Length; i++)
                 {
                     // this could start to fail if the server reorders links; if that occurs the test should be rewritten to allow it
-                    Assert.AreEqual(image.Links[i].Href, details.Links[i].Href);
-                    Assert.AreEqual(image.Links[i].Rel, details.Links[i].Rel);
+                    Assert.AreEqual(image.Links[i].Target, details.Links[i].Target);
+                    Assert.AreEqual(image.Links[i].Relation, details.Links[i].Relation);
                 }
 
                 Assert.AreEqual(image.MinDisk, details.MinDisk);

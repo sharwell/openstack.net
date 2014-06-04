@@ -20,6 +20,7 @@
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
     using IHttpService = OpenStack.Services.IHttpService;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
 #if !PORTABLE
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
@@ -435,15 +436,15 @@
                     QueuedMessageListId nextMarker = null;
                     if (task.Result != null && task.Result.Links != null)
                     {
-                        Link nextLink = task.Result.Links.FirstOrDefault(i => string.Equals(i.Rel, "next", StringComparison.OrdinalIgnoreCase));
+                        Link nextLink = task.Result.Links.FirstOrDefault(i => string.Equals(i.Relation, "next", StringComparison.OrdinalIgnoreCase));
                         if (nextLink != null)
                         {
                             Uri baseUri = new Uri("https://example.com");
                             Uri absoluteUri;
-                            if (nextLink.Href.StartsWith("/v1"))
-                                absoluteUri = new Uri(baseUri, nextLink.Href.Substring("/v1".Length));
+                            if (nextLink.Target.OriginalString.StartsWith("/v1"))
+                                absoluteUri = new Uri(baseUri, nextLink.Target.OriginalString.Substring("/v1".Length));
                             else
-                                absoluteUri = new Uri(baseUri, nextLink.Href);
+                                absoluteUri = new Uri(baseUri, nextLink.Target);
 
                             UriTemplateMatch match = template.Match(baseUri, absoluteUri);
                             if (match != null && !string.IsNullOrEmpty((string)match.Bindings["marker"].Value))

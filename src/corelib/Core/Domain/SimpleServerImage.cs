@@ -7,6 +7,7 @@ namespace net.openstack.Core.Domain
     using net.openstack.Core.Exceptions.Response;
     using net.openstack.Core.Providers;
     using Newtonsoft.Json;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
     /// <summary>
     /// Provides basic information about an image.

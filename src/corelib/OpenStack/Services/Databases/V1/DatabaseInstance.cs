@@ -4,7 +4,7 @@
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
     using ExtensibleJsonObject = OpenStack.ObjectModel.ExtensibleJsonObject;
-    using Link = net.openstack.Core.Domain.Link;
+    using Link = OpenStack.Services.Compute.V2.Link;
 
     /// <summary>
     /// This class models the JSON representation of a database instance within the <see cref="IDatabaseService"/>.
