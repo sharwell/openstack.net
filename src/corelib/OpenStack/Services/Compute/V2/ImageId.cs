@@ -5,7 +5,7 @@ namespace OpenStack.Services.Compute.V2
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the unique identifier of an image.
+    /// Represents the unique identifier of an image resource.
     /// </summary>
     /// <seealso cref="Image.Id"/>
     /// <threadsafety static="true" instance="false"/>

@@ -5,7 +5,7 @@ namespace OpenStack.Services.Compute.V2
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the unique identifier of a server.
+    /// Represents the unique identifier of a server resource.
     /// </summary>
     /// <seealso cref="Server.Id"/>
     /// <threadsafety static="true" instance="false"/>

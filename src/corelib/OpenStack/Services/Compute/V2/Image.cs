@@ -79,10 +79,10 @@ namespace OpenStack.Services.Compute.V2
         }
 
         /// <summary>
-        /// Gets the unique identifier of the server resource.
+        /// Gets the unique identifier of the image resource.
         /// </summary>
         /// <value>
-        /// A <see cref="ServerId"/> containing the unique identifier of the server resource.
+        /// A <see cref="ServerId"/> containing the unique identifier of the image resource.
         /// <para>-or-</para>
         /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
         /// </value>
@@ -145,6 +145,12 @@ namespace OpenStack.Services.Compute.V2
         /// <summary>
         /// Gets the minimum disk size required to use this image with a server resource (in GB).
         /// </summary>
+        /// <remarks>
+        /// <note>
+        /// This value should only be used in comparisons to <see cref="Flavor.Disk"/>, as the service
+        /// does not define the number of bytes in a GB.
+        /// </note>
+        /// </remarks>
         /// <value>
         /// The minimum disk size required to use this image with a server resource (in GB).
         /// <para>-or-</para>
@@ -162,6 +168,12 @@ namespace OpenStack.Services.Compute.V2
         /// <summary>
         /// Gets the minimum amount of memory required to use this image with a server resource (in MB).
         /// </summary>
+        /// <remarks>
+        /// <note>
+        /// This value should only be used in comparisons to <see cref="Flavor.Ram"/>, as the service
+        /// does not define the number of bytes in a MB.
+        /// </note>
+        /// </remarks>
         /// <value>
         /// The minimum amount of memory required to use this image with a server resource (in MB).
         /// <para>-or-</para>
@@ -212,7 +224,7 @@ namespace OpenStack.Services.Compute.V2
         /// Gets a collection of links to other resources associated with the image resource.
         /// </summary>
         /// <value>
-        /// An array of <see cref="Link"/> instances describing resources associated with the image resource.
+        /// A collection of <see cref="Link"/> instances describing resources associated with the image resource.
         /// <para>-or-</para>
         /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
         /// </value>
