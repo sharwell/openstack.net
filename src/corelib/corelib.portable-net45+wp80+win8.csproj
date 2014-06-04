@@ -183,7 +183,7 @@
     <Compile Include="OpenStack\Services\Compute\V2\AddressesResponse.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ChangePasswordApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ComputeServiceExtensions.cs" />
-    <Compile Include="OpenStack\Services\Compute\V2\ConfirmServerResizedApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\ConfirmServerResizeApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\CreateImageApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\CreateServerApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\Flavor.cs" />
@@ -207,7 +207,7 @@
     <Compile Include="OpenStack\Services\Compute\V2\RemoveImageApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\RemoveServerApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ResizeServerApiCall.cs" />
-    <Compile Include="OpenStack\Services\Compute\V2\RevertResizedServerApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\RevertServerResizeApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\Server.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ServerData.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ServerId.cs" />
