@@ -21,7 +21,7 @@
 
         #region Server Addresses
 
-        Task<GetServerAddressesApiCall> PrepareGetServerAddresses(ServerId serverId, CancellationToken cancellationToken);
+        Task<GetServerAddressesApiCall> PrepareGetServerAddressesAsync(ServerId serverId, CancellationToken cancellationToken);
 
         #endregion
 
@@ -35,9 +35,9 @@
 
         Task<ResizeServerApiCall> PrepareResizeServerAsync();
 
-        Task<ConfirmServerResizedApiCall> PrepareConfirmServerResizedAsync();
+        Task<ConfirmServerResizeApiCall> PrepareConfirmServerResizeAsync();
 
-        Task<RevertResizedServerApiCall> PrepareRevertResizedServerAsync();
+        Task<RevertServerResizeApiCall> PrepareRevertServerResizeAsync();
 
         Task<CreateImageApiCall> PrepareCreateImageAsync();
 

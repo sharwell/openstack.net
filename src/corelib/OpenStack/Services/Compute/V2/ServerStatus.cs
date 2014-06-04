@@ -200,7 +200,7 @@
         /// <summary>
         /// Gets a <see cref="ServerStatus"/> representing a server currently executing a revert resize action.
         /// </summary>
-        /// <seealso cref="IComputeService.PrepareRevertResizedServerAsync"/>
+        /// <seealso cref="IComputeService.PrepareRevertServerResizeAsync"/>
         public static ServerStatus RevertResize
         {
             get
@@ -235,7 +235,7 @@
         /// Gets a <see cref="ServerStatus"/> representing a server which completed a resize operation
         /// and is now waiting for the operation to be confirmed or reverted.
         /// </summary>
-        /// <seealso cref="IComputeService.PrepareConfirmServerResizedAsync"/>
+        /// <seealso cref="IComputeService.PrepareConfirmServerResizeAsync"/>
         public static ServerStatus VerifyResize
         {
             get
