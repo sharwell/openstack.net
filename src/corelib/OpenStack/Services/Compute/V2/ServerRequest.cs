@@ -61,7 +61,6 @@ namespace OpenStack.Services.Compute.V2
         /// <param name="server">A <see cref="ServerData"/> object describing the server resource.</param>
         /// <param name="extensionData">The extension data.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="extensionData"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException">If <paramref name="extensionData"/> contains any <see langword="null"/> values.</exception>
         public ServerRequest(ServerData server, IDictionary<string, JToken> extensionData)
             : base(extensionData)
         {
