@@ -27,19 +27,19 @@
 
         #region Server Actions
 
-        Task<ChangePasswordApiCall> PrepareChangePasswordAsync();
+        Task<ChangePasswordApiCall> PrepareChangePasswordAsync(ServerId serverId, ChangePasswordRequest request, CancellationToken cancellationToken);
 
-        Task<RebootServerApiCall> PrepareRebootServerAsync();
+        Task<RebootServerApiCall> PrepareRebootServerAsync(ServerId serverId, RebootRequest request, CancellationToken cancellationToken);
 
-        Task<RebuildServerApiCall> PrepareRebuildServerAsync();
+        Task<RebuildServerApiCall> PrepareRebuildServerAsync(ServerId serverId, RebuildRequest request, CancellationToken cancellationToken);
 
-        Task<ResizeServerApiCall> PrepareResizeServerAsync();
+        Task<ResizeServerApiCall> PrepareResizeServerAsync(ServerId serverId, ResizeRequest request, CancellationToken cancellationToken);
 
-        Task<ConfirmServerResizeApiCall> PrepareConfirmServerResizeAsync();
+        Task<ConfirmServerResizeApiCall> PrepareConfirmServerResizeAsync(ServerId serverId, ConfirmServerResizeRequest request, CancellationToken cancellationToken);
 
-        Task<RevertServerResizeApiCall> PrepareRevertServerResizeAsync();
+        Task<RevertServerResizeApiCall> PrepareRevertServerResizeAsync(ServerId serverId, RevertServerResizeRequest request, CancellationToken cancellationToken);
 
-        Task<CreateImageApiCall> PrepareCreateImageAsync();
+        Task<CreateImageApiCall> PrepareCreateImageAsync(ServerId serverId, CreateImageRequest request, CancellationToken cancellationToken);
 
         #endregion
 

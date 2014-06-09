@@ -58,6 +58,63 @@
 
         #endregion
 
+        #region Server Actions
+
+        public static Task ChangePasswordAsync(this IComputeService service, ServerId serverId, ChangePasswordData data, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareChangePasswordAsync(serverId, new ChangePasswordRequest(data), cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
+        public static Task RebootServerAsync(this IComputeService service, ServerId serverId, RebootData data, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareRebootServerAsync(serverId, new RebootRequest(data), cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
+        public static Task<Server> RebuildServerAsync(this IComputeService service, ServerId serverId, ServerData data, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareRebuildServerAsync(serverId, new RebuildRequest(data), cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2.Server);
+        }
+
+        public static Task ResizeServerAsync(this IComputeService service, ServerId serverId, ResizeData data, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareResizeServerAsync(serverId, new ResizeRequest(data), cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
+        public static Task ConfirmServerResizeAsync(this IComputeService service, ServerId serverId, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareConfirmServerResizeAsync(serverId, new ConfirmServerResizeRequest(new ConfirmServerResizeData()), cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
+        public static Task RevertServerResizeAsync(this IComputeService service, ServerId serverId, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareRevertServerResizeAsync(serverId, new RevertServerResizeRequest(new RevertServerResizeData()), cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
+        public static Task<Uri> CreateImageAsync(this IComputeService service, ServerId serverId, CreateImageData data, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareCreateImageAsync(serverId, new CreateImageRequest(data), cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2);
+        }
+
+        #endregion
+
         #region Flavors
 
         public static Task<ReadOnlyCollectionPage<Flavor>> ListFlavorsAsync(this IComputeService service, CancellationToken cancellationToken)

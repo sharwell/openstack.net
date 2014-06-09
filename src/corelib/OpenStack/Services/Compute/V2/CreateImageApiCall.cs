@@ -10,7 +10,7 @@ namespace OpenStack.Services.Compute.V2
     /// <seealso cref="ComputeServiceExtensions.CreateImageAsync"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    public class CreateImageApiCall : DelegatingHttpApiCall<string>
+    public class CreateImageApiCall : DelegatingHttpApiCall<Uri>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateImageApiCall"/> class
@@ -18,7 +18,7 @@ namespace OpenStack.Services.Compute.V2
         /// </summary>
         /// <param name="httpApiCall">The <see cref="IHttpApiCall{T}"/> providing the behavior for the API call.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="httpApiCall"/> is <see langword="null"/>.</exception>
-        public CreateImageApiCall(IHttpApiCall<string> httpApiCall)
+        public CreateImageApiCall(IHttpApiCall<Uri> httpApiCall)
             : base(httpApiCall)
         {
         }
