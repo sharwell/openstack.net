@@ -46,7 +46,7 @@ namespace OpenStack.Services.Compute.V2
         /// <summary>
         /// This is the backing field for the <see cref="Links"/> property.
         /// </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("links", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private Link[] _links;
 #pragma warning restore 649
 
