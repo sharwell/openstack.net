@@ -217,8 +217,12 @@
     <Compile Include="OpenStack\Services\Compute\V2\FlavorResponse.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\GetFlavorApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\GetImageApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\GetImageMetadataApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\GetImageMetadataItemApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\GetServerAddressesApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\GetServerApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\GetServerMetadataApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\GetServerMetadataItemApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\IComputeService.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\Image.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ImageId.cs" />
@@ -228,6 +232,8 @@
     <Compile Include="OpenStack\Services\Compute\V2\ListFlavorsApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ListImagesApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ListServersApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\MetadataRequest.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\MetadataResponse.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\RebootData.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\RebootRequest.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\RebootServerApiCall.cs" />
@@ -235,7 +241,9 @@
     <Compile Include="OpenStack\Services\Compute\V2\RebuildRequest.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\RebuildServerApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\RemoveImageApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\RemoveImageMetadataItemApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\RemoveServerApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\RemoveServerMetadataItemApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ResizeData.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ResizeRequest.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ResizeServerApiCall.cs" />
@@ -248,6 +256,10 @@
     <Compile Include="OpenStack\Services\Compute\V2\ServerRequest.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ServerResponse.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ServerStatus.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\SetImageMetadataApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\SetImageMetadataItemApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\SetServerMetadataApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\SetServerMetadataItemApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\UpdateServerApiCall.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\Database.cs" />
     <Compile Include="OpenStack\Services\Databases\V1\DatabaseConfiguration.cs" />
