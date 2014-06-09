@@ -76,6 +76,7 @@
         /// <para>-or-</para>
         /// <para>If <paramref name="extensionData"/> is <see langword="null"/>.</para>
         /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="extensionData"/> contains any <see langword="null"/> values.</exception>
         public DatabaseInstanceConfiguration(FlavorRef flavorRef, DatabaseVolumeConfiguration volumeConfiguration, string name, params JProperty[] extensionData)
             : base(extensionData)
         {
