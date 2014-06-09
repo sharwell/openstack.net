@@ -1,4 +1,5 @@
-﻿namespace OpenStack.Services
+﻿using System.Diagnostics.Contracts;
+namespace OpenStack.Services
 {
     using System;
     using System.Collections.Generic;
@@ -21,10 +22,11 @@
 #endif
 
     /// <summary>
-    /// Adds common functionality for all Rackspace Providers.
+    /// This class provides a common implementation infrastructure for asynchronous service clients
+    /// in the openstack.net SDK v2.
     /// </summary>
-    /// <typeparam name="TProvider">The service provider interface this object implements.</typeparam>
     /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public abstract class ServiceClient : IHttpApiCallFactory, IHttpService
     {
         /// <summary>
@@ -55,15 +57,18 @@
         private HttpClient _httpClient;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProviderBase{TProvider}"/> class using
-        /// the specified default identity, default region, identity provider, and REST service
-        /// implementation, and the default HTTP response code validator.
+        /// Initializes a new instance of the <see cref="ServiceClient"/> class using
+        /// the specified authentication service and default region, and the default
+        /// <see cref="System.Net.Http.HttpClient"/>.
         /// </summary>
-        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, no default identity is available so all calls must specify an explicit identity.</param>
-        /// <param name="defaultRegion">The default region to use for calls that do not explicitly specify a region. If this value is <see langword="null"/>, the default region for the user will be used; otherwise if the service uses region-specific endpoints all calls must specify an explicit region.</param>
-        /// <param name="identityProvider">The identity provider to use for authenticating requests to this provider. If this value is <see langword="null"/>, a new instance of <see cref="CloudIdentityProvider"/> is created using <paramref name="defaultIdentity"/> as the default identity.</param>
+        /// <param name="authenticationService">The authentication service to use for authenticating requests made to this service.</param>
+        /// <param name="defaultRegion">The preferred region for the service. Unless otherwise specified for a specific client, derived service clients will not use a default region if this value is <see langword="null"/> (i.e. only regionless or global service endpoints will be considered acceptable).</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="authenticationService"/> is <see langword="null"/>.</exception>
         protected ServiceClient(IAuthenticationService authenticationService, string defaultRegion)
         {
+            if (authenticationService == null)
+                throw new ArgumentNullException("authenticationService");
+
             _authenticationService = authenticationService;
             _defaultRegion = defaultRegion;
             _httpClient = new HttpClient();
@@ -157,6 +162,12 @@
             }
         }
 
+        /// <summary>
+        /// Gets the authentication service to use for authenticating requests made to this service.
+        /// </summary>
+        /// <value>
+        /// The authentication service to use for authenticating requests made to this service.
+        /// </value>
         protected IAuthenticationService AuthenticationService
         {
             get
