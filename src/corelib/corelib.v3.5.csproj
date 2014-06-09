@@ -1102,6 +1102,7 @@
     <Compile Include="Providers\Rackspace\Objects\Response\UserImpersonationResponse.cs" />
     <Compile Include="Providers\Rackspace\Validators\HttpResponseCodeValidator.cs" />
     <Compile Include="Providers\Rackspace\Validators\NamespaceDoc.cs" />
+    <Compile Include="Rackspace\Security\Authentication\RackspaceAuthentication.cs" />
     <Compile Include="Rackspace\Security\Authentication\RackspaceAuthenticationClient.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\Backup.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\BackupConfiguration.cs" />

@@ -831,12 +831,9 @@
                 identityService.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
                 identityService.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
 
-                AuthenticationRequest authenticationRequest =
-                    new AuthenticationRequest(
-                        new JProperty("auth", new JObject(
-                            new JProperty("RAX-KSKEY:apiKeyCredentials", new JObject(
-                                new JProperty("username", Bootstrapper.Settings.TestIdentity.Username),
-                                new JProperty("apiKey", Bootstrapper.Settings.TestIdentity.APIKey))))));
+                string username = Bootstrapper.Settings.TestIdentity.Username;
+                string apiKey = Bootstrapper.Settings.TestIdentity.APIKey;
+                AuthenticationRequest authenticationRequest = RackspaceAuthentication.ApiKey(username, apiKey);
                 IAuthenticationService authenticationService = new RackspaceAuthenticationClient(identityService, authenticationRequest);
                 return authenticationService;
             }, true);
