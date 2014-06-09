@@ -1,7 +1,9 @@
 ﻿namespace OpenStack.Net
 {
     using System;
+    using System.Collections.Generic;
     using OpenStack.Collections;
+    using Rackspace.Net;
     using BitArray = System.Collections.BitArray;
     using Encoding = System.Text.Encoding;
     using MatchEvaluator = System.Text.RegularExpressions.MatchEvaluator;
@@ -90,6 +92,33 @@
             _allowedFragmentCharacters = new BitArray(256).Or(_allowedPathCharacters);
             _allowedFragmentCharacters.Set('/', true);
             _allowedFragmentCharacters.Set('?', true);
+        }
+
+        public static Uri AddQueryParameter(Uri uri, string parameter, string value)
+        {
+            string originalQuery = uri.Query;
+
+            UriTemplate queryTemplate;
+            if (string.IsNullOrEmpty(originalQuery))
+            {
+                // URI does not already contain query parameters
+                queryTemplate = new UriTemplate("{?" + parameter + "}");
+            }
+            else
+            {
+                // URI already contains query parameters
+                queryTemplate = new UriTemplate("{&" + parameter + "}");
+            }
+
+            var parameters = new Dictionary<string, string> { { parameter, value } };
+            Uri queryUri = queryTemplate.BindByName(parameters);
+            UriKind uriKind = uri.IsAbsoluteUri ? UriKind.Absolute : UriKind.Relative;
+            return new Uri(uri.OriginalString + queryUri.OriginalString, uriKind);
+        }
+
+        public static Uri SetQueryParameter(Uri uri, string parameter, string value)
+        {
+            return AddQueryParameter(RemoveQueryParameter(uri, parameter), parameter, value);
         }
 
         public static Uri RemoveQueryParameter(Uri uri, string parameter)

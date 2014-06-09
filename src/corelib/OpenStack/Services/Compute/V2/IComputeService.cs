@@ -13,7 +13,7 @@
 
         Task<GetServerApiCall> PrepareGetServerAsync(ServerId serverId, CancellationToken cancellationToken);
 
-        Task<UpdateServerApiCall> PrepareUpdateServerAsync(ServerRequest request, CancellationToken cancellationToken);
+        Task<UpdateServerApiCall> PrepareUpdateServerAsync(ServerId serverId, ServerRequest request, CancellationToken cancellationToken);
 
         Task<RemoveServerApiCall> PrepareRemoveServerAsync(ServerId serverId, CancellationToken cancellationToken);
 
