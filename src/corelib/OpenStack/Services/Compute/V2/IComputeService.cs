@@ -60,5 +60,29 @@
         Task<RemoveImageApiCall> PrepareRemoveImageAsync(ImageId imageId, CancellationToken cancellationToken);
 
         #endregion
+
+        #region Metadata
+
+        Task<GetServerMetadataApiCall> PrepareGetServerMetadataAsync(ServerId serverId, CancellationToken cancellationToken);
+
+        Task<SetServerMetadataApiCall> PrepareSetServerMetadataAsync(ServerId serverId, MetadataRequest request, CancellationToken cancellationToken);
+
+        Task<GetServerMetadataItemApiCall> PrepareGetServerMetadataItemAsync(ServerId serverId, string key, CancellationToken cancellationToken);
+
+        Task<SetServerMetadataItemApiCall> PrepareSetServerMetadataItemAsync(ServerId serverId, string key, MetadataRequest request, CancellationToken cancellationToken);
+
+        Task<RemoveServerMetadataItemApiCall> PrepareRemoveServerMetadataItemAsync(ServerId serverId, string key, CancellationToken cancellationToken);
+
+        Task<GetImageMetadataApiCall> PrepareGetImageMetadataAsync(ImageId imageId, CancellationToken cancellationToken);
+
+        Task<SetImageMetadataApiCall> PrepareSetImageMetadataAsync(ImageId imageId, MetadataRequest request, CancellationToken cancellationToken);
+
+        Task<GetImageMetadataItemApiCall> PrepareGetImageMetadataItemAsync(ImageId imageId, string key, CancellationToken cancellationToken);
+
+        Task<SetImageMetadataItemApiCall> PrepareSetImageMetadataItemAsync(ImageId imageId, string key, MetadataRequest request, CancellationToken cancellationToken);
+
+        Task<RemoveImageMetadataItemApiCall> PrepareRemoveImageMetadataItemAsync(ImageId imageId, string key, CancellationToken cancellationToken);
+
+        #endregion
     }
 }

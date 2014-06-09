@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Threading;
     using System.Threading.Tasks;
     using OpenStack.Collections;
@@ -54,6 +55,19 @@
             return CoreTaskExtensions.Using(
                 () => service.PrepareRemoveServerAsync(serverId, cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+        }
+
+        #endregion
+
+        #region Server Addresses
+
+        public static Task<Addresses> GetServerAddressesAsync(this IComputeService service, ServerId serverId, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareGetServerAddressesAsync(serverId, cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2.Addresses);
         }
 
         #endregion
@@ -161,6 +175,122 @@
         {
             return CoreTaskExtensions.Using(
                 () => service.PrepareRemoveImageAsync(imageId, cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
+        #endregion
+
+        #region Metadata
+
+        public static Task<ReadOnlyDictionary<string, string>> GetServerMetadataAsync(this IComputeService service, ServerId serverId, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareGetServerMetadataAsync(serverId, cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2.Metadata);
+        }
+
+        public static Task<ReadOnlyDictionary<string, string>> SetServerMetadataAsync(this IComputeService service, ServerId serverId, IDictionary<string, string> metadata, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareSetServerMetadataAsync(serverId, new MetadataRequest(metadata), cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2.Metadata);
+        }
+
+        public static Task<string> GetServerMetadataItemAsync(this IComputeService service, ServerId serverId, string key, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareGetServerMetadataItemAsync(serverId, key, cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(
+                    task =>
+                    {
+                        var metadata = task.Result.Item2.Metadata;
+                        if (metadata == null)
+                            return null;
+
+                        string value;
+                        if (!metadata.TryGetValue(key, out value))
+                            return null;
+
+                        return value;
+                    });
+        }
+
+        public static Task<ReadOnlyDictionary<string, string>> SetServerMetadataItemAsync(this IComputeService service, ServerId serverId, string key, string value, CancellationToken cancellationToken)
+        {
+            var metadata = new Dictionary<string, string> { { key, value } };
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareSetServerMetadataItemAsync(serverId, key, new MetadataRequest(metadata), cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2.Metadata);
+        }
+
+        public static Task RemoveServerMetadataItemAsync(this IComputeService service, ServerId serverId, string key, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareRemoveServerMetadataItemAsync(serverId, key, cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
+        public static Task<ReadOnlyDictionary<string, string>> GetImageMetadataAsync(this IComputeService service, ImageId imageId, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareGetImageMetadataAsync(imageId, cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2.Metadata);
+        }
+
+        public static Task<ReadOnlyDictionary<string, string>> SetImageMetadataAsync(this IComputeService service, ImageId imageId, IDictionary<string, string> metadata, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareSetImageMetadataAsync(imageId, new MetadataRequest(metadata), cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2.Metadata);
+        }
+
+        public static Task<string> GetImageMetadataItemAsync(this IComputeService service, ImageId imageId, string key, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareGetImageMetadataItemAsync(imageId, key, cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(
+                    task =>
+                    {
+                        var metadata = task.Result.Item2.Metadata;
+                        if (metadata == null)
+                            return null;
+
+                        string value;
+                        if (!metadata.TryGetValue(key, out value))
+                            return null;
+
+                        return value;
+                    });
+        }
+
+        public static Task<ReadOnlyDictionary<string, string>> SetImageMetadataItemAsync(this IComputeService service, ImageId imageId, string key, string value, CancellationToken cancellationToken)
+        {
+            var metadata = new Dictionary<string, string> { { key, value } };
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareSetImageMetadataItemAsync(imageId, key, new MetadataRequest(metadata), cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2.Metadata);
+        }
+
+        public static Task RemoveImageMetadataItemAsync(this IComputeService service, ImageId imageId, string key, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareRemoveImageMetadataItemAsync(imageId, key, cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
         }
 
