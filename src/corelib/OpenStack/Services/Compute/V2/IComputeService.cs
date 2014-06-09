@@ -84,5 +84,13 @@
         Task<RemoveImageMetadataItemApiCall> PrepareRemoveImageMetadataItemAsync(ImageId imageId, string key, CancellationToken cancellationToken);
 
         #endregion
+
+        #region Extensions
+
+        Task<ListExtensionsApiCall> PrepareListExtensionsAsync(CancellationToken cancellationToken);
+
+        Task<GetExtensionApiCall> PrepareGetExtensionAsync(ExtensionAlias alias, CancellationToken cancellationToken);
+
+        #endregion
     }
 }

@@ -296,6 +296,28 @@
 
         #endregion
 
+        #region Extensions
+
+        public static Task<ReadOnlyCollectionPage<Extension>> ListExtensionsAsync(this IComputeService service, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareListExtensionsAsync(cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2);
+        }
+
+        public static Task<Extension> GetExtensionAsync(this IComputeService service, ExtensionAlias alias, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareGetExtensionAsync(alias, cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2.Extension);
+        }
+
+        #endregion
+
         #region Additional optional parameters for API calls
 
         /// <summary>
