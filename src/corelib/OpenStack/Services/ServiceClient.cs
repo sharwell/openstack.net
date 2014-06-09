@@ -77,13 +77,11 @@ namespace OpenStack.Services
         /// <summary>
         /// This event is fired immediately before sending an asynchronous web request.
         /// </summary>
-        /// <preliminary/>
         public event EventHandler<HttpRequestEventArgs> BeforeAsyncWebRequest;
 
         /// <summary>
         /// This event is fired when the result of an asynchronous web request is received.
         /// </summary>
-        /// <preliminary/>
         public event EventHandler<HttpResponseEventArgs> AfterAsyncWebResponse;
 
 #if !PORTABLE
@@ -132,7 +130,6 @@ namespace OpenStack.Services
         /// If this value is set to <see langword="null"/>, the default back-off policy for the current
         /// provider will be used.
         /// </remarks>
-        /// <preliminary/>
         public IBackoffPolicy BackoffPolicy
         {
             get
@@ -183,7 +180,6 @@ namespace OpenStack.Services
         /// The default implementation returns <see cref="OpenStack.Threading.BackoffPolicy.Default"/>.
         /// Providers may override this property to change the default back-off policy.
         /// </remarks>
-        /// <preliminary/>
         protected virtual IBackoffPolicy DefaultBackoffPolicy
         {
             get
@@ -232,7 +228,6 @@ namespace OpenStack.Services
         /// <para>-or-</para>
         /// <para>If <paramref name="parameters"/> is <see langword="null"/>.</para>
         /// </exception>
-        /// <preliminary/>
         public Func<Task<Uri>, Task<HttpRequestMessage>> PrepareRequestAsyncFunc<T>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, CancellationToken cancellationToken, Func<Uri, Uri> uriTransform)
         {
             var prepared = PrepareRequestAsyncFunc(method, template, parameters, cancellationToken);
@@ -290,7 +285,6 @@ namespace OpenStack.Services
         /// <para>-or-</para>
         /// <para>If <paramref name="parameters"/> is <see langword="null"/>.</para>
         /// </exception>
-        /// <preliminary/>
         public Func<Task<Uri>, Task<HttpRequestMessage>> PrepareRequestAsyncFunc<T, TBody>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, TBody body, CancellationToken cancellationToken, Func<Uri, Uri> uriTransform)
         {
             var prepared = PrepareRequestAsyncFunc(method, template, parameters, body, cancellationToken);
@@ -339,7 +333,6 @@ namespace OpenStack.Services
         /// <param name="body">The object modeling the body of the request.</param>
         /// <returns>The encoded content to send with the <see cref="HttpRequestMessage"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="request"/> is <see langword="null"/>.</exception>
-        /// <preliminary/>
         protected virtual HttpContent EncodeRequestBodyImpl<TBody>(HttpRequestMessage request, TBody body)
         {
             if (request == null)
@@ -405,7 +398,6 @@ namespace OpenStack.Services
         /// <para>If <paramref name="parameters"/> is <see langword="null"/>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">If <paramref name="baseUri"/> is not an absolute URI.</exception>
-        /// <preliminary/>
         protected virtual HttpRequestMessage PrepareRequestImpl<T>(HttpMethod method, UriTemplate template, Uri baseUri, IDictionary<string, T> parameters)
         {
             Uri boundUri = template.BindByName(baseUri, parameters);
@@ -433,7 +425,6 @@ namespace OpenStack.Services
         /// completes successfully, the <see cref="Task{TResult}.Result"/> property will contain
         /// a <see cref="Uri"/> representing the base absolute URI for the service.
         /// </returns>
-        /// <preliminary/>
         public abstract Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken);
 
         /// <summary>
@@ -441,7 +432,6 @@ namespace OpenStack.Services
         /// </summary>
         /// <param name="request">The web request.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="request"/> is <see langword="null"/>.</exception>
-        /// <preliminary/>
         protected virtual void OnBeforeAsyncWebRequest(HttpRequestMessage request)
         {
             var handler = BeforeAsyncWebRequest;
@@ -454,7 +444,6 @@ namespace OpenStack.Services
         /// </summary>
         /// <param name="response">The web response.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="response"/> is <see langword="null"/>.</exception>
-        /// <preliminary/>
         protected virtual void OnAfterAsyncWebResponse(Task<HttpResponseMessage> response)
         {
             if (response == null)
@@ -473,7 +462,6 @@ namespace OpenStack.Services
         /// A continuation function delegate which takes an asynchronously prepared <see cref="HttpRequestMessage"/>
         /// and returns the resulting body of the operation, if any, as a string.
         /// </returns>
-        /// <preliminary/>
         protected virtual Func<Task<HttpRequestMessage>, Task<string>> GetResponseAsyncFunc(CancellationToken cancellationToken)
         {
             Func<Task<HttpRequestMessage>, Task<HttpResponseMessage>> requestResource =
@@ -510,7 +498,6 @@ namespace OpenStack.Services
         /// A continuation function delegate which takes an asynchronously prepared <see cref="HttpRequestMessage"/>
         /// and returns the resulting body of the operation, if any, as an instance of type <typeparamref name="T"/>.
         /// </returns>
-        /// <preliminary/>
         protected virtual Func<Task<HttpRequestMessage>, Task<T>> GetResponseAsyncFunc<T>(CancellationToken cancellationToken, Func<Task<Tuple<HttpResponseMessage, string>>, Task<T>> parseResult = null)
         {
             Func<Task<HttpRequestMessage>, Task<HttpResponseMessage>> requestResource =
@@ -546,7 +533,6 @@ namespace OpenStack.Services
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
-        /// <preliminary/>
         protected virtual Task<HttpResponseMessage> RequestResourceImplAsync(Task<HttpRequestMessage> task, CancellationToken cancellationToken)
         {
             if (task == null)
@@ -566,7 +552,6 @@ namespace OpenStack.Services
         /// The second element of the tuple contains the complete body of the response as a string.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
-        /// <preliminary/>
         protected virtual Task<Tuple<HttpResponseMessage, string>> ReadResultImpl(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
         {
             if (task == null)
@@ -628,7 +613,6 @@ namespace OpenStack.Services
         /// object of type <typeparamref name="T"/> representing the serialized body of the response.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
-        /// <preliminary/>
         protected virtual Task<T> ParseJsonResultImplAsync<T>(Task<Tuple<HttpResponseMessage, string>> task, CancellationToken cancellationToken)
         {
             return CompletedTask.FromResult(JsonConvert.DeserializeObject<T>(task.Result.Item2));
