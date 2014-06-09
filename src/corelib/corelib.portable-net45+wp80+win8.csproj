@@ -184,6 +184,7 @@
     <Compile Include="OpenStack\Services\Compute\V2\ChangePasswordApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ChangePasswordData.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ChangePasswordRequest.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\ComputeClient.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ComputeServiceExtensions.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ConfirmServerResizeApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ConfirmServerResizeData.cs" />
