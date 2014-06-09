@@ -1,4 +1,4 @@
-﻿namespace OpenStack.Services.Networking.V2
+﻿namespace OpenStack.Services.Compute.V2
 {
     using Newtonsoft.Json;
     using OpenStack.ObjectModel;

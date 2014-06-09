@@ -199,9 +199,13 @@
     <Compile Include="OpenStack\Services\Compute\V2\CreateImageData.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\CreateImageRequest.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\CreateServerApiCall.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\Extension.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\ExtensionAlias.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\ExtensionResponse.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\Flavor.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\FlavorId.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\FlavorResponse.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\GetExtensionApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\GetFlavorApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\GetImageApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\GetImageMetadataApiCall.cs" />
@@ -216,6 +220,7 @@
     <Compile Include="OpenStack\Services\Compute\V2\ImageResponse.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ImageStatus.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\Link.cs" />
+    <Compile Include="OpenStack\Services\Compute\V2\ListExtensionsApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ListFlavorsApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ListImagesApiCall.cs" />
     <Compile Include="OpenStack\Services\Compute\V2\ListServersApiCall.cs" />
@@ -436,12 +441,8 @@
     <Compile Include="OpenStack\Services\Networking\V2\AddSubnetApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\AllocationPool.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\ApiDetails.cs" />
-    <Compile Include="OpenStack\Services\Networking\V2\Extension.cs" />
-    <Compile Include="OpenStack\Services\Networking\V2\ExtensionAlias.cs" />
-    <Compile Include="OpenStack\Services\Networking\V2\ExtensionResponse.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\FixedIp.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\GetApiDetailsApiCall.cs" />
-    <Compile Include="OpenStack\Services\Networking\V2\GetExtensionApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\GetNetworkApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\GetPortApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\GetSubnetApiCall.cs" />
@@ -475,7 +476,6 @@
     <Compile Include="OpenStack\Services\Networking\V2\Layer3\RouterStatus.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\Layer3\UpdateFloatingIpApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\Layer3\UpdateRouterApiCall.cs" />
-    <Compile Include="OpenStack\Services\Networking\V2\ListExtensionsApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\ListNetworksApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\ListPortsApiCall.cs" />
     <Compile Include="OpenStack\Services\Networking\V2\ListSubnetsApiCall.cs" />

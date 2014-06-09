@@ -9,6 +9,7 @@
     using Newtonsoft.Json.Linq;
     using OpenStack.Net;
     using Rackspace.Threading;
+    using ExtensionAlias = OpenStack.Services.Compute.V2.ExtensionAlias;
 
     public static class PortsBindingExtensions
     {

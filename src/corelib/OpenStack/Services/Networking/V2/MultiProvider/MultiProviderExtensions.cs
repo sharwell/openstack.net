@@ -8,6 +8,7 @@
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
     using Rackspace.Threading;
+    using ExtensionAlias = OpenStack.Services.Compute.V2.ExtensionAlias;
 
     public static class MultiProviderExtensions
     {

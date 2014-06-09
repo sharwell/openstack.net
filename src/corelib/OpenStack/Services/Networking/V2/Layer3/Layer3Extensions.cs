@@ -12,6 +12,7 @@
     using OpenStack.Net;
     using Rackspace.Net;
     using Rackspace.Threading;
+    using ExtensionAlias = OpenStack.Services.Compute.V2.ExtensionAlias;
     using QuotaData = OpenStack.Services.Networking.V2.Quotas.QuotaData;
 
     public static class Layer3Extensions

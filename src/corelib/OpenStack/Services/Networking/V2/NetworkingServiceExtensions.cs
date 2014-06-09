@@ -5,6 +5,8 @@
     using System.Threading.Tasks;
     using OpenStack.Collections;
     using Rackspace.Threading;
+    using Extension = OpenStack.Services.Compute.V2.Extension;
+    using ExtensionAlias = OpenStack.Services.Compute.V2.ExtensionAlias;
 
     public static class NetworkingServiceExtensions
     {

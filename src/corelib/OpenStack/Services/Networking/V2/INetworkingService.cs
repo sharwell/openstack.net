@@ -2,6 +2,9 @@
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using ExtensionAlias = OpenStack.Services.Compute.V2.ExtensionAlias;
+    using GetExtensionApiCall = OpenStack.Services.Compute.V2.GetExtensionApiCall;
+    using ListExtensionsApiCall = OpenStack.Services.Compute.V2.ListExtensionsApiCall;
 
     public interface INetworkingService : IHttpService
     {

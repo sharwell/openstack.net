@@ -13,6 +13,7 @@
     using OpenStack.Services.Identity;
     using Rackspace.Net;
     using Rackspace.Threading;
+    using ExtensionAlias = OpenStack.Services.Compute.V2.ExtensionAlias;
 
     public static class QuotasExtensions
     {
