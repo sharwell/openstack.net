@@ -619,16 +619,12 @@ namespace OpenStack.Services
         }
 
         /// <summary>
-        /// This method creates an instance of <see cref="HttpApiCall{T}"/> representing a call
-        /// to an HTTP API that returns a JSON response. The response body is deserialized to an
-        /// instance of <typeparamref name="T"/> using <see cref="JsonConvert"/>.
+        /// Create an HTTP API call where the response body is a JSON-serialized representation
+        /// of an instance of <typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam name="T">The type modeling the JSON body of the response.</typeparam>
-        /// <param name="requestMessage">The request message.</param>
-        /// <returns>
-        /// An instance of <see cref="HttpApiCall{T}"/> representing an HTTP API call that
-        /// returns a JSON body.
-        /// </returns>
+        /// <typeparam name="T">The type modeling the response to the API call.</typeparam>
+        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the request for the API call.</param>
+        /// <returns>An HTTP API call which deserializes the JSON response body to obtain the strongly-typed result of the call.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
         protected virtual HttpApiCall<T> CreateJsonApiCall<T>(HttpRequestMessage requestMessage)
         {
@@ -637,15 +633,10 @@ namespace OpenStack.Services
         }
 
         /// <summary>
-        /// This method creates an instance of <see cref="HttpApiCall{T}"/> representing a call
-        /// to an HTTP API that returns streaming content. An instance of <see cref="Stream"/>
-        /// is provided for reading the content.
+        /// Create an HTTP API call which returns a <see cref="Stream"/> for reading the response body.
         /// </summary>
-        /// <param name="requestMessage">The request message.</param>
-        /// <returns>
-        /// An instance of <see cref="HttpApiCall{T}"/> representing an HTTP API call that
-        /// returns a <see cref="Stream"/>.
-        /// </returns>
+        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the request for the API call.</param>
+        /// <returns>An HTTP API call which returns a <see cref="Stream"/> for reading the response body.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
         protected virtual HttpApiCall<Stream> CreateStreamingApiCall(HttpRequestMessage requestMessage)
         {
@@ -653,23 +644,70 @@ namespace OpenStack.Services
             return RegisterApiCall(result);
         }
 
-        protected virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage)
+        /// <summary>
+        /// Create an HTTP API call where the response body is a treated as a simple string.
+        /// </summary>
+        /// <remarks>
+        /// This method can be used for API calls that do not return a body. In those cases,
+        /// the response is treated as an empty string.
+        /// </remarks>
+        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the request for the API call.</param>
+        /// <returns>An HTTP API call which returns the response body as a string.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
+        protected HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage)
         {
             return CreateBasicApiCall(requestMessage, HttpCompletionOption.ResponseContentRead);
         }
 
+        /// <summary>
+        /// Create an HTTP API call where the response body is a treated as a simple string.
+        /// </summary>
+        /// <remarks>
+        /// This method can be used for API calls that do not return a body. In those cases,
+        /// the response is treated as an empty string.
+        /// </remarks>
+        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the request for the API call.</param>
+        /// <param name="completionOption">The <see cref="HttpCompletionOption"/> to specify when sending the HTTP request. The default value is <see cref="HttpCompletionOption.ResponseContentRead"/>.</param>
+        /// <returns>An HTTP API call which returns the response body as a string.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="requestMessage"/> is <see langword="null"/>.</exception>
         protected virtual HttpApiCall CreateBasicApiCall(HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
         {
             var result = new HttpApiCall(HttpClient, requestMessage, completionOption, ValidateResultImplAsync);
             return RegisterApiCall(result);
         }
 
+        /// <summary>
+        /// Create an HTTP API call where the deserialation logic is provided as a user-defined function.
+        /// </summary>
+        /// <typeparam name="T">The type modeling the response to the API call.</typeparam>
+        /// <param name="requestMessage">The <see cref="HttpRequestMessage"/> representing the request for the API call.</param>
+        /// <param name="completionOption">The <see cref="HttpCompletionOption"/> to specify when sending the HTTP request.</param>
+        /// <param name="deserializeResult">A user-defined function to perform deserialization of the HTTP response.</param>
+        /// <returns>An HTTP API call which deserializes the response to an instance of <typeparamref name="T"/> using a user-defined function.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="requestMessage"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="deserializeResult"/> is <see langword="null"/>.</para>
+        /// </exception>
         protected virtual HttpApiCall<T> CreateCustomApiCall<T>(HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<HttpResponseMessage, CancellationToken, Task<T>> deserializeResult)
         {
             var result = new CustomHttpApiCall<T>(HttpClient, requestMessage, completionOption, ValidateResultImplAsync, deserializeResult);
             return RegisterApiCall(result);
         }
 
+        /// <summary>
+        /// Associates an HTTP API request with the current service client.
+        /// </summary>
+        /// <remarks>
+        /// The base implementation adds event handlers to the <see cref="IHttpApiRequest.BeforeAsyncWebRequest"/>
+        /// and <see cref="IHttpApiRequest.AfterAsyncWebResponse"/> events to ensure the
+        /// <see cref="ServiceClient.OnBeforeAsyncWebRequest"/> and <see cref="ServiceClient.OnAfterAsyncWebResponse"/>
+        /// methods are invoked at the correct time.
+        /// </remarks>
+        /// <typeparam name="T">The specific (static) type of the HTTP API request.</typeparam>
+        /// <param name="call">The HTTP API request instance.</param>
+        /// <returns>The input argument <paramref name="call"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="call"/> is <see langword="null"/>.</exception>
         protected virtual T RegisterApiCall<T>(T call)
             where T : IHttpApiRequest
         {
@@ -683,21 +721,41 @@ namespace OpenStack.Services
 
         #region IHttpApiCallFactory Members
 
+        /// <inheritdoc/>
+        /// <remarks>
+        /// This implementation calls <see cref="CreateJsonApiCall{T}"/> to process
+        /// the request.
+        /// </remarks>
         HttpApiCall<T> IHttpApiCallFactory.CreateJsonApiCall<T>(HttpRequestMessage requestMessage)
         {
             return CreateJsonApiCall<T>(requestMessage);
         }
 
+        /// <inheritdoc/>
+        /// <remarks>
+        /// This implementation calls <see cref="CreateStreamingApiCall"/> to process
+        /// the request.
+        /// </remarks>
         HttpApiCall<Stream> IHttpApiCallFactory.CreateStreamingApiCall(HttpRequestMessage requestMessage)
         {
             return CreateStreamingApiCall(requestMessage);
         }
 
+        /// <inheritdoc/>
+        /// <remarks>
+        /// This implementation calls <see cref="CreateBasicApiCall(HttpRequestMessage, HttpCompletionOption)"/> to process
+        /// the request.
+        /// </remarks>
         HttpApiCall IHttpApiCallFactory.CreateBasicApiCall(HttpRequestMessage requestMessage, HttpCompletionOption completionOption)
         {
             return CreateBasicApiCall(requestMessage, completionOption);
         }
 
+        /// <inheritdoc/>
+        /// <remarks>
+        /// This implementation calls <see cref="CreateCustomApiCall{T}"/> to process
+        /// the request.
+        /// </remarks>
         HttpApiCall<T> IHttpApiCallFactory.CreateCustomApiCall<T>(HttpRequestMessage requestMessage, HttpCompletionOption completionOption, Func<HttpResponseMessage, CancellationToken, Task<T>> deserializeResult)
         {
             return CreateCustomApiCall<T>(requestMessage, completionOption, deserializeResult);
