@@ -1114,6 +1114,13 @@
     <Compile Include="Providers\Rackspace\Validators\NamespaceDoc.cs" />
     <Compile Include="Rackspace\Security\Authentication\RackspaceAuthentication.cs" />
     <Compile Include="Rackspace\Security\Authentication\RackspaceAuthenticationClient.cs" />
+    <Compile Include="Rackspace\Services\Compute\V2\ExtendedServerStatus.cs" />
+    <Compile Include="Rackspace\Services\Compute\V2\RescueExtensions.cs" />
+    <Compile Include="Rackspace\Services\Compute\V2\RescueServerApiCall.cs" />
+    <Compile Include="Rackspace\Services\Compute\V2\RescueServerRequest.cs" />
+    <Compile Include="Rackspace\Services\Compute\V2\RescueServerResponse.cs" />
+    <Compile Include="Rackspace\Services\Compute\V2\UnrescueServerApiCall.cs" />
+    <Compile Include="Rackspace\Services\Compute\V2\UnrescueServerRequest.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\Backup.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\BackupConfiguration.cs" />
     <Compile Include="Rackspace\Services\Databases\V1\BackupId.cs" />
