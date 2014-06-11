@@ -21,6 +21,27 @@
     /// <preliminary/>
     public static class UriUtility
     {
+#if PORTABLE
+        private const RegexOptions DefaultRegexOptions = RegexOptions.None;
+#else
+        private const RegexOptions DefaultRegexOptions = RegexOptions.Compiled;
+#endif
+
+        /// <summary>
+        /// A regular expression pattern for the RFC 6570 <c>pct-encoded</c> rule.
+        /// </summary>
+        private const string PctEncodedPatternString = @"(?:%[a-fA-F0-9]{2})";
+
+        /// <summary>
+        /// A regular expression pattern for the RFC 6570 <c>varchar</c> rule.
+        /// </summary>
+        private const string VarCharPatternString = @"(?:[a-zA-Z0-9_]|" + PctEncodedPatternString + @")";
+
+        /// <summary>
+        /// A regular expression pattern for the RFC 6570 <c>varname</c> rule.
+        /// </summary>
+        private const string VarNamePatternString = @"(?:" + VarCharPatternString + @"(?:\.?" + VarCharPatternString + @")*)";
+
         private static readonly BitArray _unreservedCharacters;
         private static readonly BitArray _generalDelimiters;
         private static readonly BitArray _subDelimiters;
@@ -31,15 +52,14 @@
         private static readonly BitArray _allowedFragmentCharacters;
 
         /// <summary>
+        /// This is the regular expression for the RFC 6570 <c>varname</c> rule.
+        /// </summary>
+        private static readonly Regex VarName = new Regex("^" + VarNamePatternString + "$", DefaultRegexOptions);
+
+        /// <summary>
         /// This is the regular expression for a single percent-encoded character.
         /// </summary>
-        private static readonly Regex _percentEncodedPattern = new Regex(@"%([0-9A-Fa-f][0-9A-Fa-f])",
-#if PORTABLE
-            RegexOptions.None
-#else
-            RegexOptions.Compiled
-#endif
-            );
+        private static readonly Regex _percentEncodedPattern = new Regex(PctEncodedPatternString, DefaultRegexOptions);
 
         static UriUtility()
         {
@@ -94,9 +114,70 @@
             _allowedFragmentCharacters.Set('?', true);
         }
 
+        /// <summary>
+        /// Add a query parameter with the specified name and value to a URI.
+        /// </summary>
+        /// <remarks>
+        /// This method always adds a new query parameter to the end of the query string, even
+        /// if the URI already contains one or more query parameters with the specified parameter
+        /// name.
+        ///
+        /// <note>
+        /// If necessary, characters in the <paramref name="parameter"/> name are percent-encoded
+        /// to conform to the requirements of a <c>varname</c> defined by RFC 6570.
+        /// </note>
+        /// </remarks>
+        /// <param name="uri">The URI to add a query parameter to.</param>
+        /// <param name="parameter">The name of the query parameter to add.</param>
+        /// <param name="value">The value of the query parameter.</param>
+        /// <returns>A <see cref="Uri"/> representing the input <paramref name="uri"/> with the specified query parameter added to the end of the query string.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="uri"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="parameter"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="value"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="parameter"/> is empty.</exception>
         public static Uri AddQueryParameter(Uri uri, string parameter, string value)
         {
+            if (uri == null)
+                throw new ArgumentNullException("uri");
+            if (parameter == null)
+                throw new ArgumentNullException("parameter");
+            if (value == null)
+                throw new ArgumentNullException("value");
+            if (string.IsNullOrEmpty(parameter))
+                throw new ArgumentException("parameter cannot be empty");
+
             string originalQuery = uri.Query;
+
+            if (!VarName.IsMatch(parameter))
+            {
+                // convert the parameter into a form compatible with RFC 6570
+                parameter = UriDecode(parameter);
+                StringBuilder builder = new StringBuilder();
+
+                byte[] bytes = Encoding.UTF8.GetBytes(parameter);
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    byte b = bytes[i];
+                    if ((b >= 'a' && b <= 'z')
+                        || (b >= 'A' && b <= 'Z')
+                        || (b >= '0' && b <= '9')
+                        || b == '_'
+                        || (i > 0 && i < bytes.Length - 1 && b == '.'))
+                    {
+                        builder.Append((char)b);
+                    }
+                    else
+                    {
+                        builder.Append('%').Append(b.ToString("X2"));
+                    }
+                }
+
+                parameter = builder.ToString();
+            }
 
             UriTemplate queryTemplate;
             if (string.IsNullOrEmpty(originalQuery))
@@ -116,11 +197,51 @@
             return new Uri(uri.OriginalString + queryUri.OriginalString, uriKind);
         }
 
+        /// <summary>
+        /// Sets a URI query parameter to a specific value, adding or replacing the existing value
+        /// as appropriate.
+        /// </summary>
+        /// <remarks>
+        /// This method is a convenience method for calling <see cref="RemoveQueryParameter"/> followed
+        /// by <see cref="AddQueryParameter"/>.
+        /// </remarks>
+        /// <param name="uri">The URI to add a query parameter to.</param>
+        /// <param name="parameter">The name of the query parameter to add.</param>
+        /// <param name="value">The value of the query parameter.</param>
+        /// <returns>
+        /// A <see cref="Uri"/> representing the input <paramref name="uri"/> with all previous instances
+        /// (if any) of the query parameter with the specified name removed, and a new query parameter
+        /// with the specified name and value added to the query string.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="uri"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="parameter"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="value"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="parameter"/> is empty.</exception>
         public static Uri SetQueryParameter(Uri uri, string parameter, string value)
         {
             return AddQueryParameter(RemoveQueryParameter(uri, parameter), parameter, value);
         }
 
+        /// <summary>
+        /// Remove all query parameters matching a particular parameter name from a URI.
+        /// </summary>
+        /// <remarks>
+        /// This method handles percent-encoded octets as UTF-8 encoded characters in both the
+        /// <paramref name="parameter"/> argument and the query string.
+        /// </remarks>
+        /// <param name="uri">The URI.</param>
+        /// <param name="parameter">The name of the parameter to remove.</param>
+        /// <returns>A <see cref="Uri"/> representing the input <paramref name="uri"/> with all query parameters with a name matching <paramref name="parameter"/> removed from the query string.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="uri"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="parameter"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="parameter"/> is empty.</exception>
         public static Uri RemoveQueryParameter(Uri uri, string parameter)
         {
             if (uri == null)
@@ -129,8 +250,6 @@
                 throw new ArgumentNullException("parameter");
             if (string.IsNullOrEmpty(parameter))
                 throw new ArgumentException("parameter cannot be empty");
-            if (parameter.IndexOfAny(new[] { '&', '?', '=' }) >= 0)
-                throw new ArgumentException();
 
             string query = uri.Query;
             if (string.IsNullOrEmpty(query))
@@ -143,8 +262,16 @@
             {
                 string escapedUpper = b.ToString("X2");
                 expressionBuilder.Append("(?:");
-                expressionBuilder.Append(Regex.Escape(((char)b).ToString()));
-                expressionBuilder.Append("|%");
+                if (b == '&' || b == '?' || b == '=')
+                {
+                    // these character can only appear percent-encoded in a parameter name
+                    expressionBuilder.Append('%');
+                }
+                else
+                {
+                    expressionBuilder.Append(Regex.Escape(((char)b).ToString()));
+                    expressionBuilder.Append("|%");
+                }
 
                 foreach (var escaped in escapedUpper)
                 {
@@ -204,7 +331,7 @@
             MatchEvaluator matchEvaluator =
                 match =>
                 {
-                    string hexValue = match.Groups[1].Value;
+                    string hexValue = match.Value.Substring(1);
                     return ((char)byte.Parse(hexValue, NumberStyles.HexNumber)).ToString();
                 };
             string decodedText = _percentEncodedPattern.Replace(text, matchEvaluator);
