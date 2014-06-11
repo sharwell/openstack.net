@@ -43,7 +43,7 @@ namespace OpenStack.Services.Compute.V2
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RebootData"/> class with the specified
+        /// Initializes a new instance of the <see cref="RebootRequest"/> class with the specified
         /// arguments and extension data.
         /// </summary>
         /// <param name="arguments">A <see cref="RebootData"/> object containing the arguments for the action.</param>
@@ -57,7 +57,7 @@ namespace OpenStack.Services.Compute.V2
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RebootData"/> class with the specified
+        /// Initializes a new instance of the <see cref="RebootRequest"/> class with the specified
         /// arguments and extension data.
         /// </summary>
         /// <param name="arguments">A <see cref="RebootData"/> object containing the arguments for the action.</param>
