@@ -131,15 +131,13 @@
                 throw new ArgumentException("parameter cannot be empty");
             if (parameter.IndexOfAny(new[] { '&', '?', '=' }) >= 0)
                 throw new ArgumentException();
-            if (parameter.IndexOf('%') >= 0)
-                throw new NotSupportedException("This method does not yet support percent-encoded values in the parameter name");
 
             string query = uri.Query;
             if (string.IsNullOrEmpty(query))
                 return uri;
 
             StringBuilder expressionBuilder = new StringBuilder();
-            byte[] encodedParameter = Encoding.UTF8.GetBytes(parameter);
+            byte[] encodedParameter = Encoding.UTF8.GetBytes(UriDecode(parameter));
             expressionBuilder.Append("[?&]");
             foreach (byte b in encodedParameter)
             {
