@@ -77,31 +77,8 @@
                                     return null;
 
                                 IList<Server> list = serversArray.ToObject<Server[]>();
-                                Func<CancellationToken, Task<ReadOnlyCollectionPage<Server>>> getNextPageAsync;
-                                if (list.Count > 0)
-                                {
-                                    getNextPageAsync =
-                                        innerCancellationToken2 =>
-                                        {
-                                            ServerId marker = list.Last().Id;
-                                            return
-                                                CoreTaskExtensions.Using(
-                                                    () => PrepareListServersAsync(innerCancellationToken2)
-                                                        .Select(
-                                                            _ =>
-                                                            {
-                                                                _.Result.RequestMessage.RequestUri = originalUri;
-                                                                return _.Result;
-                                                            })
-                                                        .WithMarker(marker),
-                                                    _ => _.Result.SendAsync(innerCancellationToken2))
-                                                .Select(_ => _.Result.Item2);
-                                        };
-                                }
-                                else
-                                {
-                                    getNextPageAsync = null;
-                                }
+                                Func<CancellationToken, Task<ReadOnlyCollectionPage<Server>>> getNextPageAsync =
+                                    CreateGetNextPageAsyncDelegate<ListServersApiCall, Server>(PrepareListServersAsync, responseObject, "servers");
 
                                 ReadOnlyCollectionPage<Server> results = new BasicReadOnlyCollectionPage<Server>(list, getNextPageAsync);
                                 return results;
@@ -293,31 +270,8 @@
                                     return null;
 
                                 IList<Flavor> list = flavorsArray.ToObject<Flavor[]>();
-                                Func<CancellationToken, Task<ReadOnlyCollectionPage<Flavor>>> getNextPageAsync;
-                                if (list.Count > 0)
-                                {
-                                    getNextPageAsync =
-                                        innerCancellationToken2 =>
-                                        {
-                                            FlavorId marker = list.Last().Id;
-                                            return
-                                                CoreTaskExtensions.Using(
-                                                    () => PrepareListFlavorsAsync(innerCancellationToken2)
-                                                        .Select(
-                                                            _ =>
-                                                            {
-                                                                _.Result.RequestMessage.RequestUri = originalUri;
-                                                                return _.Result;
-                                                            })
-                                                        .WithMarker(marker),
-                                                    _ => _.Result.SendAsync(innerCancellationToken2))
-                                                .Select(_ => _.Result.Item2);
-                                        };
-                                }
-                                else
-                                {
-                                    getNextPageAsync = null;
-                                }
+                                Func<CancellationToken, Task<ReadOnlyCollectionPage<Flavor>>> getNextPageAsync =
+                                    CreateGetNextPageAsyncDelegate<ListFlavorsApiCall, Flavor>(PrepareListFlavorsAsync, responseObject, "flavors");
 
                                 ReadOnlyCollectionPage<Flavor> results = new BasicReadOnlyCollectionPage<Flavor>(list, getNextPageAsync);
                                 return results;
@@ -371,31 +325,8 @@
                                     return null;
 
                                 IList<Image> list = imagesArray.ToObject<Image[]>();
-                                Func<CancellationToken, Task<ReadOnlyCollectionPage<Image>>> getNextPageAsync;
-                                if (list.Count > 0)
-                                {
-                                    getNextPageAsync =
-                                        innerCancellationToken2 =>
-                                        {
-                                            ImageId marker = list.Last().Id;
-                                            return
-                                                CoreTaskExtensions.Using(
-                                                    () => PrepareListImagesAsync(innerCancellationToken2)
-                                                        .Select(
-                                                            _ =>
-                                                            {
-                                                                _.Result.RequestMessage.RequestUri = originalUri;
-                                                                return _.Result;
-                                                            })
-                                                        .WithMarker(marker),
-                                                    _ => _.Result.SendAsync(innerCancellationToken2))
-                                                .Select(_ => _.Result.Item2);
-                                        };
-                                }
-                                else
-                                {
-                                    getNextPageAsync = null;
-                                }
+                                Func<CancellationToken, Task<ReadOnlyCollectionPage<Image>>> getNextPageAsync =
+                                    CreateGetNextPageAsyncDelegate<ListImagesApiCall, Image>(PrepareListImagesAsync, responseObject, "images");
 
                                 ReadOnlyCollectionPage<Image> results = new BasicReadOnlyCollectionPage<Image>(list, getNextPageAsync);
                                 return results;
@@ -618,6 +549,38 @@
                         _baseUri = task.Result;
                         return task.Result;
                     });
+        }
+
+        private static Func<CancellationToken, Task<ReadOnlyCollectionPage<TElement>>> CreateGetNextPageAsyncDelegate<TCall, TElement>(Func<CancellationToken, Task<TCall>> prepareApiCall, JObject responseObject, string propertyName)
+            where TCall : IHttpApiCall<ReadOnlyCollectionPage<TElement>>
+        {
+            if (responseObject == null)
+                return null;
+
+            JArray linksArray = responseObject[propertyName + "_links"] as JArray;
+            if (linksArray == null)
+                return null;
+
+            Link[] links = linksArray.ToObject<Link[]>();
+            Link nextLink = links.FirstOrDefault(i => string.Equals("next", i.Relation, StringComparison.OrdinalIgnoreCase));
+            if (nextLink == null)
+                return null;
+
+            return
+                cancellationToken =>
+                {
+                    return
+                        CoreTaskExtensions.Using(
+                            () => prepareApiCall(cancellationToken)
+                                .Select(
+                                    _ =>
+                                    {
+                                        _.Result.RequestMessage.RequestUri = nextLink.Target;
+                                        return _.Result;
+                                    }),
+                            _ => _.Result.SendAsync(cancellationToken))
+                        .Select(_ => _.Result.Item2);
+                };
         }
     }
 }
