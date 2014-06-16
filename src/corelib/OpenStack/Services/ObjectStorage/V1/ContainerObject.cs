@@ -5,25 +5,40 @@
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Provides the details of an object stored in an Object Storage provider.
+    /// Provides the details of an object stored in the Object Storage Service.
     /// </summary>
-    /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails_v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API v1 Reference)</seealso>
+    /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails__v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API V1 Reference)</seealso>
     /// <threadsafety static="true" instance="false"/>
     [JsonObject(MemberSerialization.OptIn)]
     public class ContainerObject : ExtensibleJsonObject
     {
+        /// <summary>
+        /// This is the backing field for the <see cref="Name"/> property.
+        /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private ObjectName _name;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Hash"/> property.
+        /// </summary>
         [JsonProperty("hash", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _hash;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="Size"/> property.
+        /// </summary>
         [JsonProperty("bytes", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private long? _bytes;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="ContentType"/> property.
+        /// </summary>
         [JsonProperty("content_type", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _contentType;
 
+        /// <summary>
+        /// This is the backing field for the <see cref="LastModified"/> property.
+        /// </summary>
         [JsonProperty("last_modified", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private DateTimeOffset? _lastModified;
 
@@ -37,10 +52,15 @@
         }
 
         /// <summary>
-        /// Gets a "name" associated with the object.
-        /// <note type="warning">The value of this property is not defined. Do not use.</note>
+        /// Gets the name of the object.
+        /// <note type="warning">The value of this property is not defined by OpenStack, and may not be consistent across vendors.</note>
         /// </summary>
-        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails_v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API v1 Reference)</seealso>
+        /// <value>
+        /// The name of the object.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails__v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API V1 Reference)</seealso>
         public ObjectName Name
         {
             get
@@ -50,10 +70,15 @@
         }
 
         /// <summary>
-        /// Gets the "hash" value associated with the object.
-        /// <note type="warning">The value of this property is not defined. Do not use.</note>
+        /// Gets the hash code of the object.
+        /// <note type="warning">The value of this property is not defined by OpenStack, and may not be consistent across vendors.</note>
         /// </summary>
-        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails_v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API v1 Reference)</seealso>
+        /// <value>
+        /// The hash code of the object.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails__v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API V1 Reference)</seealso>
         public string Hash
         {
             get
@@ -63,10 +88,15 @@
         }
 
         /// <summary>
-        /// Gets the "bytes" value associated with the object.
-        /// <note type="warning">The value of this property is not defined. Do not use.</note>
+        /// Gets the size of the object in bytes.
+        /// <note type="warning">The value of this property is not defined by OpenStack, and may not be consistent across vendors.</note>
         /// </summary>
-        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails_v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API v1 Reference)</seealso>
+        /// <value>
+        /// The size of the object in bytes.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails__v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API V1 Reference)</seealso>
         public long? Size
         {
             get
@@ -76,10 +106,15 @@
         }
 
         /// <summary>
-        /// Gets the "content type" value associated with the object.
-        /// <note type="warning">The value of this property is not defined. Do not use.</note>
+        /// Gets the content type of the object.
+        /// <note type="warning">The value of this property is not defined by OpenStack, and may not be consistent across vendors.</note>
         /// </summary>
-        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails_v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API v1 Reference)</seealso>
+        /// <value>
+        /// The content type of the object.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails__v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API V1 Reference)</seealso>
         public string ContentType
         {
             get
@@ -89,10 +124,15 @@
         }
 
         /// <summary>
-        /// Gets the "last modified" value associated with the object.
-        /// <note type="warning">The value of this property is not defined. Do not use.</note>
+        /// Gets a timestamp indicating when the object was last updated.
+        /// <note type="warning">The value of this property is not defined by OpenStack, and may not be consistent across vendors.</note>
         /// </summary>
-        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails_v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API v1 Reference)</seealso>
+        /// <value>
+        /// A timestamp indicating when the object was last updated.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/GET_showContainerDetails__v1__account___container__storage_container_services.html">Show container details and list objects (OpenStack Object Storage API V1 Reference)</seealso>
         public DateTimeOffset? LastModified
         {
             get

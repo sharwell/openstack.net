@@ -6,14 +6,13 @@
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents a archive format for the Cloud Files Extract Archive operation.
+    /// Represents a archive format for the Object Storage service Extract Archive operation.
     /// </summary>
     /// <remarks>
     /// This class functions as a strongly-typed enumeration of known archive types,
     /// with added support for unknown types returned or supported by a server extension.
     /// </remarks>
-    /// <seealso cref="CloudFilesProvider.ExtractArchive"/>
-    /// <seealso cref="CloudFilesProvider.ExtractArchiveFromFile"/>
+    /// <seealso cref="O:OpenStack.Services.ObjectStorage.V1.ExtractArchiveExtensions.ExtractArchiveAsync"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonConverter(typeof(ArchiveFormat.Converter))]
