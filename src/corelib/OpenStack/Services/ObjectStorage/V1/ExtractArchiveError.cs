@@ -6,11 +6,11 @@
     /// <summary>
     /// Represents an error which occurred while extracting a file during an Extract Archive operation.
     /// </summary>
-    /// <seealso cref="CloudFilesProvider.ExtractArchive"/>
-    /// <seealso cref="CloudFilesProvider.ExtractArchiveFromFile"/>
+    /// <seealso cref="O:OpenStack.Services.ObjectStorage.V1.ExtractArchiveExtensions.ExtractArchiveAsync"/>
+    /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/archive-auto-extract.html">Auto-extract archive files (OpenStack Object Storage API V1 Reference)</seealso>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
-    public class ExtractArchiveError : ExtensibleJsonObject
+    public class ExtractArchiveError
     {
         /// <summary>
         /// This is the backing field for the <see cref="Path"/> property.

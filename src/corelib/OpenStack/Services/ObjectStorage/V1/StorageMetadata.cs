@@ -11,6 +11,12 @@
     using System.Collections.ObjectModel;
 #endif
 
+    /// <summary>
+    /// This is the base class for representing metadata associated with resources in the
+    /// Object Storage Service.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public abstract class StorageMetadata
     {
         /// <summary>
@@ -23,6 +29,20 @@
         /// </summary>
         private readonly IDictionary<string, string> _metadata;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StorageMetadata"/> class
+        /// using the metadata present in the specified response message, and a
+        /// specified prefix for distinguishing custom metadata from other HTTP
+        /// headers.
+        /// </summary>
+        /// <param name="responseMessage">The HTTP response to extract the metadata from.</param>
+        /// <param name="metadataPrefix">The prefix used for HTTP headers representing custom metadata associated with the resource.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="responseMessage"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="metadataPrefix"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="metadataPrefix"/> is empty.</exception>
         protected StorageMetadata(HttpResponseMessage responseMessage, string metadataPrefix)
         {
             if (responseMessage == null)
@@ -57,6 +77,17 @@
             _metadata = metadata;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StorageMetadata"/> class
+        /// with the specified HTTP headers and custom account metadata.
+        /// </summary>
+        /// <param name="headers">The custom HTTP headers associated with the resource.</param>
+        /// <param name="metadata">The custom metadata associated with the resource.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="headers"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="metadata"/> is <see langword="null"/>.</para>
+        /// </exception>
         protected StorageMetadata(IDictionary<string, string> headers, IDictionary<string, string> metadata)
         {
             if (headers == null)
@@ -68,6 +99,9 @@
             _metadata = metadata;
         }
 
+        /// <summary>
+        /// Gets the non-metadata HTTP headers associated with the resource.
+        /// </summary>
         public ReadOnlyDictionary<string, string> Headers
         {
             get
@@ -76,6 +110,13 @@
             }
         }
 
+        /// <summary>
+        /// Gets the custom metadata headers associated with the resource.
+        /// </summary>
+        /// <remarks>
+        /// The keys of the dictionary returned by this property do not include the HTTP
+        /// header prefix which distinguishes custom metadata from other HTTP headers.
+        /// </remarks>
         public ReadOnlyDictionary<string, string> Metadata
         {
             get
@@ -84,6 +125,19 @@
             }
         }
 
+        /// <summary>
+        /// Encode a string value for use as an HTTP header when applying values
+        /// in <see cref="Headers"/> or <see cref="Metadata"/> to a particular
+        /// <see cref="HttpRequestMessage"/>.
+        /// </summary>
+        /// <remarks>
+        /// Header values are encoded by converting the input string to a UTF-8
+        /// encoded sequence of bytes, followed by reinterpreting each byte as
+        /// an ISO-8859-1 character, ensuring Unicode header values are properly
+        /// processed by the Object Storage Service.
+        /// </remarks>
+        /// <param name="value">The HTTP header value to encode for the Object Storage Service.</param>
+        /// <returns>The encoded header value.</returns>
         public static string EncodeHeaderValue(string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -93,6 +147,19 @@
             return new string(encodedBytes.ConvertAll(i => (char)i));
         }
 
+        /// <summary>
+        /// Decode a string value returned in an HTTP header from the Object
+        /// Storage Service.
+        /// </summary>
+        /// <remarks>
+        /// Header values are decoded by converting the input string to an
+        /// ISO-8859-1 encoded sequence of bytes, followed by deserializing the byte
+        /// array as a UTF-8 encoded string, ensuring that Unicode header values
+        /// returned by the Object Storage Service are correctly converted to
+        /// <see cref="string"/> values.
+        /// </remarks>
+        /// <param name="value">The HTTP header value to decode.</param>
+        /// <returns></returns>
         public static string DecodeHeaderValue(string value)
         {
             if (string.IsNullOrEmpty(value))

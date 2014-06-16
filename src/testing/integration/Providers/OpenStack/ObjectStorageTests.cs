@@ -844,8 +844,13 @@
             if (pageSize <= 0)
                 throw new ArgumentOutOfRangeException("pageSize");
 
-            var firstPage = await provider.ListContainersAsync(pageSize, cancellationToken);
-            return await firstPage.Item2.GetAllPagesAsync(cancellationToken, progress);
+            Tuple<HttpResponseMessage, Tuple<AccountMetadata, ReadOnlyCollectionPage<Container>>> firstPage;
+            using (var apiCall = await provider.PrepareListContainersAsync(cancellationToken).WithPageSize(pageSize))
+            {
+                firstPage = await apiCall.SendAsync(cancellationToken);
+            }
+
+            return await firstPage.Item2.Item2.GetAllPagesAsync(cancellationToken, progress);
         }
 
         private static async Task<ReadOnlyCollection<ContainerObject>> ListAllObjectsAsync(IObjectStorageService provider, ContainerName container, CancellationToken cancellationToken, IProgress<ReadOnlyCollection<ContainerObject>> progress)
@@ -859,8 +864,13 @@
             if (pageSize <= 0)
                 throw new ArgumentOutOfRangeException("pageSize");
 
-            var firstPage = await provider.ListObjectsAsync(container, pageSize, CancellationToken.None);
-            return await firstPage.Item2.GetAllPagesAsync(cancellationToken, progress);
+            Tuple<HttpResponseMessage, Tuple<ContainerMetadata, ReadOnlyCollectionPage<ContainerObject>>> firstPage;
+            using (var apiCall = await provider.PrepareListObjectsAsync(container, cancellationToken).WithPageSize(pageSize))
+            {
+                firstPage = await apiCall.SendAsync(cancellationToken);
+            }
+
+            return await firstPage.Item2.Item2.GetAllPagesAsync(cancellationToken, progress);
         }
 
 #if false // Rackspace-specific

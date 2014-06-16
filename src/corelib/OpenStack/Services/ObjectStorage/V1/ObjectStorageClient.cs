@@ -15,28 +15,42 @@
     using OpenStack.Security.Authentication;
     using Rackspace.Net;
     using Rackspace.Threading;
-    using Encoding = System.Text.Encoding;
-    using SeekOrigin = System.IO.SeekOrigin;
     using Stream = System.IO.Stream;
 
 #if !NET40PLUS
     using OpenStack.Compat;
 #endif
 
+    /// <summary>
+    /// This class provides a default implementation of <see cref="IObjectStorageService"/> suitable for
+    /// connecting to OpenStack-compatible installations of the Object Storage Service V1.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public class ObjectStorageClient : ServiceClient, IObjectStorageService
     {
         /// <summary>
-        /// Specifies whether the <see cref="Endpoint.PublicURL"/> or <see cref="Endpoint.InternalURL"/>
-        /// should be used for accessing the Cloud Queues API.
+        /// Specifies whether the public or internal base address
+        /// should be used for accessing the object storage service.
         /// </summary>
         private readonly bool _internalUrl;
 
         /// <summary>
-        /// This field caches the base URI used for accessing the Cloud Queues service.
+        /// This field caches the base URI used for accessing the object storage service.
         /// </summary>
         /// <seealso cref="GetBaseUriAsync"/>
         private Uri _baseUri;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObjectStorageClient"/> class
+        /// with the specified authentication service, default region, and value indicating
+        /// whether an internal or public endpoint should be used for communicating with
+        /// the service.
+        /// </summary>
+        /// <param name="authenticationService">The authentication service to use for authenticating requests made to this service.</param>
+        /// <param name="defaultRegion">The preferred region for the service. Unless otherwise specified for a specific client, derived service clients will not use a default region if this value is <see langword="null"/> (i.e. only regionless or global service endpoints will be considered acceptable).</param>
+        /// <param name="internalUrl"><see langword="true"/> to access the service over a local network; otherwise, <see langword="false"/> to access the service over a public network (the internet).</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="authenticationService"/> is <see langword="null"/>.</exception>
         public ObjectStorageClient(IAuthenticationService authenticationService, string defaultRegion, bool internalUrl)
             : base(authenticationService, defaultRegion)
         {
@@ -45,6 +59,7 @@
 
         #region IObjectStorageService Members
 
+        /// <inheritdoc/>
         public Task<GetObjectStorageInfoApiCall> PrepareGetObjectStorageInfoAsync(CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate("/info");
@@ -54,6 +69,7 @@
                 .Select(task => new GetObjectStorageInfoApiCall(CreateJsonApiCall<ReadOnlyDictionary<string, JObject>>(task.Result)));
         }
 
+        /// <inheritdoc/>
         public Task<ListContainersApiCall> PrepareListContainersAsync(CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate(string.Empty);
@@ -109,6 +125,7 @@
                 .Select(task => new ListContainersApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
+        /// <inheritdoc/>
         public Task<GetAccountMetadataApiCall> PrepareGetAccountMetadataAsync(CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate(string.Empty);
@@ -122,6 +139,7 @@
                 .Select(task => new GetAccountMetadataApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
+        /// <inheritdoc/>
         public Task<UpdateAccountMetadataApiCall> PrepareUpdateAccountMetadataAsync(AccountMetadata metadata, CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate(string.Empty);
@@ -150,6 +168,7 @@
                     });
         }
 
+        /// <inheritdoc/>
         public Task<UpdateAccountMetadataApiCall> PrepareRemoveAccountMetadataAsync(IEnumerable<string> keys, CancellationToken cancellationToken)
         {
             if (keys == null)
@@ -167,6 +186,7 @@
             return PrepareUpdateAccountMetadataAsync(new AccountMetadata(new Dictionary<string, string>(), metadata), cancellationToken);
         }
 
+        /// <inheritdoc/>
         public Task<CreateContainerApiCall> PrepareCreateContainerAsync(ContainerName container, CancellationToken cancellationToken)
         {
             if (container == null)
@@ -180,6 +200,7 @@
                 .Select(task => new CreateContainerApiCall(CreateBasicApiCall(task.Result)));
         }
 
+        /// <inheritdoc/>
         public Task<RemoveContainerApiCall> PrepareRemoveContainerAsync(ContainerName container, CancellationToken cancellationToken)
         {
             if (container == null)
@@ -193,6 +214,7 @@
                 .Select(task => new RemoveContainerApiCall(CreateBasicApiCall(task.Result)));
         }
 
+        /// <inheritdoc/>
         public Task<ListObjectsApiCall> PrepareListObjectsAsync(ContainerName container, CancellationToken cancellationToken)
         {
             if (container == null)
@@ -251,6 +273,7 @@
                 .Select(task => new ListObjectsApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
+        /// <inheritdoc/>
         public Task<GetContainerMetadataApiCall> PrepareGetContainerMetadataAsync(ContainerName container, CancellationToken cancellationToken)
         {
             if (container == null)
@@ -267,6 +290,7 @@
                 .Select(task => new GetContainerMetadataApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
+        /// <inheritdoc/>
         public Task<UpdateContainerMetadataApiCall> PrepareUpdateContainerMetadataAsync(ContainerName container, ContainerMetadata metadata, CancellationToken cancellationToken)
         {
             if (container == null)
@@ -298,6 +322,7 @@
                     });
         }
 
+        /// <inheritdoc/>
         public Task<UpdateContainerMetadataApiCall> PrepareRemoveContainerMetadataAsync(ContainerName container, IEnumerable<string> keys, CancellationToken cancellationToken)
         {
             if (keys == null)
@@ -315,6 +340,7 @@
             return PrepareUpdateContainerMetadataAsync(container, new ContainerMetadata(new Dictionary<string, string>(), metadata), cancellationToken);
         }
 
+        /// <inheritdoc/>
         public Task<CreateObjectApiCall> PrepareCreateObjectAsync(ContainerName container, ObjectName @object, Stream stream, CancellationToken cancellationToken, IProgress<long> progress)
         {
             if (container == null)
@@ -342,6 +368,7 @@
                     });
         }
 
+        /// <inheritdoc/>
         public Task<CopyObjectApiCall> PrepareCopyObjectAsync(ContainerName sourceContainer, ObjectName sourceObject, ContainerName destinationContainer, ObjectName destinationObject, CancellationToken cancellationToken)
         {
             if (sourceContainer == null)
@@ -376,6 +403,7 @@
                     });
         }
 
+        /// <inheritdoc/>
         public Task<RemoveObjectApiCall> PrepareRemoveObjectAsync(ContainerName container, ObjectName @object, CancellationToken cancellationToken)
         {
             if (container == null)
@@ -391,6 +419,7 @@
                 .Select(task => new RemoveObjectApiCall(CreateBasicApiCall(task.Result)));
         }
 
+        /// <inheritdoc/>
         public Task<GetObjectApiCall> PrepareGetObjectAsync(ContainerName container, ObjectName @object, CancellationToken cancellationToken)
         {
             if (container == null)
@@ -413,6 +442,7 @@
                 .Select(task => new GetObjectApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseHeadersRead, deserializeResult)));
         }
 
+        /// <inheritdoc/>
         public Task<GetObjectMetadataApiCall> PrepareGetObjectMetadataAsync(ContainerName container, ObjectName @object, CancellationToken cancellationToken)
         {
             if (container == null)
@@ -431,6 +461,13 @@
                 .Select(task => new GetObjectMetadataApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
+        /// <inheritdoc/>
+        /// <remarks>
+        /// This implementation avoids sending HTTP headers present in the <see cref="StorageMetadata.Headers"/> property
+        /// of <paramref name="metadata"/> which the Object Storage service is known to reject. This simplifies the use
+        /// of this method in combination with <see cref="PrepareGetObjectMetadataAsync"/> to update, as opposed to replace,
+        /// the metadata associated with an object.
+        /// </remarks>
         public Task<SetObjectMetadataApiCall> PrepareSetObjectMetadataAsync(ContainerName container, ObjectName @object, ObjectMetadata metadata, CancellationToken cancellationToken)
         {
             if (container == null)

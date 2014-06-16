@@ -9,6 +9,8 @@
     /// This class contains extension methods to support the <c>X-Newest</c> header
     /// in various requests to the <see cref="IObjectStorageService"/>.
     /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public static class NewestExtensions
     {
         /// <summary>

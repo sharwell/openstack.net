@@ -9,6 +9,7 @@
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
+    using OpenStack.Net;
     using Rackspace.Threading;
     using Stream = System.IO.Stream;
 
@@ -16,10 +17,32 @@
     using OpenStack.Compat;
 #endif
 
+    /// <summary>
+    /// This class provides extension methods that simplify the process of preparing and sending
+    /// Object Storage Service HTTP API calls for the most common use cases.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public static class ObjectStorageServiceExtensions
     {
         #region Discoverability
 
+        /// <summary>
+        /// Determine the features enabled in the Object Storage service.
+        /// </summary>
+        /// <param name="service">The <see cref="IObjectStorageService"/> instance.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the a dictionary; the keys are the names of properties, and the values are JSON
+        /// objects containing arbitrary data associated with the properties.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="service"/> is <see langword="null"/>.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="GetObjectStorageInfoApiCall"/>
+        /// <seealso cref="IObjectStorageService.PrepareGetObjectStorageInfoAsync"/>
+        /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/discoverability.html">Discoverability (OpenStack Object Storage API V1 Reference)</seealso>
         public static Task<ReadOnlyDictionary<string, JObject>> GetObjectStorageInfoAsync(this IObjectStorageService service, CancellationToken cancellationToken)
         {
             return
@@ -38,15 +61,6 @@
             return
                 CoreTaskExtensions.Using(
                     () => service.PrepareListContainersAsync(cancellationToken),
-                    task => task.Result.SendAsync(cancellationToken))
-                .Select(task => task.Result.Item2);
-        }
-
-        public static Task<Tuple<AccountMetadata, ReadOnlyCollectionPage<Container>>> ListContainersAsync(this IObjectStorageService service, int pageSize, CancellationToken cancellationToken)
-        {
-            return
-                CoreTaskExtensions.Using(
-                    () => service.PrepareListContainersAsync(cancellationToken).WithPageSize(pageSize),
                     task => task.Result.SendAsync(cancellationToken))
                 .Select(task => task.Result.Item2);
         }
@@ -97,15 +111,6 @@
             return
                 CoreTaskExtensions.Using(
                     () => service.PrepareListObjectsAsync(container, cancellationToken),
-                    task => task.Result.SendAsync(cancellationToken))
-                .Select(task => task.Result.Item2);
-        }
-
-        public static Task<Tuple<ContainerMetadata, ReadOnlyCollectionPage<ContainerObject>>> ListObjectsAsync(this IObjectStorageService service, ContainerName container, int pageSize, CancellationToken cancellationToken)
-        {
-            return
-                CoreTaskExtensions.Using(
-                    () => service.PrepareListObjectsAsync(container, cancellationToken).WithPageSize(pageSize),
                     task => task.Result.SendAsync(cancellationToken))
                 .Select(task => task.Result.Item2);
         }

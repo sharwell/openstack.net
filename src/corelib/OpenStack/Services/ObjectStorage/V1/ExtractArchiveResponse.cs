@@ -12,9 +12,8 @@
     /// <summary>
     /// This class models the JSON response to an Extract Archive operation.
     /// </summary>
-    /// <seealso cref="CloudFilesProvider.ExtractArchive"/>
-    /// <seealso cref="CloudFilesProvider.ExtractArchiveFromFile"/>
-    /// <seealso href="http://docs.rackspace.com/files/api/v1/cf-devguide/content/Extract_Archive-d1e2338.html">Extracting Archive Files (Rackspace Cloud Files Developer Guide - API v1)</seealso>
+    /// <seealso cref="O:OpenStack.Services.ObjectStorage.V1.ExtractArchiveExtensions.ExtractArchiveAsync"/>
+    /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/archive-auto-extract.html">Auto-extract archive files (OpenStack Object Storage API V1 Reference)</seealso>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
@@ -59,8 +58,9 @@
         /// Gets the number of files created by the Extract Archive operation.
         /// </summary>
         /// <value>
-        /// The number of files created by the Extract Archive operation, or <see langword="null"/> if
-        /// the JSON response from the server did not include the underlying property.
+        /// The number of files created by the Extract Archive operation.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
         /// </value>
         public int? CreatedFiles
         {
@@ -74,8 +74,9 @@
         /// Gets the response status for the Extract Archive operation.
         /// </summary>
         /// <value>
-        /// The response status for the Extract Archive operation, or <see langword="null"/> if
-        /// the JSON response from the server did not include the underlying property.
+        /// The response status for the Extract Archive operation.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
         /// </value>
         public string ResponseStatus
         {
@@ -89,8 +90,9 @@
         /// Gets the response body for the Extract Archive operation.
         /// </summary>
         /// <value>
-        /// The response body for the Extract Archive operation, or <see langword="null"/> if
-        /// the JSON response from the server did not include the underlying property.
+        /// The response body for the Extract Archive operation.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
         /// </value>
         public string ResponseBody
         {
@@ -106,8 +108,9 @@
         /// </summary>
         /// <value>
         /// A collection of errors, if any, which occurred for specific files during the
-        /// Extract Archive operation, or <see langword="null"/> if the JSON response from the server
-        /// did not include the underlying property.
+        /// Extract Archive operation.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
         /// </value>
         public ReadOnlyCollection<ExtractArchiveError> Errors
         {
