@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
+    using OpenStack.Net;
     using OpenStack.ObjectModel.JsonHome;
     using OpenStack.Security.Authentication;
     using CancellationToken = System.Threading.CancellationToken;
@@ -23,27 +24,33 @@
         #region Base endpoints
 
         /// <summary>
-        /// Gets the home document describing the operations supported by the service.
+        /// Prepare an API call to get a <see cref="HomeDocument"/> describing the operations supported by the service.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain a <see cref="HomeDocument"/> object describing the operations supported by the service.</returns>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
-        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
+        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the client, see
         /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
-        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="GetHomeAsync (await)" language="cs"/>
-        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="GetHomeAsync (await)" language="vbnet"/>
-        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="GetHomeAsync (await)" language="fs"/>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="PrepareGetHomeAsync (await)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="PrepareGetHomeAsync (await)" language="vbnet"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="PrepareGetHomeAsync (await)" language="fs"/>
         /// <token>TplExample</token>
-        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="GetHomeAsync (TPL)" language="cs"/>
-        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="GetHomeAsync (TPL)" language="vbnet"/>
-        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="GetHomeAsync (TPL)" language="cpp"/>
-        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="GetHomeAsync (TPL)" language="fs"/>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="PrepareGetHomeAsync (TPL)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="PrepareGetHomeAsync (TPL)" language="vbnet"/>
+        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="PrepareGetHomeAsync (TPL)" language="cpp"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="PrepareGetHomeAsync (TPL)" language="fs"/>
         /// </example>
+        /// <seealso cref="GetHomeApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.GetHomeAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Get_Home_Document">Get Home Document (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task<HomeDocument> GetHomeAsync(CancellationToken cancellationToken);
+        Task<GetHomeApiCall> PrepareGetHomeAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Checks the queueing service node status.

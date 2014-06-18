@@ -1,9 +1,11 @@
-﻿Imports System.Threading
+﻿Imports System.Net.Http
+Imports System.Threading
 Imports System.Threading.Tasks
 Imports OpenStack.Collections
 Imports OpenStack.ObjectModel.JsonHome
 Imports OpenStack.Security.Authentication
 Imports OpenStack.Services.Queues.V1
+Imports Rackspace.Threading
 
 Public Class QueueingServiceExamples
 
@@ -11,6 +13,27 @@ Public Class QueueingServiceExamples
     Dim clientId = Guid.NewGuid
     Dim internalUrl = False
     Dim authenticationService As IAuthenticationService = Nothing
+
+#Region "GetHomeAsync"
+    Public Async Function PrepareGetHomeAsyncAwait() As Task
+        ' #Region "PrepareGetHomeAsync (await)"
+        Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
+        Dim apiCall As GetHomeApiCall = Await queuesService.PrepareGetHomeAsync(CancellationToken.None)
+        Dim apiResponse As Tuple(Of HttpResponseMessage, HomeDocument) = Await apiCall.SendAsync(CancellationToken.None)
+        Dim homeDocument As HomeDocument = apiResponse.Item2
+        ' #End Region
+    End Function
+
+    Public Sub PrepareGetHome()
+        ' #Region "PrepareGetHomeAsync (TPL)"
+        Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
+        Dim homeDocumentTask As Task(Of HomeDocument) =
+            CoreTaskExtensions.Using(
+                Function() queuesService.PrepareGetHomeAsync(CancellationToken.None),
+                Function(task) task.Result.SendAsync(CancellationToken.None)) _
+            .Select(Function(task) task.Result.Item2)
+        ' #End Region
+    End Sub
 
     Public Async Function GetHomeAsyncAwait() As Task
         ' #Region "GetHomeAsync (await)"
@@ -25,6 +48,7 @@ Public Class QueueingServiceExamples
         Dim task = queuesService.GetHomeAsync(CancellationToken.None)
         ' #End Region
     End Sub
+#End Region
 
     Public Async Function GetNodeHealthAsyncAwait() As Task
         ' #Region "GetNodeHealthAsync (await)"

@@ -2,12 +2,14 @@
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
     using OpenStack.Collections;
     using OpenStack.ObjectModel.JsonHome;
     using OpenStack.Security.Authentication;
     using OpenStack.Services.Queues.V1;
+    using Rackspace.Threading;
 
     public class QueueingServiceExamples
     {
@@ -19,6 +21,29 @@
         bool internalUrl = false;
         // use a default RackspaceAuthenticationClient for authentication
         IAuthenticationService authenticationService = null;
+
+        #region GetHomeAsync
+        public async Task PrepareGetHomeAsyncAwait()
+        {
+            #region PrepareGetHomeAsync (await)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            GetHomeApiCall apiCall = await queuesService.PrepareGetHomeAsync(CancellationToken.None);
+            Tuple<HttpResponseMessage, HomeDocument> apiResponse = await apiCall.SendAsync(CancellationToken.None);
+            HomeDocument homeDocument = apiResponse.Item2;
+            #endregion
+        }
+
+        public void PrepareGetHome()
+        {
+            #region PrepareGetHomeAsync (TPL)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            Task<HomeDocument> homeDocumentTask =
+                CoreTaskExtensions.Using(
+                    () => queuesService.PrepareGetHomeAsync(CancellationToken.None),
+                    task => task.Result.SendAsync(CancellationToken.None))
+                .Select(task => task.Result.Item2);
+            #endregion
+        }
 
         public async Task GetHomeAsyncAwait()
         {
@@ -35,6 +60,7 @@
             Task<HomeDocument> task = queuesService.GetHomeAsync(CancellationToken.None);
             #endregion
         }
+        #endregion
 
         public async Task GetNodeHealthAsyncAwait()
         {

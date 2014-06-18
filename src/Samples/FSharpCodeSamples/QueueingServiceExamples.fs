@@ -1,17 +1,44 @@
 ﻿module QueueingServiceExamples
 
 open System
+open System.Net.Http
 open System.Threading
 open System.Threading.Tasks
 open OpenStack.Collections
 open OpenStack.ObjectModel.JsonHome
 open OpenStack.Security.Authentication
 open OpenStack.Services.Queues.V1
+open Rackspace.Threading
 
 let region : string = null
 let clientId = Guid.NewGuid()
 let internalUrl = false
 let authenticationService : IAuthenticationService = null
+
+//
+// GetHomeAsync
+//
+
+let prepareGetHomeAsyncAwait =
+    async {
+        //#region PrepareGetHomeAsync (await)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+        let! apiCall = queuesService.PrepareGetHomeAsync(CancellationToken.None) |> Async.AwaitTask
+        let! responseMessage, homeDocument = apiCall.SendAsync(CancellationToken.None) |> Async.AwaitTask
+        //#endregion
+        ()
+    }
+
+let prepareGetHome =
+    //#region PrepareGetHomeAsync (TPL)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+    let homeDocumentTask =
+        CoreTaskExtensions.Using(
+            (fun () -> queuesService.PrepareGetHomeAsync(CancellationToken.None)),
+            (fun (task : Task<GetHomeApiCall>) -> task.Result.SendAsync(CancellationToken.None)))
+          .Select(fun (task : Task<HttpResponseMessage * HomeDocument>) -> snd task.Result)
+    //#endregion
+    ()
 
 let getHomeAsyncAwait =
     async {
