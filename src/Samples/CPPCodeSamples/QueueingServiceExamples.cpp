@@ -60,9 +60,9 @@ public:
 	void ListQueues()
 	{
 		IQueuesService^ queuesService = gcnew CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-		Task<ReadOnlyCollectionPage<CloudQueue^>^>^ queuesPageTask = queuesService->ListQueuesAsync(nullptr, Nullable<int>(), true, CancellationToken::None);
-		auto func = gcnew Func<Task<ReadOnlyCollectionPage<CloudQueue^>^>^, Task<ReadOnlyCollection<CloudQueue^>^>^>(GetAllPagesContinuationAsync<CloudQueue^>);
-		Task<ReadOnlyCollection<CloudQueue^>^>^ queuesTask = TaskExtensions::Unwrap(queuesPageTask->ContinueWith(func));
+		Task<ReadOnlyCollectionPage<Queue^>^>^ queuesPageTask = queuesService->ListQueuesAsync(nullptr, Nullable<int>(), true, CancellationToken::None);
+		auto func = gcnew Func<Task<ReadOnlyCollectionPage<Queue^>^>^, Task<ReadOnlyCollection<Queue^>^>^>(GetAllPagesContinuationAsync<Queue^>);
+		Task<ReadOnlyCollection<Queue^>^>^ queuesTask = TaskExtensions::Unwrap(queuesPageTask->ContinueWith(func));
 	}
 
 	generic<class T>

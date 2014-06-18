@@ -7,7 +7,7 @@
     /// <summary>
     /// Represents the name of a queue in the <see cref="IQueuesService"/>.
     /// </summary>
-    /// <seealso cref="CloudQueue.Name"/>
+    /// <seealso cref="Queue.Name"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonConverter(typeof(QueueName.Converter))]

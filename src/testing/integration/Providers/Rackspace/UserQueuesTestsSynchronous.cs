@@ -42,8 +42,8 @@
             IQueuesService provider = CreateProvider();
             QueueName queueName = CreateRandomQueueName();
 
-            CloudQueue[] allQueues = ListAllQueues(provider, null, false).ToArray();
-            foreach (CloudQueue queue in allQueues)
+            Queue[] allQueues = ListAllQueues(provider, null, false).ToArray();
+            foreach (Queue queue in allQueues)
             {
                 Console.WriteLine("Deleting queue: {0}", queue.Name);
                 provider.DeleteQueue(queue.Name);
@@ -97,7 +97,7 @@
 
             provider.CreateQueue(queueName);
 
-            foreach (CloudQueue queue in ListAllQueues(provider, null, true))
+            foreach (Queue queue in ListAllQueues(provider, null, true))
                 Console.WriteLine("{0}: {1}", queue.Name, queue.Href);
 
             provider.DeleteQueue(queueName);
@@ -640,13 +640,13 @@
         /// each of which requests a subset of the available queues.
         /// </summary>
         /// <param name="provider">The queueing service.</param>
-        /// <param name="limit">The maximum number of <see cref="CloudQueue"/> to return from a single call to <see cref="QueueingServiceExtensions.ListQueues"/>. If this value is <see langword="null"/>, a provider-specific default is used.</param>
+        /// <param name="limit">The maximum number of <see cref="Queue"/> to return from a single call to <see cref="QueueingServiceExtensions.ListQueues"/>. If this value is <see langword="null"/>, a provider-specific default is used.</param>
         /// <param name="detailed"><see langword="true"/> to return detailed information for each queue; otherwise, <see langword="false"/>.</param>
-        /// <returns>A collection of <see cref="CloudQueue"/> objects describing the available queues.</returns>
+        /// <returns>A collection of <see cref="Queue"/> objects describing the available queues.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="provider"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        private static ReadOnlyCollection<CloudQueue> ListAllQueues(IQueuesService provider, int? limit, bool detailed)
+        private static ReadOnlyCollection<Queue> ListAllQueues(IQueuesService provider, int? limit, bool detailed)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");
@@ -666,7 +666,7 @@
         /// <param name="echo"><see langword="true"/> to include messages created by the current client; otherwise, <see langword="false"/>.</param>
         /// <param name="includeClaimed"><see langword="true"/> to include claimed messages; otherwise <see langword="false"/> to return only unclaimed messages.</param>
         /// <param name="progress">An optional callback object to receive progress notifications. If this is <see langword="null"/>, no progress notifications are sent.</param>
-        /// <returns>A collection of <see cref="CloudQueue"/> objects describing the available queues.</returns>
+        /// <returns>A collection of <see cref="Queue"/> objects describing the available queues.</returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="provider"/> is <see langword="null"/>.
         /// <para>-or-</para>
