@@ -5,26 +5,21 @@
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
-    using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core.Providers;
-    using net.openstack.Providers.Rackspace;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using global::OpenStack.Collections;
     using global::OpenStack.ObjectModel.JsonHome;
+    using global::OpenStack.Security.Authentication;
+    using global::OpenStack.Services.Identity.V2;
     using global::OpenStack.Services.Queues.V1;
+    using global::Rackspace.Security.Authentication;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
-    using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using Path = System.IO.Path;
     using WebException = System.Net.WebException;
     using WebExceptionStatus = System.Net.WebExceptionStatus;
-
-#if PORTABLE
-    using IIdentityProvider = net.openstack.Core.Providers.IIdentityService;
-#endif
 
     /// <preliminary/>
     [TestClass]
@@ -818,13 +813,32 @@
         /// <returns>An instance of <see cref="IQueuesService"/> for integration testing.</returns>
         internal static IQueuesService CreateProvider()
         {
-            var provider = new CloudQueuesProvider(Bootstrapper.Settings.TestIdentity, Bootstrapper.Settings.DefaultRegion, Guid.NewGuid(), false, null);
+            var provider = new QueuesClient(CreateAuthenticationService(), Bootstrapper.Settings.DefaultRegion, Guid.NewGuid(), false);
             provider.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
             provider.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
 #if !PORTABLE
             provider.ConnectionLimit = 80;
 #endif
             return provider;
+        }
+
+        private static Lazy<IAuthenticationService> _testAuthenticationService =
+            new Lazy<IAuthenticationService>(() =>
+            {
+                IdentityClient identityService = new IdentityClient(new Uri("https://identity.api.rackspacecloud.com"));
+                identityService.BeforeAsyncWebRequest += TestHelpers.HandleBeforeAsyncWebRequest;
+                identityService.AfterAsyncWebResponse += TestHelpers.HandleAfterAsyncWebRequest;
+
+                string username = Bootstrapper.Settings.TestIdentity.Username;
+                string apiKey = Bootstrapper.Settings.TestIdentity.APIKey;
+                AuthenticationRequest authenticationRequest = RackspaceAuthentication.ApiKey(username, apiKey);
+                IAuthenticationService authenticationService = new RackspaceAuthenticationClient(identityService, authenticationRequest);
+                return authenticationService;
+            }, true);
+
+        internal static IAuthenticationService CreateAuthenticationService()
+        {
+            return _testAuthenticationService.Value;
         }
     }
 }

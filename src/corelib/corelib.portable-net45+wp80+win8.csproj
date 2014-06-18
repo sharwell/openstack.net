@@ -722,7 +722,6 @@
     <Compile Include="Providers\Rackspace\CloudDnsProvider.cs" />
     <Compile Include="Providers\Rackspace\CloudLoadBalancerProvider.cs" />
     <Compile Include="Providers\Rackspace\CloudMonitoringProvider.cs" />
-    <Compile Include="Providers\Rackspace\CloudQueuesProvider.cs" />
     <Compile Include="Providers\Rackspace\Exceptions\BulkDeletionException.cs" />
     <Compile Include="Core\HttpStatusCodeParser.cs" />
     <Compile Include="Core\IStatusParser.cs" />
