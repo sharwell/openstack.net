@@ -696,6 +696,7 @@
     <Compile Include="OpenStack\Services\ObjectStorage\V1\UpdateContainerMetadataApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Claim.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\ClaimId.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\GetHomeApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\IQueuesService.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Message.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\MessageId.cs" />
@@ -709,6 +710,7 @@
     <Compile Include="OpenStack\Services\Queues\V1\QueueMessagesStatistics.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueName.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueuesClient.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\QueuesServiceExtensions.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueStatistics.cs" />
     <Compile Include="OpenStack\Services\ServiceClient.cs" />
     <Compile Include="OpenStack\Threading\AsyncCompletionOption.cs" />

@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Net;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Threading;
     using System.Threading.Tasks;
     using Newtonsoft.Json;
@@ -39,11 +40,6 @@
         private readonly Guid _clientId;
 
         /// <summary>
-        /// This field caches the home document returned by <see cref="GetHomeAsync"/>.
-        /// </summary>
-        private HomeDocument _homeDocument;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="QueuesClient"/> class with
         /// the specified values.
         /// </summary>
@@ -73,31 +69,24 @@
         #region IQueuesService Members
 
         /// <inheritdoc/>
-        public Task<HomeDocument> GetHomeAsync(CancellationToken cancellationToken)
+        public Task<GetHomeApiCall> PrepareGetHomeAsync(CancellationToken cancellationToken)
         {
-            if (_homeDocument != null)
-            {
-                return CompletedTask.FromResult(_homeDocument);
-            }
-
             UriTemplate template = new UriTemplate("/v1");
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Get, template, new Dictionary<string, string>(), cancellationToken);
-
-            Func<Task<HttpRequestMessage>, Task<HomeDocument>> requestResource =
-                GetResponseAsyncFunc<HomeDocument>(cancellationToken);
-
-            Func<Task<HomeDocument>, HomeDocument> cacheResult =
-                task =>
-                {
-                    _homeDocument = task.Result;
-                    return task.Result;
-                };
-
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource)
-                .Select(cacheResult);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
+                .Select(
+                    task =>
+                    {
+                        /* Do not clear the Accept header. We are intentionally accepting both application/json
+                         * and application/json-home to account for known cases where the service doesn't properly
+                         * distinguish between these values, resulting in request/response content type
+                         * mismatches.
+                         */
+                        //task.Result.Headers.Accept.Clear();
+                        task.Result.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json-home"));
+                        return new GetHomeApiCall(CreateJsonApiCall<HomeDocument>(task.Result));
+                    });
         }
 
         /// <inheritdoc/>
