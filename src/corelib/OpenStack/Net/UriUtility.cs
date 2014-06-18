@@ -206,7 +206,7 @@
         /// by <see cref="AddQueryParameter"/>.
         /// </remarks>
         /// <param name="uri">The URI to add a query parameter to.</param>
-        /// <param name="parameter">The name of the query parameter to add.</param>
+        /// <param name="parameter">The name of the query parameter to add or update.</param>
         /// <param name="value">The value of the query parameter.</param>
         /// <returns>
         /// A <see cref="Uri"/> representing the input <paramref name="uri"/> with all previous instances
