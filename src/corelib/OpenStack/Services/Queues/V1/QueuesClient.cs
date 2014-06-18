@@ -39,12 +39,6 @@
         private readonly Guid _clientId;
 
         /// <summary>
-        /// This field caches the base URI used for accessing the Cloud Queues service.
-        /// </summary>
-        /// <seealso cref="GetBaseUriAsync"/>
-        private Uri _baseUri;
-
-        /// <summary>
         /// This field caches the home document returned by <see cref="GetHomeAsync"/>.
         /// </summary>
         private HomeDocument _homeDocument;
@@ -675,21 +669,22 @@
                 PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request, cancellationToken);
 
             Func<Task<Tuple<HttpResponseMessage, string>>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> parseResult =
-                task =>
-                {
-                    Uri relativeLocation = task.Result.Item1.Headers.Location;
-                    Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
-                    if (task.Result.Item1.StatusCode == HttpStatusCode.NoContent)
+                task => GetBaseUriAsync(cancellationToken).Then(
+                    baseUriTask =>
                     {
-                        // the queue did not contain any messages to claim
-                        Tuple<Uri, IEnumerable<QueuedMessage>> result = Tuple.Create(location, Enumerable.Empty<QueuedMessage>());
-                        return CompletedTask.FromResult(result);
-                    }
+                        Uri relativeLocation = task.Result.Item1.Headers.Location;
+                        Uri location = relativeLocation != null ? new Uri(baseUriTask.Result, relativeLocation) : null;
+                        if (task.Result.Item1.StatusCode == HttpStatusCode.NoContent)
+                        {
+                            // the queue did not contain any messages to claim
+                            Tuple<Uri, IEnumerable<QueuedMessage>> result = Tuple.Create(location, Enumerable.Empty<QueuedMessage>());
+                            return CompletedTask.FromResult(result);
+                        }
 
-                    IEnumerable<QueuedMessage> messages = JsonConvert.DeserializeObject<IEnumerable<QueuedMessage>>(task.Result.Item2);
+                        IEnumerable<QueuedMessage> messages = JsonConvert.DeserializeObject<IEnumerable<QueuedMessage>>(task.Result.Item2);
 
-                    return CompletedTask.FromResult(Tuple.Create(location, messages));
-                };
+                        return CompletedTask.FromResult(Tuple.Create(location, messages));
+                    });
             Func<Task<HttpRequestMessage>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> requestResource =
                 GetResponseAsyncFunc<Tuple<Uri, IEnumerable<QueuedMessage>>>(cancellationToken, parseResult);
 
@@ -723,18 +718,19 @@
                 PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken);
 
             Func<Task<Tuple<HttpResponseMessage, string>>, Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>> parseResult =
-                task =>
-                {
-                    // this response uses ContentLocation instead of Location
-                    Uri relativeLocation = task.Result.Item1.Content.Headers.ContentLocation;
-                    Uri location = relativeLocation != null ? new Uri(_baseUri, relativeLocation) : null;
+                task => GetBaseUriAsync(cancellationToken).Then(
+                    baseUriTask =>
+                    {
+                        // this response uses ContentLocation instead of Location
+                        Uri relativeLocation = task.Result.Item1.Content.Headers.ContentLocation;
+                        Uri location = relativeLocation != null ? new Uri(baseUriTask.Result, relativeLocation) : null;
 
-                    JObject result = JsonConvert.DeserializeObject<JObject>(task.Result.Item2);
-                    TimeSpan age = TimeSpan.FromSeconds((int)result["age"]);
-                    TimeSpan ttl = TimeSpan.FromSeconds((int)result["ttl"]);
-                    IEnumerable<QueuedMessage> messages = result["messages"].ToObject<IEnumerable<QueuedMessage>>();
-                    return CompletedTask.FromResult(Tuple.Create(location, ttl, age, messages));
-                };
+                        JObject result = JsonConvert.DeserializeObject<JObject>(task.Result.Item2);
+                        TimeSpan age = TimeSpan.FromSeconds((int)result["age"]);
+                        TimeSpan ttl = TimeSpan.FromSeconds((int)result["ttl"]);
+                        IEnumerable<QueuedMessage> messages = result["messages"].ToObject<IEnumerable<QueuedMessage>>();
+                        return CompletedTask.FromResult(Tuple.Create(location, ttl, age, messages));
+                    });
             Func<Task<HttpRequestMessage>, Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>> requestResource =
                 GetResponseAsyncFunc(cancellationToken, parseResult);
 
@@ -826,26 +822,14 @@
 
         /// <inheritdoc/>
         /// <remarks>
-        /// This method returns a cached base address if one is available. If no cached address is
-        /// available, <see cref="ProviderBase{TProvider}.GetServiceEndpoint"/> is called to obtain
-        /// an <see cref="Endpoint"/> with the type <c>rax:queues</c> and preferred type <c>cloudQueues</c>.
+        /// This method calls <see cref="IAuthenticationService.GetBaseAddressAsync"/> to obtain a URI
+        /// for the type <c>rax:queues</c> and preferred name <c>cloudQueues</c>.
         /// </remarks>
-        public override Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken)
+        protected override Task<Uri> GetBaseUriAsyncImpl(CancellationToken cancellationToken)
         {
-            if (_baseUri != null)
-            {
-                return CompletedTask.FromResult(_baseUri);
-            }
-
             const string serviceType = "rax:queues";
             const string serviceName = "cloudQueues";
-            return AuthenticationService.GetBaseAddressAsync(serviceType, serviceName, DefaultRegion, _internalUrl, cancellationToken)
-                .Select(
-                    task =>
-                    {
-                        _baseUri = task.Result;
-                        return task.Result;
-                    });
+            return AuthenticationService.GetBaseAddressAsync(serviceType, serviceName, DefaultRegion, _internalUrl, cancellationToken);
         }
 
         /// <inheritdoc/>
