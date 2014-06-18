@@ -56,11 +56,36 @@ let getHome =
     //#endregion
     ()
 
+//
+// GetNodeHealthAsync
+//
+
+let prepareGetNodeHealthAsyncAwait =
+    async {
+        //#region PrepareGetNodeHealthAsync (await)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+        let! apiCall = queuesService.PrepareGetNodeHealthAsync(CancellationToken.None) |> Async.AwaitTask
+        let! responseMessage, operational = apiCall.SendAsync(CancellationToken.None) |> Async.AwaitTask
+        //#endregion
+        ()
+    }
+
+let prepareGetNodeHealth =
+    //#region PrepareGetNodeHealthAsync (TPL)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+    let nodeHealthTask =
+        CoreTaskExtensions.Using(
+            (fun () -> queuesService.PrepareGetNodeHealthAsync(CancellationToken.None)),
+            (fun (task : Task<GetNodeHealthApiCall>) -> task.Result.SendAsync(CancellationToken.None)))
+          .Select(fun (task : Task<HttpResponseMessage * bool>) -> snd task.Result)
+    //#endregion
+    ()
+
 let getNodeHealthAsyncAwait =
     async {
         //#region GetNodeHealthAsync (await)
         let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
-        queuesService.GetNodeHealthAsync(CancellationToken.None) |> Async.AwaitIAsyncResult |> ignore
+        let operational = queuesService.GetNodeHealthAsync(CancellationToken.None) |> Async.AwaitIAsyncResult |> ignore
         //#endregion
         ()
     }
