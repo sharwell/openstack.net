@@ -36,12 +36,6 @@
         private readonly bool _internalUrl;
 
         /// <summary>
-        /// This field caches the base URI used for accessing the object storage service.
-        /// </summary>
-        /// <seealso cref="GetBaseUriAsync"/>
-        private Uri _baseUri;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ObjectStorageClient"/> class
         /// with the specified authentication service, default region, and value indicating
         /// whether an internal or public endpoint should be used for communicating with
@@ -544,27 +538,14 @@
 
         /// <inheritdoc/>
         /// <remarks>
-        /// This method returns a cached base address if one is available. If no cached address is
-        /// available, <see cref="IAuthenticationService.GetBaseAddressAsync"/> is called to obtain
-        /// a <see cref="Uri"/> with the type <c>object-store</c>. The preferred name is not
-        /// specified.
+        /// This method calls <see cref="IAuthenticationService.GetBaseAddressAsync"/> to obtain a URI
+        /// for the type <c>object-store</c>. The preferred name is not specified.
         /// </remarks>
-        public override Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken)
+        protected override Task<Uri> GetBaseUriAsyncImpl(CancellationToken cancellationToken)
         {
-            if (_baseUri != null)
-            {
-                return CompletedTask.FromResult(_baseUri);
-            }
-
             const string serviceType = "object-store";
             const string serviceName = null;
-            return AuthenticationService.GetBaseAddressAsync(serviceType, serviceName, DefaultRegion, _internalUrl, cancellationToken)
-                .Select(
-                    task =>
-                    {
-                        _baseUri = task.Result;
-                        return task.Result;
-                    });
+            return AuthenticationService.GetBaseAddressAsync(serviceType, serviceName, DefaultRegion, _internalUrl, cancellationToken);
         }
     }
 }

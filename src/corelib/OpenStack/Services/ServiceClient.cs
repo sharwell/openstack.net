@@ -57,6 +57,12 @@ namespace OpenStack.Services
         private HttpClient _httpClient;
 
         /// <summary>
+        /// This field caches the base URI used for accessing the service.
+        /// </summary>
+        /// <seealso cref="GetBaseUriAsync"/>
+        private Uri _baseUri;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ServiceClient"/> class using
         /// the specified authentication service and default region, and the default
         /// <see cref="System.Net.Http.HttpClient"/>.
@@ -419,13 +425,53 @@ namespace OpenStack.Services
         /// <summary>
         /// Gets the base absolute URI to use for making asynchronous REST API calls to this service.
         /// </summary>
+        /// <remarks>
+        /// This method returns a cached base address if one is available. If no cached address is
+        /// available, <see cref="GetBaseUriAsyncImpl"/> is called to obtain the <see cref="Uri"/>.
+        /// The result is then cached for future use before returning.
+        ///
+        /// <note type="inherit">
+        /// Most service client implementations will override <see cref="GetBaseUriAsyncImpl"/> instead
+        /// of this method. This method should only be overridden in order to alter the base URI caching
+        /// strategy provided in the default implementation.
+        /// </note>
+        /// </remarks>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
         /// A <see cref="Task"/> object representing the asynchronous operation. When the task
         /// completes successfully, the <see cref="Task{TResult}.Result"/> property will contain
         /// a <see cref="Uri"/> representing the base absolute URI for the service.
         /// </returns>
-        public abstract Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken);
+        public virtual Task<Uri> GetBaseUriAsync(CancellationToken cancellationToken)
+        {
+            if (_baseUri != null)
+            {
+                return CompletedTask.FromResult(_baseUri);
+            }
+
+            return GetBaseUriAsyncImpl(cancellationToken)
+                .Select(
+                    task =>
+                    {
+                        _baseUri = task.Result;
+                        return task.Result;
+                    });
+        }
+
+        /// <summary>
+        /// Gets the base absolute URI to use for making asynchronous HTTP API calls to this service.
+        /// </summary>
+        /// <remarks>
+        /// This method provides the implementation for <see cref="GetBaseUriAsync"/>, and should not
+        /// be called directly.
+        /// </remarks>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property will contain
+        /// a <see cref="Uri"/> representing the base absolute URI for the service.
+        /// </returns>
+        protected abstract Task<Uri> GetBaseUriAsyncImpl(CancellationToken cancellationToken);
 
         /// <summary>
         /// Invokes the <see cref="BeforeAsyncWebRequest"/> event for the specified <paramref name="request"/>.
