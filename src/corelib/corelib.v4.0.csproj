@@ -321,6 +321,7 @@
     <Compile Include="OpenStack\Services\Databases\V1\UserName.cs" />
     <Compile Include="OpenStack\Services\Identity\ProjectId.cs" />
     <Compile Include="OpenStack\Services\Identity\TokenId.cs" />
+    <Compile Include="OpenStack\Services\Identity\UserId.cs" />
     <Compile Include="OpenStack\Services\Identity\V2\AdminEndpoint.cs" />
     <Compile Include="OpenStack\Services\Identity\V2\AuthenticationRequest.cs" />
     <Compile Include="OpenStack\Services\Identity\V2\Endpoint.cs" />
@@ -335,7 +336,6 @@
     <Compile Include="OpenStack\Services\Identity\V2\Tenant.cs" />
     <Compile Include="OpenStack\Services\Identity\V2\UserAccess.cs" />
     <Compile Include="OpenStack\Services\Identity\V2\UserDetails.cs" />
-    <Compile Include="OpenStack\Services\Identity\V2\UserId.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\AddCredentialApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\AddDomainApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\AddDomainGroupRoleApiCall.cs" />
@@ -471,7 +471,6 @@
     <Compile Include="OpenStack\Services\Identity\V3\UpdateUserApiCall.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\User.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\UserData.cs" />
-    <Compile Include="OpenStack\Services\Identity\V3\UserId.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\UserRequest.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\UserResponse.cs" />
     <Compile Include="OpenStack\Services\Identity\V3\ValidateDomainGroupRoleApiCall.cs" />
