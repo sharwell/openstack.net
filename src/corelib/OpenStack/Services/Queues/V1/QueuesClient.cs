@@ -823,12 +823,12 @@
         /// <inheritdoc/>
         /// <remarks>
         /// This method calls <see cref="IAuthenticationService.GetBaseAddressAsync"/> to obtain a URI
-        /// for the type <c>rax:queues</c> and preferred name <c>cloudQueues</c>.
+        /// for the type <c>queues</c>. The preferred name is not specified.
         /// </remarks>
         protected override Task<Uri> GetBaseUriAsyncImpl(CancellationToken cancellationToken)
         {
-            const string serviceType = "rax:queues";
-            const string serviceName = "cloudQueues";
+            const string serviceType = "queues";
+            const string serviceName = "";
             return AuthenticationService.GetBaseAddressAsync(serviceType, serviceName, DefaultRegion, _internalUrl, cancellationToken);
         }
 
