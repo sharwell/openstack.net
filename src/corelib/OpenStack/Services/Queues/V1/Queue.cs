@@ -11,7 +11,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class CloudQueue
+    public class Queue
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>
@@ -34,11 +34,11 @@
 #pragma warning restore 649
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CloudQueue"/> class
+        /// Initializes a new instance of the <see cref="Queue"/> class
         /// during JSON deserialization.
         /// </summary>
         [JsonConstructor]
-        protected CloudQueue()
+        protected Queue()
         {
         }
 

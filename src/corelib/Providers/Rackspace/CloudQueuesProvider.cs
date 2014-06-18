@@ -208,7 +208,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollectionPage<CloudQueue>> ListQueuesAsync(QueueName marker, int? limit, bool detailed, CancellationToken cancellationToken)
+        public Task<ReadOnlyCollectionPage<Queue>> ListQueuesAsync(QueueName marker, int? limit, bool detailed, CancellationToken cancellationToken)
         {
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
@@ -229,20 +229,20 @@
             Func<Task<HttpRequestMessage>, Task<ListCloudQueuesResponse>> requestResource =
                 GetResponseAsyncFunc<ListCloudQueuesResponse>(cancellationToken);
 
-            Func<Task<ListCloudQueuesResponse>, ReadOnlyCollectionPage<CloudQueue>> resultSelector =
+            Func<Task<ListCloudQueuesResponse>, ReadOnlyCollectionPage<Queue>> resultSelector =
                 task =>
                 {
-                    ReadOnlyCollectionPage<CloudQueue> page = null;
+                    ReadOnlyCollectionPage<Queue> page = null;
                     if (task.Result != null && task.Result.Queues != null)
                     {
-                        CloudQueue lastQueue = task.Result.Queues.LastOrDefault();
+                        Queue lastQueue = task.Result.Queues.LastOrDefault();
                         QueueName nextMarker = lastQueue != null ? lastQueue.Name : marker;
-                        Func<CancellationToken, Task<ReadOnlyCollectionPage<CloudQueue>>> getNextPageAsync =
+                        Func<CancellationToken, Task<ReadOnlyCollectionPage<Queue>>> getNextPageAsync =
                             nextCancellationToken => ListQueuesAsync(nextMarker, limit, detailed, nextCancellationToken);
-                        page = new BasicReadOnlyCollectionPage<CloudQueue>(task.Result.Queues, getNextPageAsync);
+                        page = new BasicReadOnlyCollectionPage<Queue>(task.Result.Queues, getNextPageAsync);
                     }
 
-                    return page ?? ReadOnlyCollectionPage<CloudQueue>.Empty;
+                    return page ?? ReadOnlyCollectionPage<Queue>.Empty;
                 };
 
             return AuthenticateServiceAsync(cancellationToken)

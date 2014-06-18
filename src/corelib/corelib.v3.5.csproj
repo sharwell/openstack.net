@@ -697,13 +697,13 @@
     <Compile Include="OpenStack\Services\ObjectStorage\V1\UpdateContainerMetadataApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Claim.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\ClaimId.cs" />
-    <Compile Include="OpenStack\Services\Queues\V1\CloudQueue.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\IQueuesService.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Message.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\MessageId.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\MessageStatistics.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Message`1.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\NamespaceDoc.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\Queue.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueuedMessage.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueuedMessageList.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueuedMessageListId.cs" />

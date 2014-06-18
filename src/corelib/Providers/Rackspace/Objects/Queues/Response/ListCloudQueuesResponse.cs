@@ -14,7 +14,7 @@
         private Link[] _links;
 
         [JsonProperty("queues")]
-        private CloudQueue[] _queues;
+        private Queue[] _queues;
 #pragma warning restore 649
 
         /// <summary>
@@ -34,7 +34,7 @@
             }
         }
 
-        public CloudQueue[] Queues
+        public Queue[] Queues
         {
             get
             {

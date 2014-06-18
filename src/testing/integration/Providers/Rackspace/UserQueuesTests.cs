@@ -61,7 +61,7 @@
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(60)));
             QueueName queueName = CreateRandomQueueName();
 
-            ReadOnlyCollection<CloudQueue> allQueues = await ListAllQueuesAsync(provider, null, false, cancellationTokenSource.Token, null);
+            ReadOnlyCollection<Queue> allQueues = await ListAllQueuesAsync(provider, null, false, cancellationTokenSource.Token, null);
             Task[] deleteTasks = Array.ConvertAll(allQueues.ToArray(), queue =>
             {
                 Console.WriteLine("Deleting queue: {0}", queue.Name);
@@ -121,7 +121,7 @@
 
             await provider.CreateQueueAsync(queueName, cancellationTokenSource.Token);
 
-            foreach (CloudQueue queue in await ListAllQueuesAsync(provider, null, true, cancellationTokenSource.Token, null))
+            foreach (Queue queue in await ListAllQueuesAsync(provider, null, true, cancellationTokenSource.Token, null))
             {
                 Console.WriteLine("{0}: {1}", queue.Name, queue.Href);
             }
@@ -739,7 +739,7 @@
         /// each of which requests a subset of the available queues.
         /// </summary>
         /// <param name="provider">The queueing service.</param>
-        /// <param name="limit">The maximum number of <see cref="CloudQueue"/> objects to return from a single task. If this value is <see langword="null"/>, a provider-specific default is used.</param>
+        /// <param name="limit">The maximum number of <see cref="Queue"/> objects to return from a single task. If this value is <see langword="null"/>, a provider-specific default is used.</param>
         /// <param name="detailed"><see langword="true"/> to return detailed information about each queue; otherwise, <see langword="false"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <param name="progress">An optional callback object to receive progress notifications. If this is <see langword="null"/>, no progress notifications are sent.</param>
@@ -750,7 +750,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="provider"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
-        private static async Task<ReadOnlyCollection<CloudQueue>> ListAllQueuesAsync(IQueuesService provider, int? limit, bool detailed, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<CloudQueue>> progress)
+        private static async Task<ReadOnlyCollection<Queue>> ListAllQueuesAsync(IQueuesService provider, int? limit, bool detailed, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Queue>> progress)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");

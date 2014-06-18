@@ -127,7 +127,7 @@ namespace net.openstack.Core.Synchronous
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#List_Queues">List Queues (OpenStack Marconi API v1 Blueprint)</seealso>
-        public static ReadOnlyCollectionPage<CloudQueue> ListQueues(this IQueuesService queuesService, QueueName marker, int? limit, bool detailed)
+        public static ReadOnlyCollectionPage<Queue> ListQueues(this IQueuesService queuesService, QueueName marker, int? limit, bool detailed)
         {
             if (queuesService == null)
                 throw new ArgumentNullException("queuesService");

@@ -97,7 +97,7 @@ let listQueues =
     //#region ListQueuesAsync (TPL)
     let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
     let queuesPageTask = queuesService.ListQueuesAsync(null, Nullable(), true, CancellationToken.None)
-    let queuesTask = queuesPageTask.ContinueWith(fun (task:Task<ReadOnlyCollectionPage<CloudQueue>>) -> task.Result.GetAllPagesAsync(CancellationToken.None, null)) |> TaskExtensions.Unwrap
+    let queuesTask = queuesPageTask.ContinueWith(fun (task:Task<ReadOnlyCollectionPage<Queue>>) -> task.Result.GetAllPagesAsync(CancellationToken.None, null)) |> TaskExtensions.Unwrap
     //#endregion
     ()
 

@@ -100,8 +100,8 @@
         {
             #region ListQueuesAsync (await)
             IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-            ReadOnlyCollectionPage<CloudQueue> queuesPage = await queuesService.ListQueuesAsync(null, null, true, CancellationToken.None);
-            ReadOnlyCollection<CloudQueue> queues = await queuesPage.GetAllPagesAsync(CancellationToken.None, null);
+            ReadOnlyCollectionPage<Queue> queuesPage = await queuesService.ListQueuesAsync(null, null, true, CancellationToken.None);
+            ReadOnlyCollection<Queue> queues = await queuesPage.GetAllPagesAsync(CancellationToken.None, null);
             #endregion
         }
 
@@ -109,8 +109,8 @@
         {
             #region ListQueuesAsync (TPL)
             IQueuesService queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider);
-            Task<ReadOnlyCollectionPage<CloudQueue>> queuesPageTask = queuesService.ListQueuesAsync(null, null, true, CancellationToken.None);
-            Task<ReadOnlyCollection<CloudQueue>> queuesTask =
+            Task<ReadOnlyCollectionPage<Queue>> queuesPageTask = queuesService.ListQueuesAsync(null, null, true, CancellationToken.None);
+            Task<ReadOnlyCollection<Queue>> queuesTask =
                 queuesPageTask
                 .ContinueWith(task => task.Result.GetAllPagesAsync(CancellationToken.None, null))
                 .Unwrap();
