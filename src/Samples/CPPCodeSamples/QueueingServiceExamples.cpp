@@ -84,13 +84,69 @@ public:
 	}
 #pragma endregion
 
+#pragma region GetNodeHealthAsync
+#pragma region PrepareGetNodeHealthAsync (TPL)
+private:
+	ref class AcquirePrepareGetNodeHealthAsync sealed
+	{
+		IQueuesService^ service;
+		CancellationToken cancellationToken;
+
+	public:
+		AcquirePrepareGetNodeHealthAsync(IQueuesService^ service, CancellationToken cancellationToken)
+			: service(service)
+			, cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<GetNodeHealthApiCall^>^ Invoke()
+		{
+			return service->PrepareGetNodeHealthAsync(cancellationToken);
+		}
+	};
+
+	ref class BodyPrepareGetNodeHealthAsync sealed
+	{
+		CancellationToken cancellationToken;
+
+	public:
+		BodyPrepareGetNodeHealthAsync(CancellationToken cancellationToken)
+			: cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<Tuple<HttpResponseMessage^, bool>^>^ Invoke(Task<GetNodeHealthApiCall^>^ task)
+		{
+			return task->Result->SendAsync(cancellationToken);
+		}
+	};
+
+	static bool SelectGetNodeHealthResult(Task<Tuple<HttpResponseMessage^, bool>^>^ task)
+	{
+		return task->Result->Item2;
+	}
+
+public:
+	void PrepareGetNodeHealth()
+	{
+		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
+		auto acquireWrapper = gcnew AcquirePrepareGetNodeHealthAsync(queuesService, CancellationToken::None);
+		auto acquire = gcnew Func<Task<GetNodeHealthApiCall^>^>(acquireWrapper, &AcquirePrepareGetNodeHealthAsync::Invoke);
+		auto bodyWrapper = gcnew BodyPrepareGetNodeHealthAsync(CancellationToken::None);
+		auto body = gcnew Func<Task<GetNodeHealthApiCall^>^, Task<Tuple<HttpResponseMessage^, bool>^>^>(bodyWrapper, &BodyPrepareGetNodeHealthAsync::Invoke);
+		auto select = gcnew Func<Task<Tuple<HttpResponseMessage^, bool>^>^, bool>(&SelectGetNodeHealthResult);
+		Task<bool>^ task = CoreTaskExtensions::Select(CoreTaskExtensions::Using(acquire, body), select);
+	}
+#pragma endregion
+
 	void GetNodeHealth()
 	{
 #pragma region GetNodeHealthAsync (TPL)
 		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
-		Task^ task = queuesService->GetNodeHealthAsync(CancellationToken::None);
+		Task<bool>^ operationalTask = QueuesServiceExtensions::GetNodeHealthAsync(queuesService, CancellationToken::None);
 #pragma endregion
 	}
+#pragma endregion
 
 	void CreateQueue()
 	{

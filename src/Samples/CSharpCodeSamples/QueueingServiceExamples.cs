@@ -62,11 +62,34 @@
         }
         #endregion
 
+        #region GetNodeHealthAsync
+        public async Task PrepareGetNodeHealthAsyncAwait()
+        {
+            #region PrepareGetNodeHealthAsync (await)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            GetNodeHealthApiCall apiCall = await queuesService.PrepareGetNodeHealthAsync(CancellationToken.None);
+            Tuple<HttpResponseMessage, bool> apiResponse = await apiCall.SendAsync(CancellationToken.None);
+            bool operational = apiResponse.Item2;
+            #endregion
+        }
+
+        public void PrepareGetNodeHealth()
+        {
+            #region PrepareGetNodeHealthAsync (TPL)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            Task<bool> nodeHealthTask =
+                CoreTaskExtensions.Using(
+                    () => queuesService.PrepareGetNodeHealthAsync(CancellationToken.None),
+                    task => task.Result.SendAsync(CancellationToken.None))
+                .Select(task => task.Result.Item2);
+            #endregion
+        }
+
         public async Task GetNodeHealthAsyncAwait()
         {
             #region GetNodeHealthAsync (await)
             IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
-            await queuesService.GetNodeHealthAsync(CancellationToken.None);
+            bool operational = await queuesService.GetNodeHealthAsync(CancellationToken.None);
             #endregion
         }
 
@@ -74,9 +97,10 @@
         {
             #region GetNodeHealthAsync (TPL)
             IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
-            Task task = queuesService.GetNodeHealthAsync(CancellationToken.None);
+            Task<bool> task = queuesService.GetNodeHealthAsync(CancellationToken.None);
             #endregion
         }
+        #endregion
 
         public async Task CreateQueueAsyncAwait()
         {

@@ -90,18 +90,47 @@
         }
 
         /// <inheritdoc/>
-        public Task GetNodeHealthAsync(CancellationToken cancellationToken)
+        public Task<GetNodeHealthApiCall> PrepareGetNodeHealthAsync(CancellationToken cancellationToken)
         {
             UriTemplate template = new UriTemplate("health");
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Head, template, new Dictionary<string, string>(), cancellationToken);
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
+            Func<HttpResponseMessage, CancellationToken, Task<bool>> deserializeResult =
+                (responseMessage, _) =>
+                {
+                    return CompletedTask.FromResult(responseMessage.StatusCode >= (HttpStatusCode)200 && responseMessage.StatusCode < (HttpStatusCode)300);
+                };
 
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
+                .Select(task => new GetNodeHealthApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
+        }
+
+        /// <summary>
+        /// This helper method determines if a specified <see cref="HttpRequestMessage"/> represents a
+        /// request from the <see cref="PrepareGetNodeHealthAsync"/> method.
+        /// </summary>
+        /// <remarks>
+        /// This method is used by <see cref="ValidateResultImplAsync"/> to support specialized handling
+        /// for the HTTP response to the <see cref="PrepareGetNodeHealthAsync"/> call. Unlike most calls,
+        /// the status code <see cref="HttpStatusCode.ServiceUnavailable"/> indicates a successful response
+        /// from this call.
+        /// </remarks>
+        /// <param name="message">The request message, which may be <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if <paramref name="message"/> has the form of a message created by <see cref="PrepareGetNodeHealthAsync"/>; otherwise, <see langword="false"/>.</returns>
+        protected virtual bool IsNodeHealthMessage(HttpRequestMessage message)
+        {
+            if (message == null)
+                return false;
+
+            if (message.Method != HttpMethod.Get)
+                return false;
+
+            string[] uriSegments = message.RequestUri.GetSegments();
+            if (uriSegments.Length == 0 || !string.Equals("health", uriSegments[uriSegments.Length - 1], StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            return true;
         }
 
         /// <inheritdoc/>
@@ -796,13 +825,18 @@
         /// <inheritdoc/>
         /// <remarks>
         /// This method extends the base implementation by providing special support for the
-        /// result of a call to <see cref="QueueExistsAsync"/>.
+        /// result of calls to <see cref="QueueExistsAsync"/> and <see cref="PrepareGetNodeHealthAsync"/>.
         /// </remarks>
         /// <seealso cref="IsQueueExistsMessage"/>
+        /// <seealso cref="IsNodeHealthMessage"/>
         protected override Task<HttpResponseMessage> ValidateResultImplAsync(Task<HttpResponseMessage> task, CancellationToken cancellationToken)
         {
             // special handling for QueueExistsAsync
             if (task.Result.StatusCode == HttpStatusCode.NotFound && IsQueueExistsMessage(task.Result.RequestMessage))
+                return task;
+
+            // special handling for checking the node health
+            if (task.Result.StatusCode == HttpStatusCode.ServiceUnavailable && IsNodeHealthMessage(task.Result.RequestMessage))
                 return task;
 
             // all other cases defer to the base implementation

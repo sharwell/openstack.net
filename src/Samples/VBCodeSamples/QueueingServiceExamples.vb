@@ -50,19 +50,41 @@ Public Class QueueingServiceExamples
     End Sub
 #End Region
 
+#Region "GetNodeHealthAsync"
+    Public Async Function PrepareGetNodeHealthAsyncAwait() As Task
+        ' #Region "PrepareGetNodeHealthAsync (await)"
+        Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
+        Dim apiCall As GetNodeHealthApiCall = Await queuesService.PrepareGetNodeHealthAsync(CancellationToken.None)
+        Dim apiResponse As Tuple(Of HttpResponseMessage, Boolean) = Await apiCall.SendAsync(CancellationToken.None)
+        Dim operational As Boolean = apiResponse.Item2
+        ' #End Region
+    End Function
+
+    Public Sub PrepareGetNodeHealth()
+        ' #Region "PrepareGetNodeHealthAsync (TPL)"
+        Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
+        Dim nodeHealthTask As Task(Of Boolean) =
+            CoreTaskExtensions.Using(
+                Function() queuesService.PrepareGetNodeHealthAsync(CancellationToken.None),
+                Function(task) task.Result.SendAsync(CancellationToken.None)) _
+            .Select(Function(task) task.Result.Item2)
+        ' #End Region
+    End Sub
+
     Public Async Function GetNodeHealthAsyncAwait() As Task
         ' #Region "GetNodeHealthAsync (await)"
         Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
-        Await queuesService.GetNodeHealthAsync(CancellationToken.None)
+        Dim operational As Boolean = Await queuesService.GetNodeHealthAsync(CancellationToken.None)
         ' #End Region
     End Function
 
     Public Sub GetNodeHealth()
         ' #Region "GetNodeHealthAsync (TPL)"
         Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
-        Dim task = queuesService.GetNodeHealthAsync(CancellationToken.None)
+        Dim task As Task(Of Boolean) = queuesService.GetNodeHealthAsync(CancellationToken.None)
         ' #End Region
     End Sub
+#End Region
 
     Public Async Function CreateQueueAsyncAwait() As Task
         ' #Region "CreateQueueAsync (await)"

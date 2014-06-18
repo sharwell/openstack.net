@@ -53,32 +53,33 @@
         Task<GetHomeApiCall> PrepareGetHomeAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Checks the queueing service node status.
+        /// Prepare an API call to check the queueing service node status.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
-        /// A <see cref="Task"/> object representing the asynchronous operation. If the service
-        /// is available, the task will complete successfully. If the service is unavailable due
-        /// to a storage driver failure or some other error, the task will fail and the
-        /// <see cref="Task.Exception"/> property will contain the reason for the failure.
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
         /// </returns>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
-        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
+        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the client, see
         /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
-        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="GetNodeHealthAsync (await)" language="cs"/>
-        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="GetNodeHealthAsync (await)" language="vbnet"/>
-        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="GetNodeHealthAsync (await)" language="fs"/>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="PrepareGetNodeHealthAsync (await)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="PrepareGetNodeHealthAsync (await)" language="vbnet"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="PrepareGetNodeHealthAsync (await)" language="fs"/>
         /// <token>TplExample</token>
-        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="GetNodeHealthAsync (TPL)" language="cs"/>
-        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="GetNodeHealthAsync (TPL)" language="vbnet"/>
-        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="GetNodeHealthAsync (TPL)" language="cpp"/>
-        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="GetNodeHealthAsync (TPL)" language="fs"/>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="PrepareGetNodeHealthAsync (TPL)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="PrepareGetNodeHealthAsync (TPL)" language="vbnet"/>
+        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="PrepareGetNodeHealthAsync (TPL)" language="cpp"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="PrepareGetNodeHealthAsync (TPL)" language="fs"/>
         /// </example>
+        /// <seealso cref="GetNodeHealthApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.GetNodeHealthAsync"/>
         /// <seealso href="https://wiki.openstack.org/wiki/Marconi/specs/api/v1#Check_Node_Health">Check Node Health (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task GetNodeHealthAsync(CancellationToken cancellationToken);
+        Task<GetNodeHealthApiCall> PrepareGetNodeHealthAsync(CancellationToken cancellationToken);
 
         #endregion Base endpoints
 
