@@ -35,6 +35,45 @@
 
         /// <inheritdoc/>
         /// <remarks>
+        /// This method updates the <paramref name="serviceType"/> and/or <paramref name="serviceName"/> values
+        /// for cases where "vanilla" OpenStack values were specified but Rackspace exposes the compatible
+        /// services under different names in the service catalog.
+        /// </remarks>
+        protected override Uri GetBaseAddressImpl(UserAccess userAccess, string serviceType, string serviceName, string region, bool internalAddress)
+        {
+            if (serviceName == string.Empty)
+            {
+                switch (serviceType)
+                {
+                case "compute":
+                    serviceName = "cloudServersOpenStack";
+                    break;
+
+                case "volume":
+                    serviceName = "cloudBlockStorage";
+                    break;
+
+                case "object-store":
+                    serviceName = "cloudFiles";
+                    break;
+
+                case "database":
+                    serviceType = "rax:database";
+                    serviceName = "cloudDatabases";
+                    break;
+
+                case "queues":
+                    serviceType = "rax:queues";
+                    serviceName = "cloudQueues";
+                    break;
+                }
+            }
+
+            return base.GetBaseAddressImpl(userAccess, serviceType, serviceName, region, internalAddress);
+        }
+
+        /// <inheritdoc/>
+        /// <remarks>
         /// This implementation returns <paramref name="region"/> if it is non-<see langword="null"/>.
         /// If <paramref name="region"/> is <see langword="null"/>, the default region for the specified
         /// <see cref="UserAccess"/> is returned if available; otherwise, this method returns
