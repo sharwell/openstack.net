@@ -3,22 +3,20 @@
 open System
 open System.Threading
 open System.Threading.Tasks
-open net.openstack.Core.Domain
-open net.openstack.Core.Providers
-open net.openstack.Providers.Rackspace
 open OpenStack.Collections
+open OpenStack.ObjectModel.JsonHome
+open OpenStack.Security.Authentication
 open OpenStack.Services.Queues.V1
 
-let identity = new CloudIdentity (Username = "MyUser", APIKey = "API_KEY_HERE")
 let region : string = null
 let clientId = Guid.NewGuid()
 let internalUrl = false
-let identityProvider : IIdentityProvider = null
+let authenticationService : IAuthenticationService = null
 
 let getHomeAsyncAwait =
     async {
         //#region GetHomeAsync (await)
-        let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
         let! homeDocument = queuesService.GetHomeAsync(CancellationToken.None) |> Async.AwaitTask
         //#endregion
         ()
@@ -26,7 +24,7 @@ let getHomeAsyncAwait =
 
 let getHome =
     //#region GetHomeAsync (TPL)
-    let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
     let task = queuesService.GetHomeAsync(CancellationToken.None)
     //#endregion
     ()
@@ -34,7 +32,7 @@ let getHome =
 let getNodeHealthAsyncAwait =
     async {
         //#region GetNodeHealthAsync (await)
-        let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
         queuesService.GetNodeHealthAsync(CancellationToken.None) |> Async.AwaitIAsyncResult |> ignore
         //#endregion
         ()
@@ -42,7 +40,7 @@ let getNodeHealthAsyncAwait =
 
 let getNodeHealth =
     //#region GetNodeHealthAsync (TPL)
-    let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
     let task = queuesService.GetNodeHealthAsync(CancellationToken.None)
     //#endregion
     ()
@@ -50,7 +48,7 @@ let getNodeHealth =
 let createQueueAsyncAwait =
     async {
         //#region CreateQueueAsync (await)
-        let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
         let queueName = new QueueName("ExampleQueue")
         let! createdQueue = queuesService.CreateQueueAsync(queueName, CancellationToken.None) |> Async.AwaitTask
         //#endregion
@@ -59,7 +57,7 @@ let createQueueAsyncAwait =
 
 let createQueue =
     //#region CreateQueueAsync (TPL)
-    let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
     let queueName = new QueueName("ExampleQueue")
     let task = queuesService.CreateQueueAsync(queueName, CancellationToken.None)
     //#endregion
@@ -68,7 +66,7 @@ let createQueue =
 let deleteQueueAsyncAwait =
     async {
         //#region DeleteQueueAsync (await)
-        let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
         let queueName = new QueueName("ExampleQueue")
         queuesService.DeleteQueueAsync(queueName, CancellationToken.None) |> Async.AwaitIAsyncResult |> ignore
         //#endregion
@@ -77,7 +75,7 @@ let deleteQueueAsyncAwait =
 
 let deleteQueue =
     //#region DeleteQueueAsync (TPL)
-    let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
     let queueName = new QueueName("ExampleQueue")
     let task = queuesService.DeleteQueueAsync(queueName, CancellationToken.None)
     //#endregion
@@ -86,7 +84,7 @@ let deleteQueue =
 let listQueuesAsyncAwait =
     async {
         //#region ListQueuesAsync (await)
-        let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
         let! queuesPage = queuesService.ListQueuesAsync(null, Nullable(), true, CancellationToken.None) |> Async.AwaitTask
         let! queues = queuesPage.GetAllPagesAsync(CancellationToken.None, null) |> Async.AwaitTask
         //#endregion
@@ -95,7 +93,7 @@ let listQueuesAsyncAwait =
 
 let listQueues =
     //#region ListQueuesAsync (TPL)
-    let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
     let queuesPageTask = queuesService.ListQueuesAsync(null, Nullable(), true, CancellationToken.None)
     let queuesTask = queuesPageTask.ContinueWith(fun (task:Task<ReadOnlyCollectionPage<Queue>>) -> task.Result.GetAllPagesAsync(CancellationToken.None, null)) |> TaskExtensions.Unwrap
     //#endregion
@@ -104,7 +102,7 @@ let listQueues =
 let queueExistsAsyncAwait =
     async {
         //#region QueueExistsAsync (await)
-        let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
         let queueName = new QueueName("ExampleQueue")
         let! exists = queuesService.QueueExistsAsync(queueName, CancellationToken.None) |> Async.AwaitTask
         //#endregion
@@ -113,7 +111,7 @@ let queueExistsAsyncAwait =
 
 let queueExists =
     //#region QueueExistsAsync (TPL)
-    let queuesService = new CloudQueuesProvider(identity, region, clientId, internalUrl, identityProvider)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
     let queueName = new QueueName("ExampleQueue")
     let task = queuesService.QueueExistsAsync(queueName, CancellationToken.None)
     //#endregion
