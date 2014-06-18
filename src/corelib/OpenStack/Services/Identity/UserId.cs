@@ -1,11 +1,11 @@
-﻿namespace OpenStack.Services.Identity.V3
+﻿namespace OpenStack.Services.Identity
 {
     using System;
     using Newtonsoft.Json;
     using OpenStack.ObjectModel;
 
     /// <summary>
-    /// Represents the unique identifier of a <see cref="Credential"/>.
+    /// Represents the unique identifier of a user.
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
