@@ -201,24 +201,20 @@
         }
 
         /// <inheritdoc/>
-        public Task<bool> QueueExistsAsync(QueueName queueName, CancellationToken cancellationToken)
+        public Task<QueueExistsApiCall> PrepareQueueExistsAsync(QueueName queueName, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
             UriTemplate template = new UriTemplate("queues/{queue_name}");
-            var parameters = new Dictionary<string, string>() { { "queue_name", queueName.Value } };
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Head, template, parameters, cancellationToken);
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value } };
 
-            Func<Task<Tuple<HttpResponseMessage, string>>, Task<bool>> parseResult =
-                task => CompletedTask.FromResult(task.Result.Item1.IsSuccessStatusCode);
-            Func<Task<HttpRequestMessage>, Task<bool>> requestResource =
-                GetResponseAsyncFunc<bool>(cancellationToken, parseResult);
+            Func<HttpResponseMessage, CancellationToken, Task<bool>> deserializeResult =
+                (responseMessage, _) => CompletedTask.FromResult(responseMessage.IsSuccessStatusCode);
 
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Head, template, parameters, cancellationToken))
+                .Select(task => new QueueExistsApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
         /// <summary>
@@ -504,7 +500,7 @@
                 throw new ArgumentException("messages cannot contain any null values");
 
             if (messages.Length == 0)
-                return QueueExistsAsync(queueName, cancellationToken);
+                return this.QueueExistsAsync(queueName, cancellationToken);
 
             UriTemplate template = new UriTemplate("queues/{queue_name}/messages");
 
@@ -547,7 +543,7 @@
                 throw new ArgumentException("messages cannot contain any null values");
 
             if (messages.Length == 0)
-                return QueueExistsAsync(queueName, cancellationToken);
+                return this.QueueExistsAsync(queueName, cancellationToken);
 
             UriTemplate template = new UriTemplate("queues/{queue_name}/messages");
 
@@ -806,7 +802,7 @@
         /// <inheritdoc/>
         /// <remarks>
         /// This method extends the base implementation by providing special support for the
-        /// result of calls to <see cref="QueueExistsAsync"/> and <see cref="PrepareGetNodeHealthAsync"/>.
+        /// result of calls to <see cref="PrepareQueueExistsAsync"/> and <see cref="PrepareGetNodeHealthAsync"/>.
         /// </remarks>
         /// <seealso cref="IsQueueExistsMessage"/>
         /// <seealso cref="IsNodeHealthMessage"/>

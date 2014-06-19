@@ -293,12 +293,71 @@ public:
 	}
 #pragma endregion
 
+#pragma region QueueExistsAsync
+#pragma region PrepareQueueExistsAsync (TPL)
+private:
+	ref class AcquirePrepareQueueExistsAsync sealed
+	{
+		IQueuesService^ service;
+		QueueName^ queueName;
+		CancellationToken cancellationToken;
+
+	public:
+		AcquirePrepareQueueExistsAsync(IQueuesService^ service, QueueName^ queueName, CancellationToken cancellationToken)
+			: service(service)
+			, queueName(queueName)
+			, cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<QueueExistsApiCall^>^ Invoke()
+		{
+			return service->PrepareQueueExistsAsync(queueName, cancellationToken);
+		}
+	};
+
+	ref class BodyPrepareQueueExistsAsync sealed
+	{
+		CancellationToken cancellationToken;
+
+	public:
+		BodyPrepareQueueExistsAsync(CancellationToken cancellationToken)
+			: cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<Tuple<HttpResponseMessage^, bool>^>^ Invoke(Task<QueueExistsApiCall^>^ task)
+		{
+			return task->Result->SendAsync(cancellationToken);
+		}
+	};
+
+	static bool SelectQueueExistsResult(Task<Tuple<HttpResponseMessage^, bool>^>^ task)
+	{
+		return task->Result->Item2;
+	}
+
+public:
+	void PrepareQueueExists()
+	{
+		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
+		QueueName^ queueName = gcnew QueueName("ExampleQueue");
+		auto acquireWrapper = gcnew AcquirePrepareQueueExistsAsync(queuesService, queueName, CancellationToken::None);
+		auto acquire = gcnew Func<Task<QueueExistsApiCall^>^>(acquireWrapper, &AcquirePrepareQueueExistsAsync::Invoke);
+		auto bodyWrapper = gcnew BodyPrepareQueueExistsAsync(CancellationToken::None);
+		auto body = gcnew Func<Task<QueueExistsApiCall^>^, Task<Tuple<HttpResponseMessage^, bool>^>^>(bodyWrapper, &BodyPrepareQueueExistsAsync::Invoke);
+		auto select = gcnew Func<Task<Tuple<HttpResponseMessage^, bool>^>^, bool>(&SelectQueueExistsResult);
+		Task<bool>^ task = CoreTaskExtensions::Select(CoreTaskExtensions::Using(acquire, body), select);
+	}
+#pragma endregion
+
 	void QueueExists()
 	{
 #pragma region QueueExistsAsync (TPL)
 		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
 		QueueName^ queueName = gcnew QueueName("ExampleQueue");
-		Task<bool>^ task = queuesService->QueueExistsAsync(queueName, CancellationToken::None);
+		Task<bool>^ task = QueuesServiceExtensions::QueueExistsAsync(queuesService, queueName, CancellationToken::None);
 #pragma endregion
 	}
+#pragma endregion
 };

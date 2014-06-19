@@ -204,6 +204,33 @@ let listQueues =
     //#endregion
     ()
 
+//
+// QueueExistsAsync
+//
+
+let prepareQueueExistsAsyncAwait =
+    async {
+        //#region PrepareQueueExistsAsync (await)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+        let queueName = new QueueName("ExampleQueue")
+        let! apiCall = queuesService.PrepareQueueExistsAsync(queueName, CancellationToken.None) |> Async.AwaitTask
+        let! responseMessage, queueExists = apiCall.SendAsync(CancellationToken.None) |> Async.AwaitTask
+        //#endregion
+        ()
+    }
+
+let prepareQueueExists =
+    //#region PrepareQueueExistsAsync (TPL)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+    let queueName = new QueueName("ExampleQueue")
+    let queueExistsTask =
+        CoreTaskExtensions.Using(
+            (fun () -> queuesService.PrepareQueueExistsAsync(queueName, CancellationToken.None)),
+            (fun (task : Task<QueueExistsApiCall>) -> task.Result.SendAsync(CancellationToken.None)))
+          .Select(fun (task : Task<HttpResponseMessage * bool>) -> snd task.Result)
+    //#endregion
+    ()
+
 let queueExistsAsyncAwait =
     async {
         //#region QueueExistsAsync (await)

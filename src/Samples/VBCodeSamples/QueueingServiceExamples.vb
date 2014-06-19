@@ -182,6 +182,29 @@ Public Class QueueingServiceExamples
         ' #End Region
     End Sub
 
+#Region "QueueExistsAsync"
+    Public Async Function PrepareQueueExistsAsyncAwait() As Task
+        ' #Region "PrepareQueueExistsAsync (await)"
+        Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
+        Dim queueName = New QueueName("ExampleQueue")
+        Dim apiCall As QueueExistsApiCall = Await queuesService.PrepareQueueExistsAsync(queueName, CancellationToken.None)
+        Dim apiResponse As Tuple(Of HttpResponseMessage, Boolean) = Await apiCall.SendAsync(CancellationToken.None)
+        Dim queueExists As Boolean = apiResponse.Item2
+        ' #End Region
+    End Function
+
+    Public Sub PrepareQueueExists()
+        ' #Region "PrepareQueueExistsAsync (TPL)"
+        Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
+        Dim queueName = New QueueName("ExampleQueue")
+        Dim queueExistsTask As Task(Of Boolean) =
+            CoreTaskExtensions.Using(
+                Function() queuesService.PrepareQueueExistsAsync(queueName, CancellationToken.None),
+                Function(task) task.Result.SendAsync(CancellationToken.None)) _
+            .Select(Function(task) task.Result.Item2)
+        ' #End Region
+    End Sub
+
     Public Async Function QueueExistsAsyncAwait() As Task
         ' #Region "QueueExistsAsync (await)"
         Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
@@ -197,5 +220,6 @@ Public Class QueueingServiceExamples
         Dim task = queuesService.QueueExistsAsync(queueName, CancellationToken.None)
         ' #End Region
     End Sub
+#End Region
 
 End Class

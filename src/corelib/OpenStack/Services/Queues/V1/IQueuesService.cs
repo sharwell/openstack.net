@@ -144,29 +144,35 @@
         Task<ReadOnlyCollectionPage<Queue>> ListQueuesAsync(QueueName marker, int? limit, bool detailed, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Checks for the existence of a queue with a particular name.
+        /// Prepare an API call to check for the existence of a queue with a particular name.
         /// </summary>
         /// <param name="queueName">The queue name.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain <see langword="true"/> if queue with the specified name exists; otherwise, <see langword="false"/>.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
         /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
         /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
-        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="QueueExistsAsync (await)" language="cs"/>
-        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="QueueExistsAsync (await)" language="vbnet"/>
-        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="QueueExistsAsync (await)" language="fs"/>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="PrepareQueueExistsAsync (await)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="PrepareQueueExistsAsync (await)" language="vbnet"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="PrepareQueueExistsAsync (await)" language="fs"/>
         /// <token>TplExample</token>
-        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="QueueExistsAsync (TPL)" language="cs"/>
-        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="QueueExistsAsync (TPL)" language="vbnet"/>
-        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="QueueExistsAsync (TPL)" language="cpp"/>
-        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="QueueExistsAsync (TPL)" language="fs"/>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="PrepareQueueExistsAsync (TPL)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="PrepareQueueExistsAsync (TPL)" language="vbnet"/>
+        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="PrepareQueueExistsAsync (TPL)" language="cpp"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="PrepareQueueExistsAsync (TPL)" language="fs"/>
         /// </example>
+        /// <seealso cref="QueueExistsApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.QueueExistsAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Checking_Queue_Existence">Checking Queue Existence (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task<bool> QueueExistsAsync(QueueName queueName, CancellationToken cancellationToken);
+        Task<QueueExistsApiCall> PrepareQueueExistsAsync(QueueName queueName, CancellationToken cancellationToken);
 
         /// <summary>
         /// Prepare an API call to remove a queue.
@@ -323,7 +329,7 @@
         /// Posts messages to a queue.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="messages"/> is empty, this call is equivalent to <see cref="QueueExistsAsync"/>.
+        /// If <paramref name="messages"/> is empty, this call is equivalent to <see cref="QueuesServiceExtensions.QueueExistsAsync"/>.
         /// </remarks>
         /// <param name="queueName">The queue name.</param>
         /// <param name="messages">The messages to post.</param>
@@ -345,7 +351,7 @@
         /// Posts messages to a queue.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="messages"/> is empty, this call is equivalent to <see cref="QueueExistsAsync"/>.
+        /// If <paramref name="messages"/> is empty, this call is equivalent to <see cref="QueuesServiceExtensions.QueueExistsAsync"/>.
         /// </remarks>
         /// <param name="queueName">The queue name.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
@@ -367,7 +373,7 @@
         /// Posts messages to a queue.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="messages"/> is empty, this call is equivalent to <see cref="QueueExistsAsync"/>.
+        /// If <paramref name="messages"/> is empty, this call is equivalent to <see cref="QueuesServiceExtensions.QueueExistsAsync"/>.
         /// </remarks>
         /// <typeparam name="T">The class modeling the JSON representation of the messages to post in the queue.</typeparam>
         /// <param name="queueName">The queue name.</param>
@@ -390,7 +396,7 @@
         /// Posts messages to a queue.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="messages"/> is empty, this call is equivalent to <see cref="QueueExistsAsync"/>.
+        /// If <paramref name="messages"/> is empty, this call is equivalent to <see cref="QueuesServiceExtensions.QueueExistsAsync"/>.
         /// </remarks>
         /// <typeparam name="T">The class modeling the JSON representation of the messages to post in the queue.</typeparam>
         /// <param name="queueName">The queue name.</param>
