@@ -377,7 +377,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<QueuedMessage> GetMessageAsync(QueueName queueName, MessageId messageId, CancellationToken cancellationToken)
+        public Task<GetMessageApiCall> PrepareGetMessageAsync(QueueName queueName, MessageId messageId, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -385,23 +385,10 @@
                 throw new ArgumentNullException("messageId");
 
             UriTemplate template = new UriTemplate("queues/{queue_name}/messages/{message_id}");
-
-            var parameters =
-                new Dictionary<string, string>()
-                {
-                    { "queue_name", queueName.Value },
-                    { "message_id", messageId.Value },
-                };
-
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken);
-
-            Func<Task<HttpRequestMessage>, Task<QueuedMessage>> requestResource =
-                GetResponseAsyncFunc<QueuedMessage>(cancellationToken);
-
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value }, { "message_id", messageId.Value } };
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
+                .Select(task => new GetMessageApiCall(CreateJsonApiCall<QueuedMessage>(task.Result)));
         }
 
         /// <inheritdoc/>

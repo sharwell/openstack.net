@@ -307,6 +307,45 @@
                 .Select(task => task.Result.Item2);
         }
 
+        #endregion Queue metadata
+
+        #region Messages
+
+        /// <summary>
+        /// Get detailed information about a specific queued message.
+        /// </summary>
+        /// <remarks>
+        /// This method will return information for the specified message regardless of the
+        /// <literal>Client-ID</literal> or claim associated with the message.
+        /// </remarks>
+        /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
+        /// <param name="queueName">The queue name.</param>
+        /// <param name="messageId">The ID of the message.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="service"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="queueName"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="messageId"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the operation.</exception>
+        /// <seealso cref="IQueuesService.PrepareGetMessageAsync"/>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Get_a_Specific_Message">Get a Specific Message (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task<QueuedMessage> GetMessageAsync(this IQueuesService service, QueueName queueName, MessageId messageId, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareGetMessageAsync(queueName, messageId, cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2);
+        }
+
         #endregion Messages
 
         #region Claims
