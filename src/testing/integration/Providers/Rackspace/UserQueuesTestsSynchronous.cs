@@ -155,7 +155,7 @@
                 new JProperty("valueB", "yes"));
 
             provider.SetQueueMetadata(queueName, metadata);
-            JObject result = provider.GetQueueMetadata(queueName);
+            JObject result = provider.GetQueueMetadata<JObject>(queueName);
             Assert.AreEqual(3, result["valueA"]);
             Assert.AreEqual("yes", result["valueB"]);
 

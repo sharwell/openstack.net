@@ -3,6 +3,7 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Newtonsoft.Json.Linq;
     using OpenStack.Net;
     using OpenStack.ObjectModel.JsonHome;
     using OpenStack.Security.Authentication;
@@ -246,6 +247,35 @@
             return CoreTaskExtensions.Using(
                 () => service.PrepareSetQueueMetadataAsync(queueName, metadata, cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+        }
+
+        /// <summary>
+        /// Get the metadata associated with a queue.
+        /// </summary>
+        /// <typeparam name="T">The type modeling the metadata associated with the queue. Use <see cref="JObject"/> for generic JSON metadata.</typeparam>
+        /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
+        /// <param name="queueName">The queue name.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the deserialized metadata associated with the specified queue.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="service"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="queueName"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the operation.</exception>
+        /// <seealso cref="IQueuesService.PrepareGetQueueMetadataAsync{T}"/>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Get_Queue_Metadata">Get Queue Metadata (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task<T> GetQueueMetadataAsync<T>(this IQueuesService service, QueueName queueName, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareGetQueueMetadataAsync<T>(queueName, cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2);
         }
 
         #endregion

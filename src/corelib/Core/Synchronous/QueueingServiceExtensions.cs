@@ -242,35 +242,6 @@ namespace net.openstack.Core.Synchronous
         }
 
         /// <summary>
-        /// Gets the metadata associated with a queue.
-        /// </summary>
-        /// <param name="queuesService">The queueing service instance.</param>
-        /// <param name="queueName">The queue name.</param>
-        /// <returns>A <see cref="JObject"/> object containing the metadata associated with the queue.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="queuesService"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Get_Queue_Metadata">Get Queue Metadata (OpenStack Marconi API v1 Blueprint)</seealso>
-        public static JObject GetQueueMetadata(this IQueuesService queuesService, QueueName queueName)
-        {
-            if (queuesService == null)
-                throw new ArgumentNullException("queuesService");
-
-            try
-            {
-                return queuesService.GetQueueMetadataAsync(queueName, CancellationToken.None).Result;
-            }
-            catch (AggregateException ex)
-            {
-                ReadOnlyCollection<Exception> innerExceptions = ex.Flatten().InnerExceptions;
-                if (innerExceptions.Count == 1)
-                    throw innerExceptions[0];
-
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Gets the metadata associated with a queue, as a strongly-typed object.
         /// </summary>
         /// <typeparam name="T">The type of metadata associated with the queue.</typeparam>
@@ -283,7 +254,6 @@ namespace net.openstack.Core.Synchronous
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Get_Queue_Metadata">Get Queue Metadata (OpenStack Marconi API v1 Blueprint)</seealso>
         public static T GetQueueMetadata<T>(this IQueuesService queuesService, QueueName queueName)
-            where T : class
         {
             if (queuesService == null)
                 throw new ArgumentNullException("queuesService");

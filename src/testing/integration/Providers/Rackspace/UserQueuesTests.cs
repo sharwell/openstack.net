@@ -182,7 +182,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 new JProperty("valueB", "yes"));
 
             await provider.SetQueueMetadataAsync(queueName, metadata, cancellationTokenSource.Token);
-            JObject result = await provider.GetQueueMetadataAsync(queueName, cancellationTokenSource.Token);
+            JObject result = await provider.GetQueueMetadataAsync<JObject>(queueName, cancellationTokenSource.Token);
             Assert.AreEqual(3, result["valueA"]);
             Assert.AreEqual("yes", result["valueB"]);
 

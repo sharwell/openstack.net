@@ -273,36 +273,16 @@
         }
 
         /// <inheritdoc/>
-        public Task<JObject> GetQueueMetadataAsync(QueueName queueName, CancellationToken cancellationToken)
-        {
-            if (queueName == null)
-                throw new ArgumentNullException("queueName");
-
-            return GetQueueMetadataAsync<JObject>(queueName, cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        public Task<T> GetQueueMetadataAsync<T>(QueueName queueName, CancellationToken cancellationToken)
-            where T : class
+        public Task<GetQueueMetadataApiCall<T>> PrepareGetQueueMetadataAsync<T>(QueueName queueName, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
             UriTemplate template = new UriTemplate("queues/{queue_name}/metadata");
-            var parameters = new Dictionary<string, string>
-                {
-                    { "queue_name", queueName.Value }
-                };
-
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken);
-
-            Func<Task<HttpRequestMessage>, Task<T>> requestResource =
-                GetResponseAsyncFunc<T>(cancellationToken);
-
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value } };
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
+                .Select(task => new GetQueueMetadataApiCall<T>(CreateJsonApiCall<T>(task.Result)));
         }
 
         /// <inheritdoc/>

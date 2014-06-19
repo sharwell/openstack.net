@@ -236,29 +236,22 @@
         Task<SetQueueMetadataApiCall> PrepareSetQueueMetadataAsync<T>(QueueName queueName, T metadata, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Gets the metadata associated with a queue.
+        /// Prepare an API call to get the metadata associated with a queue.
         /// </summary>
+        /// <typeparam name="T">The type modeling the metadata associated with the queue. Use <see cref="JObject"/> for generic JSON metadata.</typeparam>
         /// <param name="queueName">The queue name.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain a <see cref="JObject"/> object containing the metadata associated with the queue.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="GetQueueMetadataApiCall{T}"/>
+        /// <seealso cref="QueuesServiceExtensions.GetQueueMetadataAsync{T}"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Get_Queue_Metadata">Get Queue Metadata (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task<JObject> GetQueueMetadataAsync(QueueName queueName, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Gets the metadata associated with a queue, as a strongly-typed object.
-        /// </summary>
-        /// <typeparam name="T">The type of metadata associated with the queue.</typeparam>
-        /// <param name="queueName">The queue name.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain a deserialized object of type <typeparamref name="T"/> representing the metadata associated with the queue.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
-        /// <exception cref="JsonSerializationException">If an error occurs while deserializing the metadata.</exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Get_Queue_Metadata">Get Queue Metadata (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task<T> GetQueueMetadataAsync<T>(QueueName queueName, CancellationToken cancellationToken)
-            where T : class;
+        Task<GetQueueMetadataApiCall<T>> PrepareGetQueueMetadataAsync<T>(QueueName queueName, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets statistics for a queue.
