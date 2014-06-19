@@ -411,6 +411,43 @@
                 task => task.Result.SendAsync(cancellationToken));
         }
 
+        /// <summary>
+        /// Remove messages from a queue.
+        /// </summary>
+        /// <remarks>
+        /// <note type="warning">
+        /// This method removes messages from a queue whether or not they are currently claimed.
+        /// </note>
+        /// </remarks>
+        /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
+        /// <param name="queueName">The queue name.</param>
+        /// <param name="messageIds">The IDs of messages to remove.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="service"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="queueName"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="messageIds"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If <paramref name="messageIds"/> contains a <see langword="null"/> value.
+        /// </exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the operation.</exception>
+        /// <seealso cref="IQueuesService.PrepareRemoveMessagesAsync"/>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Delete_a_Set_of_Messages_by_ID">Delete a Set of Messages by ID (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task RemoveMessagesAsync(this IQueuesService service, QueueName queueName, IEnumerable<MessageId> messageIds, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareRemoveMessagesAsync(queueName, messageIds, cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
         #endregion Messages
 
         #region Claims

@@ -599,16 +599,16 @@ namespace net.openstack.Core.Synchronous
         }
 
         /// <summary>
-        /// Deletes messages from a queue.
+        /// Removes messages from a queue.
         /// </summary>
         /// <remarks>
         /// <note type="warning">
-        /// This method deletes messages from a queue whether or not they are currently claimed.
+        /// This method removes messages from a queue whether or not they are currently claimed.
         /// </note>
         /// </remarks>
         /// <param name="queuesService">The queueing service instance.</param>
         /// <param name="queueName">The queue name.</param>
-        /// <param name="messageIds">The IDs of messages to delete. These are obtained from <see cref="QueuedMessage.Id">QueuedMessage.Id</see>.</param>
+        /// <param name="messageIds">The IDs of messages to remove. These are obtained from <see cref="QueuedMessage.Id">QueuedMessage.Id</see>.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="queuesService"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="queueName"/> is <see langword="null"/>.
@@ -620,14 +620,14 @@ namespace net.openstack.Core.Synchronous
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Delete_a_Set_of_Messages_by_ID">Delete a Set of Messages by ID (OpenStack Marconi API v1 Blueprint)</seealso>
-        public static void DeleteMessages(this IQueuesService queuesService, QueueName queueName, IEnumerable<MessageId> messageIds)
+        public static void RemoveMessages(this IQueuesService queuesService, QueueName queueName, IEnumerable<MessageId> messageIds)
         {
             if (queuesService == null)
                 throw new ArgumentNullException("queuesService");
 
             try
             {
-                queuesService.DeleteMessagesAsync(queueName, messageIds, CancellationToken.None).Wait();
+                queuesService.RemoveMessagesAsync(queueName, messageIds, CancellationToken.None).Wait();
             }
             catch (AggregateException ex)
             {

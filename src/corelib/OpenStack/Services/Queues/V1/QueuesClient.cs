@@ -534,7 +534,7 @@
         }
 
         /// <inheritdoc/>
-        public Task DeleteMessagesAsync(QueueName queueName, IEnumerable<MessageId> messageIds, CancellationToken cancellationToken)
+        public Task<RemoveMessagesApiCall> PrepareRemoveMessagesAsync(QueueName queueName, IEnumerable<MessageId> messageIds, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -546,30 +546,15 @@
             UriTemplate template = new UriTemplate("queues/{queue_name}/messages{?ids}");
 
             var parameters =
-                new Dictionary<string, string>()
+                new Dictionary<string, object>()
                 {
-                    { "queue_name", queueName.Value },
-                    { "ids", string.Join(",", messageIds.Select(i => i.Value).ToArray()) },
+                    { "queue_name", queueName },
+                    { "ids", messageIds.ToArray() },
                 };
-
-            Func<Uri, Uri> uriTransform =
-                uri =>
-                {
-                    UriBuilder uriBuilder = new UriBuilder(uri);
-                    uriBuilder.Query = null;
-                    uriBuilder.Fragment = null;
-                    return new Uri(uriBuilder.Uri.AbsoluteUri + uri.Query.Replace("%2c", ",").Replace("%2C", ","));
-                };
-
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken, uriTransform);
-
-            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
 
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
+                .Select(task => new RemoveMessagesApiCall(CreateBasicApiCall(task.Result)));
         }
 
         /// <inheritdoc/>

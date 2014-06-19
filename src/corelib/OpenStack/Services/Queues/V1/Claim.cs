@@ -17,7 +17,7 @@
     /// been deleted will be eligible for claiming by another node in the system.
     /// Messages belonging to this claim may be deleted by calling
     /// <see cref="IQueuesService.PrepareRemoveMessageAsync"/> or
-    /// <see cref="IQueuesService.DeleteMessagesAsync"/>.
+    /// <see cref="IQueuesService.PrepareRemoveMessagesAsync"/>.
     /// </remarks>
     /// <seealso cref="IQueuesService"/>
     /// <threadsafety static="true" instance="false"/>

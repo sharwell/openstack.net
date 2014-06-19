@@ -459,17 +459,21 @@
         Task<RemoveMessageApiCall> PrepareRemoveMessageAsync(QueueName queueName, MessageId messageId, ClaimId claimId, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Deletes messages from a queue.
+        /// Prepares an API call to remove messages from a queue.
         /// </summary>
         /// <remarks>
         /// <note type="warning">
-        /// This method deletes messages from a queue whether or not they are currently claimed.
+        /// This method removes messages from a queue whether or not they are currently claimed.
         /// </note>
         /// </remarks>
         /// <param name="queueName">The queue name.</param>
-        /// <param name="messageIds">The IDs of messages to delete. These are obtained from <see cref="QueuedMessage.Id">QueuedMessage.Id</see>.</param>
+        /// <param name="messageIds">The IDs of messages to remove.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="queueName"/> is <see langword="null"/>.
         /// <para>-or-</para>
@@ -478,9 +482,11 @@
         /// <exception cref="ArgumentException">
         /// If <paramref name="messageIds"/> contains a <see langword="null"/> value.
         /// </exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="RemoveMessagesApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.RemoveMessagesAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Delete_a_Set_of_Messages_by_ID">Delete a Set of Messages by ID (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task DeleteMessagesAsync(QueueName queueName, IEnumerable<MessageId> messageIds, CancellationToken cancellationToken);
+        Task<RemoveMessagesApiCall> PrepareRemoveMessagesAsync(QueueName queueName, IEnumerable<MessageId> messageIds, CancellationToken cancellationToken);
 
         #endregion Messages
 
