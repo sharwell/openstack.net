@@ -286,22 +286,16 @@
         }
 
         /// <inheritdoc/>
-        public Task<QueueStatistics> GetQueueStatisticsAsync(QueueName queueName, CancellationToken cancellationToken)
+        public Task<GetQueueStatisticsApiCall> PrepareGetQueueStatisticsAsync(QueueName queueName, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
             UriTemplate template = new UriTemplate("queues/{queue_name}/stats");
-            var parameters = new Dictionary<string, string>() { { "queue_name", queueName.Value } };
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken);
-
-            Func<Task<HttpRequestMessage>, Task<QueueStatistics>> requestResource =
-                GetResponseAsyncFunc<QueueStatistics>(cancellationToken);
-
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value } };
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
+                .Select(task => new GetQueueStatisticsApiCall(CreateJsonApiCall<QueueStatistics>(task.Result)));
         }
 
         /// <inheritdoc/>
