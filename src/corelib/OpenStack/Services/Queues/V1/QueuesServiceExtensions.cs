@@ -219,5 +219,35 @@
         }
 
         #endregion
+
+        #region Queue metadata
+
+        /// <summary>
+        /// Set the metadata associated with a queue.
+        /// </summary>
+        /// <typeparam name="T">The type modeling the metadata to associate with the queue.</typeparam>
+        /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
+        /// <param name="queueName">The queue name.</param>
+        /// <param name="metadata">The metadata to associate with the queue.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="service"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="queueName"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="metadata"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the operation.</exception>
+        /// <seealso cref="IQueuesService.PrepareSetQueueMetadataAsync{T}"/>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Set_Queue_Metadata">Set Queue Metadata (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task SetQueueMetadataAsync<T>(this IQueuesService service, QueueName queueName, T metadata, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareSetQueueMetadataAsync(queueName, metadata, cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
+        #endregion
     }
 }

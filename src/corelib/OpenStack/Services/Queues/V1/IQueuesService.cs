@@ -213,18 +213,27 @@
         #region Queue metadata
 
         /// <summary>
-        /// Sets the metadata associated with a queue.
+        /// Prepare an API call to set the metadata associated with a queue.
         /// </summary>
-        /// <typeparam name="T">The type of data to associate with the queue.</typeparam>
+        /// <typeparam name="T">The type modeling the metadata to associate with the queue.</typeparam>
         /// <param name="queueName">The queue name.</param>
         /// <param name="metadata">The metadata to associate with the queue.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="queueName"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="metadata"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="SetQueueMetadataApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.SetQueueMetadataAsync{T}"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Set_Queue_Metadata">Set Queue Metadata (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task SetQueueMetadataAsync<T>(QueueName queueName, T metadata, CancellationToken cancellationToken)
-            where T : class;
+        Task<SetQueueMetadataApiCall> PrepareSetQueueMetadataAsync<T>(QueueName queueName, T metadata, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the metadata associated with a queue.
