@@ -711,6 +711,7 @@
     <Compile Include="OpenStack\Services\Queues\V1\QueuedMessage.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueuedMessageList.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueuedMessageListId.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\QueueExistsApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueMessagesStatistics.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueName.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueuesClient.cs" />

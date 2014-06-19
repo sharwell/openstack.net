@@ -209,6 +209,31 @@
             #endregion
         }
 
+        #region QueueExistsAsync
+        public async Task PrepareQueueExistsAsyncAwait()
+        {
+            #region PrepareQueueExistsAsync (await)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            QueueName queueName = new QueueName("ExampleQueue");
+            QueueExistsApiCall apiCall = await queuesService.PrepareQueueExistsAsync(queueName, CancellationToken.None);
+            Tuple<HttpResponseMessage, bool> apiResponse = await apiCall.SendAsync(CancellationToken.None);
+            bool queueExists = apiResponse.Item2;
+            #endregion
+        }
+
+        public void PrepareQueueExists()
+        {
+            #region PrepareQueueExistsAsync (TPL)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            QueueName queueName = new QueueName("ExampleQueue");
+            Task<bool> queueExistsTask =
+                CoreTaskExtensions.Using(
+                    () => queuesService.PrepareQueueExistsAsync(queueName, CancellationToken.None),
+                    task => task.Result.SendAsync(CancellationToken.None))
+                .Select(task => task.Result.Item2);
+            #endregion
+        }
+
         public async Task QueueExistsAsyncAwait()
         {
             #region QueueExistsAsync (await)
@@ -226,5 +251,6 @@
             Task<bool> task = queuesService.QueueExistsAsync(queueName, CancellationToken.None);
             #endregion
         }
+        #endregion
     }
 }
