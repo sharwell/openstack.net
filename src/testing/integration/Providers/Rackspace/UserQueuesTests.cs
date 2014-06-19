@@ -282,8 +282,8 @@
                 foreach (QueuedMessage message in messages)
                     Assert.IsTrue(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
 
-                int deletedMessage = messages[0].Body.ToObject<SampleMetadata>().ValueA;
-                await provider.DeleteMessageAsync(queueName, messages[0].Id, null, cancellationTokenSource.Token);
+                int removedMessage = messages[0].Body.ToObject<SampleMetadata>().ValueA;
+                await provider.RemoveMessageAsync(queueName, messages[0].Id, null, cancellationTokenSource.Token);
 
                 while (messages.Count > 0)
                 {
@@ -291,7 +291,7 @@
                     if (tempList.Count > 0)
                     {
                         Assert.IsTrue(locatedMessages.Add(tempList[0].Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
-                        await provider.DeleteMessageAsync(queueName, tempList[0].Id, null, cancellationTokenSource.Token);
+                        await provider.RemoveMessageAsync(queueName, tempList[0].Id, null, cancellationTokenSource.Token);
                     }
 
                     messages = await provider.ListMessagesAsync(queueName, messages.NextPageId, null, true, false, cancellationTokenSource.Token);
@@ -491,7 +491,7 @@
                                     // this is the reply to this thread's operation
                                     Assert.AreEqual(message.Body._operand1 + message.Body._operand2, result._result);
                                     Assert.AreEqual(x + y, result._result);
-                                    await queuesService.DeleteMessageAsync(replyQueueName, queuedMessage.Id, claim, token);
+                                    await queuesService.RemoveMessageAsync(replyQueueName, queuedMessage.Id, claim.Id, token);
                                     processedMessages++;
                                     handled = true;
                                 }

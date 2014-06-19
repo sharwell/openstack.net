@@ -565,12 +565,12 @@ namespace net.openstack.Core.Synchronous
         }
 
         /// <summary>
-        /// Deletes a message from a queue.
+        /// Remove a message from a queue.
         /// </summary>
         /// <param name="queuesService">The queueing service instance.</param>
         /// <param name="queueName">The queue name.</param>
-        /// <param name="messageId">The ID of the message to delete. This is obtained from <see cref="QueuedMessage.Id">QueuedMessage.Id</see>.</param>
-        /// <param name="claim">The claim for the message. If this value is <see langword="null"/>, the delete operation will fail if the message is claimed. If this value is non-<see langword="null"/>, the delete operation will fail if the message is not claimed by the specified claim.</param>
+        /// <param name="messageId">The ID of the message to remove. This is obtained from <see cref="QueuedMessage.Id">QueuedMessage.Id</see>.</param>
+        /// <param name="claimId">The ID of the claim for the message. If this value is <see langword="null"/>, the remove operation will fail if the message is claimed. If this value is non-<see langword="null"/>, the remove operation will fail if the message is not claimed by the specified claim.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="queuesService"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="queueName"/> is <see langword="null"/>.
@@ -579,14 +579,14 @@ namespace net.openstack.Core.Synchronous
         /// </exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Delete_Message">Delete Message (OpenStack Marconi API v1 Blueprint)</seealso>
-        public static void DeleteMessage(this IQueuesService queuesService, QueueName queueName, MessageId messageId, Claim claim)
+        public static void RemoveMessage(this IQueuesService queuesService, QueueName queueName, MessageId messageId, ClaimId claimId)
         {
             if (queuesService == null)
                 throw new ArgumentNullException("queuesService");
 
             try
             {
-                queuesService.DeleteMessageAsync(queueName, messageId, claim, CancellationToken.None).Wait();
+                queuesService.RemoveMessageAsync(queueName, messageId, claimId, CancellationToken.None).Wait();
             }
             catch (AggregateException ex)
             {
