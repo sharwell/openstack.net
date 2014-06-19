@@ -176,10 +176,10 @@ namespace net.openstack.Core.Synchronous
         }
 
         /// <summary>
-        /// Deletes a queue.
+        /// Removes a queue.
         /// </summary>
         /// <remarks>
-        /// The queue will be deleted whether or not it is empty, even if one or more messages in the queue is currently claimed.
+        /// The queue will be removed whether or not it is empty, even if one or more messages in the queue is currently claimed.
         /// </remarks>
         /// <param name="queuesService">The queueing service instance.</param>
         /// <param name="queueName">The queue name.</param>
@@ -187,14 +187,14 @@ namespace net.openstack.Core.Synchronous
         /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Delete_Queue">Delete Queue (OpenStack Marconi API v1 Blueprint)</seealso>
-        public static void DeleteQueue(this IQueuesService queuesService, QueueName queueName)
+        public static void RemoveQueue(this IQueuesService queuesService, QueueName queueName)
         {
             if (queuesService == null)
                 throw new ArgumentNullException("queuesService");
 
             try
             {
-                queuesService.DeleteQueueAsync(queueName, CancellationToken.None).Wait();
+                queuesService.RemoveQueueAsync(queueName, CancellationToken.None).Wait();
             }
             catch (AggregateException ex)
             {

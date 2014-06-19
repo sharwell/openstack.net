@@ -29,11 +29,11 @@
         /// This method can be used to clean up queues created during integration testing.
         /// </summary>
         /// <remarks>
-        /// The Cloud Queues integration tests generally delete queues created during the
+        /// The Cloud Queues integration tests generally remove queues created during the
         /// tests, but test failures may lead to unused queues gathering on the system.
         /// This method searches for all queues matching the "integration testing" pattern
         /// (i.e., queues whose name starts with <see cref="TestQueuePrefix"/>), and
-        /// attempts to delete them.
+        /// attempts to remove them.
         /// </remarks>
         [TestMethod]
         [TestCategory(TestCategories.Cleanup)]
@@ -43,10 +43,11 @@
             QueueName queueName = CreateRandomQueueName();
 
             Queue[] allQueues = ListAllQueues(provider, null, false).ToArray();
-            foreach (Queue queue in allQueues)
+            IEnumerable<Queue> testQueues = allQueues.Where(queue => queue.Name != null && queue.Name.Value.StartsWith(TestQueuePrefix));
+            foreach (Queue queue in testQueues)
             {
-                Console.WriteLine("Deleting queue: {0}", queue.Name);
-                provider.DeleteQueue(queue.Name);
+                Console.WriteLine("Removing queue: {0}", queue.Name);
+                provider.RemoveQueue(queue.Name);
             }
         }
 
@@ -84,7 +85,7 @@
             bool recreated = provider.CreateQueue(queueName);
             Assert.IsFalse(recreated);
 
-            provider.DeleteQueue(queueName);
+            provider.RemoveQueue(queueName);
         }
 
         [TestMethod]
@@ -100,7 +101,7 @@
             foreach (Queue queue in ListAllQueues(provider, null, true))
                 Console.WriteLine("{0}: {1}", queue.Name, queue.Href);
 
-            provider.DeleteQueue(queueName);
+            provider.RemoveQueue(queueName);
         }
 
         [TestMethod]
@@ -113,7 +114,7 @@
 
             provider.CreateQueue(queueName);
             Assert.IsTrue(provider.QueueExists(queueName));
-            provider.DeleteQueue(queueName);
+            provider.RemoveQueue(queueName);
             Assert.IsFalse(provider.QueueExists(queueName));
         }
 
@@ -136,7 +137,7 @@
             Assert.AreEqual(metadata.ValueA, result.ValueA);
             Assert.AreEqual(metadata.ValueB, result.ValueB);
 
-            provider.DeleteQueue(queueName);
+            provider.RemoveQueue(queueName);
         }
 
         [TestMethod]
@@ -158,7 +159,7 @@
             Assert.AreEqual(3, result["valueA"]);
             Assert.AreEqual("yes", result["valueB"]);
 
-            provider.DeleteQueue(queueName);
+            provider.RemoveQueue(queueName);
         }
 
         [JsonObject(MemberSerialization.OptIn)]
@@ -227,7 +228,7 @@
             Console.WriteLine();
             Console.WriteLine(JsonConvert.SerializeObject(statistics, Formatting.Indented));
 
-            provider.DeleteQueue(queueName);
+            provider.RemoveQueue(queueName);
         }
 
         [TestMethod]
@@ -276,7 +277,7 @@
                 Assert.IsTrue(locatedMessages.Contains(i), "The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i);
             }
 
-            provider.DeleteQueue(queueName);
+            provider.RemoveQueue(queueName);
         }
 
         [TestMethod]
@@ -306,7 +307,7 @@
                 Assert.IsTrue(locatedMessages.Contains(i), "The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i);
             }
 
-            provider.DeleteQueue(queueName);
+            provider.RemoveQueue(queueName);
         }
 
         /// <summary>
@@ -414,11 +415,11 @@
             Console.WriteLine("Total client messages: {0} ({1} messages/sec, {2} messages/sec/client)", clientTotal, clientRate, clientRate / clientCount);
             Console.WriteLine("Total server messages: {0} ({1} messages/sec, {2} messages/sec/server)", serverTotal, serverRate, serverRate / serverCount);
 
-            Console.WriteLine("Deleting request queue...");
-            provider.DeleteQueue(requestQueueName);
-            Console.WriteLine("Deleting {0} response queues...", responseQueueNames.Length);
+            Console.WriteLine("Removing request queue...");
+            provider.RemoveQueue(requestQueueName);
+            Console.WriteLine("Removing {0} response queues...", responseQueueNames.Length);
             foreach (QueueName queueName in responseQueueNames)
-                provider.DeleteQueue(queueName);
+                provider.RemoveQueue(queueName);
 
             if (clientTotal == 0)
                 Assert.Inconclusive("No messages were fully processed by the test.");
@@ -632,7 +633,7 @@
             statistics = provider.GetQueueStatistics(queueName);
             Assert.AreEqual(0, statistics.MessageStatistics.Claimed);
 
-            provider.DeleteQueue(queueName);
+            provider.RemoveQueue(queueName);
         }
 
         /// <summary>

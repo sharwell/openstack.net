@@ -249,26 +249,16 @@
         }
 
         /// <inheritdoc/>
-        public Task DeleteQueueAsync(QueueName queueName, CancellationToken cancellationToken)
+        public Task<RemoveQueueApiCall> PrepareRemoveQueueAsync(QueueName queueName, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
             UriTemplate template = new UriTemplate("queues/{queue_name}");
-            var parameters = new Dictionary<string, string>
-                {
-                    { "queue_name", queueName.Value }
-                };
-
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken);
-
-            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value } };
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
+                .Select(task => new RemoveQueueApiCall(CreateBasicApiCall(task.Result)));
         }
 
         /// <inheritdoc/>

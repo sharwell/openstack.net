@@ -146,23 +146,47 @@
         }
         #endregion
 
-        public async Task DeleteQueueAsyncAwait()
+        #region RemoveQueueAsync
+        public async Task PrepareRemoveQueueAsyncAwait()
         {
-            #region DeleteQueueAsync (await)
+            #region PrepareRemoveQueueAsync (await)
             IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
             QueueName queueName = new QueueName("ExampleQueue");
-            await queuesService.DeleteQueueAsync(queueName, CancellationToken.None);
+            RemoveQueueApiCall apiCall = await queuesService.PrepareRemoveQueueAsync(queueName, CancellationToken.None);
+            Tuple<HttpResponseMessage, string> apiResponse = await apiCall.SendAsync(CancellationToken.None);
             #endregion
         }
 
-        public void DeleteQueue()
+        public void PrepareRemoveQueue()
         {
-            #region DeleteQueueAsync (TPL)
+            #region PrepareRemoveQueueAsync (TPL)
             IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
             QueueName queueName = new QueueName("ExampleQueue");
-            Task task = queuesService.DeleteQueueAsync(queueName, CancellationToken.None);
+            Task removeQueueTask =
+                CoreTaskExtensions.Using(
+                    () => queuesService.PrepareRemoveQueueAsync(queueName, CancellationToken.None),
+                    task => task.Result.SendAsync(CancellationToken.None));
             #endregion
         }
+
+        public async Task RemoveQueueAsyncAwait()
+        {
+            #region RemoveQueueAsync (await)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            QueueName queueName = new QueueName("ExampleQueue");
+            await queuesService.RemoveQueueAsync(queueName, CancellationToken.None);
+            #endregion
+        }
+
+        public void RemoveQueue()
+        {
+            #region RemoveQueueAsync (TPL)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            QueueName queueName = new QueueName("ExampleQueue");
+            Task task = queuesService.RemoveQueueAsync(queueName, CancellationToken.None);
+            #endregion
+        }
+        #endregion
 
         public async Task ListQueuesAsyncAwait()
         {

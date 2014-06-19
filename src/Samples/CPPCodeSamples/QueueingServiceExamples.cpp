@@ -215,14 +215,67 @@ public:
 	}
 #pragma endregion
 
-	void DeleteQueue()
+#pragma region RemoveQueueAsync
+#pragma region PrepareRemoveQueueAsync (TPL)
+private:
+	ref class AcquirePrepareRemoveQueueAsync sealed
 	{
-#pragma region DeleteQueueAsync (TPL)
+		IQueuesService^ service;
+		QueueName^ queueName;
+		CancellationToken cancellationToken;
+
+	public:
+		AcquirePrepareRemoveQueueAsync(IQueuesService^ service, QueueName^ queueName, CancellationToken cancellationToken)
+			: service(service)
+			, queueName(queueName)
+			, cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<RemoveQueueApiCall^>^ Invoke()
+		{
+			return service->PrepareRemoveQueueAsync(queueName, cancellationToken);
+		}
+	};
+
+	ref class BodyPrepareRemoveQueueAsync sealed
+	{
+		CancellationToken cancellationToken;
+
+	public:
+		BodyPrepareRemoveQueueAsync(CancellationToken cancellationToken)
+			: cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<Tuple<HttpResponseMessage^, String^>^>^ Invoke(Task<RemoveQueueApiCall^>^ task)
+		{
+			return task->Result->SendAsync(cancellationToken);
+		}
+	};
+
+public:
+	void PrepareRemoveQueue()
+	{
 		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
 		QueueName^ queueName = gcnew QueueName("ExampleQueue");
-		Task^ task = queuesService->DeleteQueueAsync(queueName, CancellationToken::None);
+		auto acquireWrapper = gcnew AcquirePrepareRemoveQueueAsync(queuesService, queueName, CancellationToken::None);
+		auto acquire = gcnew Func<Task<RemoveQueueApiCall^>^>(acquireWrapper, &AcquirePrepareRemoveQueueAsync::Invoke);
+		auto bodyWrapper = gcnew BodyPrepareRemoveQueueAsync(CancellationToken::None);
+		auto body = gcnew Func<Task<RemoveQueueApiCall^>^, Task<Tuple<HttpResponseMessage^, String^>^>^>(bodyWrapper, &BodyPrepareRemoveQueueAsync::Invoke);
+		Task^ removeTask = CoreTaskExtensions::Using(acquire, body);
+	}
+#pragma endregion
+
+	void RemoveQueue()
+	{
+#pragma region RemoveQueueAsync (TPL)
+		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
+		QueueName^ queueName = gcnew QueueName("ExampleQueue");
+		Task^ task = QueuesServiceExtensions::RemoveQueueAsync(queuesService, queueName, CancellationToken::None);
 #pragma endregion
 	}
+#pragma endregion
 
 #pragma region ListQueuesAsync (TPL)
 	void ListQueues()

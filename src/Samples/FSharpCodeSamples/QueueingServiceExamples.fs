@@ -142,21 +142,47 @@ let createQueue =
     //#endregion
     ()
 
-let deleteQueueAsyncAwait =
+//
+// RemoveQueueAsync
+//
+
+let prepareRemoveQueueAsyncAwait =
     async {
-        //#region DeleteQueueAsync (await)
+        //#region PrepareRemoveQueueAsync (await)
         let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
         let queueName = new QueueName("ExampleQueue")
-        queuesService.DeleteQueueAsync(queueName, CancellationToken.None) |> Async.AwaitIAsyncResult |> ignore
+        let! apiCall = queuesService.PrepareRemoveQueueAsync(queueName, CancellationToken.None) |> Async.AwaitTask
+        let! responseMessage, rawBody = apiCall.SendAsync(CancellationToken.None) |> Async.AwaitTask
         //#endregion
         ()
     }
 
-let deleteQueue =
-    //#region DeleteQueueAsync (TPL)
+let prepareRemoveQueue =
+    //#region PrepareRemoveQueueAsync (TPL)
     let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
     let queueName = new QueueName("ExampleQueue")
-    let task = queuesService.DeleteQueueAsync(queueName, CancellationToken.None)
+    let task =
+        CoreTaskExtensions.Using(
+            (fun () -> queuesService.PrepareRemoveQueueAsync(queueName, CancellationToken.None)),
+            (fun (task : Task<RemoveQueueApiCall>) -> task.Result.SendAsync(CancellationToken.None)))
+    //#endregion
+    ()
+
+let removeQueueAsyncAwait =
+    async {
+        //#region RemoveQueueAsync (await)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+        let queueName = new QueueName("ExampleQueue")
+        queuesService.RemoveQueueAsync(queueName, CancellationToken.None) |> Async.AwaitIAsyncResult |> ignore
+        //#endregion
+        ()
+    }
+
+let removeQueue =
+    //#region RemoveQueueAsync (TPL)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+    let queueName = new QueueName("ExampleQueue")
+    let task = queuesService.RemoveQueueAsync(queueName, CancellationToken.None)
     //#endregion
     ()
 
