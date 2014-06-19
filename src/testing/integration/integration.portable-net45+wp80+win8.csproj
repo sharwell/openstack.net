@@ -82,7 +82,6 @@
     <Compile Include="Providers\Rackspace\UserDatabaseTests.cs" />
     <Compile Include="Providers\Rackspace\UserDatabaseUserTests.cs" />
     <Compile Include="Providers\Rackspace\UserMonitoringTests.cs" />
-    <None Include="Providers\Rackspace\UserQueuesTestsSynchronous.cs" />
     <None Include="Providers\Rackspace\IdentityTests.cs" />
     <None Include="Providers\Rackspace\ExtendedIdentityTests.cs" />
     <None Include="Providers\Rackspace\CloudFilesTests.cs" />
