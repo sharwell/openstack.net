@@ -739,26 +739,26 @@ namespace net.openstack.Core.Synchronous
         /// </remarks>
         /// <param name="queuesService">The queueing service instance.</param>
         /// <param name="queueName">The queue name.</param>
-        /// <param name="claim">The claim to renew.</param>
+        /// <param name="claimId">The ID of the claim to renew.</param>
         /// <param name="timeToLive">The updated time-to-live for the claim.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="queuesService"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="queueName"/> is <see langword="null"/>.
         /// <para>-or-</para>
-        /// <para>If <paramref name="claim"/> is <see langword="null"/>.</para>
+        /// <para>If <paramref name="claimId"/> is <see langword="null"/>.</para>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="timeToLive"/> is negative.</exception>
         /// <exception cref="WebException">If the REST request does not return successfully.</exception>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Update_Claim">Update Claim (OpenStack Marconi API v1 Blueprint)</seealso>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void UpdateClaim(this IQueuesService queuesService, QueueName queueName, Claim claim, TimeSpan timeToLive)
+        public static void UpdateClaim(this IQueuesService queuesService, QueueName queueName, ClaimId claimId, TimeSpan timeToLive)
         {
             if (queuesService == null)
                 throw new ArgumentNullException("queuesService");
 
             try
             {
-                queuesService.UpdateClaimAsync(queueName, claim, timeToLive, CancellationToken.None).Wait();
+                queuesService.UpdateClaimAsync(queueName, claimId, timeToLive, CancellationToken.None).Wait();
             }
             catch (AggregateException ex)
             {

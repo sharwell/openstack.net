@@ -312,6 +312,35 @@
         #region Claims
 
         /// <summary>
+        /// Renew a claim, by updating the time-to-live and resetting the age of the claim to zero.
+        /// </summary>
+        /// <remarks>
+        /// <note type="caller">Use <see cref="Claim.RenewAsync"/> instead of calling this method directly.</note>
+        /// </remarks>
+        /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
+        /// <param name="queueName">The queue name.</param>
+        /// <param name="claimId">The ID of the claim to update.</param>
+        /// <param name="timeToLive">The time to live of the claim.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="service"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="queueName"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="claimId"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the operation.</exception>
+        /// <seealso cref="IQueuesService.PrepareUpdateClaimAsync"/>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Update_Claim">Update Claim (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task UpdateClaimAsync(this IQueuesService service, QueueName queueName, ClaimId claimId, TimeSpan timeToLive, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareUpdateClaimAsync(queueName, claimId, new ClaimData(timeToLive), cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
+        /// <summary>
         /// Release a claim, making any (remaining, non-deleted) messages associated
         /// with the claim available to other workers.
         /// </summary>
