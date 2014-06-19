@@ -521,26 +521,32 @@
         Task<Claim> QueryClaimAsync(QueueName queueName, Claim claim, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Renews a claim, by updating the time-to-live and resetting the age of the claim to zero.
+        /// Prepare an API call to renew a claim, by updating the time-to-live and resetting the age of the claim to zero.
         /// </summary>
         /// <remarks>
         /// <note type="caller">Use <see cref="Claim.RenewAsync"/> instead of calling this method directly.</note>
         /// </remarks>
         /// <param name="queueName">The queue name.</param>
-        /// <param name="claim">The claim to renew.</param>
-        /// <param name="timeToLive">The updated time-to-live for the claim.</param>
+        /// <param name="claimId">The ID of the claim to update.</param>
+        /// <param name="claimData">The updated data for the claim.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="queueName"/> is <see langword="null"/>.
         /// <para>-or-</para>
-        /// <para>If <paramref name="claim"/> is <see langword="null"/>.</para>
+        /// <para>If <paramref name="claimId"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="claimData"/> is <see langword="null"/>.</para>
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="timeToLive"/> is negative.</exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="UpdateClaimApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.UpdateClaimAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Update_Claim">Update Claim (OpenStack Marconi API v1 Blueprint)</seealso>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        Task UpdateClaimAsync(QueueName queueName, Claim claim, TimeSpan timeToLive, CancellationToken cancellationToken);
+        Task<UpdateClaimApiCall> PrepareUpdateClaimAsync(QueueName queueName, ClaimId claimId, ClaimData claimData, CancellationToken cancellationToken);
 
         /// <summary>
         /// Prepare an API call to release a claim, making any (remaining, non-deleted) messages associated

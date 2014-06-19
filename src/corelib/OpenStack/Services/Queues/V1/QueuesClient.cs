@@ -704,34 +704,20 @@
         }
 
         /// <inheritdoc/>
-        public Task UpdateClaimAsync(QueueName queueName, Claim claim, TimeSpan timeToLive, CancellationToken cancellationToken)
+        public Task<UpdateClaimApiCall> PrepareUpdateClaimAsync(QueueName queueName, ClaimId claimId, ClaimData claimData, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
-            if (claim == null)
-                throw new ArgumentNullException("claim");
-            if (timeToLive <= TimeSpan.Zero)
-                throw new ArgumentOutOfRangeException("timeToLive");
+            if (claimId == null)
+                throw new ArgumentNullException("claimId");
+            if (claimData == null)
+                throw new ArgumentNullException("claimData");
 
             UriTemplate template = new UriTemplate("queues/{queue_name}/claims/{claim_id}");
-
-            var parameters =
-                new Dictionary<string, string>()
-                {
-                    { "queue_name", queueName.Value },
-                    { "claim_id", claim.Id.Value }
-                };
-
-            JObject request = new JObject(new JProperty("ttl", new JValue((int)timeToLive.TotalSeconds)));
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(new HttpMethod("PATCH"), template, parameters, request, cancellationToken);
-
-            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value }, { "claim_id", claimId.Value } };
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(new HttpMethod("PATCH"), template, parameters, claimData, cancellationToken))
+                .Select(task => new UpdateClaimApiCall(CreateBasicApiCall(task.Result)));
         }
 
         /// <inheritdoc/>

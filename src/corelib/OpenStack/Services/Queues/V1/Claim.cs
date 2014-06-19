@@ -204,7 +204,7 @@
         /// Renews the claim by resetting the age and updating the TTL for the claim.
         /// </summary>
         /// <remarks>
-        /// This method calls <see cref="IQueuesService.UpdateClaimAsync"/> to renew the
+        /// This method calls <see cref="QueuesServiceExtensions.UpdateClaimAsync"/> to renew the
         /// current claim, and then synchronously updates the current instance to reflect
         /// the new age and time-to-live values.
         /// </remarks>
@@ -228,7 +228,7 @@
                     _age = TimeSpan.Zero;
                     TimeToLive = timeToLive;
                 };
-            return _service.UpdateClaimAsync(_queueName, this, timeToLive, cancellationToken).Select(applyChanges);
+            return _service.UpdateClaimAsync(_queueName, Id, timeToLive, cancellationToken).Select(applyChanges);
         }
 
         /// <inheritdoc/>
