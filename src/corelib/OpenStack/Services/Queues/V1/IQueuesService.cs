@@ -317,7 +317,7 @@
         Task<GetMessageApiCall> PrepareGetMessageAsync(QueueName queueName, MessageId messageId, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Get messages from a queue.
+        /// Prepare an API call to get messages from a queue.
         /// </summary>
         /// <remarks>
         /// This method will return information for the specified message regardless of the
@@ -326,7 +326,11 @@
         /// <param name="queueName">The queue name.</param>
         /// <param name="messageIds">The message IDs of messages to get.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain a collection of <see cref="QueuedMessage"/> objects containing detailed information about the specified messages.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="queueName"/> is <see langword="null"/>.
         /// <para>-or-</para>
@@ -335,9 +339,11 @@
         /// <exception cref="ArgumentException">
         /// If <paramref name="messageIds"/> contains a <see langword="null"/> value.
         /// </exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="GetMessagesApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.GetMessagesAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Get_a_Set_of_Messages_by_ID">Get a Set of Messages by ID (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task<ReadOnlyCollection<QueuedMessage>> GetMessagesAsync(QueueName queueName, IEnumerable<MessageId> messageIds, CancellationToken cancellationToken);
+        Task<GetMessagesApiCall> PrepareGetMessagesAsync(QueueName queueName, IEnumerable<MessageId> messageIds, CancellationToken cancellationToken);
 
         /// <summary>
         /// Posts messages to a queue.

@@ -392,7 +392,7 @@
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollection<QueuedMessage>> GetMessagesAsync(QueueName queueName, IEnumerable<MessageId> messageIds, CancellationToken cancellationToken)
+        public Task<GetMessagesApiCall> PrepareGetMessagesAsync(QueueName queueName, IEnumerable<MessageId> messageIds, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -404,30 +404,28 @@
             UriTemplate template = new UriTemplate("queues/{queue_name}/messages{?ids}");
 
             var parameters =
-                new Dictionary<string, string>()
+                new Dictionary<string, object>()
                 {
-                    { "queue_name", queueName.Value },
-                    { "ids", string.Join(",", messageIds.Select(i => i.Value).ToArray()) },
+                    { "queue_name", queueName },
+                    { "ids", messageIds.ToArray() },
                 };
 
-            Func<Uri, Uri> uriTransform =
-                uri =>
+            Func<HttpResponseMessage, CancellationToken, Task<ReadOnlyCollectionPage<QueuedMessage>>> deserializeResult =
+                (responseMessage, _) =>
                 {
-                    UriBuilder uriBuilder = new UriBuilder(uri);
-                    uriBuilder.Query = null;
-                    uriBuilder.Fragment = null;
-                    return new Uri(uriBuilder.Uri.AbsoluteUri + uri.Query.Replace("%2c", ",").Replace("%2C", ","));
+                    return responseMessage.Content.ReadAsStringAsync()
+                        .Select(
+                            innerTask =>
+                            {
+                                QueuedMessage[] messages = JsonConvert.DeserializeObject<QueuedMessage[]>(innerTask.Result);
+                                ReadOnlyCollectionPage<QueuedMessage> result = new BasicReadOnlyCollectionPage<QueuedMessage>(messages, null);
+                                return result;
+                            });
                 };
-
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken, uriTransform);
-
-            Func<Task<HttpRequestMessage>, Task<ReadOnlyCollection<QueuedMessage>>> requestResource =
-                GetResponseAsyncFunc<ReadOnlyCollection<QueuedMessage>>(cancellationToken);
 
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
+                .Select(task => new GetMessagesApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
         /// <inheritdoc/>
