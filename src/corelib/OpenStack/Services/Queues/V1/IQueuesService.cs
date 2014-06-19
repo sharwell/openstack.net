@@ -291,24 +291,30 @@
         Task<QueuedMessageList> ListMessagesAsync(QueueName queueName, QueuedMessageListId marker, int? limit, bool echo, bool includeClaimed, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Gets detailed information about a specific queued message.
+        /// Prepare an API call to get detailed information about a specific queued message.
         /// </summary>
         /// <remarks>
         /// This method will return information for the specified message regardless of the
         /// <literal>Client-ID</literal> or claim associated with the message.
         /// </remarks>
         /// <param name="queueName">The queue name.</param>
-        /// <param name="messageId">The message ID. This is obtained from <see cref="QueuedMessage.Id">QueuedMessage.Id</see>.</param>
+        /// <param name="messageId">The ID of the message.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain a <see cref="QueuedMessage"/> object containing detailed information about the specified message.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="queueName"/> is <see langword="null"/>.
         /// <para>-or-</para>
         /// <para>If <paramref name="messageId"/> is <see langword="null"/>.</para>
         /// </exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="GetMessageApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.GetMessageAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Get_a_Specific_Message">Get a Specific Message (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task<QueuedMessage> GetMessageAsync(QueueName queueName, MessageId messageId, CancellationToken cancellationToken);
+        Task<GetMessageApiCall> PrepareGetMessageAsync(QueueName queueName, MessageId messageId, CancellationToken cancellationToken);
 
         /// <summary>
         /// Get messages from a queue.
