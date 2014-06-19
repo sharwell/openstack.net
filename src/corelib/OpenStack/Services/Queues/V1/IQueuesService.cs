@@ -543,25 +543,30 @@
         Task UpdateClaimAsync(QueueName queueName, Claim claim, TimeSpan timeToLive, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Immediately release a claim, making any (remaining, non-deleted) messages associated
+        /// Prepare an API call to release a claim, making any (remaining, non-deleted) messages associated
         /// with the claim available to other workers.
         /// </summary>
         /// <remarks>
         /// <note type="caller">Use <see cref="Claim.DisposeAsync"/> instead of calling this method directly.</note>
         /// </remarks>
         /// <param name="queueName">The queue name.</param>
-        /// <param name="claim">The claim to release.</param>
+        /// <param name="claimId">The ID of the claim to release.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="queueName"/> is <see langword="null"/>.
         /// <para>-or-</para>
-        /// <para>If <paramref name="claim"/> is <see langword="null"/>.</para>
+        /// <para>If <paramref name="claimId"/> is <see langword="null"/>.</para>
         /// </exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="ReleaseClaimApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.ReleaseClaimAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Release_Claim">Release Claim (OpenStack Marconi API v1 Blueprint)</seealso>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        Task ReleaseClaimAsync(QueueName queueName, Claim claim, CancellationToken cancellationToken);
+        Task<ReleaseClaimApiCall> PrepareReleaseClaimAsync(QueueName queueName, ClaimId claimId, CancellationToken cancellationToken);
 
         #endregion
     }

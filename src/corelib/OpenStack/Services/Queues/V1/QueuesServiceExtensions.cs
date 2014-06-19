@@ -307,6 +307,39 @@
                 .Select(task => task.Result.Item2);
         }
 
+        #endregion Messages
+
+        #region Claims
+
+        /// <summary>
+        /// Release a claim, making any (remaining, non-deleted) messages associated
+        /// with the claim available to other workers.
+        /// </summary>
+        /// <remarks>
+        /// <note type="caller">Use <see cref="Claim.DisposeAsync"/> instead of calling this method directly.</note>
+        /// </remarks>
+        /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
+        /// <param name="queueName">The queue name.</param>
+        /// <param name="claimId">The ID of the claim to release.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="service"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="queueName"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="claimId"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the operation.</exception>
+        /// <seealso cref="IQueuesService.PrepareReleaseClaimAsync"/>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Release_Claim">Release Claim (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task ReleaseClaimAsync(this IQueuesService service, QueueName queueName, ClaimId claimId, CancellationToken cancellationToken)
+        {
+            return CoreTaskExtensions.Using(
+                () => service.PrepareReleaseClaimAsync(queueName, claimId, cancellationToken),
+                task => task.Result.SendAsync(cancellationToken));
+        }
+
         #endregion
     }
 }
