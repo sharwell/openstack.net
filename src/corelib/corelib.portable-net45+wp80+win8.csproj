@@ -716,6 +716,7 @@
     <Compile Include="OpenStack\Services\Queues\V1\QueueStatistics.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\ReleaseClaimApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\RemoveMessageApiCall.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\RemoveMessagesApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\RemoveQueueApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\SetQueueMetadataApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\UpdateClaimApiCall.cs" />

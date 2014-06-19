@@ -493,7 +493,7 @@
                 // process request messages
                 using (Claim claim = queuesService.ClaimMessage(requestQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1)))
                 {
-                    List<QueuedMessage> messagesToDelete = new List<QueuedMessage>();
+                    List<QueuedMessage> messagesToRemove = new List<QueuedMessage>();
 
                     foreach (QueuedMessage queuedMessage in claim.Messages)
                     {
@@ -526,14 +526,14 @@
                             throw new InvalidOperationException();
                         }
 
-                        messagesToDelete.Add(queuedMessage);
+                        messagesToRemove.Add(queuedMessage);
 
                         queuesService.PostMessages(operation._replyQueueName, new Message<CalculatorResult>(TimeSpan.FromMinutes(5), result));
                         processedMessages++;
                     }
 
-                    if (messagesToDelete.Count > 0)
-                        queuesService.DeleteMessages(requestQueueName, messagesToDelete.Select(i => i.Id));
+                    if (messagesToRemove.Count > 0)
+                        queuesService.RemoveMessages(requestQueueName, messagesToRemove.Select(i => i.Id));
                 }
 
                 if (token.IsCancellationRequested)
