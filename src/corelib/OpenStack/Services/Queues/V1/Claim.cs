@@ -233,11 +233,11 @@
 
         /// <inheritdoc/>
         /// <remarks>
-        /// This method calls <see cref="IQueuesService.ReleaseClaimAsync"/> to release messages
+        /// This method calls <see cref="QueuesServiceExtensions.ReleaseClaimAsync"/> to release messages
         /// claimed by this claim. To prevent other subscribers from re-claiming the messages, make
         /// sure to delete the messages before calling <see cref="Dispose()"/>.
         /// </remarks>
-        /// <seealso cref="IQueuesService.ReleaseClaimAsync"/>
+        /// <seealso cref="IQueuesService.PrepareReleaseClaimAsync"/>
         public void Dispose()
         {
             Dispose(true);
@@ -248,7 +248,7 @@
         /// Asynchronously releases resources owned by this <see cref="Claim"/>.
         /// </summary>
         /// <remarks>
-        /// This method calls <see cref="IQueuesService.ReleaseClaimAsync"/> to release messages
+        /// This method calls <see cref="QueuesServiceExtensions.ReleaseClaimAsync"/> to release messages
         /// claimed by this claim. To prevent other subscribers from re-claiming the messages, make
         /// sure to delete the messages before calling <see cref="DisposeAsync"/>.
         /// </remarks>
@@ -263,7 +263,7 @@
                     if (_messages.Length == 0)
                         _releaseTask = CompletedTask.Default;
                     else
-                        _releaseTask = _service.ReleaseClaimAsync(_queueName, this, cancellationToken);
+                        _releaseTask = _service.ReleaseClaimAsync(_queueName, Id, cancellationToken);
                 }
             }
 

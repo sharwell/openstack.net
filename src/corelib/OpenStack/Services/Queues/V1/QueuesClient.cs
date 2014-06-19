@@ -735,31 +735,18 @@
         }
 
         /// <inheritdoc/>
-        public Task ReleaseClaimAsync(QueueName queueName, Claim claim, CancellationToken cancellationToken)
+        public Task<ReleaseClaimApiCall> PrepareReleaseClaimAsync(QueueName queueName, ClaimId claimId, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
-            if (claim == null)
-                throw new ArgumentNullException("claim");
+            if (claimId == null)
+                throw new ArgumentNullException("claimId");
 
             UriTemplate template = new UriTemplate("queues/{queue_name}/claims/{claim_id}");
-
-            var parameters =
-                new Dictionary<string, string>()
-                {
-                    { "queue_name", queueName.Value },
-                    { "claim_id", claim.Id.Value },
-                };
-
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken);
-
-            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value }, { "claim_id", claimId.Value } };
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
+                .Select(task => new ReleaseClaimApiCall(CreateBasicApiCall(task.Result)));
         }
 
         #endregion
