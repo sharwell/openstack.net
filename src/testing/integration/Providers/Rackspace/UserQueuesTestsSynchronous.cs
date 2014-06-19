@@ -252,8 +252,8 @@
             foreach (QueuedMessage message in messages)
                 Assert.IsTrue(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
 
-            int deletedMessage = messages[0].Body.ToObject<SampleMetadata>().ValueA;
-            provider.DeleteMessage(queueName, messages[0].Id, null);
+            int removedMessage = messages[0].Body.ToObject<SampleMetadata>().ValueA;
+            provider.RemoveMessage(queueName, messages[0].Id, null);
 
             while (messages.Count > 0)
             {
@@ -261,7 +261,7 @@
                 if (tempList.Count > 0)
                 {
                     Assert.IsTrue(locatedMessages.Add(tempList[0].Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
-                    provider.DeleteMessage(queueName, tempList[0].Id, null);
+                    provider.RemoveMessage(queueName, tempList[0].Id, null);
                 }
 
                 messages = provider.ListMessages(queueName, messages.NextPageId, null, true, false);
@@ -453,7 +453,7 @@
                                 // this is the reply to this thread's operation
                                 Assert.AreEqual(message.Body._operand1 + message.Body._operand2, result._result);
                                 Assert.AreEqual(x + y, result._result);
-                                queuesService.DeleteMessage(replyQueueName, queuedMessage.Id, claim);
+                                queuesService.RemoveMessage(replyQueueName, queuedMessage.Id, claim.Id);
                                 processedMessages++;
                                 handled = true;
                             }

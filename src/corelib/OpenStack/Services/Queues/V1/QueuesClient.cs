@@ -517,7 +517,7 @@
         }
 
         /// <inheritdoc/>
-        public Task DeleteMessageAsync(QueueName queueName, MessageId messageId, Claim claim, CancellationToken cancellationToken)
+        public Task<RemoveMessageApiCall> PrepareRemoveMessageAsync(QueueName queueName, MessageId messageId, ClaimId claimId, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -526,24 +526,13 @@
 
             UriTemplate template = new UriTemplate("queues/{queue_name}/messages/{message_id}{?claim_id}");
 
-            var parameters =
-                new Dictionary<string, string>()
-                {
-                    { "queue_name", queueName.Value },
-                    { "message_id", messageId.Value },
-                };
-            if (claim != null)
-                parameters["claim_id"] = claim.Id.Value;
-
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken);
-
-            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value }, { "message_id", messageId.Value } };
+            if (claimId != null)
+                parameters["claim_id"] = claimId.Value;
 
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
+                .Select(task => new RemoveMessageApiCall(CreateBasicApiCall(task.Result)));
         }
 
         /// <inheritdoc/>

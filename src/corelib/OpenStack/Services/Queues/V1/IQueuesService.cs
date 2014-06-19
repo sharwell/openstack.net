@@ -430,21 +430,27 @@
         Task PostMessagesAsync<T>(QueueName queueName, CancellationToken cancellationToken, params Message<T>[] messages);
 
         /// <summary>
-        /// Deletes a message from a queue.
+        /// Prepares an API call to remove a message from a queue.
         /// </summary>
         /// <param name="queueName">The queue name.</param>
-        /// <param name="messageId">The ID of the message to delete. This is obtained from <see cref="QueuedMessage.Id">QueuedMessage.Id</see>.</param>
-        /// <param name="claim">The claim for the message. If this value is <see langword="null"/>, the delete operation will fail if the message is claimed. If this value is non-<see langword="null"/>, the delete operation will fail if the message is not claimed by the specified claim.</param>
+        /// <param name="messageId">The ID of the message to remove.</param>
+        /// <param name="claimId">The ID of the claim for the message. If this value is <see langword="null"/>, the remove operation will fail if the message is claimed. If this value is non-<see langword="null"/>, the remove operation will fail if the message is not claimed by the specified claim.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="queueName"/> is <see langword="null"/>.
         /// <para>-or-</para>
         /// <para>If <paramref name="messageId"/> is <see langword="null"/>.</para>
         /// </exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="RemoveMessageApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.RemoveMessageAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Delete_Message">Delete Message (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task DeleteMessageAsync(QueueName queueName, MessageId messageId, Claim claim, CancellationToken cancellationToken);
+        Task<RemoveMessageApiCall> PrepareRemoveMessageAsync(QueueName queueName, MessageId messageId, ClaimId claimId, CancellationToken cancellationToken);
 
         /// <summary>
         /// Deletes messages from a queue.
