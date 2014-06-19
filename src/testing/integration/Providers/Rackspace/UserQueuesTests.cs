@@ -37,17 +37,17 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         /// This method can be used to clean up queues created during integration testing.
         /// </summary>
         /// <remarks>
-        /// The Cloud Queues integration tests generally delete queues created during the
+        /// The Cloud Queues integration tests generally remove queues created during the
         /// tests, but test failures may lead to unused queues gathering on the system.
         /// This method searches for all queues matching the "integration testing" pattern
         /// (i.e., queues whose name starts with <see cref="TestQueuePrefix"/>), and
-        /// attempts to delete them.
+        /// attempts to remove them.
         /// <para>
-        /// The deletion requests are sent in parallel, so a single deletion failure will
+        /// The removal requests are sent in parallel, so a single removal failure will
         /// not prevent the method from cleaning up other queues that can be successfully
-        /// deleted. Note that the system does not increase the
-        /// <see cref="ProviderBase{TProvider}.ConnectionLimit"/>, so the underlying REST
-        /// requests may be pipelined if the number of queues to delete exceeds the default
+        /// removed. Note that the system does not increase the
+        /// <see cref="ProviderBase{TProvider}.ConnectionLimit"/>, so the underlying HTTP
+        /// requests may be pipelined if the number of queues to remove exceeds the default
         /// system connection limit.
         /// </para>
         /// </remarks>
@@ -60,12 +60,13 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             QueueName queueName = CreateRandomQueueName();
 
             ReadOnlyCollection<Queue> allQueues = await ListAllQueuesAsync(provider, null, false, cancellationTokenSource.Token, null);
-            Task[] deleteTasks = Array.ConvertAll(allQueues.ToArray(), queue =>
+            IEnumerable<Queue> testQueues = allQueues.Where(queue => queue.Name != null && queue.Name.Value.StartsWith(TestQueuePrefix));
+            Task[] removeTasks = Array.ConvertAll(testQueues.ToArray(), queue =>
             {
-                Console.WriteLine("Deleting queue: {0}", queue.Name);
-                return provider.DeleteQueueAsync(queue.Name, cancellationTokenSource.Token);
+                Console.WriteLine("Removing queue: {0}", queue.Name);
+                return provider.RemoveQueueAsync(queue.Name, cancellationTokenSource.Token);
             });
-            Task.WaitAll(deleteTasks);
+            Task.WaitAll(removeTasks);
         }
 
         [TestMethod]
@@ -105,7 +106,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             bool recreated = await provider.CreateQueueAsync(queueName, cancellationTokenSource.Token);
             Assert.IsFalse(recreated);
 
-            await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
+            await provider.RemoveQueueAsync(queueName, cancellationTokenSource.Token);
         }
 
         [TestMethod]
@@ -124,7 +125,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 Console.WriteLine("{0}: {1}", queue.Name, queue.Href);
             }
 
-            await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
+            await provider.RemoveQueueAsync(queueName, cancellationTokenSource.Token);
         }
 
         [TestMethod]
@@ -138,7 +139,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
             await provider.CreateQueueAsync(queueName, cancellationTokenSource.Token);
             Assert.IsTrue(await provider.QueueExistsAsync(queueName, cancellationTokenSource.Token));
-            await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
+            await provider.RemoveQueueAsync(queueName, cancellationTokenSource.Token);
             Assert.IsFalse(await provider.QueueExistsAsync(queueName, cancellationTokenSource.Token));
         }
 
@@ -162,7 +163,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             Assert.AreEqual(metadata.ValueA, result.ValueA);
             Assert.AreEqual(metadata.ValueB, result.ValueB);
 
-            await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
+            await provider.RemoveQueueAsync(queueName, cancellationTokenSource.Token);
         }
 
         [TestMethod]
@@ -185,7 +186,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             Assert.AreEqual(3, result["valueA"]);
             Assert.AreEqual("yes", result["valueB"]);
 
-            await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
+            await provider.RemoveQueueAsync(queueName, cancellationTokenSource.Token);
         }
 
         [JsonObject(MemberSerialization.OptIn)]
@@ -255,7 +256,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             Console.WriteLine();
             Console.WriteLine(JsonConvert.SerializeObject(statistics, Formatting.Indented));
 
-            await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
+            await provider.RemoveQueueAsync(queueName, cancellationTokenSource.Token);
         }
 
         [TestMethod]
@@ -309,7 +310,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     Assert.IsTrue(locatedMessages.Contains(i), "The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i);
                 }
 
-                await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
+                await provider.RemoveQueueAsync(queueName, cancellationTokenSource.Token);
             }
         }
 
@@ -345,7 +346,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     Assert.IsTrue(locatedMessages.Contains(i), "The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i);
                 }
 
-                await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
+                await provider.RemoveQueueAsync(queueName, cancellationTokenSource.Token);
             }
         }
 
@@ -388,7 +389,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 Assert.IsNotNull(messages);
                 Assert.AreEqual(12, messages.Count);
 
-                await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
+                await provider.RemoveQueueAsync(queueName, cancellationTokenSource.Token);
             }
         }
 
@@ -454,10 +455,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             Console.WriteLine("Total client messages: {0} ({1} messages/sec, {2} messages/sec/client)", clientTotal, clientRate, clientRate / clientCount);
             Console.WriteLine("Total server messages: {0} ({1} messages/sec, {2} messages/sec/server)", serverTotal, serverRate, serverRate / serverCount);
 
-            Console.WriteLine("Deleting request queue...");
-            await provider.DeleteQueueAsync(requestQueueName, testCancellationTokenSource.Token);
-            Console.WriteLine("Deleting {0} response queues...", responseQueueNames.Length);
-            await DelayedTask.WhenAll(responseQueueNames.Select(queueName => provider.DeleteQueueAsync(queueName, testCancellationTokenSource.Token)));
+            Console.WriteLine("Removing request queue...");
+            await provider.RemoveQueueAsync(requestQueueName, testCancellationTokenSource.Token);
+            Console.WriteLine("Removing {0} response queues...", responseQueueNames.Length);
+            await DelayedTask.WhenAll(responseQueueNames.Select(queueName => provider.RemoveQueueAsync(queueName, testCancellationTokenSource.Token)));
 
             if (clientTotal == 0)
                 Assert.Inconclusive("No messages were fully processed by the test.");
@@ -729,7 +730,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             statistics = await provider.GetQueueStatisticsAsync(queueName, cancellationTokenSource.Token);
             Assert.AreEqual(0, statistics.MessageStatistics.Claimed);
 
-            await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
+            await provider.RemoveQueueAsync(queueName, cancellationTokenSource.Token);
         }
 
         /// <summary>

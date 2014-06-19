@@ -708,6 +708,7 @@
     <Compile Include="OpenStack\Services\Queues\V1\QueuesClient.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueuesServiceExtensions.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueStatistics.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\RemoveQueueApiCall.cs" />
     <Compile Include="OpenStack\Services\ServiceClient.cs" />
     <Compile Include="OpenStack\Threading\AsyncCompletionOption.cs" />
     <Compile Include="OpenStack\Threading\BackoffPolicy.cs" />

@@ -126,21 +126,43 @@ Public Class QueueingServiceExamples
     End Sub
 #End Region
 
-    Public Async Function DeleteQueueAsyncAwait() As Task
-        ' #Region "DeleteQueueAsync (await)"
+#Region "RemoveQueueAsync"
+    Public Async Function PrepareRemoveQueueAsyncAwait() As Task
+        ' #Region "PrepareRemoveQueueAsync (await)"
         Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
         Dim queueName = New QueueName("ExampleQueue")
-        Await queuesService.DeleteQueueAsync(queueName, CancellationToken.None)
+        Dim apiCall As RemoveQueueApiCall = Await queuesService.PrepareRemoveQueueAsync(queueName, CancellationToken.None)
+        Dim apiResponse As Tuple(Of HttpResponseMessage, String) = Await apiCall.SendAsync(CancellationToken.None)
         ' #End Region
     End Function
 
-    Public Sub DeleteQueue()
-        ' #Region "DeleteQueueAsync (TPL)"
+    Public Sub PrepareRemoveQueue()
+        ' #Region "PrepareRemoveQueueAsync (TPL)"
         Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
         Dim queueName = New QueueName("ExampleQueue")
-        Dim task = queuesService.DeleteQueueAsync(queueName, CancellationToken.None)
+        Dim queueCreatedTask As Task =
+            CoreTaskExtensions.Using(
+                Function() queuesService.PrepareRemoveQueueAsync(queueName, CancellationToken.None),
+                Function(task) task.Result.SendAsync(CancellationToken.None))
         ' #End Region
     End Sub
+
+    Public Async Function RemoveQueueAsyncAwait() As Task
+        ' #Region "RemoveQueueAsync (await)"
+        Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
+        Dim queueName = New QueueName("ExampleQueue")
+        Await queuesService.RemoveQueueAsync(queueName, CancellationToken.None)
+        ' #End Region
+    End Function
+
+    Public Sub RemoveQueue()
+        ' #Region "RemoveQueueAsync (TPL)"
+        Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
+        Dim queueName = New QueueName("ExampleQueue")
+        Dim task = queuesService.RemoveQueueAsync(queueName, CancellationToken.None)
+        ' #End Region
+    End Sub
+#End Region
 
     Public Async Function ListQueuesAsyncAwait() As Task
         ' #Region "ListQueuesAsync (await)"
