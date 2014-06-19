@@ -1,7 +1,6 @@
 ﻿namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
     using net.openstack.Core.Providers;
-    using net.openstack.Core.Synchronous;
 
     /// <summary>
     /// Provides predefined categories for use with the <see cref="TestCategoryAttribute"/>.
@@ -81,12 +80,6 @@
         /// </summary>
         /// <seealso cref="IQueuesService"/>
         public const string Queues = "Queues" + CategorySuffix;
-
-        /// <summary>
-        /// Tests Synchronous extensions to the queueing service.
-        /// </summary>
-        /// <seealso cref="QueueingServiceExtensions"/>
-        public const string QueuesSynchronous = "Queues (Synchronous)" + CategorySuffix;
 
         /// <summary>
         /// Unit tests designed to remove resources from an account which were created

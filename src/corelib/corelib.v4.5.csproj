@@ -124,15 +124,6 @@
     <Compile Include="Core\Providers\OpenStackIdentityProvider.cs" />
     <Compile Include="Core\ResponseExtensions.cs" />
     <Compile Include="Core\RestWebHeaderCollection.cs" />
-    <Compile Include="Core\Synchronous\AutoScaleServiceExtensions.cs" />
-    <Compile Include="Core\Synchronous\DatabaseServiceExtensions.cs" />
-    <Compile Include="Core\Synchronous\DnsServiceExtensions.cs" />
-    <Compile Include="Core\Synchronous\ClaimExtensions.cs" />
-    <Compile Include="Core\Synchronous\LoadBalancerServiceExtensions.cs" />
-    <Compile Include="Core\Synchronous\MonitoringServiceExtensions.cs" />
-    <Compile Include="Core\Synchronous\NamespaceDoc.cs" />
-    <Compile Include="Core\Synchronous\QueueingServiceExtensions.cs" />
-    <Compile Include="Core\Synchronous\ReadOnlyCollectionPageSynchronousExtensions.cs" />
     <Compile Include="Core\Validators\NamespaceDoc.cs" />
     <Compile Include="OpenStack\Collections\ArrayExtensions.cs" />
     <Compile Include="OpenStack\Collections\BasicReadOnlyCollectionPage`1.cs" />
