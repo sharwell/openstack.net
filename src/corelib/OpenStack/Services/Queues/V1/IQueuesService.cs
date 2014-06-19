@@ -86,29 +86,35 @@
         #region Queues
 
         /// <summary>
-        /// Creates a queue, if it does not already exist.
+        /// Prepare an API call to create a queue.
         /// </summary>
         /// <param name="queueName">The queue name.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain <see langword="true"/> if the queue was created by the call, or <see langword="false"/> if the queue already existed.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
         /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
         /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
-        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="CreateQueueAsync (await)" language="cs"/>
-        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="CreateQueueAsync (await)" language="vbnet"/>
-        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="CreateQueueAsync (await)" language="fs"/>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="PrepareCreateQueueAsync (await)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="PrepareCreateQueueAsync (await)" language="vbnet"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="PrepareCreateQueueAsync (await)" language="fs"/>
         /// <token>TplExample</token>
-        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="CreateQueueAsync (TPL)" language="cs"/>
-        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="CreateQueueAsync (TPL)" language="vbnet"/>
-        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="CreateQueueAsync (TPL)" language="cpp"/>
-        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="CreateQueueAsync (TPL)" language="fs"/>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="PrepareCreateQueueAsync (TPL)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="PrepareCreateQueueAsync (TPL)" language="vbnet"/>
+        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="PrepareCreateQueueAsync (TPL)" language="cpp"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="PrepareCreateQueueAsync (TPL)" language="fs"/>
         /// </example>
+        /// <seealso cref="CreateQueueApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.CreateQueueAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Create_Queue">Create Queue (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task<bool> CreateQueueAsync(QueueName queueName, CancellationToken cancellationToken);
+        Task<CreateQueueApiCall> PrepareCreateQueueAsync(QueueName queueName, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets a list of queues.

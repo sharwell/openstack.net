@@ -147,14 +147,73 @@ public:
 	}
 #pragma endregion
 
+#pragma region CreateQueueAsync
+#pragma region PrepareCreateQueueAsync (TPL)
+private:
+	ref class AcquirePrepareCreateQueueAsync sealed
+	{
+		IQueuesService^ service;
+		QueueName^ queueName;
+		CancellationToken cancellationToken;
+
+	public:
+		AcquirePrepareCreateQueueAsync(IQueuesService^ service, QueueName^ queueName, CancellationToken cancellationToken)
+			: service(service)
+			, queueName(queueName)
+			, cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<CreateQueueApiCall^>^ Invoke()
+		{
+			return service->PrepareCreateQueueAsync(queueName, cancellationToken);
+		}
+	};
+
+	ref class BodyPrepareCreateQueueAsync sealed
+	{
+		CancellationToken cancellationToken;
+
+	public:
+		BodyPrepareCreateQueueAsync(CancellationToken cancellationToken)
+			: cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<Tuple<HttpResponseMessage^, bool>^>^ Invoke(Task<CreateQueueApiCall^>^ task)
+		{
+			return task->Result->SendAsync(cancellationToken);
+		}
+	};
+
+	static bool SelectCreateQueueResult(Task<Tuple<HttpResponseMessage^, bool>^>^ task)
+	{
+		return task->Result->Item2;
+	}
+
+public:
+	void PrepareCreateQueue()
+	{
+		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
+		QueueName^ queueName = gcnew QueueName("ExampleQueue");
+		auto acquireWrapper = gcnew AcquirePrepareCreateQueueAsync(queuesService, queueName, CancellationToken::None);
+		auto acquire = gcnew Func<Task<CreateQueueApiCall^>^>(acquireWrapper, &AcquirePrepareCreateQueueAsync::Invoke);
+		auto bodyWrapper = gcnew BodyPrepareCreateQueueAsync(CancellationToken::None);
+		auto body = gcnew Func<Task<CreateQueueApiCall^>^, Task<Tuple<HttpResponseMessage^, bool>^>^>(bodyWrapper, &BodyPrepareCreateQueueAsync::Invoke);
+		auto select = gcnew Func<Task<Tuple<HttpResponseMessage^, bool>^>^, bool>(&SelectCreateQueueResult);
+		Task<bool>^ task = CoreTaskExtensions::Select(CoreTaskExtensions::Using(acquire, body), select);
+	}
+#pragma endregion
+
 	void CreateQueue()
 	{
 #pragma region CreateQueueAsync (TPL)
 		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
 		QueueName^ queueName = gcnew QueueName("ExampleQueue");
-		Task<bool>^ task = queuesService->CreateQueueAsync(queueName, CancellationToken::None);
+		Task<bool>^ task = QueuesServiceExtensions::CreateQueueAsync(queuesService, queueName, CancellationToken::None);
 #pragma endregion
 	}
+#pragma endregion
 
 	void DeleteQueue()
 	{

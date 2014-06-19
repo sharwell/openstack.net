@@ -134,35 +134,26 @@
         }
 
         /// <inheritdoc/>
-        public Task<bool> CreateQueueAsync(QueueName queueName, CancellationToken cancellationToken)
+        public Task<CreateQueueApiCall> PrepareCreateQueueAsync(QueueName queueName, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
 
             UriTemplate template = new UriTemplate("queues/{queue_name}");
-            var parameters = new Dictionary<string, string>
-                {
-                    { "queue_name", queueName.Value }
-                };
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value } };
 
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, cancellationToken);
-
-            Func<Task<Tuple<HttpResponseMessage, string>>, Task<bool>> parseResult =
-                task =>
+            Func<HttpResponseMessage, CancellationToken, Task<bool>> deserializeResult =
+                (responseMessage, _) =>
                 {
-                    if (task.Result.Item1.StatusCode == HttpStatusCode.Created)
+                    if (responseMessage.StatusCode == HttpStatusCode.Created)
                         return CompletedTask.FromResult(true);
-                    else
-                        return CompletedTask.FromResult(false);
-                };
 
-            Func<Task<HttpRequestMessage>, Task<bool>> requestResource =
-                GetResponseAsyncFunc(cancellationToken, parseResult);
+                    return CompletedTask.FromResult(false);
+                };
 
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, cancellationToken))
+                .Select(task => new CreateQueueApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
         /// <inheritdoc/>

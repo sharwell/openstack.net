@@ -717,6 +717,7 @@
     <Compile Include="OpenStack\Services\ObjectStorage\V1\UpdateContainerMetadataApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Claim.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\ClaimId.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\CreateQueueApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\GetHomeApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\GetNodeHealthApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\IQueuesService.cs" />

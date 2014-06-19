@@ -102,6 +102,31 @@
         }
         #endregion
 
+        #region CreateQueueAsync
+        public async Task PrepareCreateQueueAsyncAwait()
+        {
+            #region PrepareCreateQueueAsync (await)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            QueueName queueName = new QueueName("ExampleQueue");
+            CreateQueueApiCall apiCall = await queuesService.PrepareCreateQueueAsync(queueName, CancellationToken.None);
+            Tuple<HttpResponseMessage, bool> apiResponse = await apiCall.SendAsync(CancellationToken.None);
+            bool createdQueue = apiResponse.Item2;
+            #endregion
+        }
+
+        public void PrepareCreateQueue()
+        {
+            #region PrepareCreateQueueAsync (TPL)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            QueueName queueName = new QueueName("ExampleQueue");
+            Task<bool> createQueueTask =
+                CoreTaskExtensions.Using(
+                    () => queuesService.PrepareCreateQueueAsync(queueName, CancellationToken.None),
+                    task => task.Result.SendAsync(CancellationToken.None))
+                .Select(task => task.Result.Item2);
+            #endregion
+        }
+
         public async Task CreateQueueAsyncAwait()
         {
             #region CreateQueueAsync (await)
@@ -119,6 +144,7 @@
             Task<bool> task = queuesService.CreateQueueAsync(queueName, CancellationToken.None);
             #endregion
         }
+        #endregion
 
         public async Task DeleteQueueAsyncAwait()
         {

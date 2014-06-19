@@ -97,6 +97,33 @@ let getNodeHealth =
     //#endregion
     ()
 
+//
+// CreateQueueAsync
+//
+
+let prepareCreateQueueAsyncAwait =
+    async {
+        //#region PrepareCreateQueueAsync (await)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+        let queueName = new QueueName("ExampleQueue")
+        let! apiCall = queuesService.PrepareCreateQueueAsync(queueName, CancellationToken.None) |> Async.AwaitTask
+        let! responseMessage, createdQueue = apiCall.SendAsync(CancellationToken.None) |> Async.AwaitTask
+        //#endregion
+        ()
+    }
+
+let prepareCreateQueue =
+    //#region PrepareCreateQueueAsync (TPL)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+    let queueName = new QueueName("ExampleQueue")
+    let createdQueueTask =
+        CoreTaskExtensions.Using(
+            (fun () -> queuesService.PrepareCreateQueueAsync(queueName, CancellationToken.None)),
+            (fun (task : Task<CreateQueueApiCall>) -> task.Result.SendAsync(CancellationToken.None)))
+          .Select(fun (task : Task<HttpResponseMessage * bool>) -> snd task.Result)
+    //#endregion
+    ()
+
 let createQueueAsyncAwait =
     async {
         //#region CreateQueueAsync (await)
