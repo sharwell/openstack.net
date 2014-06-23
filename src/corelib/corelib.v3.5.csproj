@@ -706,6 +706,8 @@
     <Compile Include="OpenStack\Services\Queues\V1\MessageStatistics.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Message`1.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\NamespaceDoc.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\PostMessagesApiCall.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\PostMessagesResponse.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueryClaimApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Queue.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueuedMessage.cs" />

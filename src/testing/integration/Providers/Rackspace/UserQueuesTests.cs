@@ -5,11 +5,13 @@
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
+    using System.Net;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using global::OpenStack.Collections;
+    using global::OpenStack.Net;
     using global::OpenStack.ObjectModel.JsonHome;
     using global::OpenStack.Security.Authentication;
     using global::OpenStack.Services.Identity.V2;
@@ -367,16 +369,53 @@
                     new JObject(
                         new JProperty("type", "generic"));
                 Message genericMessage = new Message(TimeSpan.FromMinutes(50), genericBody);
-                await provider.PostMessagesAsync(queueName, cancellationTokenSource.Token);
-                await provider.PostMessagesAsync(queueName, Enumerable.Empty<Message>(), cancellationTokenSource.Token);
+
+                try
+                {
+                    await provider.PostMessagesAsync(queueName, cancellationTokenSource.Token);
+                    Assert.Fail("Expected an exception.");
+                }
+                catch (HttpWebException ex)
+                {
+                    Assert.AreEqual(HttpStatusCode.BadRequest, ex.ResponseMessage.StatusCode);
+                }
+
+                try
+                {
+                    await provider.PostMessagesAsync(queueName, Enumerable.Empty<Message>(), cancellationTokenSource.Token);
+                    Assert.Fail("Expected an exception.");
+                }
+                catch (HttpWebException ex)
+                {
+                    Assert.AreEqual(HttpStatusCode.BadRequest, ex.ResponseMessage.StatusCode);
+                }
+
                 await provider.PostMessagesAsync(queueName, cancellationTokenSource.Token, genericMessage);
                 await provider.PostMessagesAsync(queueName, new[] { genericMessage }, cancellationTokenSource.Token);
                 await provider.PostMessagesAsync(queueName, cancellationTokenSource.Token, genericMessage, genericMessage);
                 await provider.PostMessagesAsync(queueName, new[] { genericMessage, genericMessage }, cancellationTokenSource.Token);
 
                 Message<SampleMetadata> typedMessage = new Message<SampleMetadata>(TimeSpan.FromMinutes(40), new SampleMetadata(1, "Stuff!"));
-                await provider.PostMessagesAsync<SampleMetadata>(queueName, cancellationTokenSource.Token);
-                await provider.PostMessagesAsync<SampleMetadata>(queueName, Enumerable.Empty<Message<SampleMetadata>>(), cancellationTokenSource.Token);
+                try
+                {
+                    await provider.PostMessagesAsync<SampleMetadata>(queueName, cancellationTokenSource.Token);
+                    Assert.Fail("Expected an exception.");
+                }
+                catch (HttpWebException ex)
+                {
+                    Assert.AreEqual(HttpStatusCode.BadRequest, ex.ResponseMessage.StatusCode);
+                }
+
+                try
+                {
+                    await provider.PostMessagesAsync<SampleMetadata>(queueName, Enumerable.Empty<Message<SampleMetadata>>(), cancellationTokenSource.Token);
+                    Assert.Fail("Expected an exception.");
+                }
+                catch (HttpWebException ex)
+                {
+                    Assert.AreEqual(HttpStatusCode.BadRequest, ex.ResponseMessage.StatusCode);
+                }
+
                 await provider.PostMessagesAsync<SampleMetadata>(queueName, cancellationTokenSource.Token, typedMessage);
                 await provider.PostMessagesAsync<SampleMetadata>(queueName, new[] { typedMessage }, cancellationTokenSource.Token);
                 await provider.PostMessagesAsync<SampleMetadata>(queueName, cancellationTokenSource.Token, typedMessage, typedMessage);
