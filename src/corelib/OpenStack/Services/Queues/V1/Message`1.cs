@@ -2,6 +2,7 @@
 {
     using System;
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
 
     /// <summary>
     /// Represents a queue message with a strongly-typed body.
@@ -10,19 +11,19 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class Message<T>
+    public class Message<T> : ExtensibleJsonObject
     {
         /// <summary>
         /// The backing field for the <see cref="TimeToLive"/> property.
         /// This value is stored in seconds.
         /// </summary>
-        [JsonProperty("ttl")]
-        private long _timeToLive;
+        [JsonProperty("ttl", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private long? _timeToLive;
 
         /// <summary>
         /// The backing field for the <see cref="Body"/> property.
         /// </summary>
-        [JsonProperty("body")]
+        [JsonProperty("body", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private T _body;
 
         /// <summary>
@@ -53,11 +54,14 @@
         /// <summary>
         /// Gets the time-to-live for the message.
         /// </summary>
-        public TimeSpan TimeToLive
+        public TimeSpan? TimeToLive
         {
             get
             {
-                return TimeSpan.FromSeconds(_timeToLive);
+                if (_timeToLive == null)
+                    return null;
+
+                return TimeSpan.FromSeconds(_timeToLive.Value);
             }
         }
 
