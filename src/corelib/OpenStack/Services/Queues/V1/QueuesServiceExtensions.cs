@@ -541,10 +541,98 @@
         #region Claims
 
         /// <summary>
+        /// Claim messages from a queue.
+        /// </summary>
+        /// <remarks>
+        /// <para>When the claim is no longer required, the code should call <see cref="ClaimHandle.DisposeAsync"/>
+        /// or <see cref="ClaimHandle.Dispose()"/> to ensure the following actions are taken.</para>
+        /// <list type="bullet">
+        /// <item>Messages which are part of this claim which were not processed are made available to other nodes.</item>
+        /// <item>The claim resource is cleaned up without waiting for the time-to-live to expire.</item>
+        /// </list>
+        ///
+        /// <para>Messages which are not deleted before the claim is released will be eligible for
+        /// reclaiming by another process.</para>
+        /// </remarks>
+        /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
+        /// <param name="queueName">The queue name.</param>
+        /// <param name="timeToLive">The time to live of the claim.</param>
+        /// <param name="gracePeriod">The message grace period. Claimed messages are prevented from expiring until the claim's time-to-live has lapsed followed by this additional grace period.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// a <see cref="Claim"/> object containing detailed information about the claimed
+        /// messages.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="service"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="queueName"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the operation.</exception>
+        /// <seealso cref="IQueuesService.PrepareClaimMessagesAsync"/>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Claim_Messages">Claim Messages (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task<ClaimHandle> ClaimMessagesAsync(this IQueuesService service, QueueName queueName, TimeSpan timeToLive, TimeSpan gracePeriod, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareClaimMessagesAsync(queueName, new ClaimData(timeToLive, gracePeriod), cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(
+                    task =>
+                    {
+                        Uri location = null;
+                        Uri relativeLocation = task.Result.Item2.Item1;
+                        if (relativeLocation != null)
+                        {
+                            Uri requestUri = task.Result.Item1.RequestMessage.RequestUri;
+                            location = new Uri(requestUri, task.Result.Item2.Item1);
+                        }
+
+                        return new ClaimHandle(service, queueName, location, task.Result.Item2.Item2);
+                    });
+        }
+
+        /// <summary>
+        /// Get detailed information about the current state of a claim.
+        /// </summary>
+        /// <remarks>
+        /// <note type="caller">Use <see cref="ClaimHandle.RefreshAsync"/> instead of calling this method directly.</note>
+        /// </remarks>
+        /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
+        /// <param name="queueName">The queue name.</param>
+        /// <param name="claimId">The ID of the claim to update.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// a <see cref="Claim"/> instance containing the updated information about the claim.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="service"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="queueName"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="claimId"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the operation.</exception>
+        /// <seealso cref="IQueuesService.PrepareQueryClaimAsync"/>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Query_Claim">Query Claim (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task<Claim> QueryClaimAsync(this IQueuesService service, QueueName queueName, ClaimId claimId, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () => service.PrepareQueryClaimAsync(queueName, claimId, cancellationToken),
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2.Item2);
+        }
+
+        /// <summary>
         /// Renew a claim, by updating the time-to-live and resetting the age of the claim to zero.
         /// </summary>
         /// <remarks>
-        /// <note type="caller">Use <see cref="Claim.RenewAsync"/> instead of calling this method directly.</note>
+        /// <note type="caller">Use <see cref="ClaimHandle.RenewAsync"/> instead of calling this method directly.</note>
         /// </remarks>
         /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
         /// <param name="queueName">The queue name.</param>
@@ -574,7 +662,7 @@
         /// with the claim available to other workers.
         /// </summary>
         /// <remarks>
-        /// <note type="caller">Use <see cref="Claim.DisposeAsync"/> instead of calling this method directly.</note>
+        /// <note type="caller">Use <see cref="ClaimHandle.DisposeAsync"/> instead of calling this method directly.</note>
         /// </remarks>
         /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
         /// <param name="queueName">The queue name.</param>

@@ -538,108 +538,59 @@
         }
 
         /// <inheritdoc/>
-        public Task<Claim> ClaimMessageAsync(QueueName queueName, int? limit, TimeSpan timeToLive, TimeSpan gracePeriod, CancellationToken cancellationToken)
+        public Task<ClaimMessagesApiCall> PrepareClaimMessagesAsync(QueueName queueName, ClaimData claimData, CancellationToken cancellationToken)
         {
-            if (queueName == null)
-                throw new ArgumentNullException("queueName");
-            if (limit < 0)
-                throw new ArgumentOutOfRangeException("limit");
-            if (timeToLive <= TimeSpan.Zero)
-                throw new ArgumentOutOfRangeException("timeToLive");
-            if (gracePeriod < TimeSpan.Zero)
-                throw new ArgumentOutOfRangeException("gracePeriod");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/claims");
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value } };
 
-            UriTemplate template = new UriTemplate("queues/{queue_name}/claims{?limit}");
-
-            var parameters =
-                new Dictionary<string, string>()
+            Func<HttpResponseMessage, CancellationToken, Task<Tuple<Uri, Claim>>> deserializeResult =
+                (responseMessage, _) =>
                 {
-                    { "queue_name", queueName.Value },
-                };
-            if (limit != null)
-                parameters["limit"] = limit.ToString();
-
-            var request =
-                new JObject(
-                    new JProperty("ttl", (long)timeToLive.TotalSeconds),
-                    new JProperty("grace", (long)gracePeriod.TotalSeconds));
-
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request, cancellationToken);
-
-            Func<Task<Tuple<HttpResponseMessage, string>>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> parseResult =
-                task => GetBaseUriAsync(cancellationToken).Then(
-                    baseUriTask =>
+                    Uri location = responseMessage.Headers.Location;
+                    if (responseMessage.StatusCode == HttpStatusCode.NoContent)
                     {
-                        Uri relativeLocation = task.Result.Item1.Headers.Location;
-                        Uri location = relativeLocation != null ? new Uri(baseUriTask.Result, relativeLocation) : null;
-                        if (task.Result.Item1.StatusCode == HttpStatusCode.NoContent)
-                        {
-                            // the queue did not contain any messages to claim
-                            Tuple<Uri, IEnumerable<QueuedMessage>> result = Tuple.Create(location, Enumerable.Empty<QueuedMessage>());
-                            return CompletedTask.FromResult(result);
-                        }
+                        Claim claim = new Claim(claimData.TimeToLive, null, TimeSpan.Zero, new QueuedMessage[0]);
+                        Tuple<Uri, Claim> result = Tuple.Create(location, claim);
+                        return CompletedTask.FromResult(result);
+                    }
 
-                        IEnumerable<QueuedMessage> messages = JsonConvert.DeserializeObject<IEnumerable<QueuedMessage>>(task.Result.Item2);
-
-                        return CompletedTask.FromResult(Tuple.Create(location, messages));
-                    });
-            Func<Task<HttpRequestMessage>, Task<Tuple<Uri, IEnumerable<QueuedMessage>>>> requestResource =
-                GetResponseAsyncFunc<Tuple<Uri, IEnumerable<QueuedMessage>>>(cancellationToken, parseResult);
-
-            Func<Task<Tuple<Uri, IEnumerable<QueuedMessage>>>, Claim> resultSelector =
-                task => new Claim(this, queueName, task.Result.Item1, timeToLive, TimeSpan.Zero, true, task.Result.Item2);
+                    return responseMessage.Content.ReadAsStringAsync()
+                        .Select(
+                            innerTask =>
+                            {
+                                QueuedMessage[] messages = JsonConvert.DeserializeObject<QueuedMessage[]>(innerTask.Result);
+                                Claim claim = new Claim(claimData.TimeToLive, null, TimeSpan.Zero, messages);
+                                return Tuple.Create(location, claim);
+                            });
+                };
 
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource)
-                .Select(resultSelector);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, claimData, cancellationToken))
+                .Select(task => new ClaimMessagesApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
         /// <inheritdoc/>
-        public Task<Claim> QueryClaimAsync(QueueName queueName, Claim claim, CancellationToken cancellationToken)
+        public Task<QueryClaimApiCall> PrepareQueryClaimAsync(QueueName queueName, ClaimId claimId, CancellationToken cancellationToken)
         {
-            if (queueName == null)
-                throw new ArgumentNullException("queueName");
-            if (claim == null)
-                throw new ArgumentNullException("claim");
-
             UriTemplate template = new UriTemplate("queues/{queue_name}/claims/{claim_id}");
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value }, { "claim_id", claimId.Value } };
 
-            var parameters =
-                new Dictionary<string, string>()
+            Func<HttpResponseMessage, CancellationToken, Task<Tuple<Uri, Claim>>> deserializeResult =
+                (responseMessage, _) =>
                 {
-                    { "queue_name", queueName.Value },
-                    { "claim_id", claim.Id.Value }
+                    return responseMessage.Content.ReadAsStringAsync()
+                        .Select(
+                            innerTask =>
+                            {
+                                Uri location = responseMessage.Content.Headers.ContentLocation;
+                                Claim claim = JsonConvert.DeserializeObject<Claim>(innerTask.Result);
+                                return Tuple.Create(location, claim);
+                            });
                 };
 
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken);
-
-            Func<Task<Tuple<HttpResponseMessage, string>>, Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>> parseResult =
-                task => GetBaseUriAsync(cancellationToken).Then(
-                    baseUriTask =>
-                    {
-                        // this response uses ContentLocation instead of Location
-                        Uri relativeLocation = task.Result.Item1.Content.Headers.ContentLocation;
-                        Uri location = relativeLocation != null ? new Uri(baseUriTask.Result, relativeLocation) : null;
-
-                        JObject result = JsonConvert.DeserializeObject<JObject>(task.Result.Item2);
-                        TimeSpan age = TimeSpan.FromSeconds((int)result["age"]);
-                        TimeSpan ttl = TimeSpan.FromSeconds((int)result["ttl"]);
-                        IEnumerable<QueuedMessage> messages = result["messages"].ToObject<IEnumerable<QueuedMessage>>();
-                        return CompletedTask.FromResult(Tuple.Create(location, ttl, age, messages));
-                    });
-            Func<Task<HttpRequestMessage>, Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>> requestResource =
-                GetResponseAsyncFunc(cancellationToken, parseResult);
-
-            Func<Task<Tuple<Uri, TimeSpan, TimeSpan, IEnumerable<QueuedMessage>>>, Claim> resultSelector =
-                task => new Claim(this, queueName, task.Result.Item1, task.Result.Item2, task.Result.Item3, false, task.Result.Item4);
-
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource)
-                .Select(resultSelector);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
+                .Select(task => new QueryClaimApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
         /// <inheritdoc/>
