@@ -510,11 +510,14 @@
         #region Claims
 
         /// <summary>
-        /// Claim messages from a queue.
+        /// Prepare an API call to claim messages from a queue.
         /// </summary>
         /// <remarks>
-        /// When the claim is no longer required, the code should call <see cref="Claim.DisposeAsync"/>
-        /// or <see cref="Claim.Dispose()"/> to ensure the following actions are taken.
+        /// The OpenStack Queues API requires the <paramref name="claimData"/> argument specify both the
+        /// <see cref="ClaimData.TimeToLive"/> and <see cref="ClaimData.GracePeriod"/> properties.
+        ///
+        /// <para>When the claim is no longer required, the code should call <see cref="ClaimHandle.DisposeAsync"/>
+        /// or <see cref="ClaimHandle.Dispose()"/> to ensure the following actions are taken.</para>
         /// <list type="bullet">
         /// <item>Messages which are part of this claim which were not processed are made available to other nodes.</item>
         /// <item>The claim resource is cleaned up without waiting for the time-to-live to expire.</item>
@@ -524,48 +527,54 @@
         /// reclaiming by another process.</para>
         /// </remarks>
         /// <param name="queueName">The queue name.</param>
-        /// <param name="limit">The maximum number of messages to claim. If this value is <see langword="null"/>, a provider-specific default value is used.</param>
-        /// <param name="timeToLive">The time to wait before the server automatically releases the claim.</param>
-        /// <param name="gracePeriod">The time to wait, after the time-to-live for the claim expires, before the server allows the claimed messages to be deleted due to the individual message's time-to-live expiring.</param>
+        /// <param name="claimData">A <see cref="ClaimData"/> instance containing the parameters for the claim.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain <see cref="Claim"/> object representing the claim.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="queueName"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// If <paramref name="limit"/> is less than or equal to 0.
-        /// <para>-or-</para>
-        /// <para>If <paramref name="timeToLive"/> is negative or <see cref="TimeSpan.Zero"/>.</para>
-        /// <para>-or-</para>
-        /// <para>If <paramref name="gracePeriod"/> is negative.</para>
-        /// </exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
-        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Claim_Messages">Claim Messages (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task<Claim> ClaimMessageAsync(QueueName queueName, int? limit, TimeSpan timeToLive, TimeSpan gracePeriod, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Gets detailed information about the current state of a claim.
-        /// </summary>
-        /// <remarks>
-        /// <note type="caller">Use <see cref="Claim.RefreshAsync"/> instead of calling this method directly.</note>
-        /// </remarks>
-        /// <param name="queueName">The queue name.</param>
-        /// <param name="claim">The claim to query.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain a <see cref="Claim"/> object representing the claim.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="queueName"/> is <see langword="null"/>.
         /// <para>-or-</para>
-        /// <para>If <paramref name="claim"/> is <see langword="null"/>.</para>
+        /// <para>If <paramref name="claimData"/> is <see langword="null"/>.</para>
         /// </exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="ClaimMessagesApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.ClaimMessagesAsync"/>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Claim_Messages">Claim Messages (OpenStack Marconi API v1 Blueprint)</seealso>
+        Task<ClaimMessagesApiCall> PrepareClaimMessagesAsync(QueueName queueName, ClaimData claimData, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Prepare an API call to get detailed information about the current state of a claim.
+        /// </summary>
+        /// <remarks>
+        /// <note type="caller">Use <see cref="ClaimHandle.RefreshAsync"/> instead of calling this method directly.</note>
+        /// </remarks>
+        /// <param name="queueName">The queue name.</param>
+        /// <param name="claimId">The ID of the claim to update.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="queueName"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="claimId"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <seealso cref="QueryClaimApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.QueryClaimAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#Query_Claim">Query Claim (OpenStack Marconi API v1 Blueprint)</seealso>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        Task<Claim> QueryClaimAsync(QueueName queueName, Claim claim, CancellationToken cancellationToken);
+        Task<QueryClaimApiCall> PrepareQueryClaimAsync(QueueName queueName, ClaimId claimId, CancellationToken cancellationToken);
 
         /// <summary>
         /// Prepare an API call to renew a claim, by updating the time-to-live and resetting the age of the claim to zero.
         /// </summary>
         /// <remarks>
-        /// <note type="caller">Use <see cref="Claim.RenewAsync"/> instead of calling this method directly.</note>
+        /// <note type="caller">Use <see cref="ClaimHandle.RenewAsync"/> instead of calling this method directly.</note>
         /// </remarks>
         /// <param name="queueName">The queue name.</param>
         /// <param name="claimId">The ID of the claim to update.</param>
@@ -594,7 +603,7 @@
         /// with the claim available to other workers.
         /// </summary>
         /// <remarks>
-        /// <note type="caller">Use <see cref="Claim.DisposeAsync"/> instead of calling this method directly.</note>
+        /// <note type="caller">Use <see cref="ClaimHandle.DisposeAsync"/> instead of calling this method directly.</note>
         /// </remarks>
         /// <param name="queueName">The queue name.</param>
         /// <param name="claimId">The ID of the claim to release.</param>

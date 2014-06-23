@@ -481,9 +481,9 @@
                     while (true)
                     {
                         // process reply messages
-                        using (Claim claim = await queuesService.ClaimMessageAsync(replyQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1), token))
+                        using (ClaimHandle claim = await queuesService.ClaimMessagesAsync(replyQueueName, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1), token))
                         {
-                            foreach (QueuedMessage queuedMessage in claim.Messages)
+                            foreach (QueuedMessage queuedMessage in claim.Claim.Messages)
                             {
                                 CalculatorResult result = queuedMessage.Body.ToObject<CalculatorResult>();
                                 if (result._id == message.Body._id)
@@ -553,11 +553,11 @@
                 while (true)
                 {
                     // process request messages
-                    using (Claim claim = await queuesService.ClaimMessageAsync(requestQueueName, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1), token))
+                    using (ClaimHandle claim = await queuesService.ClaimMessagesAsync(requestQueueName, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1), token))
                     {
                         List<QueuedMessage> messagesToRemove = new List<QueuedMessage>();
 
-                        foreach (QueuedMessage queuedMessage in claim.Messages)
+                        foreach (QueuedMessage queuedMessage in claim.Claim.Messages)
                         {
                             CalculatorOperation operation = queuedMessage.Body.ToObject<CalculatorOperation>();
                             CalculatorResult result;
@@ -702,26 +702,26 @@
             await provider.PostMessagesAsync(queueName, cancellationTokenSource.Token, new Message<SampleMetadata>(TimeSpan.FromSeconds(120), new SampleMetadata(3, "yes")));
 
             QueueStatistics statistics;
-            using (Claim claim = await provider.ClaimMessageAsync(queueName, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(1), cancellationTokenSource.Token))
+            using (ClaimHandle claim = await provider.ClaimMessagesAsync(queueName, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(1), cancellationTokenSource.Token))
             {
-                Assert.AreEqual(TimeSpan.FromMinutes(5), claim.TimeToLive);
+                Assert.AreEqual(TimeSpan.FromMinutes(5), claim.Claim.TimeToLive);
 
-                Assert.IsNotNull(claim.Messages);
-                Assert.AreEqual(1, claim.Messages.Count);
+                Assert.IsNotNull(claim.Claim.Messages);
+                Assert.AreEqual(1, claim.Claim.Messages.Count);
 
                 statistics = await provider.GetQueueStatisticsAsync(queueName, cancellationTokenSource.Token);
                 Assert.AreEqual(1, statistics.MessageStatistics.Claimed);
 
-                QueuedMessage message = await provider.GetMessageAsync(queueName, claim.Messages[0].Id, cancellationTokenSource.Token);
+                QueuedMessage message = await provider.GetMessageAsync(queueName, claim.Claim.Messages[0].Id, cancellationTokenSource.Token);
                 Assert.IsNotNull(message);
 
-                TimeSpan age = claim.Age;
+                TimeSpan? age = claim.Claim.Age;
                 await Task.Delay(TimeSpan.FromSeconds(2));
                 await claim.RefreshAsync(cancellationTokenSource.Token);
-                Assert.IsTrue(claim.Age >= age + TimeSpan.FromSeconds(2));
+                Assert.IsTrue(claim.Claim.Age >= age + TimeSpan.FromSeconds(2));
 
                 await claim.RenewAsync(TimeSpan.FromMinutes(10), cancellationTokenSource.Token);
-                Assert.AreEqual(TimeSpan.FromMinutes(10), claim.TimeToLive);
+                Assert.AreEqual(TimeSpan.FromMinutes(10), claim.Claim.TimeToLive);
             }
 
             statistics = await provider.GetQueueStatisticsAsync(queueName, cancellationTokenSource.Token);
