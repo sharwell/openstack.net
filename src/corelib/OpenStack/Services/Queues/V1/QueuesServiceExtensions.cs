@@ -140,6 +140,51 @@
         }
 
         /// <summary>
+        /// Get a list of queues.
+        /// </summary>
+        /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
+        /// <param name="detailed"><see langword="true"/> to return detailed information about each queue; otherwise, <see langword="false"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// a collection of <see cref="Queue"/> instances describing the queues.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="service"/> is <see langword="null"/>.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the operation.</exception>
+        /// <example>
+        /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
+        /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
+        /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
+        /// <token>AsyncAwaitExample</token>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="ListQueuesAsync (await)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="ListQueuesAsync (await)" language="vbnet"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="ListQueuesAsync (await)" language="fs"/>
+        /// <token>TplExample</token>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="ListQueuesAsync (TPL)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="ListQueuesAsync (TPL)" language="vbnet"/>
+        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="ListQueuesAsync (TPL)" language="cpp"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="ListQueuesAsync (TPL)" language="fs"/>
+        /// </example>
+        /// <seealso cref="IQueuesService.PrepareListQueuesAsync"/>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#List_Queues">List Queues (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task<ReadOnlyCollectionPage<Queue>> ListQueuesAsync(this IQueuesService service, bool detailed, CancellationToken cancellationToken)
+        {
+            return
+                CoreTaskExtensions.Using(
+                    () =>
+                    {
+                        var apiCall = service.PrepareListQueuesAsync(cancellationToken);
+                        if (detailed)
+                            apiCall = apiCall.WithDetails();
+
+                        return apiCall;
+                    },
+                    task => task.Result.SendAsync(cancellationToken))
+                .Select(task => task.Result.Item2);
+        }
+
+        /// <summary>
         /// Check for the existence of a queue with a particular name.
         /// </summary>
         /// <param name="service">The <see cref="IQueuesService"/> instance.</param>
@@ -511,5 +556,96 @@
         }
 
         #endregion
+
+        /// <summary>
+        /// Update an HTTP API call prepared by <see cref="IQueuesService.PrepareListQueuesAsync"/>
+        /// to include the <c>limit</c> query parameter, limiting the maximum number of items in the returned
+        /// list of queues to a specified value.
+        /// </summary>
+        /// <param name="task">A <see cref="Task"/> representing an asynchronous operation to prepare a <see cref="ListQueuesApiCall"/> HTTP API call.</param>
+        /// <param name="pageSize">The maximum number of queues to return in a single page of the resulting API call.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property contains
+        /// the modified API call.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">If the API call provided by <paramref name="task"/> has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">If the API call provided by <paramref name="task"/> has already been sent.</exception>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#List_Queues">List Queues (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task<ListQueuesApiCall> WithPageSize(this Task<ListQueuesApiCall> task, int pageSize)
+        {
+            if (task == null)
+                throw new ArgumentNullException("task");
+
+            return task.WithQueryParameter("limit", pageSize.ToString());
+        }
+
+        /// <summary>
+        /// Updates the HTTP API call created by <see cref="IQueuesService.PrepareListQueuesAsync"/>
+        /// to include the <c>detailed</c> query parameter. The value of the parameter is <c>true</c>.
+        /// </summary>
+        /// <param name="task">A <see cref="Task"/> representing the asynchronous operation to prepare an HTTP API call.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property contains
+        /// the modified API call.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">If the API call provided by <paramref name="task"/> has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">If the API call provided by <paramref name="task"/> has already been sent.</exception>
+        /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#List_Queues">List Queues (OpenStack Marconi API v1 Blueprint)</seealso>
+        public static Task<ListQueuesApiCall> WithDetails(this Task<ListQueuesApiCall> task)
+        {
+            if (task == null)
+                throw new ArgumentNullException("task");
+
+            return task.WithQueryParameter("detailed", "true");
+        }
+
+        /// <summary>
+        /// Update a generic <see cref="IHttpApiRequest"/> to add or update a query parameter
+        /// to a specific value.
+        /// </summary>
+        /// <typeparam name="TCall">The type of the HTTP API request.</typeparam>
+        /// <param name="task">A <see cref="Task"/> representing an asynchronous operation to prepare HTTP API request.</param>
+        /// <param name="parameter">The name of the query parameter to add or update.</param>
+        /// <param name="value">The value of the query parameter.</param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property contains
+        /// the modified API call.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="task"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="parameter"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="value"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="parameter"/> is empty.</exception>
+        /// <exception cref="ObjectDisposedException">If the API call provided by <paramref name="task"/> has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">If the API call provided by <paramref name="task"/> has already been sent.</exception>
+        private static Task<TCall> WithQueryParameter<TCall>(this Task<TCall> task, string parameter, string value)
+            where TCall : IHttpApiRequest
+        {
+            if (task == null)
+                throw new ArgumentNullException("task");
+            if (parameter == null)
+                throw new ArgumentNullException("parameter");
+            if (value == null)
+                throw new ArgumentNullException("value");
+            if (string.IsNullOrEmpty(parameter))
+                throw new ArgumentException("parameter cannot be empty", "parameter");
+
+            return task.Select(
+                innerTask =>
+                {
+                    Uri requestUri = innerTask.Result.RequestMessage.RequestUri;
+                    requestUri = UriUtility.SetQueryParameter(requestUri, parameter, value);
+                    innerTask.Result.RequestMessage.RequestUri = requestUri;
+                    return innerTask.Result;
+                });
+        }
     }
 }

@@ -756,7 +756,16 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            return await (await provider.ListQueuesAsync(null, limit, detailed, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
+            Task<ListQueuesApiCall> apiCallTask = provider.PrepareListQueuesAsync(cancellationToken);
+            if (limit.HasValue)
+                apiCallTask = apiCallTask.WithPageSize(limit.Value);
+            if (detailed)
+                apiCallTask = apiCallTask.WithDetails();
+
+            using (ListQueuesApiCall apiCall = await apiCallTask)
+            {
+                return await (await apiCall.SendAsync(cancellationToken)).Item2.GetAllPagesAsync(cancellationToken, progress);
+            }
         }
 
         /// <summary>

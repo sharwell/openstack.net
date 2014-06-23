@@ -698,6 +698,7 @@
     <Compile Include="OpenStack\Services\Queues\V1\GetQueueMetadataApiCall`1.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\GetQueueStatisticsApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\IQueuesService.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\ListQueuesApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Message.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\MessageId.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\MessageStatistics.cs" />

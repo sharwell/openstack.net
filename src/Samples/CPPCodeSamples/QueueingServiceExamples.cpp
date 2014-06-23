@@ -278,13 +278,72 @@ public:
 	}
 #pragma endregion
 
+#pragma region ListQueuesAsync
+#pragma region PrepareListQueuesAsync (TPL)
+private:
+	ref class AcquirePrepareListQueuesAsync sealed
+	{
+		IQueuesService^ service;
+		CancellationToken cancellationToken;
+
+	public:
+		AcquirePrepareListQueuesAsync(IQueuesService^ service, CancellationToken cancellationToken)
+			: service(service)
+			, cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<ListQueuesApiCall^>^ Invoke()
+		{
+			return service->PrepareListQueuesAsync(cancellationToken);
+		}
+	};
+
+	ref class BodyPrepareListQueuesAsync sealed
+	{
+		CancellationToken cancellationToken;
+
+	public:
+		BodyPrepareListQueuesAsync(CancellationToken cancellationToken)
+			: cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<Tuple<HttpResponseMessage^, ReadOnlyCollectionPage<Queue^>^>^>^ Invoke(Task<ListQueuesApiCall^>^ task)
+		{
+			return task->Result->SendAsync(cancellationToken);
+		}
+	};
+
+	static ReadOnlyCollectionPage<Queue^>^ SelectListQueuesResult(Task<Tuple<HttpResponseMessage^, ReadOnlyCollectionPage<Queue^>^>^>^ task)
+	{
+		return task->Result->Item2;
+	}
+
+public:
+	void PrepareListQueues()
+	{
+		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
+		auto acquireWrapper = gcnew AcquirePrepareListQueuesAsync(queuesService, CancellationToken::None);
+		auto acquire = gcnew Func<Task<ListQueuesApiCall^>^>(acquireWrapper, &AcquirePrepareListQueuesAsync::Invoke);
+		auto bodyWrapper = gcnew BodyPrepareListQueuesAsync(CancellationToken::None);
+		auto body = gcnew Func<Task<ListQueuesApiCall^>^, Task<Tuple<HttpResponseMessage^, ReadOnlyCollectionPage<Queue^>^>^>^>(bodyWrapper, &BodyPrepareListQueuesAsync::Invoke);
+		auto select = gcnew Func<Task<Tuple<HttpResponseMessage^, ReadOnlyCollectionPage<Queue^>^>^>^, ReadOnlyCollectionPage<Queue^>^>(&SelectListQueuesResult);
+		Task<ReadOnlyCollectionPage<Queue^>^>^ listQueuesTask = CoreTaskExtensions::Select(CoreTaskExtensions::Using(acquire, body), select);
+
+		// The GetAllPagesContinuationAsync method is defined in the example for QueuesServiceExtensions::ListQueuesAsync
+		auto func = gcnew Func<Task<ReadOnlyCollectionPage<Queue^>^>^, Task<ReadOnlyCollection<Queue^>^>^>(GetAllPagesContinuationAsync<Queue^>);
+		Task<ReadOnlyCollection<Queue^>^>^ allQueuesTask = CoreTaskExtensions::Then(listQueuesTask, func);
+	}
+#pragma endregion
+
 #pragma region ListQueuesAsync (TPL)
 	void ListQueues()
 	{
 		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
-		Task<ReadOnlyCollectionPage<Queue^>^>^ queuesPageTask = queuesService->ListQueuesAsync(nullptr, Nullable<int>(), true, CancellationToken::None);
+		Task<ReadOnlyCollectionPage<Queue^>^>^ queuesPageTask = QueuesServiceExtensions::ListQueuesAsync(queuesService, true, CancellationToken::None);
 		auto func = gcnew Func<Task<ReadOnlyCollectionPage<Queue^>^>^, Task<ReadOnlyCollection<Queue^>^>^>(GetAllPagesContinuationAsync<Queue^>);
-		Task<ReadOnlyCollection<Queue^>^>^ queuesTask = TaskExtensions::Unwrap(queuesPageTask->ContinueWith(func));
+		Task<ReadOnlyCollection<Queue^>^>^ queuesTask = CoreTaskExtensions::Then(queuesPageTask, func);
 	}
 
 	generic<class T>
@@ -292,6 +351,7 @@ public:
 	{
 		return ReadOnlyCollectionPageExtensions::GetAllPagesAsync(pageTask->Result, CancellationToken::None, static_cast<IProgress<ReadOnlyCollectionPage<T>^>^>(nullptr));
 	}
+#pragma endregion
 #pragma endregion
 
 #pragma region QueueExistsAsync

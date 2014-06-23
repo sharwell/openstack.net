@@ -13,6 +13,7 @@
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
     using OpenStack.Compat;
+    using OpenStack.Net;
     using OpenStack.ObjectModel.JsonHome;
     using OpenStack.Security.Authentication;
     using Rackspace.Net;
@@ -157,47 +158,45 @@
         }
 
         /// <inheritdoc/>
-        public Task<ReadOnlyCollectionPage<Queue>> ListQueuesAsync(QueueName marker, int? limit, bool detailed, CancellationToken cancellationToken)
+        public Task<ListQueuesApiCall> PrepareListQueuesAsync(CancellationToken cancellationToken)
         {
-            if (limit <= 0)
-                throw new ArgumentOutOfRangeException("limit");
+            UriTemplate template = new UriTemplate("queues");
+            var parameters = new Dictionary<string, string>();
 
-            UriTemplate template = new UriTemplate("queues{?marker,limit,detailed}");
-            var parameters = new Dictionary<string, string>
+            Func<HttpResponseMessage, CancellationToken, Task<ReadOnlyCollectionPage<Queue>>> deserializeResult =
+                (responseMessage, _) =>
                 {
-                    { "detailed", detailed.ToString().ToLowerInvariant() },
-                };
-            if (marker != null)
-                parameters.Add("marker", marker.Value);
-            if (limit.HasValue)
-                parameters.Add("limit", limit.ToString());
+                    if (responseMessage.StatusCode == HttpStatusCode.NoContent)
+                        return CompletedTask.FromResult(ReadOnlyCollectionPage<Queue>.Empty);
 
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken);
+                    if (!HttpApiCall.IsAcceptable(responseMessage))
+                        throw new HttpWebException(responseMessage);
 
-            Func<Task<HttpRequestMessage>, Task<ListCloudQueuesResponse>> requestResource =
-                GetResponseAsyncFunc<ListCloudQueuesResponse>(cancellationToken);
+                    Uri originalUri = responseMessage.RequestMessage.RequestUri;
+                    return responseMessage.Content.ReadAsStringAsync()
+                        .Select(
+                            innerTask =>
+                            {
+                                if (string.IsNullOrEmpty(innerTask.Result))
+                                    return null;
 
-            Func<Task<ListCloudQueuesResponse>, ReadOnlyCollectionPage<Queue>> resultSelector =
-                task =>
-                {
-                    ReadOnlyCollectionPage<Queue> page = null;
-                    if (task.Result != null && task.Result.Queues != null)
-                    {
-                        Queue lastQueue = task.Result.Queues.LastOrDefault();
-                        QueueName nextMarker = lastQueue != null ? lastQueue.Name : marker;
-                        Func<CancellationToken, Task<ReadOnlyCollectionPage<Queue>>> getNextPageAsync =
-                            nextCancellationToken => ListQueuesAsync(nextMarker, limit, detailed, nextCancellationToken);
-                        page = new BasicReadOnlyCollectionPage<Queue>(task.Result.Queues, getNextPageAsync);
-                    }
+                                JObject responseObject = JsonConvert.DeserializeObject<JObject>(innerTask.Result);
+                                JArray queuesArray = responseObject["queues"] as JArray;
+                                if (queuesArray == null)
+                                    return null;
 
-                    return page ?? ReadOnlyCollectionPage<Queue>.Empty;
+                                IList<Queue> list = queuesArray.ToObject<Queue[]>();
+                                Func<CancellationToken, Task<ReadOnlyCollectionPage<Queue>>> getNextPageAsync =
+                                    CreateGetNextPageAsyncDelegate<ListQueuesApiCall, Queue>(PrepareListQueuesAsync, responseObject);
+
+                                ReadOnlyCollectionPage<Queue> results = new BasicReadOnlyCollectionPage<Queue>(list, getNextPageAsync);
+                                return results;
+                            });
                 };
 
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource)
-                .Select(resultSelector);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
+                .Select(task => new ListQueuesApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
         /// <inheritdoc/>
@@ -742,43 +741,36 @@
             return request;
         }
 
-        /// <threadsafety static="true" instance="false"/>
-        /// <preliminary/>
-        [JsonObject(MemberSerialization.OptIn)]
-        protected class ListCloudQueuesResponse
+        private static Func<CancellationToken, Task<ReadOnlyCollectionPage<TElement>>> CreateGetNextPageAsyncDelegate<TCall, TElement>(Func<CancellationToken, Task<TCall>> prepareApiCall, JObject responseObject)
+            where TCall : IHttpApiCall<ReadOnlyCollectionPage<TElement>>
         {
-#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
-            [JsonProperty("links")]
-            private Link[] _links;
+            if (responseObject == null)
+                return null;
 
-            [JsonProperty("queues")]
-            private Queue[] _queues;
-#pragma warning restore 649
+            JArray linksArray = responseObject["links"] as JArray;
+            if (linksArray == null)
+                return null;
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ListCloudQueuesResponse"/> class
-            /// during JSON deserialization.
-            /// </summary>
-            [JsonConstructor]
-            protected ListCloudQueuesResponse()
-            {
-            }
+            Link[] links = linksArray.ToObject<Link[]>();
+            Link nextLink = links.FirstOrDefault(i => string.Equals("next", i.Relation, StringComparison.OrdinalIgnoreCase));
+            if (nextLink == null)
+                return null;
 
-            public Link[] Links
-            {
-                get
+            return
+                cancellationToken =>
                 {
-                    return _links;
-                }
-            }
-
-            public Queue[] Queues
-            {
-                get
-                {
-                    return _queues;
-                }
-            }
+                    return
+                        CoreTaskExtensions.Using(
+                            () => prepareApiCall(cancellationToken)
+                                .Select(
+                                    _ =>
+                                    {
+                                        _.Result.RequestMessage.RequestUri = new Uri(_.Result.RequestMessage.RequestUri, nextLink.Target);
+                                        return _.Result;
+                                    }),
+                            _ => _.Result.SendAsync(cancellationToken))
+                        .Select(_ => _.Result.Item2);
+                };
         }
 
         /// <threadsafety static="true" instance="false"/>

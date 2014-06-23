@@ -1,4 +1,5 @@
-﻿Imports System.Net.Http
+﻿Imports System.Collections.ObjectModel
+Imports System.Net.Http
 Imports System.Threading
 Imports System.Threading.Tasks
 Imports OpenStack.Collections
@@ -164,10 +165,34 @@ Public Class QueueingServiceExamples
     End Sub
 #End Region
 
+#Region "ListQueuesAsync"
+    Public Async Function PrepareListQueuesAsyncAwait() As Task
+        ' #Region "PrepareListQueuesAsync (await)"
+        Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
+        Dim apiCall As ListQueuesApiCall = Await queuesService.PrepareListQueuesAsync(CancellationToken.None).WithDetails()
+        Dim apiResponse As Tuple(Of HttpResponseMessage, ReadOnlyCollectionPage(Of Queue)) = Await apiCall.SendAsync(CancellationToken.None)
+        Dim firstPage As ReadOnlyCollectionPage(Of Queue) = apiResponse.Item2
+        Dim queues As ReadOnlyCollection(Of Queue) = Await firstPage.GetAllPagesAsync(CancellationToken.None, Nothing)
+        ' #End Region
+    End Function
+
+    Public Sub PrepareListQueues()
+        ' #Region "PrepareListQueuesAsync (TPL)"
+        Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
+        Dim listQueuesTask As Task(Of ReadOnlyCollectionPage(Of Queue)) =
+            CoreTaskExtensions.Using(
+                Function() queuesService.PrepareListQueuesAsync(CancellationToken.None).WithDetails(),
+                Function(task) task.Result.SendAsync(CancellationToken.None)) _
+            .Select(Function(task) task.Result.Item2)
+        Dim allQueuesTask As Task(Of ReadOnlyCollection(Of Queue)) =
+            listQueuesTask.Then(Function(task) task.Result.GetAllPagesAsync(CancellationToken.None, Nothing))
+        ' #End Region
+    End Sub
+
     Public Async Function ListQueuesAsyncAwait() As Task
         ' #Region "ListQueuesAsync (await)"
         Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
-        Dim queuesPage = Await queuesService.ListQueuesAsync(Nothing, Nothing, True, CancellationToken.None)
+        Dim queuesPage = Await queuesService.ListQueuesAsync(True, CancellationToken.None)
         Dim queues = Await queuesPage.GetAllPagesAsync(CancellationToken.None, Nothing)
         ' #End Region
     End Function
@@ -175,12 +200,11 @@ Public Class QueueingServiceExamples
     Public Sub ListQueues()
         ' #Region "ListQueuesAsync (TPL)"
         Dim queuesService As IQueuesService = New QueuesClient(authenticationService, region, clientId, internalUrl)
-        Dim queuesPageTask = queuesService.ListQueuesAsync(Nothing, Nothing, True, CancellationToken.None)
-        Dim queuesTask = queuesPageTask _
-            .ContinueWith(Function(task) task.Result.GetAllPagesAsync(CancellationToken.None, Nothing)) _
-            .Unwrap()
+        Dim queuesPageTask = queuesService.ListQueuesAsync(True, CancellationToken.None)
+        Dim queuesTask = queuesPageTask.Then(Function(task) task.Result.GetAllPagesAsync(CancellationToken.None, Nothing))
         ' #End Region
     End Sub
+#End Region
 
 #Region "QueueExistsAsync"
     Public Async Function PrepareQueueExistsAsyncAwait() As Task

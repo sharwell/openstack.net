@@ -117,31 +117,33 @@
         Task<CreateQueueApiCall> PrepareCreateQueueAsync(QueueName queueName, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Gets a list of queues.
+        /// Prepare an API call to get a list of queues.
         /// </summary>
-        /// <param name="marker">The name of the last queue in the previous list. The resulting collection of queues will start with the first queue <em>after</em> this value, when sorted using <see cref="StringComparer.Ordinal"/>. If this value is <see langword="null"/>, the list starts at the beginning.</param>
-        /// <param name="limit">The maximum number of queues to return. If this value is <see langword="null"/>, a provider-specific default value is used.</param>
-        /// <param name="detailed"><see langword="true"/> to return detailed information about each queue; otherwise, <see langword="false"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A <see cref="Task"/> object representing the asynchronous operation. When the task completes successfully, the <see cref="Task{TResult}.Result"/> property will contain <placeholder>placeholder</placeholder>.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property returns
+        /// the prepared API call.
+        /// </returns>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
         /// <example>
         /// <para>The following example demonstrates the use of this method using the <see cref="QueuesClient"/>
         /// implementation of the <see cref="IQueuesService"/>. For more information about creating the provider, see
         /// <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>.</para>
         /// <token>AsyncAwaitExample</token>
-        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="ListQueuesAsync (await)" language="cs"/>
-        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="ListQueuesAsync (await)" language="vbnet"/>
-        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="ListQueuesAsync (await)" language="fs"/>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="PrepareListQueuesAsync (await)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="PrepareListQueuesAsync (await)" language="vbnet"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="PrepareListQueuesAsync (await)" language="fs"/>
         /// <token>TplExample</token>
-        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="ListQueuesAsync (TPL)" language="cs"/>
-        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="ListQueuesAsync (TPL)" language="vbnet"/>
-        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="ListQueuesAsync (TPL)" language="cpp"/>
-        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="ListQueuesAsync (TPL)" language="fs"/>
+        /// <code source="..\Samples\CSharpCodeSamples\QueueingServiceExamples.cs" region="PrepareListQueuesAsync (TPL)" language="cs"/>
+        /// <code source="..\Samples\VBCodeSamples\QueueingServiceExamples.vb" region="PrepareListQueuesAsync (TPL)" language="vbnet"/>
+        /// <code source="..\Samples\CPPCodeSamples\QueueingServiceExamples.cpp" region="PrepareListQueuesAsync (TPL)" language="cpp"/>
+        /// <code source="..\Samples\FSharpCodeSamples\QueueingServiceExamples.fs" region="PrepareListQueuesAsync (TPL)" language="fs"/>
         /// </example>
+        /// <seealso cref="ListQueuesApiCall"/>
+        /// <seealso cref="QueuesServiceExtensions.ListQueuesAsync"/>
         /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1#List_Queues">List Queues (OpenStack Marconi API v1 Blueprint)</seealso>
-        Task<ReadOnlyCollectionPage<Queue>> ListQueuesAsync(QueueName marker, int? limit, bool detailed, CancellationToken cancellationToken);
+        Task<ListQueuesApiCall> PrepareListQueuesAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Prepare an API call to check for the existence of a queue with a particular name.
