@@ -186,11 +186,39 @@ let removeQueue =
     //#endregion
     ()
 
+//
+// ListQueuesAsync
+//
+
+let prepareListQueuesAsyncAwait =
+    async {
+        //#region PrepareListQueuesAsync (await)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+        let! apiCall = queuesService.PrepareListQueuesAsync(CancellationToken.None) |> Async.AwaitTask
+        let! responseMessage, firstPage = apiCall.SendAsync(CancellationToken.None) |> Async.AwaitTask
+        let! queues = firstPage.GetAllPagesAsync(CancellationToken.None, null) |> Async.AwaitTask
+        //#endregion
+        ()
+    }
+
+let prepareListQueues =
+    //#region PrepareListQueuesAsync (TPL)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+    let listQueuesTask =
+        CoreTaskExtensions.Using(
+            (fun () -> queuesService.PrepareListQueuesAsync(CancellationToken.None).WithDetails()),
+            (fun (task : Task<ListQueuesApiCall>) -> task.Result.SendAsync(CancellationToken.None)))
+          .Select(fun (task : Task<HttpResponseMessage * ReadOnlyCollectionPage<Queue>>) -> snd task.Result)
+    let allQueuesTask =
+        listQueuesTask.Then(fun (task : Task<ReadOnlyCollectionPage<Queue>>) -> task.Result.GetAllPagesAsync(CancellationToken.None, null))
+    //#endregion
+    ()
+
 let listQueuesAsyncAwait =
     async {
         //#region ListQueuesAsync (await)
         let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
-        let! queuesPage = queuesService.ListQueuesAsync(null, Nullable(), true, CancellationToken.None) |> Async.AwaitTask
+        let! queuesPage = queuesService.ListQueuesAsync(true, CancellationToken.None) |> Async.AwaitTask
         let! queues = queuesPage.GetAllPagesAsync(CancellationToken.None, null) |> Async.AwaitTask
         //#endregion
         ()
@@ -199,8 +227,8 @@ let listQueuesAsyncAwait =
 let listQueues =
     //#region ListQueuesAsync (TPL)
     let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
-    let queuesPageTask = queuesService.ListQueuesAsync(null, Nullable(), true, CancellationToken.None)
-    let queuesTask = queuesPageTask.ContinueWith(fun (task:Task<ReadOnlyCollectionPage<Queue>>) -> task.Result.GetAllPagesAsync(CancellationToken.None, null)) |> TaskExtensions.Unwrap
+    let queuesPageTask = queuesService.ListQueuesAsync(true, CancellationToken.None)
+    let queuesTask = queuesPageTask.Then(fun (task : Task<ReadOnlyCollectionPage<Queue>>) -> task.Result.GetAllPagesAsync(CancellationToken.None, null))
     //#endregion
     ()
 

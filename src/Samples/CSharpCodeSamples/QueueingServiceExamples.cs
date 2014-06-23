@@ -188,11 +188,37 @@
         }
         #endregion
 
+        #region ListQueuesAsync
+        public async Task PrepareListQueuesAsyncAwait()
+        {
+            #region PrepareListQueuesAsync (await)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            ListQueuesApiCall apiCall = await queuesService.PrepareListQueuesAsync(CancellationToken.None).WithDetails();
+            Tuple<HttpResponseMessage, ReadOnlyCollectionPage<Queue>> apiResponse = await apiCall.SendAsync(CancellationToken.None);
+            ReadOnlyCollectionPage<Queue> firstPage = apiResponse.Item2;
+            ReadOnlyCollection<Queue> queues = await firstPage.GetAllPagesAsync(CancellationToken.None, null);
+            #endregion
+        }
+
+        public void PrepareListQueues()
+        {
+            #region PrepareListQueuesAsync (TPL)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            Task<ReadOnlyCollectionPage<Queue>> listQueuesTask =
+                CoreTaskExtensions.Using(
+                    () => queuesService.PrepareListQueuesAsync(CancellationToken.None).WithDetails(),
+                    task => task.Result.SendAsync(CancellationToken.None))
+                .Select(task => task.Result.Item2);
+            Task<ReadOnlyCollection<Queue>> allQueuesTask =
+                listQueuesTask.Then(task => task.Result.GetAllPagesAsync(CancellationToken.None, null));
+            #endregion
+        }
+
         public async Task ListQueuesAsyncAwait()
         {
             #region ListQueuesAsync (await)
             IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
-            ReadOnlyCollectionPage<Queue> queuesPage = await queuesService.ListQueuesAsync(null, null, true, CancellationToken.None);
+            ReadOnlyCollectionPage<Queue> queuesPage = await queuesService.ListQueuesAsync(true, CancellationToken.None);
             ReadOnlyCollection<Queue> queues = await queuesPage.GetAllPagesAsync(CancellationToken.None, null);
             #endregion
         }
@@ -201,13 +227,12 @@
         {
             #region ListQueuesAsync (TPL)
             IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
-            Task<ReadOnlyCollectionPage<Queue>> queuesPageTask = queuesService.ListQueuesAsync(null, null, true, CancellationToken.None);
+            Task<ReadOnlyCollectionPage<Queue>> queuesPageTask = queuesService.ListQueuesAsync(true, CancellationToken.None);
             Task<ReadOnlyCollection<Queue>> queuesTask =
-                queuesPageTask
-                .ContinueWith(task => task.Result.GetAllPagesAsync(CancellationToken.None, null))
-                .Unwrap();
+                queuesPageTask.Then(task => task.Result.GetAllPagesAsync(CancellationToken.None, null));
             #endregion
         }
+        #endregion
 
         #region QueueExistsAsync
         public async Task PrepareQueueExistsAsyncAwait()
