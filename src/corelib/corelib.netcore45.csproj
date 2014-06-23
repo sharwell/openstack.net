@@ -685,6 +685,7 @@
     <Compile Include="OpenStack\Services\Queues\V1\GetQueueMetadataApiCall`1.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\GetQueueStatisticsApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\IQueuesService.cs" />
+    <Compile Include="OpenStack\Services\Queues\V1\ListMessagesApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\ListQueuesApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Message.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\MessageId.cs" />
@@ -693,8 +694,6 @@
     <Compile Include="OpenStack\Services\Queues\V1\NamespaceDoc.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\Queue.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueuedMessage.cs" />
-    <Compile Include="OpenStack\Services\Queues\V1\QueuedMessageList.cs" />
-    <Compile Include="OpenStack\Services\Queues\V1\QueuedMessageListId.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueExistsApiCall.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueMessagesStatistics.cs" />
     <Compile Include="OpenStack\Services\Queues\V1\QueueName.cs" />

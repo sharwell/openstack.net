@@ -36,7 +36,7 @@
         private readonly bool _internalUrl;
 
         /// <summary>
-        /// The value of the Client-Id header to send with message requests from this service.
+        /// This is the backing field for the <see cref="ClientId"/> property.
         /// </summary>
         private readonly Guid _clientId;
 
@@ -65,6 +65,20 @@
         {
             _clientId = clientId;
             _internalUrl = internalUrl;
+        }
+
+        /// <summary>
+        /// Gets the value of the <strong>Client-Id</strong> header to send with message requests from this service.
+        /// </summary>
+        /// <value>
+        /// The value of the <strong>Client-Id</strong> header to send with message requests from this service.
+        /// </value>
+        protected Guid ClientId
+        {
+            get
+            {
+                return _clientId;
+            }
         }
 
         #region IQueuesService Members
@@ -298,81 +312,48 @@
         }
 
         /// <inheritdoc/>
-        public Task<QueuedMessageList> ListMessagesAsync(QueueName queueName, QueuedMessageListId marker, int? limit, bool echo, bool includeClaimed, CancellationToken cancellationToken)
+        public Task<ListMessagesApiCall> PrepareListMessagesAsync(QueueName queueName, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
-            if (limit <= 0)
-                throw new ArgumentOutOfRangeException("limit");
 
-            UriTemplate template = new UriTemplate("queues/{queue_name}/messages{?marker,limit,echo,include_claimed}");
+            UriTemplate template = new UriTemplate("queues/{queue_name}/messages");
+            var parameters = new Dictionary<string, string> { { "queue_name", queueName.Value } };
 
-            var parameters =
-                new Dictionary<string, string>()
+            Func<HttpResponseMessage, CancellationToken, Task<ReadOnlyCollectionPage<QueuedMessage>>> deserializeResult =
+                (responseMessage, _) =>
                 {
-                    { "queue_name", queueName.Value },
-                    { "echo", echo.ToString() },
-                    { "include_claimed", includeClaimed.ToString() }
-                };
-            if (marker != null)
-                parameters["marker"] = marker.Value;
-            if (limit != null)
-                parameters["limit"] = limit.ToString();
+                    if (responseMessage.StatusCode == HttpStatusCode.NoContent)
+                        return CompletedTask.FromResult(ReadOnlyCollectionPage<QueuedMessage>.Empty);
 
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken);
+                    if (!HttpApiCall.IsAcceptable(responseMessage))
+                        throw new HttpWebException(responseMessage);
 
-            Func<Task<HttpRequestMessage>, Task<ListCloudQueueMessagesResponse>> requestResource =
-                GetResponseAsyncFunc<ListCloudQueueMessagesResponse>(cancellationToken);
+                    Uri originalUri = responseMessage.RequestMessage.RequestUri;
+                    return responseMessage.Content.ReadAsStringAsync()
+                        .Select(
+                            innerTask =>
+                            {
+                                if (string.IsNullOrEmpty(innerTask.Result))
+                                    return null;
 
-            Func<Task<ListCloudQueueMessagesResponse>, QueuedMessageList> resultSelector =
-                task =>
-                {
-                    ReadOnlyCollection<QueuedMessage> messages = null;
-                    if (task.Result != null)
-                        messages = task.Result.Messages;
+                                JObject responseObject = JsonConvert.DeserializeObject<JObject>(innerTask.Result);
+                                JArray queuesArray = responseObject["messages"] as JArray;
+                                if (queuesArray == null)
+                                    return null;
 
-                    QueuedMessageListId nextMarker = null;
-                    if (task.Result != null && task.Result.Links != null)
-                    {
-                        Link nextLink = task.Result.Links.FirstOrDefault(i => string.Equals(i.Relation, "next", StringComparison.OrdinalIgnoreCase));
-                        if (nextLink != null)
-                        {
-                            Uri baseUri = new Uri("https://example.com");
-                            Uri absoluteUri;
-                            if (nextLink.Target.OriginalString.StartsWith("/v1"))
-                                absoluteUri = new Uri(baseUri, nextLink.Target.OriginalString.Substring("/v1".Length));
-                            else
-                                absoluteUri = new Uri(baseUri, nextLink.Target);
+                                IList<QueuedMessage> list = queuesArray.ToObject<QueuedMessage[]>();
+                                Func<CancellationToken, Task<ReadOnlyCollectionPage<QueuedMessage>>> getNextPageAsync =
+                                    CreateGetNextPageAsyncDelegate<ListMessagesApiCall, QueuedMessage>(innerCancellationToken => PrepareListMessagesAsync(queueName, innerCancellationToken), responseObject);
 
-                            UriTemplateMatch match = template.Match(baseUri, absoluteUri);
-                            if (match != null && !string.IsNullOrEmpty((string)match.Bindings["marker"].Value))
-                                nextMarker = new QueuedMessageListId((string)match.Bindings["marker"].Value);
-                        }
-                    }
-
-                    if (messages == null || messages.Count == 0)
-                    {
-                        // use the same marker again
-                        messages = messages ?? new ReadOnlyCollection<QueuedMessage>(new QueuedMessage[0]);
-                        nextMarker = marker;
-                    }
-
-                    Func<CancellationToken, Task<ReadOnlyCollectionPage<QueuedMessage>>> getNextPageAsync = null;
-                    if (nextMarker != null || messages.Count == 0)
-                    {
-                        getNextPageAsync =
-                            nextCancellationToken => ListMessagesAsync(queueName, nextMarker, limit, echo, includeClaimed, nextCancellationToken)
-                                .Select(t => (ReadOnlyCollectionPage<QueuedMessage>)t.Result);
-                    }
-
-                    return new QueuedMessageList(messages, getNextPageAsync, nextMarker);
+                                ReadOnlyCollectionPage<QueuedMessage> results = new BasicReadOnlyCollectionPage<QueuedMessage>(list, getNextPageAsync);
+                                return results;
+                            });
                 };
 
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource)
-                .Select(resultSelector);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
+                .Select(task => new ListMessagesApiCall(CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
         }
 
         /// <inheritdoc/>
@@ -771,51 +752,6 @@
                             _ => _.Result.SendAsync(cancellationToken))
                         .Select(_ => _.Result.Item2);
                 };
-        }
-
-        /// <threadsafety static="true" instance="false"/>
-        /// <preliminary/>
-        [JsonObject(MemberSerialization.OptIn)]
-        protected class ListCloudQueueMessagesResponse
-        {
-#pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
-            [JsonProperty("links")]
-            private Link[] _links;
-
-            [JsonProperty("messages")]
-            private QueuedMessage[] _messages;
-#pragma warning restore 649
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ListCloudQueueMessagesResponse"/> class
-            /// during JSON deserialization.
-            /// </summary>
-            [JsonConstructor]
-            protected ListCloudQueueMessagesResponse()
-            {
-            }
-
-            public ReadOnlyCollection<Link> Links
-            {
-                get
-                {
-                    if (_links == null)
-                        return null;
-
-                    return new ReadOnlyCollection<Link>(_links);
-                }
-            }
-
-            public ReadOnlyCollection<QueuedMessage> Messages
-            {
-                get
-                {
-                    if (_messages == null)
-                        return null;
-
-                    return new ReadOnlyCollection<QueuedMessage>(_messages);
-                }
-            }
         }
     }
 }
