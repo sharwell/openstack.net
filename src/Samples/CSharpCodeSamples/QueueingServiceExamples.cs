@@ -277,5 +277,55 @@
             #endregion
         }
         #endregion
+
+        #region ListMessagesAsync
+        public async Task PrepareListMessagesAsyncAwait()
+        {
+            #region PrepareListMessagesAsync (await)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            QueueName queueName = new QueueName("ExampleQueue");
+            ListMessagesApiCall apiCall = await queuesService.PrepareListMessagesAsync(queueName, CancellationToken.None);
+            Tuple<HttpResponseMessage, ReadOnlyCollectionPage<QueuedMessage>> apiResponse = await apiCall.SendAsync(CancellationToken.None);
+            ReadOnlyCollectionPage<QueuedMessage> firstPage = apiResponse.Item2;
+            ReadOnlyCollection<QueuedMessage> messages = await firstPage.GetAllPagesAsync(CancellationToken.None, null);
+            #endregion
+        }
+
+        public void PrepareListMessages()
+        {
+            #region PrepareListMessagesAsync (TPL)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            QueueName queueName = new QueueName("ExampleQueue");
+            Task<ReadOnlyCollectionPage<QueuedMessage>> listMessagesTask =
+                CoreTaskExtensions.Using(
+                    () => queuesService.PrepareListMessagesAsync(queueName, CancellationToken.None),
+                    task => task.Result.SendAsync(CancellationToken.None))
+                .Select(task => task.Result.Item2);
+            Task<ReadOnlyCollection<QueuedMessage>> allMessagesTask =
+                listMessagesTask.Then(task => task.Result.GetAllPagesAsync(CancellationToken.None, null));
+            #endregion
+        }
+
+        public async Task ListMessagesAsyncAwait()
+        {
+            #region ListMessagesAsync (await)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            QueueName queueName = new QueueName("ExampleQueue");
+            ReadOnlyCollectionPage<QueuedMessage> messagesPage = await queuesService.ListMessagesAsync(queueName, CancellationToken.None);
+            ReadOnlyCollection<QueuedMessage> messages = await messagesPage.GetAllPagesAsync(CancellationToken.None, null);
+            #endregion
+        }
+
+        public void ListMessages()
+        {
+            #region ListMessagesAsync (TPL)
+            IQueuesService queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl);
+            QueueName queueName = new QueueName("ExampleQueue");
+            Task<ReadOnlyCollectionPage<QueuedMessage>> messagesPageTask = queuesService.ListMessagesAsync(queueName, CancellationToken.None);
+            Task<ReadOnlyCollection<QueuedMessage>> messagesTask =
+                messagesPageTask.Then(task => task.Result.GetAllPagesAsync(CancellationToken.None, null));
+            #endregion
+        }
+        #endregion
     }
 }

@@ -276,3 +276,53 @@ let queueExists =
     let task = queuesService.QueueExistsAsync(queueName, CancellationToken.None)
     //#endregion
     ()
+
+//
+// ListMessagesAsync
+//
+
+let prepareListMessagesAsyncAwait =
+    async {
+        //#region PrepareListMessagesAsync (await)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+        let queueName = new QueueName("ExampleQueue")
+        let! apiCall = queuesService.PrepareListMessagesAsync(queueName, CancellationToken.None) |> Async.AwaitTask
+        let! responseMessage, firstPage = apiCall.SendAsync(CancellationToken.None) |> Async.AwaitTask
+        let! messages = firstPage.GetAllPagesAsync(CancellationToken.None, null) |> Async.AwaitTask
+        //#endregion
+        ()
+    }
+
+let prepareListMessages =
+    //#region PrepareListMessagesAsync (TPL)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+    let queueName = new QueueName("ExampleQueue")
+    let listMessagesTask =
+        CoreTaskExtensions.Using(
+            (fun () -> queuesService.PrepareListMessagesAsync(queueName, CancellationToken.None)),
+            (fun (task : Task<ListMessagesApiCall>) -> task.Result.SendAsync(CancellationToken.None)))
+          .Select(fun (task : Task<HttpResponseMessage * ReadOnlyCollectionPage<QueuedMessage>>) -> snd task.Result)
+    let allMessagesTask =
+        listMessagesTask.Then(fun (task : Task<ReadOnlyCollectionPage<QueuedMessage>>) -> task.Result.GetAllPagesAsync(CancellationToken.None, null))
+    //#endregion
+    ()
+
+let listMessagesAsyncAwait =
+    async {
+        //#region ListMessagesAsync (await)
+        let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+        let queueName = new QueueName("ExampleQueue")
+        let! messagesPage = queuesService.ListMessagesAsync(queueName, CancellationToken.None) |> Async.AwaitTask
+        let! messages = messagesPage.GetAllPagesAsync(CancellationToken.None, null) |> Async.AwaitTask
+        //#endregion
+        ()
+    }
+
+let listMessages =
+    //#region ListMessagesAsync (TPL)
+    let queuesService = new QueuesClient(authenticationService, region, clientId, internalUrl)
+    let queueName = new QueueName("ExampleQueue")
+    let messagesPageTask = queuesService.ListMessagesAsync(queueName, CancellationToken.None)
+    let messagesTask = messagesPageTask.Then(fun (task : Task<ReadOnlyCollectionPage<QueuedMessage>>) -> task.Result.GetAllPagesAsync(CancellationToken.None, null))
+    //#endregion
+    ()

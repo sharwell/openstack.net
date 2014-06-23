@@ -281,23 +281,23 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 HashSet<int> locatedMessages = new HashSet<int>();
 
-                QueuedMessageList messages = await provider.ListMessagesAsync(queueName, null, null, true, false, cancellationTokenSource.Token);
+                ReadOnlyCollectionPage<QueuedMessage> messages = (await (await provider.PrepareListMessagesAsync(queueName, cancellationTokenSource.Token).WithEcho()).SendAsync(cancellationTokenSource.Token)).Item2;
                 foreach (QueuedMessage message in messages)
                     Assert.IsTrue(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
 
                 int removedMessage = messages[0].Body.ToObject<SampleMetadata>().ValueA;
                 await provider.RemoveMessageAsync(queueName, messages[0].Id, null, cancellationTokenSource.Token);
 
-                while (messages.Count > 0)
+                while (messages.Count > 0 && messages.CanHaveNextPage)
                 {
-                    QueuedMessageList tempList = await provider.ListMessagesAsync(queueName, messages.NextPageId, null, true, false, cancellationTokenSource.Token);
+                    ReadOnlyCollectionPage<QueuedMessage> tempList = await messages.GetNextPageAsync(cancellationTokenSource.Token);
                     if (tempList.Count > 0)
                     {
                         Assert.IsTrue(locatedMessages.Add(tempList[0].Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
                         await provider.RemoveMessageAsync(queueName, tempList[0].Id, null, cancellationTokenSource.Token);
                     }
 
-                    messages = await provider.ListMessagesAsync(queueName, messages.NextPageId, null, true, false, cancellationTokenSource.Token);
+                    messages = await messages.GetNextPageAsync(cancellationTokenSource.Token);
                     foreach (QueuedMessage message in messages)
                     {
                         Assert.IsTrue(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
@@ -799,7 +799,22 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             if (limit <= 0)
                 throw new ArgumentOutOfRangeException("limit");
 
-            return await (await provider.ListMessagesAsync(queueName, null, limit, echo, includeClaimed, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
+            Task<ListMessagesApiCall> task = provider.PrepareListMessagesAsync(queueName, cancellationToken);
+            if (limit.HasValue)
+                task = task.WithPageSize(limit.Value);
+            if (echo)
+                task = task.WithEcho();
+            if (includeClaimed)
+                task = task.WithClaimed();
+
+            ReadOnlyCollectionPage<QueuedMessage> firstPage;
+            using (ListMessagesApiCall apiCall = await task)
+            {
+                var result = await apiCall.SendAsync(cancellationToken);
+                firstPage = result.Item2;
+            }
+
+            return await firstPage.GetAllPagesAsync(cancellationToken, progress);
         }
 
         private TimeSpan TestTimeout(TimeSpan timeout)

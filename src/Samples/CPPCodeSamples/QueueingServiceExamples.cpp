@@ -421,4 +421,80 @@ public:
 #pragma endregion
 	}
 #pragma endregion
+
+#pragma region ListMessagesAsync
+#pragma region PrepareListMessagesAsync (TPL)
+private:
+	ref class AcquirePrepareListMessagesAsync sealed
+	{
+		IQueuesService^ service;
+		QueueName^ queueName;
+		CancellationToken cancellationToken;
+
+	public:
+		AcquirePrepareListMessagesAsync(IQueuesService^ service, QueueName^ queueName, CancellationToken cancellationToken)
+			: service(service)
+			, queueName(queueName)
+			, cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<ListMessagesApiCall^>^ Invoke()
+		{
+			return service->PrepareListMessagesAsync(queueName, cancellationToken);
+		}
+	};
+
+	ref class BodyPrepareListMessagesAsync sealed
+	{
+		CancellationToken cancellationToken;
+
+	public:
+		BodyPrepareListMessagesAsync(CancellationToken cancellationToken)
+			: cancellationToken(cancellationToken)
+		{
+		}
+
+		Task<Tuple<HttpResponseMessage^, ReadOnlyCollectionPage<QueuedMessage^>^>^>^ Invoke(Task<ListMessagesApiCall^>^ task)
+		{
+			return task->Result->SendAsync(cancellationToken);
+		}
+	};
+
+	static ReadOnlyCollectionPage<QueuedMessage^>^ SelectListMessagesResult(Task<Tuple<HttpResponseMessage^, ReadOnlyCollectionPage<QueuedMessage^>^>^>^ task)
+	{
+		return task->Result->Item2;
+	}
+
+public:
+	void PrepareListMessages()
+	{
+		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
+		QueueName^ queueName = gcnew QueueName("ExampleQueue");
+		auto acquireWrapper = gcnew AcquirePrepareListMessagesAsync(queuesService, queueName, CancellationToken::None);
+		auto acquire = gcnew Func<Task<ListMessagesApiCall^>^>(acquireWrapper, &AcquirePrepareListMessagesAsync::Invoke);
+		auto bodyWrapper = gcnew BodyPrepareListMessagesAsync(CancellationToken::None);
+		auto body = gcnew Func<Task<ListMessagesApiCall^>^, Task<Tuple<HttpResponseMessage^, ReadOnlyCollectionPage<QueuedMessage^>^>^>^>(bodyWrapper, &BodyPrepareListMessagesAsync::Invoke);
+		auto select = gcnew Func<Task<Tuple<HttpResponseMessage^, ReadOnlyCollectionPage<QueuedMessage^>^>^>^, ReadOnlyCollectionPage<QueuedMessage^>^>(&SelectListMessagesResult);
+		Task<ReadOnlyCollectionPage<QueuedMessage^>^>^ listMessagesTask = CoreTaskExtensions::Select(CoreTaskExtensions::Using(acquire, body), select);
+
+		// The GetAllPagesContinuationAsync method is defined in the example for QueuesServiceExtensions::ListQueuesAsync
+		auto func = gcnew Func<Task<ReadOnlyCollectionPage<QueuedMessage^>^>^, Task<ReadOnlyCollection<QueuedMessage^>^>^>(GetAllPagesContinuationAsync<QueuedMessage^>);
+		Task<ReadOnlyCollection<QueuedMessage^>^>^ allMessagesTask = CoreTaskExtensions::Then(listMessagesTask, func);
+	}
+#pragma endregion
+
+#pragma region ListMessagesAsync (TPL)
+	void ListMessages()
+	{
+		IQueuesService^ queuesService = gcnew QueuesClient(authenticationService, region, clientId, internalUrl);
+		QueueName^ queueName = gcnew QueueName("ExampleQueue");
+		Task<ReadOnlyCollectionPage<QueuedMessage^>^>^ messagesPageTask = QueuesServiceExtensions::ListMessagesAsync(queuesService, queueName, CancellationToken::None);
+
+		// The GetAllPagesContinuationAsync method is defined in the example for QueuesServiceExtensions::ListQueuesAsync
+		auto func = gcnew Func<Task<ReadOnlyCollectionPage<QueuedMessage^>^>^, Task<ReadOnlyCollection<QueuedMessage^>^>^>(GetAllPagesContinuationAsync<QueuedMessage^>);
+		Task<ReadOnlyCollection<QueuedMessage^>^>^ messagesTask = CoreTaskExtensions::Then(messagesPageTask, func);
+	}
+#pragma endregion
+#pragma endregion
 };
