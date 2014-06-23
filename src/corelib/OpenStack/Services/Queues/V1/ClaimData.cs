@@ -6,6 +6,12 @@ namespace OpenStack.Services.Queues.V1
     using Newtonsoft.Json.Linq;
     using OpenStack.ObjectModel;
 
+    /// <summary>
+    /// This class models the JSON representation for the basic configurable information in
+    /// a Claim resource in the <see cref="IQueuesService"/>.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class ClaimData : ExtensibleJsonObject
     {

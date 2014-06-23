@@ -7,6 +7,12 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    /// <summary>
+    /// This class extends the <see cref="ClaimData"/> class to include additional information
+    /// about a claim provided by the <see cref="IQueuesService"/>.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
     public class Claim : ClaimData
     {
@@ -89,7 +95,7 @@
         /// </summary>
         /// <remarks>
         /// This value does not automatically update. To obtain the age of a claim after a period of time elapses,
-        /// use <see cref="IQueuesService.QueryClaimAsync"/>.
+        /// use <see cref="IQueuesService.PrepareQueryClaimAsync"/>.
         /// </remarks>
         /// <value>
         /// The age of the claim.

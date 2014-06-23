@@ -54,6 +54,11 @@
         /// <summary>
         /// Gets the time-to-live for the message.
         /// </summary>
+        /// <value>
+        /// The time-to-live for the message.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
         public TimeSpan? TimeToLive
         {
             get
@@ -68,6 +73,11 @@
         /// <summary>
         /// Gets the body of the message.
         /// </summary>
+        /// <value>
+        /// The body of the message.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
         public T Body
         {
             get
