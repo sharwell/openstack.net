@@ -1,6 +1,8 @@
 ﻿namespace OpenStack.Services.Queues.V1
 {
     using Newtonsoft.Json;
+    using OpenStack.ObjectModel;
+
 
     /// <summary>
     /// This models the JSON object used to represent statistics for messages
@@ -9,37 +11,37 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class QueueMessagesStatistics
+    public class QueueMessagesStatistics : ExtensibleJsonObject
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>
         /// The backing field for the <see cref="Free"/> property;
         /// </summary>
-        [JsonProperty("free")]
-        private long _free;
+        [JsonProperty("free", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private long? _free;
 
         /// <summary>
         /// The backing field for the <see cref="Claimed"/> property;
         /// </summary>
-        [JsonProperty("claimed")]
-        private long _claimed;
+        [JsonProperty("claimed", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private long? _claimed;
 
         /// <summary>
         /// The backing field for the <see cref="Total"/> property;
         /// </summary>
-        [JsonProperty("total")]
-        private long _total;
+        [JsonProperty("total", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private long? _total;
 
         /// <summary>
         /// The backing field for the <see cref="Oldest"/> property;
         /// </summary>
-        [JsonProperty("oldest")]
+        [JsonProperty("oldest", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private MessageStatistics _oldest;
 
         /// <summary>
         /// The backing field for the <see cref="Newest"/> property;
         /// </summary>
-        [JsonProperty("newest")]
+        [JsonProperty("newest", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private MessageStatistics _newest;
 #pragma warning restore 649
 
@@ -55,7 +57,12 @@
         /// <summary>
         /// Gets the number of unclaimed messages in the queue.
         /// </summary>
-        public long Free
+        /// <value>
+        /// The number of unclaimed messages in the queue.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        public long? Free
         {
             get
             {
@@ -66,7 +73,12 @@
         /// <summary>
         /// Gets the number of claimed messages in the queue.
         /// </summary>
-        public long Claimed
+        /// <value>
+        /// The number of claimed messages in the queue.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        public long? Claimed
         {
             get
             {
@@ -77,7 +89,12 @@
         /// <summary>
         /// Gets the total number of messages currently in the queue.
         /// </summary>
-        public long Total
+        /// <value>
+        /// The total number of messages currently in the queue.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        public long? Total
         {
             get
             {
@@ -91,6 +108,8 @@
         /// <value>
         /// A <see cref="MessageStatistics"/> object containing statistics about the oldest message in the queue,
         /// or <see langword="null"/> if <see cref="Total"/> is 0.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
         /// </value>
         public MessageStatistics Oldest
         {
@@ -106,6 +125,8 @@
         /// <value>
         /// A <see cref="MessageStatistics"/> object containing statistics about the newest message in the queue,
         /// or <see langword="null"/> if <see cref="Total"/> is 0.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
         /// </value>
         public MessageStatistics Newest
         {

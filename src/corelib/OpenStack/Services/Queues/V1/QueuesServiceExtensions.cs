@@ -11,6 +11,12 @@
     using OpenStack.Security.Authentication;
     using Rackspace.Threading;
 
+    /// <summary>
+    /// This class provides extension methods that simplify the process of preparing and sending
+    /// Object Storage Service HTTP API calls for the most common use cases.
+    /// </summary>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
     public static class QueuesServiceExtensions
     {
         #region Base endpoints
@@ -891,8 +897,13 @@
         /// <summary>
         /// Update an HTTP API call prepared by <see cref="IQueuesService.PrepareListMessagesAsync"/>
         /// to include the <c>echo</c> query parameter, which includes messages created by the current
-        /// client (identified by <see cref="QueuesClient.ClientId"/>) the resulting list.
+        /// client the resulting list.
         /// </summary>
+        /// <remarks>
+        /// The current client is identified by the <see cref="Guid"/> client ID passed as an argument
+        /// to the <see cref="QueuesClient.QueuesClient(IAuthenticationService, string, Guid, bool)"/>
+        /// constructor.
+        /// </remarks>
         /// <param name="task">A <see cref="Task"/> representing an asynchronous operation to prepare a <see cref="ListMessagesApiCall"/> HTTP API call.</param>
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation. When the task

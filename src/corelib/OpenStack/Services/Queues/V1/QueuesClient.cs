@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Net;
     using System.Net.Http;
@@ -21,8 +20,8 @@
     using Link = OpenStack.Services.Compute.V2.Link;
 
     /// <summary>
-    /// Provides an implementation of <see cref="IQueuesService"/> for operating
-    /// with Rackspace's Cloud Queues product.
+    /// This class provides a default implementation of <see cref="IQueuesService"/> suitable for
+    /// connecting to OpenStack-compatible installations of the Queues Service V1.
     /// </summary>
     /// <seealso href="https://wiki.openstack.org/w/index.php?title=Marconi/specs/api/v1">OpenStack Marconi API v1 Blueprint</seealso>
     /// <threadsafety static="true" instance="false"/>
@@ -30,8 +29,8 @@
     public class QueuesClient : ServiceClient, IQueuesService
     {
         /// <summary>
-        /// Specifies whether the <see cref="Endpoint.PublicURL"/> or <see cref="Endpoint.InternalURL"/>
-        /// should be used for accessing the Cloud Queues API.
+        /// Specifies whether the public or internal base address
+        /// should be used for accessing the object storage service.
         /// </summary>
         private readonly bool _internalUrl;
 
@@ -41,30 +40,37 @@
         private readonly Guid _clientId;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="QueuesClient"/> class with
-        /// the specified values.
+        /// Initializes a new instance of the <see cref="QueuesClient"/> class with the
+        /// specified authentication service, default region, client ID, and value
+        /// indicating whether an internal or public endpoint should be used for
+        /// communicating with the service.
         /// </summary>
-        /// <remarks>
-        /// <note type="inherit">
-        /// The default implementation does not rely on <paramref name="restService"/> or
-        /// <paramref name="httpStatusCodeValidator"/> for any services. If a derived class
-        /// uses synchronous methods for any web API calls, the constructor for the derived
-        /// class can either specify or expose these parameters.
-        /// </note>
-        /// </remarks>
-        /// <param name="defaultIdentity">The default identity to use for calls that do not explicitly specify an identity. If this value is <see langword="null"/>, the <paramref name="identityProvider"/> provides the default identity.</param>
-        /// <param name="defaultRegion">The default region to use for calls that do not explicitly specify a region. If this value is <see langword="null"/>, the default region for the user will be used; otherwise if the service uses region-specific endpoints all calls must specify an explicit region.</param>
+        /// <param name="authenticationService">The authentication service to use for authenticating requests made to this service.</param>
+        /// <param name="defaultRegion">The preferred region for the service. Unless otherwise specified for a specific client, derived service clients will not use a default region if this value is <see langword="null"/> (i.e. only regionless or global service endpoints will be considered acceptable).</param>
         /// <param name="clientId">The value of the <strong>Client-Id</strong> header to send with message requests from this service.</param>
-        /// <param name="internalUrl"><see langword="true"/> to use the endpoint's <see cref="Endpoint.InternalURL"/>; otherwise <see langword="false"/> to use the endpoint's <see cref="Endpoint.PublicURL"/>.</param>
-        /// <param name="identityProvider">The identity provider to use for authenticating requests to this provider. If this value is <see langword="null"/>, a new instance of <see cref="CloudIdentityProvider"/> is created using <paramref name="defaultIdentity"/> as the default identity.</param>
-        /// <param name="restService">The implementation of <see cref="IRestService"/> to use for executing synchronous REST requests. If this value is <see langword="null"/>, the provider will use a new instance of <see cref="JsonRestServices"/>.</param>
-        /// <param name="httpStatusCodeValidator">The HTTP status code validator to use for synchronous REST requests. If this value is <see langword="null"/>, the provider will use <see cref="HttpResponseCodeValidator.Default"/>.</param>
-        /// <exception cref="ArgumentException">If both <paramref name="defaultIdentity"/> and <paramref name="identityProvider"/> are <see langword="null"/>.</exception>
+        /// <param name="internalUrl"><see langword="true"/> to access the service over a local network; otherwise, <see langword="false"/> to access the service over a public network (the internet).</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="authenticationService"/> is <see langword="null"/>.</exception>
         public QueuesClient(IAuthenticationService authenticationService, string defaultRegion, Guid clientId, bool internalUrl)
             : base(authenticationService, defaultRegion)
         {
             _clientId = clientId;
             _internalUrl = internalUrl;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the service should be accessed over a local or public network.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> to access the service over a local network.
+        /// <para>-or-</para>
+        /// <para><see langword="false"/> to access the service over a public network (the internet).</para>
+        /// </value>
+        protected bool InternalUrl
+        {
+            get
+            {
+                return _internalUrl;
+            }
         }
 
         /// <summary>
@@ -232,16 +238,16 @@
 
         /// <summary>
         /// This helper method determines if a specified <see cref="HttpRequestMessage"/> represents a
-        /// request from the <see cref="QueueExistsAsync"/> method.
+        /// request from the <see cref="PrepareQueueExistsAsync"/> method.
         /// </summary>
         /// <remarks>
         /// This method is used by <see cref="ValidateResultImplAsync"/> to support specialized handling
-        /// for the HTTP response to the <see cref="QueueExistsAsync"/> call. Unlike most calls, the
+        /// for the HTTP response to the <see cref="PrepareQueueExistsAsync"/> call. Unlike most calls, the
         /// status code <see cref="HttpStatusCode.NotFound"/> indicates a successful response from this
         /// call.
         /// </remarks>
         /// <param name="message">The request message, which may be <see langword="null"/>.</param>
-        /// <returns><see langword="true"/> if <paramref name="message"/> has the form of a message created by <see cref="QueueExistsAsync"/>; otherwise, <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="message"/> has the form of a message created by <see cref="PrepareQueueExistsAsync"/>; otherwise, <see langword="false"/>.</returns>
         protected virtual bool IsQueueExistsMessage(HttpRequestMessage message)
         {
             if (message == null)
@@ -605,9 +611,9 @@
 
         /// <inheritdoc/>
         /// <remarks>
-        /// This method calls <see cref="ProviderBase{TProvider}.PrepareRequestImpl"/> to create the
+        /// This method calls <see cref="ServiceClient.PrepareRequestImpl"/> to create the
         /// initial <see cref="HttpRequestMessage"/>, and then sets the <c>Client-Id</c> header according
-        /// to the Marconi (Cloud Queues) specification before returning.
+        /// to the Marconi (OpenStack Queues Service) specification before returning.
         /// </remarks>
         protected override HttpRequestMessage PrepareRequestImpl<T>(HttpMethod method, UriTemplate template, Uri baseUri, IDictionary<string, T> parameters)
         {

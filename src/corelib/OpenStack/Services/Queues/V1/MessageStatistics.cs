@@ -16,20 +16,20 @@
         /// <summary>
         /// The backing field for the <see cref="Href"/> property.
         /// </summary>
-        [JsonProperty("href")]
+        [JsonProperty("href", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _href;
 
         /// <summary>
         /// The backing field for the <see cref="Age"/> property.
         /// </summary>
-        [JsonProperty("age")]
-        private long _age;
+        [JsonProperty("age", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private long? _age;
 
         /// <summary>
         /// The backing field for the <see cref="Created"/> property.
         /// </summary>
-        [JsonProperty("created")]
-        private string _created;
+        [JsonProperty("created", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private DateTimeOffset? _created;
 #pragma warning restore 649
 
         /// <summary>
@@ -42,35 +42,56 @@
         }
 
         /// <summary>
-        /// Gets the absolute path of the URI to this message.
+        /// Gets the absolute path portion of the URI to this message resource.
         /// </summary>
-        public string Href
+        /// <value>
+        /// The absolute path portion of the URI to this message resource.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        public Uri Href
         {
             get
             {
-                return _href;
+                if (_href == null)
+                    return null;
+
+                return new Uri(_href, UriKind.Relative);
             }
         }
 
         /// <summary>
         /// Gets the age of the message in the queue.
         /// </summary>
-        public TimeSpan Age
+        /// <value>
+        /// The age of the message in the queue.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        public TimeSpan? Age
         {
             get
             {
-                return TimeSpan.FromSeconds(_age);
+                if (!_age.HasValue)
+                    return null;
+
+                return TimeSpan.FromSeconds(_age.Value);
             }
         }
 
         /// <summary>
-        /// Gets the timestamp when this message was first added to the queue.
+        /// Gets a timestamp indicating when this message was first added to the queue.
         /// </summary>
-        public DateTimeOffset Created
+        /// <value>
+        /// A timestamp indicating when this message was first added to the queue.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
+        public DateTimeOffset? Created
         {
             get
             {
-                return JsonConvert.DeserializeObject<DateTimeOffset>(_created);
+                return _created;
             }
         }
     }

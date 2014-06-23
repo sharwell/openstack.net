@@ -7,7 +7,7 @@
     /// <summary>
     /// Represents the unique identifier of a claim in the <see cref="IQueuesService"/>.
     /// </summary>
-    /// <seealso cref="Claim.Id"/>
+    /// <seealso cref="ClaimHandle.Id"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonConverter(typeof(ClaimId.Converter))]
