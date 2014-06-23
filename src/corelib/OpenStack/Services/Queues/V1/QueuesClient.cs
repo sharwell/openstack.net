@@ -409,18 +409,18 @@
         }
 
         /// <inheritdoc/>
-        public Task PostMessagesAsync(QueueName queueName, IEnumerable<Message> messages, CancellationToken cancellationToken)
+        public Task<PostMessagesApiCall> PreparePostMessagesAsync(QueueName queueName, IEnumerable<Message> messages, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
             if (messages == null)
                 throw new ArgumentNullException("messages");
 
-            return PostMessagesAsync(queueName, cancellationToken, messages.ToArray());
+            return PreparePostMessagesAsync(queueName, messages.Cast<Message<JObject>>(), cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task PostMessagesAsync(QueueName queueName, CancellationToken cancellationToken, params Message[] messages)
+        public Task<PostMessagesApiCall> PreparePostMessagesAsync<T>(QueueName queueName, IEnumerable<Message<T>> messages, CancellationToken cancellationToken)
         {
             if (queueName == null)
                 throw new ArgumentNullException("queueName");
@@ -429,69 +429,12 @@
             if (messages.Contains(null))
                 throw new ArgumentException("messages cannot contain any null values");
 
-            if (messages.Length == 0)
-                return this.QueueExistsAsync(queueName, cancellationToken);
-
             UriTemplate template = new UriTemplate("queues/{queue_name}/messages");
-
-            var parameters =
-                new Dictionary<string, string>()
-                {
-                    { "queue_name", queueName.Value },
-                };
-
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, messages, cancellationToken);
-
-            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
+            var parameters = new Dictionary<string, object> { { "queue_name", queueName } };
 
             return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
-        }
-
-        /// <inheritdoc/>
-        public Task PostMessagesAsync<T>(QueueName queueName, IEnumerable<Message<T>> messages, CancellationToken cancellationToken)
-        {
-            if (queueName == null)
-                throw new ArgumentNullException("queueName");
-            if (messages == null)
-                throw new ArgumentNullException("messages");
-
-            return PostMessagesAsync(queueName, cancellationToken, messages.ToArray());
-        }
-
-        /// <inheritdoc/>
-        public Task PostMessagesAsync<T>(QueueName queueName, CancellationToken cancellationToken, params Message<T>[] messages)
-        {
-            if (queueName == null)
-                throw new ArgumentNullException("queueName");
-            if (messages == null)
-                throw new ArgumentNullException("messages");
-            if (messages.Contains(null))
-                throw new ArgumentException("messages cannot contain any null values");
-
-            if (messages.Length == 0)
-                return this.QueueExistsAsync(queueName, cancellationToken);
-
-            UriTemplate template = new UriTemplate("queues/{queue_name}/messages");
-
-            var parameters =
-                new Dictionary<string, string>()
-                {
-                    { "queue_name", queueName.Value },
-                };
-
-            Func<Task<Uri>, Task<HttpRequestMessage>> prepareRequest =
-                PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, messages, cancellationToken);
-
-            Func<Task<HttpRequestMessage>, Task<string>> requestResource =
-                GetResponseAsyncFunc(cancellationToken);
-
-            return GetBaseUriAsync(cancellationToken)
-                .Then(prepareRequest)
-                .Then(requestResource);
+                .Then(PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, messages.ToArray(), cancellationToken))
+                .Select(task => new PostMessagesApiCall(CreateJsonApiCall<PostMessagesResponse>(task.Result)));
         }
 
         /// <inheritdoc/>
