@@ -7,6 +7,7 @@
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
+    using global::Rackspace.Threading;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;

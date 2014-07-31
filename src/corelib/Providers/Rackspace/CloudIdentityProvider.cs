@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Rackspace.Threading;
 using JSIStudios.SimpleRESTServices.Client;
 using JSIStudios.SimpleRESTServices.Client.Json;
-using net.openstack.Core;
 using net.openstack.Core.Caching;
 using net.openstack.Core.Domain;
 using net.openstack.Core.Exceptions.Response;
@@ -16,6 +16,10 @@ using net.openstack.Providers.Rackspace.Objects.Response;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using CancellationToken = System.Threading.CancellationToken;
+
+#if NET35
+using net.openstack.Core;
+#endif
 
 namespace net.openstack.Providers.Rackspace
 {

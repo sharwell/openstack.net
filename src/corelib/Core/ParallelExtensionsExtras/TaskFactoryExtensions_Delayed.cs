@@ -8,6 +8,8 @@
 
 namespace System.Threading.Tasks
 {
+    using Rackspace.Threading;
+
     partial class TaskFactoryExtensions
     {
         #region TaskFactory No Action

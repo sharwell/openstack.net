@@ -5,8 +5,8 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading.Tasks;
-    using net.openstack.Core;
     using net.openstack.Core.Providers;
+    using Rackspace.Threading;
     using CancellationToken = System.Threading.CancellationToken;
 
     /// <summary>
@@ -103,7 +103,7 @@
             if (!owner)
             {
                 // prevent this object from releasing the resource
-                _releaseTask = InternalTaskExtensions.CompletedTask();
+                _releaseTask = CompletedTask.Default;
             }
         }
 
@@ -262,7 +262,7 @@
                 if (_releaseTask == null)
                 {
                     if (_messages.Length == 0)
-                        _releaseTask = InternalTaskExtensions.CompletedTask();
+                        _releaseTask = CompletedTask.Default;
                     else
                         _releaseTask = _service.ReleaseClaimAsync(_queueName, this, cancellationToken);
                 }

@@ -1,11 +1,14 @@
-﻿namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
+﻿// This is intentionally placed in another scope to avoid conflicts between System.IProgress<T> and Rackspace.Threading.IProgress<T>
+using System;
+
+namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
+    using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
@@ -17,7 +20,6 @@
     using Newtonsoft.Json.Linq;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
-    using Encoding = System.Text.Encoding;
     using HttpWebRequest = System.Net.HttpWebRequest;
     using HttpWebResponse = System.Net.HttpWebResponse;
     using Path = System.IO.Path;
@@ -749,7 +751,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="provider"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
-        private static async Task<ReadOnlyCollection<CloudQueue>> ListAllQueuesAsync(IQueueingService provider, int? limit, bool detailed, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollectionPage<CloudQueue>> progress)
+        private static async Task<ReadOnlyCollection<CloudQueue>> ListAllQueuesAsync(IQueueingService provider, int? limit, bool detailed, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<CloudQueue>> progress)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");
@@ -781,7 +783,7 @@
         /// <para>If <paramref name="queueName"/> is <see langword="null"/>.</para>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
-        private static async Task<ReadOnlyCollection<QueuedMessage>> ListAllMessagesAsync(IQueueingService provider, QueueName queueName, int? limit, bool echo, bool includeClaimed, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollectionPage<QueuedMessage>> progress)
+        private static async Task<ReadOnlyCollection<QueuedMessage>> ListAllMessagesAsync(IQueueingService provider, QueueName queueName, int? limit, bool echo, bool includeClaimed, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<QueuedMessage>> progress)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");

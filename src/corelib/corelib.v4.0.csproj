@@ -46,6 +46,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Rackspace.Threading">
+      <HintPath>..\packages\Rackspace.Threading.1.1.0-beta001\lib\net40-client\Rackspace.Threading.dll</HintPath>
+    </Reference>
     <Reference Include="SimpleRESTServices, Version=1.3.0.0, Culture=neutral, PublicKeyToken=8965cea5c205d3a3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SimpleRESTServices.1.3.0.1\lib\net40\SimpleRESTServices.dll</HintPath>
@@ -68,7 +71,6 @@
     <Compile Include="Core\Collections\ReadOnlyCollectionPage`1.cs" />
     <Compile Include="Core\Collections\ReadOnlyDictionary`2.cs" />
     <Compile Include="Core\BackoffPolicy.cs" />
-    <Compile Include="Core\CoreTaskExtensions.cs" />
     <Compile Include="Core\Domain\AuthenticationRequirement.cs" />
     <Compile Include="Core\Domain\AuthenticationType.cs" />
     <Compile Include="Core\Domain\CloudIdentityWithProject.cs" />
@@ -134,11 +136,8 @@
     <Compile Include="Core\Exceptions\VolumeEnteredErrorStateException.cs" />
     <Compile Include="Core\ExtensibleEnum`1.cs" />
     <Compile Include="Core\IBackoffPolicy.cs" />
-    <Compile Include="Core\InternalTaskExtensions.cs" />
-    <Compile Include="Core\IProgress`1.cs" />
     <Compile Include="Core\NamespaceDoc.cs" />
     <Compile Include="Core\Domain\HomeDocument.cs" />
-    <Compile Include="Core\ParallelExtensionsExtras\TaskCompletionSourceExtensions.cs" />
     <Compile Include="Core\ParallelExtensionsExtras\TaskExtrasExtensions.cs" />
     <Compile Include="Core\ParallelExtensionsExtras\TaskFactoryExtensions_Common.cs" />
     <Compile Include="Core\ParallelExtensionsExtras\TaskFactoryExtensions_ContinueWhenAllAny.cs" />
@@ -208,7 +207,6 @@
     <Compile Include="Core\Validators\INetworksValidator.cs" />
     <Compile Include="Core\UserAgentGenerator.cs" />
     <Compile Include="Core\Validators\IHttpResponseCodeValidator.cs" />
-    <Compile Include="Core\WebRequestExtensions.cs" />
     <Compile Include="Providers\Rackspace\CloudBlockStorageProvider.cs" />
     <Compile Include="Core\Exceptions\TTLLengthException.cs" />
     <Compile Include="Core\Providers\IObjectStorageProvider.cs" />

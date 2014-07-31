@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using global::Rackspace.Threading;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using Newtonsoft.Json.Linq;

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.ObjectModel;
     using System.Threading.Tasks;
+    using global::Rackspace.Threading;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace.Objects.Databases;

@@ -1,12 +1,12 @@
 ﻿namespace OpenStackNet.Testing.Unit
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core;
     using System;
     using System.Collections.ObjectModel;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Rackspace.Threading;
 
     /// <preliminary/>
     [TestClass]

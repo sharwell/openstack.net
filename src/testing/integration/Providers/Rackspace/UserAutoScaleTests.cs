@@ -1,14 +1,18 @@
-﻿namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
+﻿// This is intentionally placed in another scope to avoid conflicts between System.IProgress<T> and Rackspace.Threading.IProgress<T>
+using System;
+
+namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
+    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
@@ -56,7 +60,7 @@
                     if (group.State.ActiveCapacity > 0)
                         prepTask = provider.SetGroupConfigurationAsync(group.Id, new GroupConfiguration(group.State.Name, TimeSpan.FromSeconds(60), 0, 0, new JObject()), cancellationTokenSource.Token);
                     else
-                        prepTask = InternalTaskExtensions.CompletedTask();
+                        prepTask = CompletedTask.Default;
 
                     cleanupTasks.Add(prepTask.ContinueWith(task => provider.DeleteGroupAsync(group.Id, false, cancellationTokenSource.Token)).Unwrap());
                 }
@@ -982,7 +986,7 @@
             }
         }
 
-        protected static async Task<ReadOnlyCollection<ScalingGroup>> ListAllScalingGroupsAsync(IAutoScaleService service, int? blockSize, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<ScalingGroup>> progress = null)
+        protected static async Task<ReadOnlyCollection<ScalingGroup>> ListAllScalingGroupsAsync(IAutoScaleService service, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollection<ScalingGroup>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -990,7 +994,7 @@
             return await (await service.ListScalingGroupsAsync(null, blockSize, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
         }
 
-        protected static async Task<ReadOnlyCollection<Policy>> ListAllPoliciesAsync(IAutoScaleService service, ScalingGroupId groupId, int? blockSize, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<Policy>> progress = null)
+        protected static async Task<ReadOnlyCollection<Policy>> ListAllPoliciesAsync(IAutoScaleService service, ScalingGroupId groupId, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollection<Policy>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
@@ -998,7 +1002,7 @@
             return await (await service.ListPoliciesAsync(groupId, null, blockSize, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
         }
 
-        protected static async Task<ReadOnlyCollection<Webhook>> ListAllWebhooksAsync(IAutoScaleService service, ScalingGroupId groupId, PolicyId policyId, int? blockSize, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollection<Webhook>> progress = null)
+        protected static async Task<ReadOnlyCollection<Webhook>> ListAllWebhooksAsync(IAutoScaleService service, ScalingGroupId groupId, PolicyId policyId, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollection<Webhook>> progress = null)
         {
             if (service == null)
                 throw new ArgumentNullException("service");

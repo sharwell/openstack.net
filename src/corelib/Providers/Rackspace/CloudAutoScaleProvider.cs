@@ -6,7 +6,7 @@
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
-    using net.openstack.Core;
+    using global::Rackspace.Threading;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
@@ -16,9 +16,12 @@
     using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
     using HttpResponseCodeValidator = net.openstack.Providers.Rackspace.Validators.HttpResponseCodeValidator;
     using IHttpResponseCodeValidator = net.openstack.Core.Validators.IHttpResponseCodeValidator;
-    using InternalTaskExtensions = net.openstack.Core.InternalTaskExtensions;
     using IRestService = JSIStudios.SimpleRESTServices.Client.IRestService;
     using JsonRestServices = JSIStudios.SimpleRESTServices.Client.Json.JsonRestServices;
+
+#if NET35
+    using net.openstack.Core;
+#endif
 
     /// <summary>
     /// Provides an implementation of <see cref="IAutoScaleService"/> for operating
@@ -825,7 +828,7 @@
         {
             if (_baseUri != null)
             {
-                return InternalTaskExtensions.CompletedTask(_baseUri);
+                return CompletedTask.FromResult(_baseUri);
             }
 
             return Task.Factory.StartNew(

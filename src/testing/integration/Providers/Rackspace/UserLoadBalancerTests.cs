@@ -1,6 +1,8 @@
-﻿namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
+﻿// This is intentionally placed in another scope to avoid conflicts between System.IProgress<T> and Rackspace.Threading.IProgress<T>
+using System;
+
+namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -10,6 +12,7 @@
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using System.Threading.Tasks;
+    using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
@@ -21,7 +24,6 @@
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
-    using Encoding = System.Text.Encoding;
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
     using Interlocked = System.Threading.Interlocked;
     using Path = System.IO.Path;
@@ -1973,7 +1975,7 @@
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="provider"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="limit"/> is less than or equal to 0.</exception>
-        private static async Task<ReadOnlyCollection<LoadBalancer>> ListAllLoadBalancersAsync(ILoadBalancerService provider, int? limit, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollectionPage<LoadBalancer>> progress = null)
+        private static async Task<ReadOnlyCollection<LoadBalancer>> ListAllLoadBalancersAsync(ILoadBalancerService provider, int? limit, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<LoadBalancer>> progress = null)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");
@@ -1983,7 +1985,7 @@
             return await (await provider.ListLoadBalancersAsync(null, limit, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
         }
 
-        private static async Task<ReadOnlyCollection<NodeServiceEvent>> ListAllNodeServiceEventsAsync(ILoadBalancerService provider, LoadBalancerId loadBalancerId, int? limit, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollectionPage<NodeServiceEvent>> progress = null)
+        private static async Task<ReadOnlyCollection<NodeServiceEvent>> ListAllNodeServiceEventsAsync(ILoadBalancerService provider, LoadBalancerId loadBalancerId, int? limit, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<NodeServiceEvent>> progress = null)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");

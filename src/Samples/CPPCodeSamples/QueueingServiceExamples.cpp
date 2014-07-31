@@ -10,6 +10,7 @@ using namespace System;
 using namespace System::Collections::ObjectModel;
 using namespace System::Threading;
 using namespace System::Threading::Tasks;
+using namespace Rackspace::Threading;
 
 ref class QueueingServiceExamples
 {

@@ -1,10 +1,13 @@
-﻿namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
+﻿// This is intentionally placed in another scope to avoid conflicts between System.IProgress<T> and Rackspace.Threading.IProgress<T>
+using System;
+
+namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading.Tasks;
+    using global::Rackspace.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
@@ -14,14 +17,10 @@
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
     using Debugger = System.Diagnostics.Debugger;
-    using Encoding = System.Text.Encoding;
-    using Formatting = Newtonsoft.Json.Formatting;
     using HttpWebRequest = System.Net.HttpWebRequest;
     using HttpWebResponse = System.Net.HttpWebResponse;
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
-    using JsonConvert = Newtonsoft.Json.JsonConvert;
     using Path = System.IO.Path;
-    using WebException = System.Net.WebException;
     using WebResponse = System.Net.WebResponse;
 
     [TestClass]
@@ -371,7 +370,7 @@
             }
         }
 
-        protected async Task<ReadOnlyCollection<DatabaseInstance>> ListAllDatabaseInstancesAsync(IDatabaseService provider, int? blockSize, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollectionPage<DatabaseInstance>> progress = null)
+        protected async Task<ReadOnlyCollection<DatabaseInstance>> ListAllDatabaseInstancesAsync(IDatabaseService provider, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<DatabaseInstance>> progress = null)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");
@@ -381,7 +380,7 @@
             return await (await provider.ListDatabaseInstancesAsync(null, blockSize, cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
         }
 
-        protected async Task<ReadOnlyCollection<Database>> ListAllDatabasesAsync(IDatabaseService provider, DatabaseInstanceId instanceId, int? blockSize, CancellationToken cancellationToken, net.openstack.Core.IProgress<ReadOnlyCollectionPage<Database>> progress = null)
+        protected async Task<ReadOnlyCollection<Database>> ListAllDatabasesAsync(IDatabaseService provider, DatabaseInstanceId instanceId, int? blockSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Database>> progress = null)
         {
             if (provider == null)
                 throw new ArgumentNullException("provider");

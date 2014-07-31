@@ -8,6 +8,7 @@
 
 using System.Linq;
 using System.Windows.Threading;
+using Rackspace.Threading;
 
 namespace System.Threading.Tasks
 {
@@ -79,7 +80,7 @@ namespace System.Threading.Tasks
             var tcs = new TaskCompletionSource<object>(state);
             task.ContinueWith(_ =>
             {
-                tcs.SetFromTask(task);
+                tcs.SetFromTask(task, null);
                 if (callback != null) callback(tcs.Task);
             });
             return tcs.Task;
@@ -245,7 +246,7 @@ namespace System.Threading.Tasks
             task.ContinueWith(t =>
             {
                 timer.Dispose();
-                result.TrySetFromTask(t);
+                result.TrySetFromTask(t, null);
             }, TaskContinuationOptions.ExecuteSynchronously);
             return result.Task;
         }

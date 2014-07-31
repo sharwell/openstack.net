@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
+    using global::Rackspace.Threading;
     using JSIStudios.SimpleRESTServices.Client;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
@@ -1267,7 +1268,7 @@
         {
             if (_baseUri != null)
             {
-                return InternalTaskExtensions.CompletedTask(_baseUri);
+                return CompletedTask.FromResult(_baseUri);
             }
 
             return Task.Factory.StartNew(

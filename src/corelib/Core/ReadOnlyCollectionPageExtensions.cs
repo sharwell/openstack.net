@@ -6,6 +6,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using net.openstack.Core.Collections;
+    using Rackspace.Threading;
 
     /// <summary>
     /// This class provides extension methods for the <see cref="ReadOnlyCollectionPage{T}"/> class.
@@ -52,7 +53,7 @@
 
             if (!page.CanHaveNextPage || page.Count == 0)
             {
-                return InternalTaskExtensions.CompletedTask<ReadOnlyCollection<T>>(page);
+                return CompletedTask.FromResult<ReadOnlyCollection<T>>(page);
             }
 
             TaskCompletionSource<ReadOnlyCollection<T>> taskCompletionSource = new TaskCompletionSource<ReadOnlyCollection<T>>();
