@@ -9,7 +9,6 @@ using System.Text;
 using JSIStudios.SimpleRESTServices.Client;
 using JSIStudios.SimpleRESTServices.Client.Json;
 using net.openstack.Core;
-using net.openstack.Core.Collections;
 using net.openstack.Core.Domain;
 using net.openstack.Core.Domain.Mapping;
 using net.openstack.Core.Exceptions;
@@ -23,6 +22,12 @@ using net.openstack.Providers.Rackspace.Objects.Monitoring;
 using net.openstack.Providers.Rackspace.Objects.Response;
 using net.openstack.Providers.Rackspace.Validators;
 using Newtonsoft.Json;
+
+#if NET45PLUS
+using System.Collections.ObjectModel;
+#else
+using net.openstack.Core.Collections;
+#endif
 
 namespace net.openstack.Providers.Rackspace
 {

@@ -3,9 +3,14 @@
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain.Converters;
     using Newtonsoft.Json;
+
+#if NET45PLUS
+    using System.Collections.ObjectModel;
+#else
+    using net.openstack.Core.Collections;
+#endif
 
     /// <summary>
     /// This class models the configurable properties of the JSON representation of

@@ -53,10 +53,10 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Rackspace.Threading">
-      <HintPath>..\..\packages\Rackspace.Threading.1.1.0-beta001\lib\net40-client\Rackspace.Threading.dll</HintPath>
+      <HintPath>..\..\packages\Rackspace.Threading.1.1.0-beta001\lib\net45\Rackspace.Threading.dll</HintPath>
     </Reference>
     <Reference Include="Security.Cryptography">
       <HintPath>..\..\lib\Security.Cryptography\Security.Cryptography.dll</HintPath>
@@ -106,9 +106,9 @@
     <Compile Include="Providers\Rackspace\UserServerTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\corelib\corelib.v4.0.csproj">
-      <Project>{7DBA11EB-DBA7-4D3A-8D42-B5312E74B9C0}</Project>
-      <Name>corelib.v4.0</Name>
+    <ProjectReference Include="..\..\corelib\corelib.v4.5.csproj">
+      <Project>{bd12ad92-10be-4380-a5a0-f5062e9b8e35}</Project>
+      <Name>corelib.v4.5</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

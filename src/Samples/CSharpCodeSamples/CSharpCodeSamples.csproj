@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Rackspace.Threading">
-      <HintPath>..\..\packages\Rackspace.Threading.1.1.0-beta001\lib\net40-client\Rackspace.Threading.dll</HintPath>
+      <HintPath>..\..\packages\Rackspace.Threading.1.1.0-beta001\lib\net45\Rackspace.Threading.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -55,9 +55,9 @@
     <None Include="packages.CSharpCodeSamples.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\corelib\corelib.v4.0.csproj">
-      <Project>{7dba11eb-dba7-4d3a-8d42-b5312e74b9c0}</Project>
-      <Name>corelib.v4.0</Name>
+    <ProjectReference Include="..\..\corelib\corelib.v4.5.csproj">
+      <Project>{bd12ad92-10be-4380-a5a0-f5062e9b8e35}</Project>
+      <Name>corelib.v4.5</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -9,6 +9,10 @@
     using net.openstack.Core.Collections;
     using Newtonsoft.Json.Linq;
 
+#if NET45PLUS
+    using System.Collections.ObjectModel;
+#endif
+
     /// <summary>
     /// This class provides read-only access to a single page of results returned
     /// by a paginated API call in the <see cref="IMonitoringService"/>.

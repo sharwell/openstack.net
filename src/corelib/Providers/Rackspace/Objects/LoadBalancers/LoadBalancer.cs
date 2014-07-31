@@ -2,8 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
-    using net.openstack.Core.Collections;
     using Newtonsoft.Json;
+
+#if NET45PLUS
+    using System.Collections.ObjectModel;
+#else
+    using net.openstack.Core.Collections;
+#endif
 
     /// <summary>
     /// Represents a load balancer in the <see cref="ILoadBalancerService"/>.

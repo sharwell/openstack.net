@@ -3,11 +3,16 @@
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using HttpMethod = JSIStudios.SimpleRESTServices.Client.HttpMethod;
+
+#if NET45PLUS
+    using System.Collections.ObjectModel;
+#else
+    using net.openstack.Core.Collections;
+#endif
 
     /// <summary>
     /// This class models the JSON representation of an Audit resource in the <see cref="IMonitoringService"/>.
