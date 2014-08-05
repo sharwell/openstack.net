@@ -1286,11 +1286,17 @@ namespace net.openstack.Providers.Rackspace
             {
                 webException = task.Exception.Flatten().InnerException as WebException;
                 if (webException == null)
-                    task.PropagateExceptions();
+                {
+                    // propagate the exception
+                    task.Wait();
+                }
 
                 response = webException.Response as HttpWebResponse;
                 if (response == null)
-                    task.PropagateExceptions();
+                {
+                    // propagate the exception
+                    task.Wait();
+                }
             }
             else
             {
@@ -1310,7 +1316,8 @@ namespace net.openstack.Providers.Rackspace
                         throw new WebException(body, task.Exception, webExceptionStatus, webResponse);
                     }
 
-                    task.PropagateExceptions();
+                    // propagate the exception
+                    task.Wait();
                 }
 
                 return Tuple.Create(response, body);
