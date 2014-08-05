@@ -66,7 +66,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 }
 
                 if (cleanupTasks.Count > 0)
-                    await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                    await DelayedTask.WhenAll(cleanupTasks);
             }
         }
 
@@ -103,7 +103,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 }
 
                 if (cleanupTasks.Count > 0)
-                    await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                    await DelayedTask.WhenAll(cleanupTasks);
             }
         }
 
@@ -126,7 +126,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 }
 
                 if (cleanupTasks.Count > 0)
-                    await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                    await DelayedTask.WhenAll(cleanupTasks);
             }
         }
 
@@ -149,7 +149,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 }
 
                 if (cleanupTasks.Count > 0)
-                    await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                    await DelayedTask.WhenAll(cleanupTasks);
             }
         }
 
@@ -1481,7 +1481,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 }
 
                 if (tasks.Count > 0)
-                    await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                    await DelayedTask.WhenAll(tasks);
 
                 bool foundHistoryItem = tasks.Any(i => i.Result);
 
@@ -1501,7 +1501,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
 
             if (tasks.Count > 0)
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
             return tasks.Any(i => i.Result);
         }
@@ -1515,7 +1515,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
 
             if (tasks.Count > 0)
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
             return tasks.Any(i => i.Result);
         }
@@ -1530,7 +1530,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
 
             if (tasks.Count > 0)
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
             return tasks.Any(i => i.Result);
         }
@@ -2061,7 +2061,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 foreach (AlarmExample alarmExample in alarmExamples)
                     tasks.Add(TestEvaluateAlarmExampleAsync(provider, alarmExample, cancellationTokenSource.Token));
 
-                await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
             }
         }
 
@@ -2289,7 +2289,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 foreach (Agent agent in agents)
                     tasks.Add(TestGetAgentHostInformation(provider, agent.Id, cancellationTokenSource.Token));
 
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
                 foreach (Task<string> task in tasks)
                 {
@@ -2333,7 +2333,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 foreach (Agent agent in agents)
                     tasks.Add(TestGetCpuInformation(provider, agent.Id, cancellationTokenSource.Token));
 
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
                 foreach (Task<string> task in tasks)
                 {
@@ -2377,7 +2377,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 foreach (Agent agent in agents)
                     tasks.Add(TestGetDiskInformation(provider, agent.Id, cancellationTokenSource.Token));
 
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
                 foreach (Task<string> task in tasks)
                 {
@@ -2421,7 +2421,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 foreach (Agent agent in agents)
                     tasks.Add(TestGetFilesystemInformation(provider, agent.Id, cancellationTokenSource.Token));
 
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
                 foreach (Task<string> task in tasks)
                 {
@@ -2465,7 +2465,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 foreach (Agent agent in agents)
                     tasks.Add(TestGetMemoryInformation(provider, agent.Id, cancellationTokenSource.Token));
 
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
                 foreach (Task<string> task in tasks)
                 {
@@ -2508,7 +2508,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 foreach (Agent agent in agents)
                     tasks.Add(TestGetNetworkInterfaceInformation(provider, agent.Id, cancellationTokenSource.Token));
 
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
                 foreach (Task<string> task in tasks)
                 {
@@ -2552,7 +2552,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 foreach (Agent agent in agents)
                     tasks.Add(TestGetProcessInformation(provider, agent.Id, cancellationTokenSource.Token));
 
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
                 foreach (Task<string> task in tasks)
                 {
@@ -2596,7 +2596,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 foreach (Agent agent in agents)
                     tasks.Add(TestGetSystemInformation(provider, agent.Id, cancellationTokenSource.Token));
 
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
                 foreach (Task<string> task in tasks)
                 {
@@ -2639,7 +2639,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 foreach (Agent agent in agents)
                     tasks.Add(TestGetLoginInformation(provider, agent.Id, cancellationTokenSource.Token));
 
-                await Task.Factory.ContinueWhenAll((Task[])tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
 
                 foreach (Task<string> task in tasks)
                 {
@@ -2680,7 +2680,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     Assert.Inconclusive("The service did not report any agents.");
 
                 Task<ReadOnlyCollectionPage<AgentConnection, AgentConnectionId>>[] agentConnectionTasks = Array.ConvertAll(agents.ToArray(), agent => provider.ListAgentConnectionsAsync(agent.Id, null, 1, cancellationTokenSource.Token));
-                await Task.Factory.ContinueWhenAll((Task[])agentConnectionTasks, TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(agentConnectionTasks);
 
                 ISet<AgentId> connectedAgents = new HashSet<AgentId>();
                 foreach (Task<ReadOnlyCollectionPage<AgentConnection, AgentConnectionId>> task in agentConnectionTasks)
@@ -2713,7 +2713,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 if (tasks.Count == 0)
                     Assert.Inconclusive("The service did not report any entities with connected agents.");
 
-                await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
             }
         }
 
@@ -2724,7 +2724,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 tasks.Add(TestListAgentCheckTargets(provider, entity, agentCheckType, cancellationToken));
 
             if (tasks.Count > 0)
-                await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(tasks);
         }
 
         private async Task TestListAgentCheckTargets(IMonitoringService provider, Entity entity, CheckTypeId agentCheckType, CancellationToken cancellationToken)

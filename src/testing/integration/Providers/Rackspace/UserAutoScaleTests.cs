@@ -66,7 +66,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 }
 
                 if (cleanupTasks.Count > 0)
-                    await Task.Factory.ContinueWhenAll(cleanupTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                    await DelayedTask.WhenAll(cleanupTasks);
             }
         }
 

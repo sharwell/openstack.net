@@ -57,7 +57,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 }
 
                 if (tasks.Count > 0)
-                    await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                    await DelayedTask.WhenAll(tasks);
             }
         }
 
@@ -80,7 +80,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 }
 
                 if (tasks.Count > 0)
-                    await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                    await DelayedTask.WhenAll(tasks);
             }
         }
 

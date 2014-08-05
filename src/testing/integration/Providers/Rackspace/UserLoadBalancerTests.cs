@@ -255,7 +255,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     sessionPersistence: null);
                 Task<LoadBalancer> tempLoadBalancer2 = provider.CreateLoadBalancerAsync(configuration2, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
-                await Task.Factory.ContinueWhenAll(new Task[] { tempLoadBalancer, tempLoadBalancer2 }, TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(new Task[] { tempLoadBalancer, tempLoadBalancer2 });
                 Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Result.Status);
                 Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer2.Result.Status);
 

@@ -279,7 +279,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     postMessagesTasks.Add(provider.PostMessagesAsync(queueName, cancellationTokenSource.Token, new Message<SampleMetadata>(TimeSpan.FromSeconds(120), new SampleMetadata(i, "Some Message " + i))));
                 }
 
-                await Task.Factory.ContinueWhenAll(postMessagesTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(postMessagesTasks);
 
                 HashSet<int> locatedMessages = new HashSet<int>();
 
@@ -334,7 +334,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     postMessagesTasks.Add(provider.PostMessagesAsync(queueName, cancellationTokenSource.Token, new Message<SampleMetadata>(TimeSpan.FromSeconds(120), new SampleMetadata(i, "Some Message " + i))));
                 }
 
-                await Task.Factory.ContinueWhenAll(postMessagesTasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
+                await DelayedTask.WhenAll(postMessagesTasks);
 
                 HashSet<int> locatedMessages = new HashSet<int>();
 
@@ -420,7 +420,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             Console.WriteLine("Creating request queue...");
             await provider.CreateQueueAsync(requestQueueName, testCancellationTokenSource.Token);
             Console.WriteLine("Creating {0} response queues...", responseQueueNames.Length);
-            await Task.Factory.ContinueWhenAll(responseQueueNames.Select(queueName => (Task)provider.CreateQueueAsync(queueName, testCancellationTokenSource.Token)).ToArray(), TaskExtrasExtensions.PropagateExceptions);
+            await DelayedTask.WhenAll(responseQueueNames.Select(queueName => provider.CreateQueueAsync(queueName, testCancellationTokenSource.Token)));
             TimeSpan initializationTime = initializationTimer.Elapsed;
             Console.WriteLine("Initialization time: {0} sec", initializationTime.TotalSeconds);
 
@@ -437,7 +437,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 serverTasks.Add(SubscribeMessages(requestQueueName, cancellationTokenSource.Token));
 
             // wait for all client and server tasks to finish processing
-            await Task.Factory.ContinueWhenAll(clientTasks.Concat(serverTasks).Cast<Task>().ToArray(), TaskExtrasExtensions.PropagateExceptions);
+            await DelayedTask.WhenAll(clientTasks.Concat(serverTasks));
 
             int clientTotal = 0;
             int serverTotal = 0;
@@ -460,7 +460,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             Console.WriteLine("Deleting request queue...");
             await provider.DeleteQueueAsync(requestQueueName, testCancellationTokenSource.Token);
             Console.WriteLine("Deleting {0} response queues...", responseQueueNames.Length);
-            await Task.Factory.ContinueWhenAll(responseQueueNames.Select(queueName => provider.DeleteQueueAsync(queueName, testCancellationTokenSource.Token)).ToArray(), TaskExtrasExtensions.PropagateExceptions);
+            await DelayedTask.WhenAll(responseQueueNames.Select(queueName => provider.DeleteQueueAsync(queueName, testCancellationTokenSource.Token)));
 
             if (clientTotal == 0)
                 Assert.Inconclusive("No messages were fully processed by the test.");
