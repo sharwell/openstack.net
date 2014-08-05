@@ -1072,55 +1072,34 @@
             if (state == null)
                 throw new ArgumentNullException("state");
 
-            TaskCompletionSource<DatabaseInstance> taskCompletionSource = new TaskCompletionSource<DatabaseInstance>();
-            Func<Task<DatabaseInstance>> pollDatabaseInstance = () => PollDatabaseInstanceStateAsync(instanceId, cancellationToken, progress);
-
+            DatabaseInstance result = null;
             IEnumerator<TimeSpan> backoffPolicy = BackoffPolicy.GetBackoffIntervals().GetEnumerator();
-            Func<Task<DatabaseInstance>> moveNext =
+
+            Func<Task<bool>> condition =
                 () =>
                 {
+                    // the polling operation is cancelled if the back-off policy reaches the end
                     if (!backoffPolicy.MoveNext())
-                        throw new OperationCanceledException();
+                        return CompletedTask.Canceled<bool>();
 
-                    if (backoffPolicy.Current == TimeSpan.Zero)
-                    {
-                        return pollDatabaseInstance();
-                    }
-                    else
-                    {
-                        return Task.Factory.StartNewDelayed((int)backoffPolicy.Current.TotalMilliseconds, cancellationToken)
-                            .Then(task => pollDatabaseInstance());
-                    }
+                    // delay by the requested about, and then poll the current database instance state
+                    return DelayedTask.Delay(backoffPolicy.Current, cancellationToken)
+                        .Then(_ => PollDatabaseInstanceStateAsync(instanceId, cancellationToken, progress))
+                        .Select(task =>
+                        {
+                            // record the result
+                            result = task.Result;
+                            // return true to continue iterating (wait, then poll again), or false
+                            // if the terminating condition is reached
+                            return result != null && result.Status == state;
+                        });
                 };
 
-            Task<DatabaseInstance> currentTask = moveNext();
-            Action<Task<DatabaseInstance>> continuation = null;
-            continuation =
-                previousTask =>
-                {
-                    if (previousTask.Status != TaskStatus.RanToCompletion)
-                    {
-                        taskCompletionSource.SetFromTask(previousTask);
-                        return;
-                    }
+            // all of the actual work is done in the condition function
+            Func<Task> body = () => CompletedTask.Default;
 
-                    DatabaseInstance result = previousTask.Result;
-                    if (result == null || result.Status != state)
-                    {
-                        // finished waiting
-                        taskCompletionSource.SetResult(result);
-                        return;
-                    }
-
-                    // reschedule
-                    currentTask = moveNext();
-                    // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-                    currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
-                };
-            // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-            currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
-
-            return taskCompletionSource.Task;
+            return TaskBlocks.While(condition, body)
+                .Select(_ => result);
         }
 
         /// <summary>

@@ -1107,55 +1107,34 @@
             if (job == null)
                 throw new ArgumentNullException("job");
 
-            TaskCompletionSource<DnsJob> taskCompletionSource = new TaskCompletionSource<DnsJob>();
-            Func<Task<DnsJob>> pollJob = () => PollJobStateAsync(job, showDetails, cancellationToken, progress);
-
+            DnsJob result = null;
             IEnumerator<TimeSpan> backoffPolicy = BackoffPolicy.GetBackoffIntervals().GetEnumerator();
-            Func<Task<DnsJob>> moveNext =
+
+            Func<Task<bool>> condition =
                 () =>
                 {
+                    // the polling operation is cancelled if the back-off policy reaches the end
                     if (!backoffPolicy.MoveNext())
-                        throw new OperationCanceledException();
+                        return CompletedTask.Canceled<bool>();
 
-                    if (backoffPolicy.Current == TimeSpan.Zero)
-                    {
-                        return pollJob();
-                    }
-                    else
-                    {
-                        return Task.Factory.StartNewDelayed((int)backoffPolicy.Current.TotalMilliseconds, cancellationToken)
-                            .Then(task => pollJob());
-                    }
+                    // delay by the requested about, and then poll the current job state
+                    return DelayedTask.Delay(backoffPolicy.Current, cancellationToken)
+                        .Then(_ => PollJobStateAsync(job, showDetails, cancellationToken, progress))
+                        .Select(task =>
+                        {
+                            // record the result
+                            result = task.Result;
+                            // return true to continue iterating (wait, then poll again), or false
+                            // if the terminating condition is reached
+                            return result != null && result.Status != DnsJobStatus.Completed && result.Status != DnsJobStatus.Error;
+                        });
                 };
 
-            Task<DnsJob> currentTask = moveNext();
-            Action<Task<DnsJob>> continuation = null;
-            continuation =
-                previousTask =>
-                {
-                    if (previousTask.Status != TaskStatus.RanToCompletion)
-                    {
-                        taskCompletionSource.SetFromTask(previousTask);
-                        return;
-                    }
+            // all of the actual work is done in the condition function
+            Func<Task> body = () => CompletedTask.Default;
 
-                    DnsJob result = previousTask.Result;
-                    if (result == null || result.Status == DnsJobStatus.Completed || result.Status == DnsJobStatus.Error)
-                    {
-                        // finished waiting
-                        taskCompletionSource.SetResult(result);
-                        return;
-                    }
-
-                    // reschedule
-                    currentTask = moveNext();
-                    // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-                    currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
-                };
-            // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-            currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
-
-            return taskCompletionSource.Task;
+            return TaskBlocks.While(condition, body)
+                .Select(_ => result);
         }
 
         /// <summary>
@@ -1188,55 +1167,34 @@
             if (job == null)
                 throw new ArgumentNullException("job");
 
-            TaskCompletionSource<DnsJob<TResult>> taskCompletionSource = new TaskCompletionSource<DnsJob<TResult>>();
-            Func<Task<DnsJob<TResult>>> pollJob = () => PollJobStateAsync(job, showDetails, cancellationToken, progress);
-
+            DnsJob<TResult> result = null;
             IEnumerator<TimeSpan> backoffPolicy = BackoffPolicy.GetBackoffIntervals().GetEnumerator();
-            Func<Task<DnsJob<TResult>>> moveNext =
+
+            Func<Task<bool>> condition =
                 () =>
                 {
+                    // the polling operation is cancelled if the back-off policy reaches the end
                     if (!backoffPolicy.MoveNext())
-                        throw new OperationCanceledException();
+                        return CompletedTask.Canceled<bool>();
 
-                    if (backoffPolicy.Current == TimeSpan.Zero)
-                    {
-                        return pollJob();
-                    }
-                    else
-                    {
-                        return Task.Factory.StartNewDelayed((int)backoffPolicy.Current.TotalMilliseconds, cancellationToken)
-                            .Then(task => pollJob());
-                    }
+                    // delay by the requested about, and then poll the current job state
+                    return DelayedTask.Delay(backoffPolicy.Current, cancellationToken)
+                        .Then(_ => PollJobStateAsync(job, showDetails, cancellationToken, progress))
+                        .Select(task =>
+                        {
+                            // record the result
+                            result = task.Result;
+                            // return true to continue iterating (wait, then poll again), or false
+                            // if the terminating condition is reached
+                            return result != null && result.Status != DnsJobStatus.Completed && result.Status != DnsJobStatus.Error;
+                        });
                 };
 
-            Task<DnsJob<TResult>> currentTask = moveNext();
-            Action<Task<DnsJob<TResult>>> continuation = null;
-            continuation =
-                previousTask =>
-                {
-                    if (previousTask.Status != TaskStatus.RanToCompletion)
-                    {
-                        taskCompletionSource.SetFromTask(previousTask);
-                        return;
-                    }
+            // all of the actual work is done in the condition function
+            Func<Task> body = () => CompletedTask.Default;
 
-                    DnsJob<TResult> result = previousTask.Result;
-                    if (result == null || result.Status == DnsJobStatus.Completed || result.Status == DnsJobStatus.Error)
-                    {
-                        // finished waiting
-                        taskCompletionSource.SetResult(result);
-                        return;
-                    }
-
-                    // reschedule
-                    currentTask = moveNext();
-                    // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-                    currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
-                };
-            // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-            currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
-
-            return taskCompletionSource.Task;
+            return TaskBlocks.While(condition, body)
+                .Select(_ => result);
         }
 
         /// <summary>

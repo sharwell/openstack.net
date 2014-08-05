@@ -2418,55 +2418,34 @@
             if (state == null)
                 throw new ArgumentNullException("state");
 
-            TaskCompletionSource<LoadBalancer> taskCompletionSource = new TaskCompletionSource<LoadBalancer>();
-            Func<Task<LoadBalancer>> pollLoadBalancer = () => PollLoadBalancerStateAsync(loadBalancerId, cancellationToken, progress);
-
+            LoadBalancer result = null;
             IEnumerator<TimeSpan> backoffPolicy = BackoffPolicy.GetBackoffIntervals().GetEnumerator();
-            Func<Task<LoadBalancer>> moveNext =
+
+            Func<Task<bool>> condition =
                 () =>
                 {
+                    // the polling operation is cancelled if the back-off policy reaches the end
                     if (!backoffPolicy.MoveNext())
-                        throw new OperationCanceledException();
+                        return CompletedTask.Canceled<bool>();
 
-                    if (backoffPolicy.Current == TimeSpan.Zero)
-                    {
-                        return pollLoadBalancer();
-                    }
-                    else
-                    {
-                        return Task.Factory.StartNewDelayed((int)backoffPolicy.Current.TotalMilliseconds, cancellationToken)
-                            .Then(task => pollLoadBalancer());
-                    }
+                    // delay by the requested about, and then poll the current load balancer state
+                    return DelayedTask.Delay(backoffPolicy.Current, cancellationToken)
+                        .Then(_ => PollLoadBalancerStateAsync(loadBalancerId, cancellationToken, progress))
+                        .Select(task =>
+                        {
+                            // record the result
+                            result = task.Result;
+                            // return true to continue iterating (wait, then poll again), or false
+                            // if the terminating condition is reached
+                            return result != null && result.Status == state;
+                        });
                 };
 
-            Task<LoadBalancer> currentTask = moveNext();
-            Action<Task<LoadBalancer>> continuation = null;
-            continuation =
-                previousTask =>
-                {
-                    if (previousTask.Status != TaskStatus.RanToCompletion)
-                    {
-                        taskCompletionSource.SetFromTask(previousTask);
-                        return;
-                    }
+            // all of the actual work is done in the condition function
+            Func<Task> body = () => CompletedTask.Default;
 
-                    LoadBalancer result = previousTask.Result;
-                    if (result == null || result.Status != state)
-                    {
-                        // finished waiting
-                        taskCompletionSource.SetResult(result);
-                        return;
-                    }
-
-                    // reschedule
-                    currentTask = moveNext();
-                    // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-                    currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
-                };
-            // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-            currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
-
-            return taskCompletionSource.Task;
+            return TaskBlocks.While(condition, body)
+                .Select(_ => result);
         }
 
         /// <summary>
@@ -2543,21 +2522,20 @@
             if (loadBalancerIds.Contains(null))
                 throw new ArgumentException("loadBalancerIds cannot contain any null values");
 
-            TaskCompletionSource<LoadBalancer[]> taskCompletionSource = new TaskCompletionSource<LoadBalancer[]>();
+            LoadBalancer[] results = null;
+            IEnumerator<TimeSpan> backoffPolicy = BackoffPolicy.GetBackoffIntervals().GetEnumerator();
+
             Func<Task<LoadBalancer[]>> pollLoadBalancers =
                 () =>
                 {
                     Task<LoadBalancer>[] tasks = Array.ConvertAll(
                         loadBalancerIds,
-                        loadBalancerId =>
-                        {
-                            return PollLoadBalancerStateAsync(loadBalancerId, cancellationToken, null);
-                        });
+                        loadBalancerId => PollLoadBalancerStateAsync(loadBalancerId, cancellationToken, null));
 
-                    return Task.Factory.WhenAll(tasks).Select(
+                    return DelayedTask.WhenAll(tasks.AsEnumerable()).Select(
                         completedTasks =>
                         {
-                            LoadBalancer[] loadBalancers = Array.ConvertAll(completedTasks.Result, completedTask => completedTask.Result);
+                            LoadBalancer[] loadBalancers = completedTasks.Result;
                             if (progress != null)
                                 progress.Report(loadBalancers);
 
@@ -2565,52 +2543,31 @@
                         });
                 };
 
-            IEnumerator<TimeSpan> backoffPolicy = BackoffPolicy.GetBackoffIntervals().GetEnumerator();
-            Func<Task<LoadBalancer[]>> moveNext =
+            Func<Task<bool>> condition =
                 () =>
                 {
+                    // the polling operation is cancelled if the back-off policy reaches the end
                     if (!backoffPolicy.MoveNext())
-                        throw new OperationCanceledException();
+                        return CompletedTask.Canceled<bool>();
 
-                    if (backoffPolicy.Current == TimeSpan.Zero)
-                    {
-                        return pollLoadBalancers();
-                    }
-                    else
-                    {
-                        return Task.Factory.StartNewDelayed((int)backoffPolicy.Current.TotalMilliseconds, cancellationToken)
-                            .Then(task => pollLoadBalancers());
-                    }
+                    // delay by the requested about, and then poll the current load balancer states
+                    return DelayedTask.Delay(backoffPolicy.Current, cancellationToken)
+                        .Then(_ => pollLoadBalancers())
+                        .Select(task =>
+                        {
+                            // record the result
+                            results = task.Result;
+                            // return true to continue iterating (wait, then poll again), or false
+                            // if the terminating condition is reached
+                            return results.Any(result => result != null && result.Status != state);
+                        });
                 };
 
-            Task<LoadBalancer[]> currentTask = moveNext();
-            Action<Task<LoadBalancer[]>> continuation = null;
-            continuation =
-                previousTask =>
-                {
-                    if (previousTask.Status != TaskStatus.RanToCompletion)
-                    {
-                        taskCompletionSource.SetFromTask(previousTask);
-                        return;
-                    }
+            // all of the actual work is done in the condition function
+            Func<Task> body = () => CompletedTask.Default;
 
-                    LoadBalancer[] results = previousTask.Result;
-                    if (results.All(result => result == null || result.Status == state))
-                    {
-                        // finished waiting
-                        taskCompletionSource.SetResult(results);
-                        return;
-                    }
-
-                    // reschedule
-                    currentTask = moveNext();
-                    // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-                    currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
-                };
-            // use ContinueWith since the continuation handles cancellation and faulted antecedent tasks
-            currentTask.ContinueWith(continuation, TaskContinuationOptions.ExecuteSynchronously);
-
-            return taskCompletionSource.Task;
+            return TaskBlocks.While(condition, body)
+                .Select(_ => results);
         }
 
         /// <inheritdoc/>
