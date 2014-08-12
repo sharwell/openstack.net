@@ -62,7 +62,7 @@
                     serviceName = "cloudDatabases";
                     break;
 
-                case "queues":
+                case "queuing":
                     serviceType = "rax:queues";
                     serviceName = "cloudQueues";
                     break;

@@ -11,7 +11,6 @@
     using global::OpenStack.Services.Identity.V2;
     using global::Rackspace.Security.Authentication;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Newtonsoft.Json.Linq;
     using TestHelpers = Rackspace.TestHelpers;
 
     [TestClass]
@@ -23,7 +22,7 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(20))))
             {
                 IComputeService client = CreateProvider();
-                ReadOnlyCollection<Flavor> flavors = await ListAllFlavorsAsync(client, null, cancellationTokenSource.Token);
+                ReadOnlyCollection<Flavor> flavors = await ListAllFlavorsAsync(client, cancellationTokenSource.Token);
                 Console.WriteLine("Flavors");
                 foreach (var flavor in flavors)
                 {
@@ -38,7 +37,13 @@
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(20))))
             {
                 IComputeService client = CreateProvider();
-                ReadOnlyCollection<Flavor> flavors = await ListAllFlavorsAsync(client, 2, cancellationTokenSource.Token);
+
+                int pageSize = 2;
+                Action<ReadOnlyCollectionPage<Flavor>> handler =
+                    page => Assert.IsTrue(page.Count <= pageSize);
+                IProgress<ReadOnlyCollectionPage<Flavor>> progressValidator = new Progress<ReadOnlyCollectionPage<Flavor>>(handler);
+
+                ReadOnlyCollection<Flavor> flavors = await ListAllFlavorsAsync(client, pageSize, null, cancellationTokenSource.Token, progressValidator);
                 Console.WriteLine("Flavors");
                 foreach (var flavor in flavors)
                 {
@@ -47,12 +52,40 @@
             }
         }
 
-        private static async Task<ReadOnlyCollection<Flavor>> ListAllFlavorsAsync(IComputeService client, int? pageSize, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Flavor>> progress = null)
+        [TestMethod]
+        public async Task TestListFlavorsWithChangesSince()
         {
-            if (!pageSize.HasValue)
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(20))))
+            {
+                IComputeService client = CreateProvider();
+                ReadOnlyCollection<Flavor> flavors = await ListAllFlavorsAsync(client, null, DateTimeOffset.Now, cancellationTokenSource.Token);
+                Console.WriteLine("Flavors");
+                foreach (var flavor in flavors)
+                {
+                    Console.WriteLine("  {0} ({1})", flavor.Name, flavor.Id);
+                }
+
+                Assert.AreEqual(0, flavors.Count, "Expected changes-since filter with current date/time to filter out all flavors");
+            }
+        }
+
+        private static Task<ReadOnlyCollection<Flavor>> ListAllFlavorsAsync(IComputeService client, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Flavor>> progress = null)
+        {
+            return ListAllFlavorsAsync(client, null, null, cancellationToken, progress);
+        }
+
+        private static async Task<ReadOnlyCollection<Flavor>> ListAllFlavorsAsync(IComputeService client, int? pageSize, DateTimeOffset? changesSince, CancellationToken cancellationToken, IProgress<ReadOnlyCollectionPage<Flavor>> progress = null)
+        {
+            if (!pageSize.HasValue && !changesSince.HasValue)
                 return await (await client.ListFlavorsAsync(cancellationToken)).GetAllPagesAsync(cancellationToken, progress);
 
-            ListFlavorsApiCall apiCall = await client.PrepareListFlavorsAsync(cancellationToken).WithPageSize(pageSize.Value);
+            Task<ListFlavorsApiCall> apiCallTask = client.PrepareListFlavorsAsync(cancellationToken);
+            if (pageSize.HasValue)
+                apiCallTask = apiCallTask.WithPageSize(pageSize.Value);
+            if (changesSince.HasValue)
+                apiCallTask = apiCallTask.WithChangesSince(changesSince.Value);
+
+            ListFlavorsApiCall apiCall = await apiCallTask;
             return await (await apiCall.SendAsync(cancellationToken)).Item2.GetAllPagesAsync(cancellationToken, progress);
         }
 

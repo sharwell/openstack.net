@@ -36,6 +36,7 @@
         /// <param name="authenticationService">The authentication service to use for authenticating requests made to this service.</param>
         /// <param name="defaultRegion">The preferred region for the service. Unless otherwise specified for a specific client, derived service clients will not use a default region if this value is <see langword="null"/> (i.e. only regionless or global service endpoints will be considered acceptable).</param>
         /// <param name="internalUrl"><see langword="true"/> to access the service over a local network; otherwise, <see langword="false"/> to access the service over a public network (the internet).</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="authenticationService"/> is <see langword="null"/>.</exception>
         public ComputeClient(IAuthenticationService authenticationService, string defaultRegion, bool internalUrl)
             : base(authenticationService, defaultRegion)
         {
@@ -562,6 +563,16 @@
                             _ => _.Result.SendAsync(cancellationToken))
                         .Select(_ => _.Result.Item2);
                 };
+        }
+
+        public Task<Server> WaitForServerStatusAsync(ServerId serverId, IEnumerable<ServerStatus> exitStatus, IProgress<Server> progress)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Image> WaitForImageStatusAsync(ImageId imageId, IEnumerable<ImageStatus> exitStatus, IProgress<Image> progress)
+        {
+            throw new NotImplementedException();
         }
     }
 }

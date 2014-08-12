@@ -55,7 +55,7 @@
                             });
                 };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new ListQuotasApiCall(factory.CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
@@ -66,7 +66,7 @@
             UriTemplate template = new UriTemplate("quotas/{project_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "project_id", projectId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetQuotasApiCall(factory.CreateJsonApiCall<QuotaResponse>(task.Result)));
@@ -77,7 +77,7 @@
             UriTemplate template = new UriTemplate("quotas/{project_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "project_id", projectId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request, cancellationToken))
                 .Select(task => new UpdateQuotasApiCall(factory.CreateJsonApiCall<QuotaResponse>(task.Result)));
@@ -88,7 +88,7 @@
             UriTemplate template = new UriTemplate("quotas/{project_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "project_id", projectId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new ResetQuotasApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -126,12 +126,6 @@
             return CoreTaskExtensions.Using(
                 () => client.PrepareResetQuotasAsync(projectId, cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
-        }
-
-        private static IHttpApiCallFactory GetHttpApiCallFactory(INetworkingService client)
-        {
-            IHttpApiCallFactory factory = client as IHttpApiCallFactory;
-            return factory ?? new HttpApiCallFactory();
         }
     }
 }

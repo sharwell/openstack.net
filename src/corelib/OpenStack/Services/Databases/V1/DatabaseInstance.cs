@@ -12,61 +12,49 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class DatabaseInstance : ExtensibleJsonObject
+    public class DatabaseInstance : DatabaseInstanceData
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>
         /// This is the backing field for the <see cref="Id"/> property.
         /// </summary>
-        [JsonProperty("id")]
+        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private DatabaseInstanceId _id;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="Name"/> property.
-        /// </summary>
-        [JsonProperty("name")]
-        private string _name;
 
         /// <summary>
         /// This is the backing field for the <see cref="Status"/> property.
         /// </summary>
-        [JsonProperty("status")]
+        [JsonProperty("status", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private DatabaseInstanceStatus _status;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="VolumeConfiguration"/> property.
-        /// </summary>
-        [JsonProperty("volume")]
-        private DatabaseVolumeConfiguration _volumeStatistics;
 
         /// <summary>
         /// This is the backing field for the <see cref="HostName"/> property.
         /// </summary>
-        [JsonProperty("hostname")]
+        [JsonProperty("hostname", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _hostName;
 
         /// <summary>
         /// This is the backing field for the <see cref="Flavor"/> property.
         /// </summary>
-        [JsonProperty("flavor")]
+        [JsonProperty("flavor", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private DatabaseFlavor _flavor;
 
         /// <summary>
         /// This is the backing field for the <see cref="Created"/> property.
         /// </summary>
-        [JsonProperty("created")]
+        [JsonProperty("created", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private DateTimeOffset? _created;
 
         /// <summary>
         /// This is the backing field for the <see cref="Updated"/> property.
         /// </summary>
-        [JsonProperty("updated")]
+        [JsonProperty("updated", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private DateTimeOffset? _updated;
 
         /// <summary>
         /// This is the backing field for the <see cref="Links"/> property.
         /// </summary>
-        [JsonProperty("links")]
+        [JsonProperty("links", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private Link[] _links;
 #pragma warning restore 649
 
@@ -91,17 +79,6 @@
         }
 
         /// <summary>
-        /// Gets the name of the database instance.
-        /// </summary>
-        public string Name
-        {
-            get
-            {
-                return _name;
-            }
-        }
-
-        /// <summary>
         /// Gets the current status of the database instance.
         /// </summary>
         public DatabaseInstanceStatus Status
@@ -109,17 +86,6 @@
             get
             {
                 return _status;
-            }
-        }
-
-        /// <summary>
-        /// Gets the volume configuration for the database instance.
-        /// </summary>
-        public DatabaseVolumeConfiguration VolumeConfiguration
-        {
-            get
-            {
-                return _volumeStatistics;
             }
         }
 

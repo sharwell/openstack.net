@@ -48,6 +48,11 @@ namespace OpenStack.Services.Compute.V2
         /// <item>An <c>alternate</c> link can contain an alternative representation of the resource. For example, an OpenStack Compute image might have an alternate representation in the OpenStack Image service.</item>
         /// </list>
         /// </remarks>
+        /// <value>
+        /// The link relation.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
         /// <seealso href="http://docs.openstack.org/api/openstack-compute/2/content/LinksReferences.html">Links and References (OpenStack Compute API v2 and Extensions Reference)</seealso>
         public string Relation
         {
@@ -60,6 +65,11 @@ namespace OpenStack.Services.Compute.V2
         /// <summary>
         /// Gets the link target.
         /// </summary>
+        /// <value>
+        /// The link target.
+        /// <para>-or-</para>
+        /// <para><see langword="null"/> if the JSON representation did not include the underlying property.</para>
+        /// </value>
         /// <seealso href="http://docs.openstack.org/api/openstack-compute/2/content/LinksReferences.html">Links and References (OpenStack Compute API v2 and Extensions Reference)</seealso>
         public Uri Target
         {

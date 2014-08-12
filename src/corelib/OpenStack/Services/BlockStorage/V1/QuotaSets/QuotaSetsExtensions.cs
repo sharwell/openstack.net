@@ -17,7 +17,7 @@
             UriTemplate template = new UriTemplate("os-quota-sets/{tenant_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "tenant_id", projectId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(service);
+            IHttpApiCallFactory factory = service.GetHttpApiCallFactory();
             return service.GetBaseUriAsync(cancellationToken)
                 .Then(service.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetQuotasApiCall(factory.CreateJsonApiCall<QuotaSetResponse>(task.Result)));
@@ -28,7 +28,7 @@
             UriTemplate template = new UriTemplate("os-quota-sets/{tenant_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "tenant_id", projectId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(service);
+            IHttpApiCallFactory factory = service.GetHttpApiCallFactory();
             return service.GetBaseUriAsync(cancellationToken)
                 .Then(service.PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request, cancellationToken))
                 .Select(task => new UpdateQuotasApiCall(factory.CreateJsonApiCall<QuotaSetResponse>(task.Result)));
@@ -39,7 +39,7 @@
             UriTemplate template = new UriTemplate("os-quota-sets/{tenant_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "tenant_id", projectId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(service);
+            IHttpApiCallFactory factory = service.GetHttpApiCallFactory();
             return service.GetBaseUriAsync(cancellationToken)
                 .Then(service.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new RemoveQuotasApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -50,7 +50,7 @@
             UriTemplate template = new UriTemplate("os-quota-sets/defaults");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(service);
+            IHttpApiCallFactory factory = service.GetHttpApiCallFactory();
             return service.GetBaseUriAsync(cancellationToken)
                 .Then(service.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetDefaultQuotasApiCall(factory.CreateJsonApiCall<QuotaSetResponse>(task.Result)));
@@ -61,7 +61,7 @@
             UriTemplate template = new UriTemplate("os-quota-sets/{tenant_id}/{user_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "tenant_id", projectId.Value }, { "user_id", userId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(service);
+            IHttpApiCallFactory factory = service.GetHttpApiCallFactory();
             return service.GetBaseUriAsync(cancellationToken)
                 .Then(service.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetUserQuotasApiCall(factory.CreateJsonApiCall<QuotaSetResponse>(task.Result)));
@@ -72,7 +72,7 @@
             UriTemplate template = new UriTemplate("os-quota-sets/{tenant_id}/{user_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "tenant_id", projectId.Value }, { "user_id", userId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(service);
+            IHttpApiCallFactory factory = service.GetHttpApiCallFactory();
             return service.GetBaseUriAsync(cancellationToken)
                 .Then(service.PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request, cancellationToken))
                 .Select(task => new UpdateUserQuotasApiCall(factory.CreateJsonApiCall<QuotaSetResponse>(task.Result)));
@@ -83,7 +83,7 @@
             UriTemplate template = new UriTemplate("os-quota-sets/{tenant_id}/{user_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "tenant_id", projectId.Value }, { "user_id", userId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(service);
+            IHttpApiCallFactory factory = service.GetHttpApiCallFactory();
             return service.GetBaseUriAsync(cancellationToken)
                 .Then(service.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new RemoveUserQuotasApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -94,7 +94,7 @@
             UriTemplate template = new UriTemplate("os-quota-sets/{tenant_id}/detail/{user_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "tenant_id", projectId.Value }, { "user_id", userId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(service);
+            IHttpApiCallFactory factory = service.GetHttpApiCallFactory();
             return service.GetBaseUriAsync(cancellationToken)
                 .Then(service.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetUserQuotaDetailsApiCall(factory.CreateJsonApiCall<QuotaSetDetailsResponse>(task.Result)));
@@ -190,12 +190,6 @@
                     () => service.PrepareGetUserQuotaDetailsAsync(projectId, userId, cancellationToken),
                     task => task.Result.SendAsync(cancellationToken))
                 .Select(task => task.Result.Item2.QuotaSetDetails);
-        }
-
-        private static IHttpApiCallFactory GetHttpApiCallFactory(IBlockStorageService service)
-        {
-            IHttpApiCallFactory factory = service as IHttpApiCallFactory;
-            return factory ?? new HttpApiCallFactory();
         }
     }
 }

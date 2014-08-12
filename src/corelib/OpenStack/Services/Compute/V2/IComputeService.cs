@@ -1,7 +1,13 @@
 ﻿namespace OpenStack.Services.Compute.V2
 {
+    using System;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+
+#if !NET40PLUS
+    using Rackspace.Threading;
+#endif
 
     public interface IComputeService : IHttpService
     {
@@ -90,6 +96,14 @@
         Task<ListExtensionsApiCall> PrepareListExtensionsAsync(CancellationToken cancellationToken);
 
         Task<GetExtensionApiCall> PrepareGetExtensionAsync(ExtensionAlias alias, CancellationToken cancellationToken);
+
+        #endregion
+
+        #region Polling Operations
+
+        Task<Server> WaitForServerStatusAsync(ServerId serverId, IEnumerable<ServerStatus> exitStatus, IProgress<Server> progress);
+
+        Task<Image> WaitForImageStatusAsync(ImageId imageId, IEnumerable<ImageStatus> exitStatus, IProgress<Image> progress);
 
         #endregion
     }

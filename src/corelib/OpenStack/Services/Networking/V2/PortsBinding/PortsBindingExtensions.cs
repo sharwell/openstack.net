@@ -115,11 +115,5 @@
             extensionData["binding:vnic_type"] = JToken.FromObject(vnicType);
             return new PortData(port.NetworkId, port.Name, port.Status, port.AdminStateUp, port.ProjectId, port.PhysicalAddress, port.FixedAddresses, extensionData);
         }
-
-        private static IHttpApiCallFactory GetHttpApiCallFactory(INetworkingService client)
-        {
-            IHttpApiCallFactory factory = client as IHttpApiCallFactory;
-            return factory ?? new HttpApiCallFactory();
-        }
     }
 }

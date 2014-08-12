@@ -30,7 +30,7 @@
             UriTemplate template = new UriTemplate("metering-labels");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request, cancellationToken))
                 .Select(task => new AddMeteringLabelApiCall(factory.CreateJsonApiCall<MeteringLabelResponse>(task.Result)));
@@ -66,7 +66,7 @@
                             });
                 };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new ListMeteringLabelsApiCall(factory.CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
@@ -77,7 +77,7 @@
             UriTemplate template = new UriTemplate("metering-labels/{metering_label_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "metering_label_id", meteringLabelId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetMeteringLabelApiCall(factory.CreateJsonApiCall<MeteringLabelResponse>(task.Result)));
@@ -88,7 +88,7 @@
             UriTemplate template = new UriTemplate("metering-labels/{metering_label_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "metering_label_id", meteringLabelId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new RemoveMeteringLabelApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -99,7 +99,7 @@
             UriTemplate template = new UriTemplate("metering-label-rules");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request, cancellationToken))
                 .Select(task => new AddMeteringLabelRuleApiCall(factory.CreateJsonApiCall<MeteringLabelRuleResponse>(task.Result)));
@@ -135,7 +135,7 @@
                             });
                 };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new ListMeteringLabelRulesApiCall(factory.CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
@@ -146,7 +146,7 @@
             UriTemplate template = new UriTemplate("metering-label-rules/{metering_label_rule_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "metering_label_rule_id", meteringLabelRuleId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetMeteringLabelRuleApiCall(factory.CreateJsonApiCall<MeteringLabelRuleResponse>(task.Result)));
@@ -157,7 +157,7 @@
             UriTemplate template = new UriTemplate("metering-label-rules/{metering_label_rule_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "metering_label_rule_id", meteringLabelRuleId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new RemoveMeteringLabelRuleApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -229,12 +229,6 @@
             return CoreTaskExtensions.Using(
                 () => client.PrepareRemoveMeteringLabelRuleAsync(meteringLabelRuleId, cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
-        }
-
-        private static IHttpApiCallFactory GetHttpApiCallFactory(INetworkingService client)
-        {
-            IHttpApiCallFactory factory = client as IHttpApiCallFactory;
-            return factory ?? new HttpApiCallFactory();
         }
     }
 }

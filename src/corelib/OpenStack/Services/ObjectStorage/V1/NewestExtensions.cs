@@ -30,8 +30,14 @@
         /// needed.
         /// </remarks>
         /// <param name="task">A <see cref="Task"/> representing the asynchronous operation to prepare an HTTP API call.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property contains
+        /// the modified API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">If the API call provided by <paramref name="task"/> has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">If the API call provided by <paramref name="task"/> has already been sent.</exception>
         public static Task<GetAccountMetadataApiCall> WithNewest(this Task<GetAccountMetadataApiCall> task)
         {
             if (task == null)
@@ -51,8 +57,14 @@
         /// needed.
         /// </remarks>
         /// <param name="task">A <see cref="Task"/> representing the asynchronous operation to prepare an HTTP API call.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property contains
+        /// the modified API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">If the API call provided by <paramref name="task"/> has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">If the API call provided by <paramref name="task"/> has already been sent.</exception>
         public static Task<GetContainerMetadataApiCall> WithNewest(this Task<GetContainerMetadataApiCall> task)
         {
             if (task == null)
@@ -72,8 +84,14 @@
         /// needed.
         /// </remarks>
         /// <param name="task">A <see cref="Task"/> representing the asynchronous operation to prepare an HTTP API call.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property contains
+        /// the modified API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">If the API call provided by <paramref name="task"/> has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">If the API call provided by <paramref name="task"/> has already been sent.</exception>
         public static Task<GetObjectMetadataApiCall> WithNewest(this Task<GetObjectMetadataApiCall> task)
         {
             if (task == null)
@@ -93,8 +111,14 @@
         /// needed.
         /// </remarks>
         /// <param name="task">A <see cref="Task"/> representing the asynchronous operation to prepare an HTTP API call.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property contains
+        /// the modified API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">If the API call provided by <paramref name="task"/> has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">If the API call provided by <paramref name="task"/> has already been sent.</exception>
         public static Task<GetObjectApiCall> WithNewest(this Task<GetObjectApiCall> task)
         {
             if (task == null)
@@ -114,8 +138,14 @@
         /// needed.
         /// </remarks>
         /// <param name="task">A <see cref="Task"/> representing the asynchronous operation to prepare an HTTP API call.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property contains
+        /// the modified API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">If the API call provided by <paramref name="task"/> has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">If the API call provided by <paramref name="task"/> has already been sent.</exception>
         public static Task<ListContainersApiCall> WithNewest(this Task<ListContainersApiCall> task)
         {
             if (task == null)
@@ -135,8 +165,14 @@
         /// needed.
         /// </remarks>
         /// <param name="task">A <see cref="Task"/> representing the asynchronous operation to prepare an HTTP API call.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property contains
+        /// the modified API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">If the API call provided by <paramref name="task"/> has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">If the API call provided by <paramref name="task"/> has already been sent.</exception>
         public static Task<ListObjectsApiCall> WithNewest(this Task<ListObjectsApiCall> task)
         {
             if (task == null)
@@ -147,11 +183,17 @@
 
         /// <summary>
         /// Updates an arbitrary <see cref="IHttpApiRequest"/> to include the <c>X-Newest</c> header.
-       ///  The value of the header is <c>true</c>.
+        /// The value of the header is <c>true</c>.
         /// </summary>
         /// <param name="task">A <see cref="Task"/> representing the asynchronous operation to prepare an HTTP API call.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation. When the task
+        /// completes successfully, the <see cref="Task{TResult}.Result"/> property contains
+        /// the modified API call.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="task"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">If the API call provided by <paramref name="task"/> has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">If the API call provided by <paramref name="task"/> has already been sent.</exception>
         private static Task<TCall> WithNewestImpl<TCall>(this Task<TCall> task)
             where TCall : IHttpApiRequest
         {

@@ -38,6 +38,59 @@
         public const string UnitTestInterfacePrefix = "UnitTestInterface-";
 
 #if !PORTABLE
+
+        public void ExamineImages(IComputeProvider provider)
+        {
+            ServerImage[] images = ListAllImagesSince(provider, DateTimeOffset.Now - TimeSpan.FromHours(24)).ToArray();
+            foreach (ServerImage image in images)
+            {
+                if (image.Status == ImageState.Active)
+                {
+                    if (image.Progress == 100)
+                    {
+                        // Successful image; ignore this case.
+                    }
+                    else
+                    {
+                        // TODO: It really shouldn't be active? Not sure how to handle.
+                    }
+                }
+                else if (image.Status == ImageState.Error || image.Status == ImageState.Unknown)
+                {
+                    // TODO: send email for this image here
+                }
+                else if (image.Status == ImageState.Saving)
+                {
+                    // Status is Saving (not yet complete; handle next time)
+                }
+                else if (image.Status == ImageState.Deleted)
+                {
+                    // Could occur since changesSince is specified. Probably want to ignore.
+                }
+                else
+                {
+                    // TODO: Some unrecognized/undocumented status was returned. Not sure how to handle.
+                }
+            }
+        }
+
+        public static IEnumerable<ServerImage> ListAllImagesSince(IComputeProvider provider, DateTimeOffset? changesSince = null, string region = null, CloudIdentity identity = null)
+        {
+            ServerImage lastImage = null;
+
+            do
+            {
+                string marker = lastImage != null ? lastImage.Id : null;
+                IEnumerable<ServerImage> images = provider.ListImagesWithDetails(changesSince: changesSince, markerId:  marker, region: region, identity: identity);
+                lastImage = null;
+                foreach (ServerImage image in images)
+                {
+                    lastImage = image;
+                    yield return image;
+                }
+            } while (lastImage != null);
+        }
+
         public static IEnumerable<SimpleServer> ListAllServers(IComputeProvider provider, int? blockSize = null, string imageId = null, string flavorId = null, string name = null, ServerState status = null, DateTimeOffset? changesSince = null, string region = null, CloudIdentity identity = null)
         {
             if (blockSize <= 0)

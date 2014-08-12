@@ -4,7 +4,7 @@
 
     /// <summary>
     /// The <see cref="OpenStack.Services.Databases.V1"/> namespace defines
-    /// the object model for communicating with the OpenStack Database service over REST APIs.
+    /// the object model for communicating with the OpenStack Database service over HTTP APIs.
     /// </summary>
     /// <preliminary/>
     [CompilerGenerated]

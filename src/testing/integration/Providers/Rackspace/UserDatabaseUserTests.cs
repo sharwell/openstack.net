@@ -37,15 +37,15 @@
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = UserDatabaseTests.CreateRandomDatabaseInstanceName();
-                DatabaseInstanceConfiguration configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
+                DatabaseInstanceData configuration = new DatabaseInstanceData(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
                 _instance = provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null).Result;
 
                 _databaseName = UserDatabaseTests.CreateRandomDatabaseName();
-                DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration(_databaseName, null, null);
+                DatabaseData databaseConfiguration = new DatabaseData(_databaseName, null, null);
                 provider.CreateDatabaseAsync(_instance.Id, databaseConfiguration, cancellationTokenSource.Token).Wait();
 
                 _databaseName2 = UserDatabaseTests.CreateRandomDatabaseName();
-                DatabaseConfiguration databaseConfiguration2 = new DatabaseConfiguration(_databaseName2, null, null);
+                DatabaseData databaseConfiguration2 = new DatabaseData(_databaseName2, null, null);
                 provider.CreateDatabaseAsync(_instance.Id, databaseConfiguration2, cancellationTokenSource.Token).Wait();
             }
         }
@@ -80,7 +80,7 @@
                 string host = null;
                 UserName userName = UserDatabaseTests.CreateRandomUserName(host);
                 string password = UserDatabaseTests.CreateRandomPassword();
-                UserConfiguration userConfiguration = new UserConfiguration(userName, password);
+                DatabaseUserData userConfiguration = new DatabaseUserData(userName, password);
                 await provider.CreateUserAsync(_instance.Id, userConfiguration, cancellationTokenSource.Token);
 
                 await provider.ListDatabaseUsersAsync(_instance.Id, null, null, cancellationTokenSource.Token);
@@ -100,7 +100,7 @@
                 string host = "%";
                 UserName userName = UserDatabaseTests.CreateRandomUserName(host);
                 string password = UserDatabaseTests.CreateRandomPassword();
-                UserConfiguration userConfiguration = new UserConfiguration(userName, password);
+                DatabaseUserData userConfiguration = new DatabaseUserData(userName, password);
                 await provider.CreateUserAsync(_instance.Id, userConfiguration, cancellationTokenSource.Token);
 
                 await provider.ListDatabaseUsersAsync(_instance.Id, null, null, cancellationTokenSource.Token);
@@ -120,7 +120,7 @@
                 string host = "10.0.0.1";
                 UserName userName = UserDatabaseTests.CreateRandomUserName(host);
                 string password = UserDatabaseTests.CreateRandomPassword();
-                UserConfiguration userConfiguration = new UserConfiguration(userName, password);
+                DatabaseUserData userConfiguration = new DatabaseUserData(userName, password);
                 await provider.CreateUserAsync(_instance.Id, userConfiguration, cancellationTokenSource.Token);
 
                 await provider.ListDatabaseUsersAsync(_instance.Id, null, null, cancellationTokenSource.Token);
@@ -140,7 +140,7 @@
                 string host = null;
                 UserName userName = UserDatabaseTests.CreateRandomUserName(host);
                 string password = UserDatabaseTests.CreateRandomPassword();
-                UserConfiguration userConfiguration = new UserConfiguration(userName, password, _databaseName);
+                DatabaseUserData userConfiguration = new DatabaseUserData(userName, password, _databaseName);
                 await provider.CreateUserAsync(_instance.Id, userConfiguration, cancellationTokenSource.Token);
 
                 await provider.ListDatabaseUsersAsync(_instance.Id, null, null, cancellationTokenSource.Token);
@@ -160,7 +160,7 @@
                 string host = null;
                 UserName userName = UserDatabaseTests.CreateRandomUserName(host);
                 string password = UserDatabaseTests.CreateRandomPassword();
-                UserConfiguration userConfiguration = new UserConfiguration(userName, password, _databaseName, _databaseName2);
+                DatabaseUserData userConfiguration = new DatabaseUserData(userName, password, _databaseName, _databaseName2);
                 await provider.CreateUserAsync(_instance.Id, userConfiguration, cancellationTokenSource.Token);
 
                 await provider.ListDatabaseUsersAsync(_instance.Id, null, null, cancellationTokenSource.Token);
@@ -180,7 +180,7 @@
                 string host = null;
                 UserName userName = UserDatabaseTests.CreateRandomUserName(host);
                 string password = UserDatabaseTests.CreateRandomPassword();
-                UserConfiguration userConfiguration = new UserConfiguration(userName, password);
+                DatabaseUserData userConfiguration = new DatabaseUserData(userName, password);
                 await provider.CreateUserAsync(_instance.Id, userConfiguration, cancellationTokenSource.Token);
 
                 await provider.ListDatabaseUsersAsync(_instance.Id, null, null, cancellationTokenSource.Token);
@@ -200,7 +200,7 @@
                 string host = null;
                 UserName userName = UserDatabaseTests.CreateRandomUserName(host);
                 string password = UserDatabaseTests.CreateRandomPassword();
-                UserConfiguration userConfiguration = new UserConfiguration(userName, password);
+                DatabaseUserData userConfiguration = new DatabaseUserData(userName, password);
                 await provider.CreateUserAsync(_instance.Id, userConfiguration, cancellationTokenSource.Token);
 
                 await provider.SetUserPasswordAsync(_instance.Id, userName, UserDatabaseTests.CreateRandomPassword(), cancellationTokenSource.Token);
@@ -220,7 +220,7 @@
                 string host = null;
                 UserName userName = UserDatabaseTests.CreateRandomUserName(host);
                 string password = UserDatabaseTests.CreateRandomPassword();
-                UserConfiguration userConfiguration = new UserConfiguration(userName, password);
+                DatabaseUserData userConfiguration = new DatabaseUserData(userName, password);
                 await provider.CreateUserAsync(_instance.Id, userConfiguration, cancellationTokenSource.Token);
 
                 UpdateUserConfiguration updateUserConfiguration = new UpdateUserConfiguration(null, UserDatabaseTests.CreateRandomPassword());
@@ -241,7 +241,7 @@
                 string host = null;
                 UserName userName = UserDatabaseTests.CreateRandomUserName(host);
                 string password = UserDatabaseTests.CreateRandomPassword();
-                UserConfiguration userConfiguration = new UserConfiguration(userName, password);
+                DatabaseUserData userConfiguration = new DatabaseUserData(userName, password);
                 await provider.CreateUserAsync(_instance.Id, userConfiguration, cancellationTokenSource.Token);
 
                 DatabaseUser user = await provider.GetUserAsync(_instance.Id, userName, cancellationTokenSource.Token);
@@ -261,7 +261,7 @@
                 string host = null;
                 UserName userName = UserDatabaseTests.CreateRandomUserName(host);
                 string password = UserDatabaseTests.CreateRandomPassword();
-                UserConfiguration userConfiguration = new UserConfiguration(userName, password);
+                DatabaseUserData userConfiguration = new DatabaseUserData(userName, password);
                 await provider.CreateUserAsync(_instance.Id, userConfiguration, cancellationTokenSource.Token);
 
                 ReadOnlyCollection<DatabaseName> accessible;

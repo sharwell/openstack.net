@@ -1,14 +1,17 @@
 ﻿namespace OpenStack.Services.Databases.V1
 {
     using System;
-    using System.Net;
     using Newtonsoft.Json;
     using OpenStack.ObjectModel;
+
+#if !PORTABLE
+    using System.Net;
+#endif
 
     /// <summary>
     /// Represents the unique name of a user in the <see cref="IDatabaseService"/>.
     /// </summary>
-    /// <seealso cref="UserConfiguration.UserName"/>
+    /// <seealso cref="DatabaseUserData.UserName"/>
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonConverter(typeof(UserName.Converter))]

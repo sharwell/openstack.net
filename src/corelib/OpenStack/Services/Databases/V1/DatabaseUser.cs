@@ -10,7 +10,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class DatabaseUser : UserConfiguration
+    public class DatabaseUser : DatabaseUserData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseUser"/> class

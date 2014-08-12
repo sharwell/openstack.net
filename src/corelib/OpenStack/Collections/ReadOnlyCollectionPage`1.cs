@@ -57,7 +57,7 @@
         /// a collection containing the next page of results.
         /// </returns>
         /// <exception cref="InvalidOperationException">If <see cref="CanHaveNextPage"/> is <see langword="false"/>.</exception>
-        /// <exception cref="WebException">If the REST request does not return successfully.</exception>
+        /// <exception cref="WebException">If the HTTP request does not return successfully.</exception>
         public abstract Task<ReadOnlyCollectionPage<T>> GetNextPageAsync(CancellationToken cancellationToken);
 
         /// <summary>

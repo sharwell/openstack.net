@@ -39,7 +39,7 @@
         /// objects containing arbitrary data associated with the properties.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="service"/> is <see langword="null"/>.</exception>
-        /// <exception cref="HttpWebException">If an HTTP API call failed during the preparation of this API call.</exception>
+        /// <exception cref="HttpWebException">If an HTTP API call failed during the operation.</exception>
         /// <seealso cref="GetObjectStorageInfoApiCall"/>
         /// <seealso cref="IObjectStorageService.PrepareGetObjectStorageInfoAsync"/>
         /// <seealso href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/discoverability.html">Discoverability (OpenStack Object Storage API V1 Reference)</seealso>

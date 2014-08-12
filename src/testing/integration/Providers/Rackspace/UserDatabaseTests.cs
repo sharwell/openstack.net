@@ -102,7 +102,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
-                DatabaseInstanceConfiguration configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
+                DatabaseInstanceData configuration = new DatabaseInstanceData(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
                 DatabaseInstance instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 /* Cleanup
@@ -125,7 +125,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
-                DatabaseInstanceConfiguration configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
+                DatabaseInstanceData configuration = new DatabaseInstanceData(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
                 DatabaseInstance instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 bool? enabled = await provider.CheckRootEnabledStatusAsync(instance.Id, cancellationTokenSource.Token);
@@ -164,7 +164,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
-                DatabaseInstanceConfiguration configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
+                DatabaseInstanceData configuration = new DatabaseInstanceData(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
                 DatabaseInstance instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 await provider.RestartDatabaseInstanceAsync(instance.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
@@ -189,7 +189,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
-                DatabaseInstanceConfiguration configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
+                DatabaseInstanceData configuration = new DatabaseInstanceData(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
                 DatabaseInstance instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 DatabaseFlavor nextSmallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).Skip(1).First();
@@ -215,7 +215,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
-                DatabaseInstanceConfiguration configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
+                DatabaseInstanceData configuration = new DatabaseInstanceData(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
                 DatabaseInstance instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 await provider.ResizeDatabaseInstanceVolumeAsync(instance.Id, 2, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
@@ -240,11 +240,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
-                DatabaseInstanceConfiguration configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
+                DatabaseInstanceData configuration = new DatabaseInstanceData(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
                 DatabaseInstance instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 DatabaseName databaseName = CreateRandomDatabaseName();
-                DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration(databaseName, null, null);
+                DatabaseData databaseConfiguration = new DatabaseData(databaseName, null, null);
                 await provider.CreateDatabaseAsync(instance.Id, databaseConfiguration, cancellationTokenSource.Token);
 
                 Console.WriteLine("Databases in instance '{0}':", instance.Name);
@@ -332,7 +332,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
-                DatabaseInstanceConfiguration configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
+                DatabaseInstanceData configuration = new DatabaseInstanceData(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName);
                 DatabaseInstance instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 ReadOnlyCollection<Backup> initialBackups = await backupExtension.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
@@ -341,7 +341,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
                 string backupName = CreateRandomBackupName();
                 string backupDescription = "My backup";
-                BackupConfiguration backupConfiguration = new BackupConfiguration(instance.Id, backupName, backupDescription);
+                BackupData backupConfiguration = new BackupData(instance.Id, backupName, backupDescription);
                 Backup backup = await backupExtension.CreateBackupAsync(backupConfiguration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.AreEqual(BackupStatus.Completed, backup.Status);
 
@@ -363,7 +363,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 ReadOnlyCollection<Backup> instanceBackupsAfterRemove = await backupExtension.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
                 Assert.AreEqual(instanceBackups.Count, instanceBackupsAfterRemove.Count);
 
-                configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName).WithRestorePoint(new RestorePoint(backup.Id));
+                configuration = new DatabaseInstanceData(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName).WithRestorePoint(new RestorePoint(backup.Id));
                 instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Assert.AreEqual(false, await provider.CheckRootEnabledStatusAsync(instance.Id, cancellationTokenSource.Token));
 

@@ -30,7 +30,7 @@
     {
         /// <summary>
         /// Specifies whether the public or internal base address
-        /// should be used for accessing the object storage service.
+        /// should be used for accessing the Queues Service.
         /// </summary>
         private readonly bool _internalUrl;
 
@@ -600,11 +600,11 @@
         /// <inheritdoc/>
         /// <remarks>
         /// This method calls <see cref="IAuthenticationService.GetBaseAddressAsync"/> to obtain a URI
-        /// for the type <c>queues</c>. The preferred name is not specified.
+        /// for the type <c>queuing</c>. The preferred name is not specified.
         /// </remarks>
         protected override Task<Uri> GetBaseUriAsyncImpl(CancellationToken cancellationToken)
         {
-            const string serviceType = "queues";
+            const string serviceType = "queuing";
             const string serviceName = "";
             return AuthenticationService.GetBaseAddressAsync(serviceType, serviceName, DefaultRegion, _internalUrl, cancellationToken);
         }

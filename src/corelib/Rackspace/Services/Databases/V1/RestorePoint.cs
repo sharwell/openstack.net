@@ -1,7 +1,9 @@
 ﻿namespace Rackspace.Services.Databases.V1
 {
     using System;
+    using System.Collections.Generic;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using OpenStack.Services.Databases.V1;
     using ExtensibleJsonObject = OpenStack.ObjectModel.ExtensibleJsonObject;
 
@@ -31,13 +33,31 @@
         /// Initializes a new instance of the <see cref="RestorePoint"/> class
         /// with the specified backup ID.
         /// </summary>
-        /// <param name="backupId">The backup ID. This is obtained from <see cref="Backup.Id">Backup.Id</see>.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="backupId"/> is <see langword="null"/>.</exception>
+        /// <param name="backupId">The backup ID.</param>
         public RestorePoint(BackupId backupId)
         {
-            if (backupId == null)
-                throw new ArgumentNullException("backupId");
+            _backupId = backupId;
+        }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RestorePoint"/> class
+        /// with the specified backup ID.
+        /// </summary>
+        /// <param name="backupId">The backup ID.</param>
+        public RestorePoint(BackupId backupId, params JProperty[] extensionData)
+            : base(extensionData)
+        {
+            _backupId = backupId;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RestorePoint"/> class
+        /// with the specified backup ID.
+        /// </summary>
+        /// <param name="backupId">The backup ID.</param>
+        public RestorePoint(BackupId backupId, IDictionary<string, JToken> extensionData)
+            : base(extensionData)
+        {
             _backupId = backupId;
         }
 

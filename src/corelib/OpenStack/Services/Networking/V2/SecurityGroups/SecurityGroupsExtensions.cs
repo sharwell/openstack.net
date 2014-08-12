@@ -30,7 +30,7 @@
             UriTemplate template = new UriTemplate("security-groups");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request, cancellationToken))
                 .Select(task => new AddSecurityGroupApiCall(factory.CreateJsonApiCall<SecurityGroupResponse>(task.Result)));
@@ -66,7 +66,7 @@
                             });
                 };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new ListSecurityGroupsApiCall(factory.CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
@@ -77,7 +77,7 @@
             UriTemplate template = new UriTemplate("security-groups/{security_group_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "security_group_id", securityGroupId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetSecurityGroupApiCall(factory.CreateJsonApiCall<SecurityGroupResponse>(task.Result)));
@@ -99,7 +99,7 @@
             UriTemplate template = new UriTemplate("security-groups/{security_group_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "security_group_id", securityGroupId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new RemoveSecurityGroupApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -110,7 +110,7 @@
             UriTemplate template = new UriTemplate("security-group-rules");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request, cancellationToken))
                 .Select(task => new AddSecurityGroupRuleApiCall(factory.CreateJsonApiCall<SecurityGroupRuleResponse>(task.Result)));
@@ -146,7 +146,7 @@
                             });
                 };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new ListSecurityGroupRulesApiCall(factory.CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
@@ -157,7 +157,7 @@
             UriTemplate template = new UriTemplate("security-group-rules/{security_group_rule_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "security_group_rule_id", securityGroupRuleId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetSecurityGroupRuleApiCall(factory.CreateJsonApiCall<SecurityGroupRuleResponse>(task.Result)));
@@ -179,7 +179,7 @@
             UriTemplate template = new UriTemplate("security-group-rules/{security_group_rule_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "security_group_rule_id", securityGroupRuleId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new RemoveSecurityGroupRuleApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -273,12 +273,6 @@
                 CoreTaskExtensions.Using(
                     () => client.PrepareRemoveSecurityGroupRuleAsync(securityGroupRuleId, cancellationToken),
                     task => task.Result.SendAsync(cancellationToken));
-        }
-
-        private static IHttpApiCallFactory GetHttpApiCallFactory(INetworkingService client)
-        {
-            IHttpApiCallFactory factory = client as IHttpApiCallFactory;
-            return factory ?? new HttpApiCallFactory();
         }
     }
 }

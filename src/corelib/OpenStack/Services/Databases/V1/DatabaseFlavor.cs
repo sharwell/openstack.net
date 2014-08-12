@@ -19,25 +19,25 @@
         /// <summary>
         /// This is the backing field for the <see cref="Id"/> property.
         /// </summary>
-        [JsonProperty("id")]
+        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private FlavorId _id;
 
         /// <summary>
         /// This is the backing field for the <see cref="Links"/> property.
         /// </summary>
-        [JsonProperty("links")]
+        [JsonProperty("links", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private Link[] _links;
 
         /// <summary>
         /// This is the backing field for the <see cref="Name"/> property.
         /// </summary>
-        [JsonProperty("name")]
+        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private string _name;
 
         /// <summary>
         /// This is the backing field for the <see cref="Memory"/> property.
         /// </summary>
-        [JsonProperty("ram")]
+        [JsonProperty("ram", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? _ram;
 #pragma warning restore 649
 

@@ -1,0 +1,146 @@
+﻿namespace OpenStack.Services.Databases.V1
+{
+    using System;
+    using System.Collections.Generic;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    using ExtensibleJsonObject = OpenStack.ObjectModel.ExtensibleJsonObject;
+
+    /// <summary>
+    /// This class models the JSON object used to describe a new database instance in the <see cref="IDatabaseService"/>.
+    /// </summary>
+    /// <seealso cref="IDatabaseService.CreateDatabaseInstanceAsync"/>
+    /// <threadsafety static="true" instance="false"/>
+    /// <preliminary/>
+    [JsonObject(MemberSerialization.OptIn)]
+    public class DatabaseInstanceData : ExtensibleJsonObject
+    {
+        /// <summary>
+        /// This is the backing field for the <see cref="FlavorRef"/> property.
+        /// </summary>
+        [JsonProperty("flavorRef", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private FlavorRef _flavorRef;
+
+        /// <summary>
+        /// This is the backing field for the <see cref="Volume"/> property.
+        /// </summary>
+        [JsonProperty("volume", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private DatabaseVolumeConfiguration _volume;
+
+        /// <summary>
+        /// This is the backing field for the <see cref="Name"/> property.
+        /// </summary>
+        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private string _name;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseInstanceData"/> class
+        /// during JSON deserialization.
+        /// </summary>
+        [JsonConstructor]
+        protected DatabaseInstanceData()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseInstanceData"/> class
+        /// with the specified values.
+        /// </summary>
+        /// <param name="flavorRef">A <see cref="FlavorRef"/> object describing the flavor of the database instance.</param>
+        /// <param name="volumeConfiguration">A <see cref="DatabaseVolumeConfiguration"/> object containing additional information about
+        /// the database instance storage volume.</param>
+        /// <param name="name">The name of the database instance, or <see langword="null"/> if the database instance is not named.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="flavorRef"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="volumeConfiguration"/> is <see langword="null"/>.</para>
+        /// </exception>
+        public DatabaseInstanceData(FlavorRef flavorRef, DatabaseVolumeConfiguration volumeConfiguration, string name)
+            : this(flavorRef, volumeConfiguration, name, EmptyExtensionData)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseInstanceData"/> class
+        /// with the specified values.
+        /// </summary>
+        /// <param name="flavorRef">A <see cref="FlavorRef"/> object describing the flavor of the database instance.</param>
+        /// <param name="volumeConfiguration">A <see cref="DatabaseVolumeConfiguration"/> object containing additional information about
+        /// the database instance storage volume.</param>
+        /// <param name="name">The name of the database instance, or <see langword="null"/> if the database instance is not named.</param>
+        /// <param name="extensionData">The extension data to include in the JSON representation of this resource.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="flavorRef"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="volumeConfiguration"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="extensionData"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="extensionData"/> contains any <see langword="null"/> values.</exception>
+        public DatabaseInstanceData(FlavorRef flavorRef, DatabaseVolumeConfiguration volumeConfiguration, string name, params JProperty[] extensionData)
+            : base(extensionData)
+        {
+            _flavorRef = flavorRef;
+            _volume = volumeConfiguration;
+            _name = name;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseInstanceData"/> class
+        /// with the specified values.
+        /// </summary>
+        /// <param name="flavorRef">A <see cref="FlavorRef"/> object describing the flavor of the database instance.</param>
+        /// <param name="volumeConfiguration">A <see cref="DatabaseVolumeConfiguration"/> object containing additional information about
+        /// the database instance storage volume.</param>
+        /// <param name="name">The name of the database instance, or <see langword="null"/> if the database instance is not named.</param>
+        /// <param name="extensionData">The extension data to include in the JSON representation of this resource.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="flavorRef"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="volumeConfiguration"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para>If <paramref name="extensionData"/> is <see langword="null"/>.</para>
+        /// </exception>
+        public DatabaseInstanceData(FlavorRef flavorRef, DatabaseVolumeConfiguration volumeConfiguration, string name, IDictionary<string, JToken> extensionData)
+            : base(extensionData)
+        {
+            _flavorRef = flavorRef;
+            _volume = volumeConfiguration;
+            _name = name;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="FlavorRef"/> object describing the flavor of the database instance.
+        /// </summary>
+        public FlavorRef FlavorRef
+        {
+            get
+            {
+                return _flavorRef;
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="DatabaseVolumeConfiguration"/> object containing additional information about
+        /// the database instance storage volume.
+        /// </summary>
+        public DatabaseVolumeConfiguration Volume
+        {
+            get
+            {
+                return _volume;
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the database instance.
+        /// </summary>
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+        }
+    }
+}

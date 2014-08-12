@@ -11,7 +11,7 @@
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class Backup : ExtensibleJsonObject
+    public class Backup : BackupData
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>
@@ -31,18 +31,6 @@
         /// </summary>
         [JsonProperty("locationRef")]
         private string _locationRef;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="Name"/> property.
-        /// </summary>
-        [JsonProperty("name")]
-        private string _name;
-
-        /// <summary>
-        /// This is the backing field for the <see cref="Description"/> property.
-        /// </summary>
-        [JsonProperty("description")]
-        private string _description;
 
         /// <summary>
         /// This is the backing field for the <see cref="Status"/> property.
@@ -83,36 +71,12 @@
             }
         }
 
-        /// <summary>
-        /// Gets the unique identifier of the database instance associated with this backup.
-        /// </summary>
-        public DatabaseInstanceId InstanceId
+        /// <inheritdoc/>
+        public override DatabaseInstanceId InstanceId
         {
             get
             {
-                return _instanceId;
-            }
-        }
-
-        /// <summary>
-        /// Gets the name of this database backup.
-        /// </summary>
-        public string Name
-        {
-            get
-            {
-                return _name;
-            }
-        }
-
-        /// <summary>
-        /// Gets the description associated with this database backup.
-        /// </summary>
-        public string Description
-        {
-            get
-            {
-                return _description;
+                return _instanceId ?? base.InstanceId;
             }
         }
 
@@ -155,7 +119,7 @@
         /// <summary>
         /// Gets a timestamp indicating when this backup was last modified.
         /// </summary>
-        public DateTimeOffset? Updated
+        public DateTimeOffset? LastModified
         {
             get
             {

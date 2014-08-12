@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using OpenStack.Collections;
     using OpenStack.Net;
+    using OpenStack.Threading;
     using Rackspace.Net;
     using Rackspace.Threading;
 
@@ -23,13 +24,19 @@
                 .Select(task => task.Result.Item2);
         }
 
-        public static Task<Server> CreateServerAsync(this IComputeService service, ServerData data, CancellationToken cancellationToken)
+        public static Task<Server> CreateServerAsync(this IComputeService service, ServerData data, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Server> progress)
         {
-            return
+            Task<Server> result =
                 CoreTaskExtensions.Using(
                     () => service.PrepareCreateServerAsync(new ServerRequest(data), cancellationToken),
                     task => task.Result.SendAsync(cancellationToken))
                 .Select(task => task.Result.Item2.Server);
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ServerStatus[] exitStatus = { ServerStatus.Active, ServerStatus.Error, ServerStatus.Unknown, ServerStatus.Suspended };
+            return result.Then(task => service.WaitForServerStatusAsync(task.Result.Id, exitStatus, progress));
         }
 
         public static Task<Server> GetServerAsync(this IComputeService service, ServerId serverId, CancellationToken cancellationToken)
@@ -41,20 +48,32 @@
                 .Select(task => task.Result.Item2.Server);
         }
 
-        public static Task<Server> UpdateServerAsync(this IComputeService service, ServerId serverId, ServerData data, CancellationToken cancellationToken)
+        public static Task<Server> UpdateServerAsync(this IComputeService service, ServerId serverId, ServerData data, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Server> progress)
         {
-            return
+            Task<Server> result =
                 CoreTaskExtensions.Using(
                     () => service.PrepareUpdateServerAsync(serverId, new ServerRequest(data), cancellationToken),
                     task => task.Result.SendAsync(cancellationToken))
                 .Select(task => task.Result.Item2.Server);
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ServerStatus[] exitStatus = { ServerStatus.Active, ServerStatus.Error, ServerStatus.Unknown, ServerStatus.Suspended };
+            return result.Then(task => service.WaitForServerStatusAsync(serverId, exitStatus, progress));
         }
 
-        public static Task RemoveServerAsync(this IComputeService service, ServerId serverId, CancellationToken cancellationToken)
+        public static Task RemoveServerAsync(this IComputeService service, ServerId serverId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Server> progress)
         {
-            return CoreTaskExtensions.Using(
+            Task result = CoreTaskExtensions.Using(
                 () => service.PrepareRemoveServerAsync(serverId, cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ServerStatus[] exitStatus = { ServerStatus.Deleted, ServerStatus.Error, ServerStatus.Unknown, ServerStatus.Suspended };
+            return result.Then(task => service.WaitForServerStatusAsync(serverId, exitStatus, progress));
         }
 
         #endregion
@@ -74,57 +93,100 @@
 
         #region Server Actions
 
-        public static Task ChangePasswordAsync(this IComputeService service, ServerId serverId, ChangePasswordData data, CancellationToken cancellationToken)
+        public static Task ChangePasswordAsync(this IComputeService service, ServerId serverId, ChangePasswordData data, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Server> progress)
         {
-            return CoreTaskExtensions.Using(
+            Task result = CoreTaskExtensions.Using(
                 () => service.PrepareChangePasswordAsync(serverId, new ChangePasswordRequest(data), cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ServerStatus[] exitStatus = { ServerStatus.Active, ServerStatus.Error, ServerStatus.Unknown, ServerStatus.Suspended };
+            return result.Then(task => service.WaitForServerStatusAsync(serverId, exitStatus, progress));
         }
 
-        public static Task RebootServerAsync(this IComputeService service, ServerId serverId, RebootData data, CancellationToken cancellationToken)
+        public static Task RebootServerAsync(this IComputeService service, ServerId serverId, RebootData data, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Server> progress)
         {
-            return CoreTaskExtensions.Using(
+            Task result = CoreTaskExtensions.Using(
                 () => service.PrepareRebootServerAsync(serverId, new RebootRequest(data), cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ServerStatus[] exitStatus = { ServerStatus.Active, ServerStatus.Error, ServerStatus.Unknown, ServerStatus.Suspended };
+            return result.Then(task => service.WaitForServerStatusAsync(serverId, exitStatus, progress));
         }
 
-        public static Task<Server> RebuildServerAsync(this IComputeService service, ServerId serverId, ServerData data, CancellationToken cancellationToken)
+        public static Task<Server> RebuildServerAsync(this IComputeService service, ServerId serverId, ServerData data, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Server> progress)
         {
-            return
+            Task<Server> result =
                 CoreTaskExtensions.Using(
                     () => service.PrepareRebuildServerAsync(serverId, new RebuildRequest(data), cancellationToken),
                     task => task.Result.SendAsync(cancellationToken))
                 .Select(task => task.Result.Item2.Server);
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ServerStatus[] exitStatus = { ServerStatus.Active, ServerStatus.Error, ServerStatus.Unknown, ServerStatus.Suspended };
+            return result.Then(task => service.WaitForServerStatusAsync(serverId, exitStatus, progress));
         }
 
-        public static Task ResizeServerAsync(this IComputeService service, ServerId serverId, ResizeData data, CancellationToken cancellationToken)
+        public static Task ResizeServerAsync(this IComputeService service, ServerId serverId, ResizeData data, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Server> progress)
         {
-            return CoreTaskExtensions.Using(
+            Task result = CoreTaskExtensions.Using(
                 () => service.PrepareResizeServerAsync(serverId, new ResizeRequest(data), cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ServerStatus[] exitStatus = { ServerStatus.Active, ServerStatus.Error, ServerStatus.Unknown, ServerStatus.Suspended };
+            return result.Then(task => service.WaitForServerStatusAsync(serverId, exitStatus, progress));
         }
 
-        public static Task ConfirmServerResizeAsync(this IComputeService service, ServerId serverId, CancellationToken cancellationToken)
+        public static Task ConfirmServerResizeAsync(this IComputeService service, ServerId serverId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Server> progress)
         {
-            return CoreTaskExtensions.Using(
+            Task result = CoreTaskExtensions.Using(
                 () => service.PrepareConfirmServerResizeAsync(serverId, new ConfirmServerResizeRequest(new ConfirmServerResizeData()), cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ServerStatus[] exitStatus = { ServerStatus.Active, ServerStatus.Error, ServerStatus.Unknown, ServerStatus.Suspended };
+            return result.Then(task => service.WaitForServerStatusAsync(serverId, exitStatus, progress));
         }
 
-        public static Task RevertServerResizeAsync(this IComputeService service, ServerId serverId, CancellationToken cancellationToken)
+        public static Task RevertServerResizeAsync(this IComputeService service, ServerId serverId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Server> progress)
         {
-            return CoreTaskExtensions.Using(
+            Task result = CoreTaskExtensions.Using(
                 () => service.PrepareRevertServerResizeAsync(serverId, new RevertServerResizeRequest(new RevertServerResizeData()), cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ServerStatus[] exitStatus = { ServerStatus.Active, ServerStatus.Error, ServerStatus.Unknown, ServerStatus.Suspended };
+            return result.Then(task => service.WaitForServerStatusAsync(serverId, exitStatus, progress));
         }
 
-        public static Task<Uri> CreateImageAsync(this IComputeService service, ServerId serverId, CreateImageData data, CancellationToken cancellationToken)
+        public static Task<Uri> CreateImageAsync(this IComputeService service, ServerId serverId, CreateImageData data, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Server> progress)
         {
-            return
+            Task<Uri> result =
                 CoreTaskExtensions.Using(
                     () => service.PrepareCreateImageAsync(serverId, new CreateImageRequest(data), cancellationToken),
                     task => task.Result.SendAsync(cancellationToken))
                 .Select(task => task.Result.Item2);
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ServerStatus[] exitStatus = { ServerStatus.Active, ServerStatus.Error, ServerStatus.Unknown, ServerStatus.Suspended };
+            return result.Then(task => service.WaitForServerStatusAsync(serverId, exitStatus, progress))
+                .Select(_ => result.Result);
         }
 
         #endregion
@@ -171,11 +233,17 @@
                 .Select(task => task.Result.Item2.Image);
         }
 
-        public static Task RemoveImageAsync(this IComputeService service, ImageId imageId, CancellationToken cancellationToken)
+        public static Task RemoveImageAsync(this IComputeService service, ImageId imageId, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<Image> progress)
         {
-            return CoreTaskExtensions.Using(
+            Task result = CoreTaskExtensions.Using(
                 () => service.PrepareRemoveImageAsync(imageId, cancellationToken),
                 task => task.Result.SendAsync(cancellationToken));
+
+            if (completionOption == AsyncCompletionOption.RequestSubmitted)
+                return result;
+
+            ImageStatus[] exitStatus = { ImageStatus.Deleted, ImageStatus.Error, ImageStatus.Unknown };
+            return result.Then(task => service.WaitForImageStatusAsync(imageId, exitStatus, progress));
         }
 
         #endregion

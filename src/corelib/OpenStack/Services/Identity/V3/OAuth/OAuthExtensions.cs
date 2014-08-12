@@ -18,7 +18,7 @@
             UriTemplate template = new UriTemplate("v3/OS-OAUTH1/consumers");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, cancellationToken))
                 .Select(task => new AddConsumerApiCall(factory.CreateJsonApiCall<ConsumerResponse>(task.Result)));
@@ -34,7 +34,7 @@
             UriTemplate template = new UriTemplate("v3/OS-OAUTH1/consumers/{consumer_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "consumer_id", consumerId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetConsumerApiCall(factory.CreateJsonApiCall<ConsumerResponse>(task.Result)));
@@ -45,7 +45,7 @@
             UriTemplate template = new UriTemplate("v3/OS-OAUTH1/consumers/{consumer_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "consumer_id", consumerId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(new HttpMethod("PATCH"), template, parameters, consumerData, cancellationToken))
                 .Select(task => new UpdateConsumerApiCall(factory.CreateJsonApiCall<ConsumerResponse>(task.Result)));
@@ -56,7 +56,7 @@
             UriTemplate template = new UriTemplate("v3/OS-OAUTH1/consumers/{consumer_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "consumer_id", consumerId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new RemoveConsumerApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -90,7 +90,7 @@
             UriTemplate template = new UriTemplate("v3/OS-OAUTH1/users/{user_id}/access_tokens/{access_token_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "user_id", userId.Value }, { "access_token_id", accessTokenId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetAccessTokenApiCall(factory.CreateJsonApiCall<AccessTokenResponse>(task.Result)));
@@ -101,7 +101,7 @@
             UriTemplate template = new UriTemplate("v3/OS-OAUTH1/users/{user_id}/access_tokens/{access_token_id}");
             Dictionary<string, string> parameters = new Dictionary<string, string> { { "user_id", userId.Value }, { "access_token_id", accessTokenId.Value } };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new RemoveAccessTokenApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -122,18 +122,12 @@
                 { "role_id", roleId.Value },
             };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetAccessTokenRoleApiCall(factory.CreateJsonApiCall<RoleResponse>(task.Result)));
         }
 
         #endregion
-
-        private static IHttpApiCallFactory GetHttpApiCallFactory(IIdentityService client)
-        {
-            IHttpApiCallFactory factory = client as IHttpApiCallFactory;
-            return factory ?? new HttpApiCallFactory();
-        }
     }
 }

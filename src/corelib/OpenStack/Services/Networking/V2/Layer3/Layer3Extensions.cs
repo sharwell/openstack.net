@@ -30,7 +30,7 @@
             UriTemplate template = new UriTemplate("routers");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request, cancellationToken))
                 .Select(task => new AddRouterApiCall(factory.CreateJsonApiCall<RouterResponse>(task.Result)));
@@ -66,7 +66,7 @@
                             });
                 };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new ListRoutersApiCall(factory.CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
@@ -80,7 +80,7 @@
                 { "router_id", routerId.Value }
             };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetRouterApiCall(factory.CreateJsonApiCall<RouterResponse>(task.Result)));
@@ -94,7 +94,7 @@
                 { "router_id", routerId.Value }
             };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request, cancellationToken))
                 .Select(task => new UpdateRouterApiCall(factory.CreateJsonApiCall<RouterResponse>(task.Result)));
@@ -108,7 +108,7 @@
                 { "router_id", routerId.Value }
             };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new RemoveRouterApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -122,7 +122,7 @@
                 { "router_id", routerId.Value }
             };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request, cancellationToken))
                 .Select(task => new AddRouterInterfaceApiCall(factory.CreateJsonApiCall<AddRouterInterfaceResponse>(task.Result)));
@@ -136,7 +136,7 @@
                 { "router_id", routerId.Value }
             };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request, cancellationToken))
                 .Select(task => new RemoveRouterInterfaceApiCall(factory.CreateJsonApiCall<RemoveRouterInterfaceResponse>(task.Result)));
@@ -147,7 +147,7 @@
             UriTemplate template = new UriTemplate("floatingips");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Post, template, parameters, request, cancellationToken))
                 .Select(task => new AddFloatingIpApiCall(factory.CreateJsonApiCall<FloatingIpResponse>(task.Result)));
@@ -183,7 +183,7 @@
                             });
                 };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new ListFloatingIpsApiCall(factory.CreateCustomApiCall(task.Result, HttpCompletionOption.ResponseContentRead, deserializeResult)));
@@ -197,7 +197,7 @@
                 { "floatingip_id", floatingIpId.Value }
             };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Get, template, parameters, cancellationToken))
                 .Select(task => new GetFloatingIpApiCall(factory.CreateJsonApiCall<FloatingIpResponse>(task.Result)));
@@ -211,7 +211,7 @@
                 { "floatingip_id", floatingIpId.Value }
             };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Put, template, parameters, request, cancellationToken))
                 .Select(task => new UpdateFloatingIpApiCall(factory.CreateJsonApiCall<FloatingIpResponse>(task.Result)));
@@ -225,7 +225,7 @@
                 { "floatingip_id", floatingIpId.Value }
             };
 
-            IHttpApiCallFactory factory = GetHttpApiCallFactory(client);
+            IHttpApiCallFactory factory = client.GetHttpApiCallFactory();
             return client.GetBaseUriAsync(cancellationToken)
                 .Then(client.PrepareRequestAsyncFunc(HttpMethod.Delete, template, parameters, cancellationToken))
                 .Select(task => new RemoveFloatingIpApiCall(factory.CreateBasicApiCall(task.Result, HttpCompletionOption.ResponseContentRead)));
@@ -365,12 +365,6 @@
             Dictionary<string, JToken> extensionData = new Dictionary<string, JToken>(quotaData.ExtensionData);
             extensionData["floatingip"] = JToken.FromObject(routerQuota);
             return new QuotaData(quotaData.Network, quotaData.Subnet, quotaData.Port, extensionData);
-        }
-
-        private static IHttpApiCallFactory GetHttpApiCallFactory(INetworkingService client)
-        {
-            IHttpApiCallFactory factory = client as IHttpApiCallFactory;
-            return factory ?? new HttpApiCallFactory();
         }
     }
 }

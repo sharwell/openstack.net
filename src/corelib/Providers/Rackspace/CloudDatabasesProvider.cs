@@ -7,6 +7,7 @@ namespace net.openstack.Providers.Rackspace
     using System.Collections.ObjectModel;
     using System.Net;
     using System.Net.Http;
+    using System.Threading;
     using System.Threading.Tasks;
     using global::Rackspace.Net;
     using global::Rackspace.Threading;
@@ -95,7 +96,7 @@ namespace net.openstack.Providers.Rackspace
         #region IDatabaseService Members
 
         /// <inheritdoc/>
-        public Task<DatabaseInstance> CreateDatabaseInstanceAsync(DatabaseInstanceConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
+        public Task<DatabaseInstance> CreateDatabaseInstanceAsync(DatabaseInstanceData configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
@@ -256,7 +257,7 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <inheritdoc/>
-        public Task<RootUser> EnableRootUserAsync(DatabaseInstanceId instanceId, CancellationToken cancellationToken)
+        public Task<DatabaseUser> EnableRootUserAsync(DatabaseInstanceId instanceId, CancellationToken cancellationToken)
         {
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
@@ -270,7 +271,7 @@ namespace net.openstack.Providers.Rackspace
             Func<Task<HttpRequestMessage>, Task<JObject>> requestResource =
                 GetResponseAsyncFunc<JObject>(cancellationToken);
 
-            Func<Task<JObject>, RootUser> resultSelector =
+            Func<Task<JObject>, DatabaseUser> resultSelector =
                 task =>
                 {
                     JObject result = task.Result;
@@ -281,7 +282,7 @@ namespace net.openstack.Providers.Rackspace
                     if (user == null)
                         return null;
 
-                    return user.ToObject<RootUser>();
+                    return user.ToObject<DatabaseUser>();
                 };
 
             return AuthenticateServiceAsync(cancellationToken)
@@ -435,7 +436,7 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <inheritdoc/>
-        public Task CreateDatabaseAsync(DatabaseInstanceId instanceId, DatabaseConfiguration configuration, CancellationToken cancellationToken)
+        public Task CreateDatabaseAsync(DatabaseInstanceId instanceId, DatabaseData configuration, CancellationToken cancellationToken)
         {
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
@@ -532,7 +533,7 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <inheritdoc/>
-        public Task CreateUserAsync(DatabaseInstanceId instanceId, UserConfiguration configuration, CancellationToken cancellationToken)
+        public Task CreateUserAsync(DatabaseInstanceId instanceId, DatabaseUserData configuration, CancellationToken cancellationToken)
         {
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
@@ -640,7 +641,7 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <inheritdoc/>
-        public Task UpdateUserAsync(DatabaseInstanceId instanceId, UserName userName, UpdateUserConfiguration configuration, CancellationToken cancellationToken)
+        public Task UpdateUserAsync(DatabaseInstanceId instanceId, UserName userName, DatabaseUserData configuration, CancellationToken cancellationToken)
         {
             if (instanceId == null)
                 throw new ArgumentNullException("instanceId");
@@ -894,7 +895,7 @@ namespace net.openstack.Providers.Rackspace
         }
 
         /// <inheritdoc/>
-        public Task<Backup> CreateBackupAsync(BackupConfiguration configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
+        public Task<Backup> CreateBackupAsync(BackupData configuration, AsyncCompletionOption completionOption, CancellationToken cancellationToken, IProgress<DatabaseInstance> progress)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
@@ -1247,6 +1248,91 @@ namespace net.openstack.Providers.Rackspace
         }
 
         Task<Uri> IHttpService.GetBaseUriAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CreateDatabaseInstanceApiCall> PrepareCreateDatabaseInstanceAsync(DatabaseInstanceRequest request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ListDatabaseInstancesApiCall> PrepareListDatabaseInstancesAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<GetDatabaseInstanceApiCall> PrepareGetDatabaseInstanceAsync(DatabaseInstanceId instanceId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<RemoveDatabaseInstanceApiCall> PrepareRemoveDatabaseInstanceAsync(DatabaseInstanceId instanceId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<EnableRootUserApiCall> PrepareEnableRootUserAsync(DatabaseInstanceId instanceId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CheckRootEnabledApiCall> PrepareCheckRootEnabledAsync(DatabaseInstanceId instanceId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<RestartDatabaseInstanceApiCall> PrepareRestartDatabaseInstanceAsync(DatabaseInstanceId instanceId, RestartRequest request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResizeDatabaseInstanceApiCall> PrepareResizeDatabaseInstanceAsync(DatabaseInstanceId instanceId, ResizeRequest request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResizeDatabaseInstanceVolumeApiCall> PrepareResizeDatabaseInstanceVolumeAsync(DatabaseInstanceId instanceId, ResizeVolumeRequest request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CreateDatabasesApiCall> PrepareCreateDatabasesAsync(DatabaseInstanceId instanceId, DatabasesRequest request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ListDatabasesApiCall> PrepareListDatabasesAsync(DatabaseInstanceId instanceId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<RemoveDatabaseApiCall> PrepareRemoveDatabaseAsync(DatabaseInstanceId instanceId, DatabaseName databaseName, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CreateUsersApiCall> PrepareCreateUsersAsync(DatabaseInstanceId instanceId, UsersRequest request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ListUsersApiCall> PrepareListUsersAsync(DatabaseInstanceId instanceId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<RemoveUserApiCall> PrepareRemoveUserAsync(DatabaseInstanceId instanceId, UserName userName, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ListFlavorsApiCall> PrepareListFlavorsAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<GetFlavorApiCall> PrepareGetFlavorAsync(FlavorId flavorId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

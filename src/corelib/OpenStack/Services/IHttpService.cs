@@ -18,8 +18,8 @@
     {
         /// <summary>
         /// Creates a task continuation function responsible for creating an <see cref="HttpRequestMessage"/> for use
-        /// in asynchronous REST API calls. The input to the continuation function is a completed task which
-        /// provides the base absolute URI for the service for use in binding the URI templates for REST API calls,
+        /// in asynchronous HTTP API calls. The input to the continuation function is a completed task which
+        /// provides the base absolute URI for the service for use in binding the URI templates for HTTP API calls,
         /// and the <see cref="CancellationToken"/> which the task should observe.
         /// </summary>
         /// <typeparam name="T">The type used to represent replacement parameters for the URI Template expansion process.</typeparam>
@@ -39,8 +39,8 @@
 
         /// <summary>
         /// Creates a task continuation function responsible for creating an <see cref="HttpRequestMessage"/> for use
-        /// in asynchronous REST API calls. The input to the continuation function is a completed task which
-        /// provides the base absolute URI for the service for use in binding the URI templates for REST API calls,
+        /// in asynchronous HTTP API calls. The input to the continuation function is a completed task which
+        /// provides the base absolute URI for the service for use in binding the URI templates for HTTP API calls,
         /// and the <see cref="CancellationToken"/> which the task should observe.
         /// </summary>
         /// <typeparam name="T">The type used to represent replacement parameters for the URI Template expansion process.</typeparam>
@@ -61,7 +61,7 @@
         Func<Task<Uri>, Task<HttpRequestMessage>> PrepareRequestAsyncFunc<T, TBody>(HttpMethod method, UriTemplate template, IDictionary<string, T> parameters, TBody body, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Gets the base absolute URI to use for making asynchronous REST API calls to this service.
+        /// Gets the base absolute URI to use for making asynchronous HTTP API calls to this service.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <returns>
