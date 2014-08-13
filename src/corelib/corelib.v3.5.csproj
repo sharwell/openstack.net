@@ -40,7 +40,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\..\keys\openstacknetsdk.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\keys\openstack.net.net35.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -639,8 +639,8 @@
     <Compile Include="Providers\Rackspace\WebResponseEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\keys\openstacknetsdk.snk">
-      <Link>openstacknetsdk.snk</Link>
+    <None Include="..\..\..\keys\openstack.net.net35.snk">
+      <Link>openstack.net.net35.snk</Link>
     </None>
     <None Include="corelib.nuspec" />
     <None Include="packages.corelib.v3.5.config" />

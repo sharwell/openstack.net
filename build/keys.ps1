@@ -1,7 +1,7 @@
 # Note: these values may only change during minor release
 $Keys = @{
-	'v3.5' = '8965cea5c205d3a3'
-	'v4.0' = '8965cea5c205d3a3'
+	'v3.5' = '60ee1d542341ddcd'
+	'v4.0' = '326b3de041f03d04'
 }
 
 function Resolve-FullPath() {
