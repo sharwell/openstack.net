@@ -196,8 +196,12 @@
           execution of the task itself. The asynchronous service interfaces do not distinguish between these
           two cases, allowing for any of the specified exceptions to be thrown in either manner.
         </para>
-        <list class="bullet">
-          <listItem>
+      </content>
+
+      <sections>
+        <section>
+          <title>Exceptions Prior to Task Creation</title>
+          <content>
             <para>
               Exceptions thrown prior to the creation of the
               <codeEntityReference>T:System.Threading.Tasks.Task</codeEntityReference> object representing the
@@ -207,8 +211,12 @@
               <codeEntityReference>T:System.ArgumentNullException</codeEntityReference> or
               <codeEntityReference>T:System.ArgumentException</codeEntityReference> to handle the exception.
             </para>
-          </listItem>
-          <listItem>
+          </content>
+        </section>
+
+        <section>
+          <title>Exceptions During Task Execution</title>
+          <content>
             <para>
               Exceptions thrown during the asynchronous execution of the task are wrapped in an
               <codeEntityReference>T:System.AggregateException</codeEntityReference> object and returned by the
@@ -220,9 +228,32 @@
               property within an exception handling block that includes a handler for
               <codeEntityReference>T:System.AggregateException</codeEntityReference>.
             </para>
-          </listItem>
-        </list>
-      </content>
+            <para>
+              This library additionally ensures that exceptions thrown by asynchronous operations are
+              not wrapped in multiple layers of <codeEntityReference>T:System.AggregateException</codeEntityReference>.
+              In other words, an <codeEntityReference>T:System.AggregateException</codeEntityReference>
+              thrown during the asynchronous execution of a task will result in the
+              <codeEntityReference>P:System.AggregateException.Exception</codeEntityReference> property returning an
+              <codeEntityReference>T:System.AggregateException</codeEntityReference> with exactly one inner exception, which is
+              the original <codeEntityReference>T:System.ArgumentException</codeEntityReference>. This
+              guarantee simplifies the use of the API is languages that support <markup>
+                <span class="input">async</span>/<span class="input">await</span>
+              </markup>, since those operators automatically unwrap the first layer of
+              <codeEntityReference>T:System.AggregateException</codeEntityReference>.
+            </para>
+          </content>
+        </section>
+
+        <section>
+          <title>Consistent Exception Handling</title>
+          <content>
+            <para>
+              Applications implementing specialized handling for exception which occur during asynchronous
+              calls have multiple options available for consistent handling.
+            </para>
+          </content>
+        </section>
+      </sections>
     </section>
 
     <section address="SynchronousExtensions">
