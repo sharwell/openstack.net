@@ -158,6 +158,7 @@
     <Compile Include="OpenStack\Services\ObjectStorage\V1\CopyObjectApiCall.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\CreateContainerApiCall.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\CreateObjectApiCall.cs" />
+    <Compile Include="OpenStack\Services\ObjectStorage\V1\CreateObjectApiCallExtensions.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\CreateVersionedContainerApiCall.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ExtractArchiveApiCall.cs" />
     <Compile Include="OpenStack\Services\ObjectStorage\V1\ExtractArchiveError.cs" />

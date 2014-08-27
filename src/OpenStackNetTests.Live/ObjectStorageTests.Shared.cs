@@ -28,6 +28,11 @@
     using Stream = System.IO.Stream;
     using StreamReader = System.IO.StreamReader;
 
+#if false // used by tests that are currently excluded
+    using Newtonsoft.Json;
+    using FileInfo = System.IO.FileInfo;
+#endif
+
     partial class ObjectStorageTests
     {
         /// <summary>
@@ -241,6 +246,11 @@
             await RemoveAllObjectsAsync(service, container, stats, cancellationToken);
 
             await service.RemoveContainerAsync(container, cancellationToken);
+        }
+
+        private Task RemoveAllObjectsAsync(IObjectStorageService service, ContainerName container, CancellationToken cancellationToken)
+        {
+            return RemoveAllObjectsAsync(service, container, new RemovedObjectStats(), cancellationToken);
         }
 
         private async Task RemoveAllObjectsAsync(IObjectStorageService service, ContainerName container, RemovedObjectStats stats, CancellationToken cancellationToken)
@@ -847,6 +857,210 @@
             }
         }
 
+#if false // these tests do not have a corresponding implementation in the V2 SDK (at this point)
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
+        public async Task TestListCDNContainers()
+        {
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
+            {
+                cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(60)));
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+                IObjectStorageService service = CreateService();
+                ReadOnlyCollection<ContainerCDN> containers = await ListAllCdnContainersAsync(service, cancellationToken);
+
+                Console.WriteLine("Containers");
+                foreach (ContainerCDN container in containers)
+                {
+                    Console.WriteLine("  {1}{0}", container.Name, container.CDNEnabled ? "*" : "");
+                }
+            }
+        }
+
+        /// <summary>
+        /// This test covers most of the CDN functionality exposed by <see cref="IObjectStorageProvider"/>.
+        /// </summary>
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
+        public async Task TestCDNOnContainer()
+        {
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
+            {
+                cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(60)));
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+                IObjectStorageService service = CreateService();
+                ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
+                ObjectName objectName = new ObjectName(Path.GetRandomFileName());
+                string fileContents = "File contents!";
+
+                await service.CreateContainerAsync(containerName, cancellationToken);
+
+                using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileContents)))
+                {
+                    await service.CreateObjectAsync(containerName, objectName, stream, cancellationToken, null);
+                }
+
+                Dictionary<string, string> cdnHeaders = await service.EnableCDNOnContainerAsync(containerName, false, cancellationToken);
+                Assert.IsNotNull(cdnHeaders);
+                Console.WriteLine("CDN Headers from EnableCDNOnContainer");
+                foreach (var pair in cdnHeaders)
+                    Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
+
+                ContainerCDN containerHeader = await service.GetContainerCDNHeaderAsync(containerName, cancellationToken);
+                Assert.IsNotNull(containerHeader);
+                Console.WriteLine(JsonConvert.SerializeObject(containerHeader, Formatting.Indented));
+                Assert.IsTrue(containerHeader.CDNEnabled);
+                Assert.IsFalse(containerHeader.LogRetention);
+                Assert.IsTrue(
+                    containerHeader.CDNUri != null
+                    || containerHeader.CDNIosUri != null
+                    || containerHeader.CDNSslUri != null
+                    || containerHeader.CDNStreamingUri != null);
+
+                // Call the other overloads of EnableCDNOnContainer
+                cdnHeaders = await service.EnableCDNOnContainerAsync(containerName, containerHeader.Ttl, cancellationToken);
+                ContainerCDN updatedHeader = await service.GetContainerCDNHeaderAsync(containerName, cancellationToken);
+                Console.WriteLine(JsonConvert.SerializeObject(updatedHeader, Formatting.Indented));
+                Assert.IsNotNull(updatedHeader);
+                Assert.IsTrue(updatedHeader.CDNEnabled);
+                Assert.IsFalse(updatedHeader.LogRetention);
+                Assert.IsTrue(
+                    updatedHeader.CDNUri != null
+                    || updatedHeader.CDNIosUri != null
+                    || updatedHeader.CDNSslUri != null
+                    || updatedHeader.CDNStreamingUri != null);
+                Assert.AreEqual(containerHeader.Ttl, updatedHeader.Ttl);
+
+                cdnHeaders = await service.EnableCDNOnContainerAsync(containerName, containerHeader.Ttl, true, cancellationToken);
+                updatedHeader = await service.GetContainerCDNHeaderAsync(containerName, cancellationToken);
+                Console.WriteLine(JsonConvert.SerializeObject(updatedHeader, Formatting.Indented));
+                Assert.IsNotNull(updatedHeader);
+                Assert.IsTrue(updatedHeader.CDNEnabled);
+                Assert.IsTrue(updatedHeader.LogRetention);
+                Assert.IsTrue(
+                    updatedHeader.CDNUri != null
+                    || updatedHeader.CDNIosUri != null
+                    || updatedHeader.CDNSslUri != null
+                    || updatedHeader.CDNStreamingUri != null);
+                Assert.AreEqual(containerHeader.Ttl, updatedHeader.Ttl);
+
+                // update the container CDN properties
+                Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { CloudFilesProvider.CdnTTL, (updatedHeader.Ttl + 1).ToString() },
+                    { CloudFilesProvider.CdnLogRetention, false.ToString() },
+                    //{ CloudFilesProvider.CdnEnabled, true.ToString() },
+                };
+
+                await service.UpdateContainerCdnHeadersAsync(containerName, headers, cancellationToken);
+                updatedHeader = await service.GetContainerCDNHeaderAsync(containerName, cancellationToken);
+                Console.WriteLine(JsonConvert.SerializeObject(updatedHeader, Formatting.Indented));
+                Assert.IsNotNull(updatedHeader);
+                Assert.IsTrue(updatedHeader.CDNEnabled);
+                Assert.IsFalse(updatedHeader.LogRetention);
+                Assert.IsTrue(
+                    updatedHeader.CDNUri != null
+                    || updatedHeader.CDNIosUri != null
+                    || updatedHeader.CDNSslUri != null
+                    || updatedHeader.CDNStreamingUri != null);
+                Assert.AreEqual(containerHeader.Ttl + 1, updatedHeader.Ttl);
+
+                // attempt to access the container over the CDN
+                if (containerHeader.CDNUri != null || containerHeader.CDNSslUri != null)
+                {
+                    string baseUri = containerHeader.CDNUri ?? containerHeader.CDNSslUri;
+                    Uri uri = new Uri(containerHeader.CDNUri + '/' + objectName);
+                    WebRequest request = WebRequest.Create(uri);
+                    using (WebResponse response = request.GetResponse())
+                    {
+                        Stream cdnStream = response.GetResponseStream();
+                        StreamReader reader = new StreamReader(cdnStream, Encoding.UTF8);
+                        string text = reader.ReadToEnd();
+                        Assert.AreEqual(fileContents, text);
+                    }
+                }
+                else
+                {
+                    Assert.Inconclusive("This integration test relies on cdn_uri or cdn_ssl_uri.");
+                }
+
+                ReadOnlyCollection<ContainerCDN> containers = await ListAllCdnContainersAsync(service, cancellationToken);
+                Console.WriteLine("Containers");
+                foreach (ContainerCDN container in containers)
+                {
+                    Console.WriteLine("    {1}{0}", container.Name, container.CDNEnabled ? "*" : "");
+                }
+
+                cdnHeaders = await service.DisableCDNOnContainerAsync(containerName, cancellationToken);
+                Assert.IsNotNull(cdnHeaders);
+                Console.WriteLine("CDN Headers from DisableCDNOnContainer");
+                foreach (var pair in cdnHeaders)
+                    Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
+
+                updatedHeader = await service.GetContainerCDNHeaderAsync(containerName, cancellationToken);
+                Console.WriteLine(JsonConvert.SerializeObject(updatedHeader, Formatting.Indented));
+                Assert.IsNotNull(updatedHeader);
+                Assert.IsFalse(updatedHeader.CDNEnabled);
+                Assert.IsFalse(updatedHeader.LogRetention);
+                Assert.IsTrue(
+                    updatedHeader.CDNUri != null
+                    || updatedHeader.CDNIosUri != null
+                    || updatedHeader.CDNSslUri != null
+                    || updatedHeader.CDNStreamingUri != null);
+                Assert.AreEqual(containerHeader.Ttl + 1, updatedHeader.Ttl);
+
+                /* Cleanup
+                 */
+                await RemoveContainerWithObjectsAsync(service, containerName, cancellationToken);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
+        public async Task TestStaticWebOnContainer()
+        {
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
+            {
+                cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(60)));
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+                IObjectStorageService service = CreateService();
+                ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
+                ObjectName objectName = new ObjectName(Path.GetRandomFileName());
+                string fileContents = "File contents!";
+
+                await service.CreateContainerAsync(containerName, cancellationToken);
+
+                using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileContents)))
+                {
+                    await service.CreateObjectAsync(containerName, objectName, stream, cancellationToken, null);
+                }
+
+                Dictionary<string, string> cdnHeaders = await service.EnableCDNOnContainerAsync(containerName, false, cancellationToken);
+                Assert.IsNotNull(cdnHeaders);
+                Console.WriteLine("CDN Headers");
+                foreach (var pair in cdnHeaders)
+                    Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
+
+                ObjectName index = objectName;
+                ObjectName error = objectName;
+                ObjectName css = objectName;
+                await service.EnableStaticWebOnContainerAsync(containerName, index: index, error: error, listing: false, cancellationToken: cancellationToken);
+
+                await service.DisableStaticWebOnContainerAsync(containerName, cancellationToken);
+
+                /* Cleanup
+                 */
+                await RemoveContainerWithObjectsAsync(service, containerName, cancellationToken);
+            }
+        }
+#endif
+
         /// <summary>
         /// This is a regression test for openstacknetsdk/openstack.net#333.
         /// </summary>
@@ -1186,6 +1400,23 @@
             return await firstPage.Item2.GetAllPagesAsync(cancellationToken, null);
         }
 
+#if false // this method does not have a corresponding implementation in the V2 SDK (at this point)
+        private static async Task<ReadOnlyCollection<ContainerCDN>> ListAllCdnContainersAsync(IObjectStorageService service, CancellationToken cancellationToken)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+
+            ReadOnlyCollectionPage<ContainerCDN> firstPage = await service.ListCDNContainersAsync(cancellationToken);
+            return await firstPage.GetAllPagesAsync(cancellationToken, null);
+        }
+#endif
+
+        private static async Task<IDictionary<string, string>> GetContainerMetadataWithPrefix(IObjectStorageService service, ContainerName container, string prefix, CancellationToken cancellationToken)
+        {
+            ContainerMetadata containerMetadata = await service.GetContainerMetadataAsync(container, cancellationToken);
+            return FilterMetadataPrefix(containerMetadata.Metadata, prefix);
+        }
+
         private static async Task<string> GetObjectContentTypeAsync(IObjectStorageService service, ContainerName container, ObjectName @object, CancellationToken cancellationToken)
         {
             ObjectMetadata metadata = await service.GetObjectMetadataAsync(container, @object, cancellationToken);
@@ -1497,6 +1728,94 @@
             }
         }
 
+#if false // these tests do not have a corresponding implementation in the V2 SDK (at this point)
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
+        public async Task TestCreateObjectFromFile_UseFileName()
+        {
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
+            {
+                cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(60)));
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+                IObjectStorageService service = CreateService();
+                ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
+                ObjectName objectName = new ObjectName(Path.GetRandomFileName());
+                // another random name counts as random content
+                string fileData = Path.GetRandomFileName();
+                string tempFilePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+
+                await service.CreateContainerAsync(containerName, cancellationToken);
+
+                try
+                {
+                    File.WriteAllText(tempFilePath, fileData, Encoding.UTF8);
+                    await service.CreateObjectFromFileAsync(containerName, tempFilePath, cancellationToken);
+
+                    // it's ok to create the same file twice
+                    ProgressMonitor progressMonitor = new ProgressMonitor(new FileInfo(tempFilePath).Length);
+                    await service.CreateObjectFromFileAsync(containerName, tempFilePath, cancellationToken, progressMonitor);
+                    Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                }
+                finally
+                {
+                    File.Delete(tempFilePath);
+                }
+
+                string actualData = await ReadAllObjectTextAsync(service, containerName, new ObjectName(Path.GetFileName(tempFilePath)), Encoding.UTF8, cancellationToken);
+                Assert.AreEqual(fileData, actualData);
+
+                /* Cleanup
+                 */
+                await RemoveContainerWithObjectsAsync(service, containerName, cancellationToken);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
+        public async Task TestCreateObjectFromFile_UseCustomObjectName()
+        {
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
+            {
+                cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(10)));
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+                IObjectStorageService service = CreateService();
+                ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
+                ObjectName objectName = new ObjectName(Path.GetRandomFileName());
+                // another random name counts as random content
+                string fileData = Path.GetRandomFileName();
+                string tempFilePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+
+                await service.CreateContainerAsync(containerName, cancellationToken);
+
+                try
+                {
+                    File.WriteAllText(tempFilePath, fileData, Encoding.UTF8);
+                    await service.CreateObjectFromFileAsync(containerName, tempFilePath, objectName, cancellationToken);
+
+                    // it's ok to create the same file twice
+                    ProgressMonitor progressMonitor = new ProgressMonitor(new FileInfo(tempFilePath).Length);
+                    await service.CreateObjectFromFileAsync(containerName, tempFilePath, objectName, cancellationToken, progressMonitor);
+                    Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                }
+                finally
+                {
+                    File.Delete(tempFilePath);
+                }
+
+                string actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
+                Assert.AreEqual(fileData, actualData);
+
+                /* Cleanup
+                 */
+                await RemoveContainerWithObjectsAsync(service, containerName, cancellationToken);
+            }
+        }
+#endif
+
         [TestMethod]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.ObjectStorage)]
@@ -1641,6 +1960,112 @@
                 await RemoveContainerWithObjectsAsync(service, containerName, cancellationToken);
             }
         }
+
+#if false // these tests do not have a corresponding implementation in the V2 SDK (at this point)
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
+        [DeploymentItem("DarkKnightRises.jpg")]
+        public async Task TestCreateLargeObject()
+        {
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
+            {
+                cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(60)));
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+                IObjectStorageService service = CreateService();
+                service.LargeFileBatchThreshold = 81920;
+
+                ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
+                ObjectName sourceFileName = new ObjectName("DarkKnightRises.jpg");
+                byte[] content = File.ReadAllBytes("DarkKnightRises.jpg");
+
+                await service.CreateContainerAsync(containerName, cancellationToken);
+
+                ProgressMonitor progressMonitor = new ProgressMonitor(content.Length);
+                await service.CreateObjectFromFileAsync(containerName, sourceFileName.Value, cancellationToken, progressMonitor);
+                Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+
+                using (MemoryStream downloadStream = new MemoryStream())
+                {
+                    var objectData = await service.GetObjectAsync(containerName, sourceFileName, cancellationToken);
+                    await objectData.Item2.CopyToAsync(downloadStream);
+                    Assert.AreEqual(content.Length, await GetContainerObjectSizeAsync(service, containerName, sourceFileName, cancellationToken));
+
+                    downloadStream.Position = 0;
+                    byte[] actualData = new byte[downloadStream.Length];
+                    downloadStream.Read(actualData, 0, actualData.Length);
+                    Assert.AreEqual(content.Length, actualData.Length);
+                    using (MD5 md5 = MD5.Create())
+                    {
+                        byte[] contentMd5 = md5.ComputeHash(content);
+                        byte[] actualMd5 = md5.ComputeHash(actualData);
+                        Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                    }
+                }
+
+                /* Cleanup
+                 */
+                await RemoveContainerWithObjectsAsync(service, containerName, cancellationToken);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
+        [DeploymentItem("DarkKnightRises.jpg")]
+        public async Task TestVerifyLargeObjectETag()
+        {
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
+            {
+                cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(60)));
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+                IObjectStorageService service = CreateService();
+                service.LargeFileBatchThreshold = 81920;
+
+                ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
+                ObjectName sourceFileName = new ObjectName("DarkKnightRises.jpg");
+                byte[] content = File.ReadAllBytes("DarkKnightRises.jpg");
+
+                await service.CreateContainerAsync(containerName, cancellationToken);
+
+                ProgressMonitor progressMonitor = new ProgressMonitor(content.Length);
+                await service.CreateObjectFromFileAsync(containerName, sourceFileName, cancellationToken, progressMonitor);
+                Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+
+                try
+                {
+                    using (MemoryStream downloadStream = new MemoryStream())
+                    {
+                        var objectData = await service.GetObjectAsync(containerName, sourceFileName, cancellationToken);
+                        await objectData.Item2.CopyToAsync(downloadStream);
+
+                        Assert.AreEqual(content.Length, await GetContainerObjectSizeAsync(service, containerName, sourceFileName, cancellationToken));
+
+                        downloadStream.Position = 0;
+                        byte[] actualData = new byte[downloadStream.Length];
+                        downloadStream.Read(actualData, 0, actualData.Length);
+                        Assert.AreEqual(content.Length, actualData.Length);
+                        using (MD5 md5 = MD5.Create())
+                        {
+                            byte[] contentMd5 = md5.ComputeHash(content);
+                            byte[] actualMd5 = md5.ComputeHash(actualData);
+                            Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                        }
+                    }
+
+                    /* Cleanup
+                     */
+                    await RemoveContainerWithObjectsAsync(service, containerName, cancellationToken);
+                }
+                catch (NotSupportedException)
+                {
+                    Assert.Inconclusive("The service does not support verifying ETags for large objects.");
+                }
+            }
+        }
+#endif
 
         [TestMethod]
         [TestCategory(TestCategories.User)]
@@ -1946,6 +2371,68 @@
                 _currentValue = value;
             }
         }
+
+#if false // these tests do not have a corresponding implementation in the V2 SDK (at this point)
+        [TestMethod]
+        [TestCategory(TestCategories.User)]
+        [TestCategory(TestCategories.ObjectStorage)]
+        public async Task TestGetObjectSaveToFile()
+        {
+            using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
+            {
+                cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(10)));
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+                IObjectStorageService service = CreateService();
+                ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
+                ObjectName objectName = new ObjectName(Path.GetRandomFileName());
+                // another random name counts as random content
+                string fileData = Path.GetRandomFileName();
+
+                await service.CreateContainerAsync(containerName, cancellationToken);
+
+                using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
+                {
+                    await service.CreateObjectAsync(containerName, objectName, uploadStream, cancellationToken, null);
+                }
+
+                try
+                {
+                    await service.GetObjectSaveToFileAsync(containerName, objectName, Path.GetTempPath(), cancellationToken);
+                    Assert.AreEqual(fileData, File.ReadAllText(Path.Combine(Path.GetTempPath(), objectName.Value), Encoding.UTF8));
+
+                    // it's ok to download the same file twice
+                    ProgressMonitor progressMonitor = new ProgressMonitor(await GetContainerObjectSizeAsync(service, containerName, objectName, cancellationToken));
+                    await service.GetObjectSaveToFileAsync(containerName, objectName, Path.GetTempPath(), cancellationToken, progressMonitor);
+                    Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                }
+                finally
+                {
+                    File.Delete(Path.Combine(Path.GetTempPath(), objectName.Value));
+                }
+
+                string tempFileName = Path.GetRandomFileName();
+                try
+                {
+                    await service.GetObjectSaveToFileAsync(containerName, objectName, Path.GetTempPath(), tempFileName, cancellationToken);
+                    Assert.AreEqual(fileData, File.ReadAllText(Path.Combine(Path.GetTempPath(), tempFileName), Encoding.UTF8));
+
+                    // it's ok to download the same file twice
+                    ProgressMonitor progressMonitor = new ProgressMonitor(await GetContainerObjectSizeAsync(service, containerName, objectName, cancellationToken));
+                    await service.GetObjectSaveToFileAsync(containerName, objectName, Path.GetTempPath(), cancellationToken, progressMonitor);
+                    Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                }
+                finally
+                {
+                    File.Delete(Path.Combine(Path.GetTempPath(), tempFileName));
+                }
+
+                /* Cleanup
+                 */
+                await RemoveContainerWithObjectsAsync(service, containerName, cancellationToken);
+            }
+        }
+#endif
 
         [TestMethod]
         [TestCategory(TestCategories.User)]
