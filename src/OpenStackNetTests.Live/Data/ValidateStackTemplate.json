@@ -1,0 +1,30 @@
+﻿{
+    "heat_template_version": "2013-05-23",
+    "parameters": {
+        "key_name": {
+            "type": "string",
+            "description": "A parameter created for unit testing"
+        }
+    },
+    "resources": {
+        "compute_instance": {
+            "type": "Rackspace::Cloud::Server",
+            "properties": {
+                "flavor": "1 GB Performance",
+                "image": "CentOS 6.5",
+                "name": "Single Server Stack"
+            }
+        }
+    },
+    "outputs": {
+        "public_ip": {
+            "description": "public IP address of the deployed compute instance",
+            "value": {
+                "get_attr": [
+                    "compute_instance",
+                    "accessIPv4"
+                ]
+            }
+        }
+    }
+}

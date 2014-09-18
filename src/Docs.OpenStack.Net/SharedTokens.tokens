@@ -40,6 +40,14 @@
     </note>
   </item>
 
+  <item id="OpenStackObjectNotDefined">
+    <note type="warning">
+      <para>
+        This object is not defined by OpenStack, and may not be consistent across vendors.
+      </para>
+    </note>
+  </item>
+
   <item id="PrepareCallReturns">
     <para>
       A <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous operation. When the task completes

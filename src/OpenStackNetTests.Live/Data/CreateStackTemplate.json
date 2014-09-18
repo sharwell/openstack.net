@@ -1,0 +1,20 @@
+﻿{
+    "heat_template_version": "2013-05-23",
+    "description": "Heat Orchestration Template that spins up a resource group with 2 Rackspace Cloud Servers and a Cloud Load Balancer",
+    "resources": {
+        "web_nodes": {
+            "type": "OS::HEAT::ResourceGroup",
+            "properties": {
+                "count": 2,
+                "resource_def": {
+                    "type": "Rackspace::Cloud::Server",
+                    "properties": {
+                        "flavor": "1 GB Performance",
+                        "image": "CentOS 6.5",
+                        "name":  "LB-Compute Web Nodes"
+                    }
+                }
+            }
+        }
+    }
+}

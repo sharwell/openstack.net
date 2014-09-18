@@ -9,5 +9,7 @@
         public const string Identity = "Identity";
 
         public const string ObjectStorage = "Object Storage";
+
+        public const string Orchestration = "Orchestration";
     }
 }
