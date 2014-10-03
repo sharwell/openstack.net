@@ -35,9 +35,9 @@
         /// <param name="accessIPv4">The behavior of this value is unspecified. Do not use.</param>
         /// <param name="accessIPv6">The behavior of this value is unspecified. Do not use.</param>
         /// <param name="networks">A collection of identifiers for networks to initially connect to the server. These are obtained from <see cref="CloudNetwork.Id">CloudNetwork.Id</see></param>
-        public CreateServerRequest(string name, string imageName, string flavor, DiskConfiguration diskConfig, Dictionary<string, string> metadata, string accessIPv4, string accessIPv6, IEnumerable<string> networks, IEnumerable<Personality> personality)
+        public CreateServerRequest(string name, string imageName, BlockDeviceMapping blockDeviceMapping, string flavor, DiskConfiguration diskConfig, Dictionary<string, string> metadata, string accessIPv4, string accessIPv6, IEnumerable<string> networks, IEnumerable<Personality> personality)
         {
-            Details = new CreateServerDetails(name, imageName, flavor, diskConfig, metadata, accessIPv4, accessIPv6, networks, personality);
+            Details = new CreateServerDetails(name, imageName, blockDeviceMapping, flavor, diskConfig, metadata, accessIPv4, accessIPv6, networks, personality);
         }
 
         /// <summary>
@@ -59,6 +59,13 @@
             /// </summary>
             [JsonProperty("imageRef")]
             public string ImageName { get; private set; }
+
+            /// <summary>
+            /// Gets a <see cref="net.openstack.Core.Domain.BlockDeviceMapping"/> object describing the boot-from-volume
+            /// properties for the Create Server request.
+            /// </summary>
+            [JsonProperty("block_device_mapping_v2", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            public BlockDeviceMapping BlockDeviceMapping { get; private set; }
 
             /// <summary>
             /// Gets the flavor to use for the new server instance. This
@@ -120,10 +127,11 @@
             /// <param name="accessIPv4">The behavior of this value is unspecified. Do not use.</param>
             /// <param name="accessIPv6">The behavior of this value is unspecified. Do not use.</param>
             /// <param name="networks">A collection of identifiers for networks to initially connect to the server. These are obtained from <see cref="CloudNetwork.Id">CloudNetwork.Id</see></param>
-            public CreateServerDetails(string name, string imageName, string flavor, DiskConfiguration diskConfig, Dictionary<string, string> metadata, string accessIPv4, string accessIPv6, IEnumerable<string> networks, IEnumerable<Personality> personality)
+            public CreateServerDetails(string name, string imageName, BlockDeviceMapping blockDeviceMapping, string flavor, DiskConfiguration diskConfig, Dictionary<string, string> metadata, string accessIPv4, string accessIPv6, IEnumerable<string> networks, IEnumerable<Personality> personality)
             {
                 Name = name;
                 ImageName = imageName;
+                BlockDeviceMapping = blockDeviceMapping;
                 Flavor = flavor;
                 DiskConfig = diskConfig;
                 Metadata = metadata;

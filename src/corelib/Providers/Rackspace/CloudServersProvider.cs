@@ -175,16 +175,162 @@ namespace net.openstack.Providers.Rackspace
         /// <inheritdoc />
         public NewServer CreateServer(string cloudServerName, string imageName, string flavor, DiskConfiguration diskConfig = null, Metadata metadata = null, Personality[] personality = null, bool attachToServiceNetwork = false, bool attachToPublicNetwork = false, IEnumerable<string> networks = null, string region = null, CloudIdentity identity = null)
         {
+            return CreateServer(cloudServerName, imageName, null, flavor, diskConfig, metadata, personality, attachToServiceNetwork, attachToPublicNetwork, networks, region, identity);
+        }
+
+        /// <summary>
+        /// Creates a new server.
+        /// </summary>
+        /// <remarks>
+        /// This operation asynchronously provisions a new server. The progress of this operation depends on
+        /// several factors including location of the requested image, network i/o, host load, and the selected
+        /// flavor. The progress of the request can be checked by calling <see cref="GetDetails"/> and getting
+        /// the value of <see cref="Server.Status"/> and <see cref="Server.Progress"/>.
+        ///
+        /// <note type="caller">
+        /// This is the only time the server's admin password is returned. Make sure to retain the value.
+        /// </note>
+        ///
+        /// <note>
+        /// The <paramref name="diskConfig"/> parameter is ignored if the provider does not support the
+        /// <see href="http://docs.rackspace.com/servers/api/v2/cs-devguide/content/ch_extensions.html#diskconfig_attribute"><newTerm>disk configuration extension</newTerm></see>.
+        /// </note>
+        /// </remarks>
+        /// <param name="cloudServerName">Name of the cloud server.</param>
+        /// <param name="imageName">The image to use for the new server instance. This is
+        /// specified as an image ID (see <see cref="SimpleServerImage.Id"/>) or a full URL.</param>
+        /// <param name="flavor">The flavor to use for the new server instance. This
+        /// is specified as a flavor ID (see <see cref="Flavor.Id"/>) or a full URL.</param>
+        /// <param name="diskConfig">The disk configuration. If the value is <see langword="null"/>, the default configuration for the specified image is used.</param>
+        /// <param name="metadata">The metadata to associate with the server.</param>
+        /// <param name="personality">A collection of <see cref="Personality"/> objects describing the paths and contents of files to inject in the target file system during the creation process. If the value is <see langword="null"/>, no files are injected.</param>
+        /// <param name="attachToServiceNetwork"><see langword="true"/> if the private network will be attached to the newly created server; otherwise, <see langword="false"/>.</param>
+        /// <param name="attachToPublicNetwork"><see langword="true"/> if the public network will be attached to the newly created server; otherwise, <see langword="false"/>.</param>
+        /// <param name="networks">A collection of IDs of networks to attach to the server. This is obtained from <see cref="CloudNetwork.Id">CloudNetwork.Id</see>.</param>
+        /// <param name="region">The region in which to execute this action. If not specified, the user's default region will be used.</param>
+        /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
+        /// <returns>A <see cref="NewServer"/> instance containing the details for the newly created server.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="cloudServerName"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para><paramref name="imageName"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="flavor"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="cloudServerName"/> is empty.
+        /// <para>-or-</para>
+        /// <para><paramref name="imageName"/> is empty.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="flavor"/> is empty.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="metadata"/> contains a value with a null or empty key.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="networks"/> contains a null or empty value.</para>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// If the provider does not support the given <paramref name="diskConfig"/>.
+        /// <para>-or-</para>
+        /// <para>If the provider does not support the given <paramref name="identity"/> type.</para>
+        /// <para>-or-</para>
+        /// <para>The specified <paramref name="region"/> is not supported.</para>
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <see langword="null"/> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <see langword="null"/> and no default region is available for the provider.</para>
+        /// </exception>
+        /// <exception cref="ResponseException">If the REST API request failed.</exception>
+        /// <seealso href="http://docs.openstack.org/api/openstack-compute/2/content/CreateServers.html">Create Server (OpenStack Compute API v2 and Extensions Reference)</seealso>
+        public NewServer CreateServer(string cloudServerName, BlockDeviceMapping blockDeviceMapping, string flavor, DiskConfiguration diskConfig = null, Metadata metadata = null, Personality[] personality = null, bool attachToServiceNetwork = false, bool attachToPublicNetwork = false, IEnumerable<string> networks = null, string region = null, CloudIdentity identity = null)
+        {
+            if (blockDeviceMapping == null)
+                throw new ArgumentNullException("blockDeviceMapping");
+
+            return CreateServer(cloudServerName, null, blockDeviceMapping, flavor, diskConfig, metadata, personality, attachToServiceNetwork, attachToPublicNetwork, networks, region, identity);
+        }
+
+        /// <summary>
+        /// Creates a new server.
+        /// </summary>
+        /// <remarks>
+        /// This operation asynchronously provisions a new server. The progress of this operation depends on
+        /// several factors including location of the requested image, network i/o, host load, and the selected
+        /// flavor. The progress of the request can be checked by calling <see cref="GetDetails"/> and getting
+        /// the value of <see cref="Server.Status"/> and <see cref="Server.Progress"/>.
+        ///
+        /// <note type="caller">
+        /// This is the only time the server's admin password is returned. Make sure to retain the value.
+        /// </note>
+        ///
+        /// <note>
+        /// The <paramref name="diskConfig"/> parameter is ignored if the provider does not support the
+        /// <see href="http://docs.rackspace.com/servers/api/v2/cs-devguide/content/ch_extensions.html#diskconfig_attribute"><newTerm>disk configuration extension</newTerm></see>.
+        /// </note>
+        /// </remarks>
+        /// <param name="cloudServerName">Name of the cloud server.</param>
+        /// <param name="imageName">The image to use for the new server instance. This is
+        /// specified as an image ID (see <see cref="SimpleServerImage.Id"/>) or a full URL.</param>
+        /// <param name="flavor">The flavor to use for the new server instance. This
+        /// is specified as a flavor ID (see <see cref="Flavor.Id"/>) or a full URL.</param>
+        /// <param name="diskConfig">The disk configuration. If the value is <see langword="null"/>, the default configuration for the specified image is used.</param>
+        /// <param name="metadata">The metadata to associate with the server.</param>
+        /// <param name="personality">A collection of <see cref="Personality"/> objects describing the paths and contents of files to inject in the target file system during the creation process. If the value is <see langword="null"/>, no files are injected.</param>
+        /// <param name="attachToServiceNetwork"><see langword="true"/> if the private network will be attached to the newly created server; otherwise, <see langword="false"/>.</param>
+        /// <param name="attachToPublicNetwork"><see langword="true"/> if the public network will be attached to the newly created server; otherwise, <see langword="false"/>.</param>
+        /// <param name="networks">A collection of IDs of networks to attach to the server. This is obtained from <see cref="CloudNetwork.Id">CloudNetwork.Id</see>.</param>
+        /// <param name="region">The region in which to execute this action. If not specified, the user's default region will be used.</param>
+        /// <param name="identity">The cloud identity to use for this request. If not specified, the default identity for the current provider instance will be used.</param>
+        /// <returns>A <see cref="NewServer"/> instance containing the details for the newly created server.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="cloudServerName"/> is <see langword="null"/>.
+        /// <para>-or-</para>
+        /// <para><paramref name="imageName"/> is <see langword="null"/>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="flavor"/> is <see langword="null"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="cloudServerName"/> is empty.
+        /// <para>-or-</para>
+        /// <para><paramref name="imageName"/> is empty.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="flavor"/> is empty.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="metadata"/> contains a value with a null or empty key.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="networks"/> contains a null or empty value.</para>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// If the provider does not support the given <paramref name="diskConfig"/>.
+        /// <para>-or-</para>
+        /// <para>If the provider does not support the given <paramref name="identity"/> type.</para>
+        /// <para>-or-</para>
+        /// <para>The specified <paramref name="region"/> is not supported.</para>
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// If <paramref name="identity"/> is <see langword="null"/> and no default identity is available for the provider.
+        /// <para>-or-</para>
+        /// <para>If <paramref name="region"/> is <see langword="null"/> and no default region is available for the provider.</para>
+        /// </exception>
+        /// <exception cref="ResponseException">If the REST API request failed.</exception>
+        /// <seealso href="http://docs.openstack.org/api/openstack-compute/2/content/CreateServers.html">Create Server (OpenStack Compute API v2 and Extensions Reference)</seealso>
+        private NewServer CreateServer(string cloudServerName, string imageName, BlockDeviceMapping blockDeviceMapping, string flavor, DiskConfiguration diskConfig = null, Metadata metadata = null, Personality[] personality = null, bool attachToServiceNetwork = false, bool attachToPublicNetwork = false, IEnumerable<string> networks = null, string region = null, CloudIdentity identity = null)
+        {
             if (cloudServerName == null)
                 throw new ArgumentNullException("cloudServerName");
-            if (imageName == null)
-                throw new ArgumentNullException("imageName");
+
+            if (blockDeviceMapping == null)
+            {
+                if (imageName == null)
+                    throw new ArgumentNullException("imageName");
+                if (string.IsNullOrEmpty(imageName))
+                    throw new ArgumentException("imageName cannot be empty");
+            }
+
             if (flavor == null)
                 throw new ArgumentNullException("flavor");
             if (string.IsNullOrEmpty(cloudServerName))
                 throw new ArgumentException("cloudServerName cannot be empty");
-            if (string.IsNullOrEmpty(imageName))
-                throw new ArgumentException("imageName cannot be empty");
             if (string.IsNullOrEmpty(flavor))
                 throw new ArgumentException("flavor cannot be empty");
             if (networks != null && networks.Any(string.IsNullOrEmpty))
@@ -210,7 +356,7 @@ namespace net.openstack.Providers.Rackspace
 
             const string accessIPv4 = null;
             const string accessIPv6 = null;
-            var request = new CreateServerRequest(cloudServerName, imageName, flavor, diskConfig, metadata, accessIPv4, accessIPv6, networksToAttach, personality);
+            var request = new CreateServerRequest(cloudServerName, imageName, blockDeviceMapping, flavor, diskConfig, metadata, accessIPv4, accessIPv6, networksToAttach, personality);
             var response = ExecuteRESTRequest<CreateServerResponse>(identity, urlPath, HttpMethod.POST, request);
 
             if (response == null || response.Data == null || response.Data.Server == null)
