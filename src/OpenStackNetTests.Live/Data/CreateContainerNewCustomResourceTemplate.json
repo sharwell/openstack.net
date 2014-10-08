@@ -1,0 +1,105 @@
+﻿{
+    "heat_template_version": "2013-05-23",
+    "outputs": {
+        "RootURL": {
+            "description": "The parent URL of the container.",
+            "value": {
+                "get_attr": [
+                    "SwiftContainer",
+                    "RootURL"
+                ]
+            }
+        },
+        "BytesUsed": {
+            "description": "The number of bytes stored in the container.",
+            "value": {
+                "get_attr": [
+                    "SwiftContainer",
+                    "BytesUsed"
+                ]
+            }
+        },
+        "DomainName": {
+            "description": "The host from the container URL.",
+            "value": {
+                "get_attr": [
+                    "SwiftContainer",
+                    "DomainName"
+                ]
+            }
+        },
+        "WebsiteURL": {
+            "description": "The URL of the container.",
+            "value": {
+                "get_attr": [
+                    "SwiftContainer",
+                    "WebsiteURL"
+                ]
+            }
+        },
+        "ObjectCount": {
+            "description": "The number of objects stored in the container.",
+            "value": {
+                "get_attr": [
+                    "SwiftContainer",
+                    "ObjectCount"
+                ]
+            }
+        },
+        "HeadContainer": {
+            "description": "A map containing all headers for the container.",
+            "value": {
+                "get_attr": [
+                    "SwiftContainer",
+                    "HeadContainer"
+                ]
+            }
+        }
+    },
+    "resources": {
+        "SwiftContainer": {
+            "type": "OS::Swift::Container",
+            "properties": {
+                "X-Container-Meta": {
+                    "get_param": "X-Container-Meta"
+                },
+                "X-Container-Write": {
+                    "get_param": "X-Container-Write"
+                },
+                "name": {
+                    "get_param": "name"
+                },
+                "X-Account-Meta": {
+                    "get_param": "X-Account-Meta"
+                },
+                "X-Container-Read": {
+                    "get_param": "X-Container-Read"
+                }
+            }
+        }
+    },
+    "parameters": {
+        "X-Container-Meta": {
+            "default": { },
+            "type": "json",
+            "description": "A map of user-defined meta data to associate with the container. Each key in the map will set the header X-Container-Meta-{key} with the corresponding value."
+        },
+        "X-Container-Write": {
+            "type": "string",
+            "description": "Specify the ACL permissions on who can write objects to the container."
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the container. If not specified, a unique name will be generated."
+        },
+        "X-Account-Meta": {
+            "default": { },
+            "type": "json",
+            "description": "A map of user-defined meta data to associate with the account. Each key in the map will set the header X-Account-Meta-{key} with the corresponding value."
+        },
+        "X-Container-Read": {
+            "type": "string",
+            "description": "Specify the ACL permissions on who can read objects in the container."
+        }
+    }
+}

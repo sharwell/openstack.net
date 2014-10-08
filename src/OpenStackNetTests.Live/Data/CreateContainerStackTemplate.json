@@ -1,0 +1,21 @@
+﻿{
+    "heat_template_version": "2013-05-23",
+    "description": "Heat Orchestration Template creates a Swift container",
+    "parameters": {
+        "name": {
+            "type": "string",
+            "label": "name",
+            "description": "The name of the container to create"
+        }
+    },
+    "resources": {
+        "container": {
+            "type": "OS::Swift::Container",
+            "properties": {
+                "name": {
+                    "get_param": "name"
+                }
+            }
+        }
+    }
+}

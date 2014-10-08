@@ -70,8 +70,6 @@
         {
             if (apiCall == null)
                 throw new ArgumentNullException("apiCall");
-            if (alias == null)
-                throw new ArgumentNullException("alias");
 
             Uri uri = apiCall.RequestMessage.RequestUri;
             if (alias == null)

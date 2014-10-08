@@ -35,6 +35,25 @@
         }
 
         /// <summary>
+        /// Defines an explicit conversion of an <see cref="ExtensibleEnum{T}"/> to a string.
+        /// </summary>
+        /// <remarks>
+        /// <para>This method supports the of <see cref="ExtensibleEnum{T}"/> types as dictionary keys for Json.NET.
+        /// While other conversion mechanisms exist, the only simple conversion mechanism supported by all target
+        /// versions of the .NET framework is the cast operators.</para>
+        /// </remarks>
+        /// <param name="value">The enumeration member.</param>
+        /// <returns>The value of the enumeration member as a <see cref="string"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="value"/> is <see langword="null"/>.</exception>
+        public static explicit operator string (ExtensibleEnum<T> value)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            return value.Name;
+        }
+
+        /// <summary>
         /// Gets the canonical name of this member.
         /// </summary>
         public string Name
@@ -61,6 +80,13 @@
         /// Provides support for serializing and deserializing <see cref="ExtensibleEnum{T}"/>
         /// objects to JSON string values.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Json.NET does not support the use of <see cref="SimpleStringJsonConverter{T}"/> for keys in a dictionary.
+        /// To support this use case, implement an explicit cast operator from <see cref="string"/> to the extensible
+        /// enumeration type <typeparamref name="T"/>.
+        /// </para>
+        /// </remarks>
         /// <threadsafety static="true" instance="false"/>
         /// <preliminary/>
         protected abstract class ConverterBase : SimpleStringJsonConverter<T>

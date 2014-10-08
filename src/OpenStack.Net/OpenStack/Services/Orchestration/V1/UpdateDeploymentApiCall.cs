@@ -3,6 +3,8 @@ namespace OpenStack.Services.Orchestration.V1
     using System;
     using OpenStack.Net;
 
+#warning Unlike "Update Stack", this operation is documented as returning the updated resource.
+
     /// <summary>
     /// This class represents an HTTP API call to update a <see cref="Deployment"/> resource in the OpenStack
     /// Orchestration Service.

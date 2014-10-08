@@ -1,6 +1,9 @@
 namespace OpenStack.Services.Orchestration.V1
 {
+    using System;
+    using System.Collections.Generic;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// This class models the JSON object used in the <see cref="AdoptStackApiCall"/> HTTP API call, which extends the
@@ -25,6 +28,30 @@ namespace OpenStack.Services.Orchestration.V1
         [JsonConstructor]
         protected AdoptStackData()
         {
+        }
+
+        public AdoptStackData(StackName name, Stack abandonedStack)
+            : base(name, abandonedStack.TemplateUri, abandonedStack.Template, abandonedStack.Environment != null ? JsonConvert.SerializeObject(abandonedStack.Environment) : null, abandonedStack.Files, abandonedStack.Parameters, abandonedStack.Timeout, abandonedStack.DisableRollback)
+        {
+            _adoptStackData = JsonConvert.SerializeObject(abandonedStack);
+        }
+
+        public AdoptStackData(StackName name, string adoptStackData, Uri templateUri, StackTemplate template, TemplateEnvironment environment, JObject files, IDictionary<string, string> parameters, TimeSpan? timeout, bool? disableRollback)
+            : base(name, templateUri, template, environment, files, parameters, timeout, disableRollback)
+        {
+            _adoptStackData = adoptStackData;
+        }
+
+        public AdoptStackData(StackName name, string adoptStackData, Uri templateUri, StackTemplate template, TemplateEnvironment environment, JObject files, IDictionary<string, string> parameters, TimeSpan? timeout, bool? disableRollback, params JProperty[] extensionData)
+            : base(name, templateUri, template, environment, files, parameters, timeout, disableRollback, extensionData)
+        {
+            _adoptStackData = adoptStackData;
+        }
+
+        public AdoptStackData(StackName name, string adoptStackData, Uri templateUri, StackTemplate template, TemplateEnvironment environment, JObject files, IDictionary<string, string> parameters, TimeSpan? timeout, bool? disableRollback, IDictionary<string, JToken> extensionData)
+            : base(name, templateUri, template, environment, files, parameters, timeout, disableRollback, extensionData)
+        {
+            _adoptStackData = adoptStackData;
         }
 
         /// <summary>

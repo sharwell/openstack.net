@@ -99,6 +99,10 @@
     <None Include="..\testing\SDKTestingKey.snk">
       <Link>SDKTestingKey.snk</Link>
     </None>
+    <None Include="Data\CreateContainerCustomResourceTemplate.json" />
+    <None Include="Data\CreateContainerNewCustomResourceTemplate.json" />
+    <None Include="Data\CreateContainerStackTemplate.json" />
+    <None Include="Data\CreateCustomContainerStackTemplate.json" />
     <None Include="Data\CreateStackTemplate.json" />
     <None Include="Data\UpdateStackTemplate.json" />
     <None Include="Data\ValidateStackTemplate.json" />

@@ -63,6 +63,78 @@ namespace OpenStackNetTests.Live {
         /// <summary>
         ///   Looks up a localized string similar to {
         ///    &quot;heat_template_version&quot;: &quot;2013-05-23&quot;,
+        ///    &quot;outputs&quot;: {
+        ///        &quot;RootURL&quot;: {
+        ///            &quot;description&quot;: &quot;The parent URL of the container.&quot;,
+        ///            &quot;value&quot;: &quot;{\&quot;Fn::GetAtt\&quot;: [\&quot;SwiftContainer\&quot;, \&quot;RootURL\&quot;]}&quot;
+        ///        },
+        ///        &quot;BytesUsed&quot;: {
+        ///            &quot;description&quot;: &quot;The number of bytes stored in the container.&quot;,
+        ///            &quot;value&quot;: &quot;{\&quot;Fn::GetAtt\&quot;: [\&quot;SwiftContainer\&quot;, \&quot;BytesUsed\&quot;]}&quot;
+        ///        },
+        ///        &quot;DomainName&quot;: {
+        ///            &quot;description&quot;: &quot;The host from the container UR [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CreateContainerNewCustomResourceTemplate {
+            get {
+                return ResourceManager.GetString("CreateContainerNewCustomResourceTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;heat_template_version&quot;: &quot;2013-05-23&quot;,
+        ///    &quot;description&quot;: &quot;Heat Orchestration Template creates a Swift container&quot;,
+        ///    &quot;parameters&quot;: {
+        ///        &quot;name&quot;: {
+        ///            &quot;type&quot;: &quot;string&quot;,
+        ///            &quot;label&quot;: &quot;name&quot;,
+        ///            &quot;description&quot;: &quot;The name of the container to create&quot;
+        ///        }
+        ///    },
+        ///    &quot;resources&quot;: {
+        ///        &quot;container&quot;: {
+        ///            &quot;type&quot;: &quot;OS::Swift::Container&quot;,
+        ///            &quot;properties&quot;: {
+        ///                &quot;name&quot;: {
+        ///                    &quot;get_param&quot;: &quot;name&quot;
+        ///                 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CreateContainerStackTemplate {
+            get {
+                return ResourceManager.GetString("CreateContainerStackTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;heat_template_version&quot;: &quot;2013-05-23&quot;,
+        ///    &quot;description&quot;: &quot;Heat Orchestration Template creates a Swift container&quot;,
+        ///    &quot;parameters&quot;: {
+        ///        &quot;name&quot;: {
+        ///            &quot;type&quot;: &quot;string&quot;,
+        ///            &quot;label&quot;: &quot;name&quot;,
+        ///            &quot;description&quot;: &quot;The name of the container to create&quot;
+        ///        }
+        ///    },
+        ///    &quot;resources&quot;: {
+        ///        &quot;container&quot;: {
+        ///            &quot;type&quot;: &quot;My::Container&quot;,
+        ///            &quot;properties&quot;: {
+        ///                &quot;name&quot;: {
+        ///                    &quot;get_param&quot;: &quot;name&quot;
+        ///                },
+        ///    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CreateCustomContainerStackTemplate {
+            get {
+                return ResourceManager.GetString("CreateCustomContainerStackTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;heat_template_version&quot;: &quot;2013-05-23&quot;,
         ///    &quot;description&quot;: &quot;Heat Orchestration Template that spins up a resource group with 2 Rackspace Cloud Servers and a Cloud Load Balancer&quot;,
         ///    &quot;resources&quot;: {
         ///        &quot;web_nodes&quot;: {
@@ -110,13 +182,16 @@ namespace OpenStackNetTests.Live {
         ///        }
         ///    },
         ///    &quot;resources&quot;: {
-        ///            &quot;compute_instance&quot;: {
-        ///                &quot;type&quot;: &quot;Rackspace::Cloud::Server&quot;,
-        ///                &quot;properties&quot;: {
-        ///                    &quot;flavor&quot;: &quot;1 GB Performance&quot;,
-        ///                    &quot;image&quot;: &quot;CentOS 6.5&quot;,
-        ///                    &quot;name&quot;: &quot;Single Server Stack&quot;
-        ///                } [rest of string was truncated]&quot;;.
+        ///        &quot;compute_instance&quot;: {
+        ///            &quot;type&quot;: &quot;Rackspace::Cloud::Server&quot;,
+        ///            &quot;properties&quot;: {
+        ///                &quot;flavor&quot;: &quot;1 GB Performance&quot;,
+        ///                &quot;image&quot;: &quot;CentOS 6.5&quot;,
+        ///                &quot;name&quot;: &quot;Single Server Stack&quot;
+        ///            }
+        ///        }
+        ///    },
+        ///    &quot;ou [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ValidateStackTemplateJson {
             get {
@@ -131,7 +206,7 @@ namespace OpenStackNetTests.Live {
         ///
         ///resources:
         ///  compute_instance:
-        ///    type: &quot;&quot;Rackspace::Cloud::Server&quot;&quot;
+        ///    type: &quot;Rackspace::Cloud::Server&quot;
         ///    properties:
         ///      flavor: 1 GB Performance
         ///      image: CentOS 6.5

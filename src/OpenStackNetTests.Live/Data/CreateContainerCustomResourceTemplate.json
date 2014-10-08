@@ -1,0 +1,75 @@
+﻿{
+    "HeatTemplateFormatVersion": "2012-12-12",
+    "Outputs": {
+        "RootURL": {
+            "Description": "The parent URL of the container.",
+            "Value": "{\"Fn::GetAtt\": [\"SwiftContainer\", \"RootURL\"]}"
+        },
+        "BytesUsed": {
+            "Description": "The number of bytes stored in the container.",
+            "Value": "{\"Fn::GetAtt\": [\"SwiftContainer\", \"BytesUsed\"]}"
+        },
+        "DomainName": {
+            "Description": "The host from the container URL.",
+            "Value": "{\"Fn::GetAtt\": [\"SwiftContainer\", \"DomainName\"]}"
+        },
+        "WebsiteURL": {
+            "Description": "The URL of the container.",
+            "Value": "{\"Fn::GetAtt\": [\"SwiftContainer\", \"WebsiteURL\"]}"
+        },
+        "ObjectCount": {
+            "Description": "The number of objects stored in the container.",
+            "Value": "{\"Fn::GetAtt\": [\"SwiftContainer\", \"ObjectCount\"]}"
+        },
+        "HeadContainer": {
+            "Description": "A map containing all headers for the container.",
+            "Value": "{\"Fn::GetAtt\": [\"SwiftContainer\", \"HeadContainer\"]}"
+        }
+    },
+    "Resources": {
+        "SwiftContainer": {
+            "Type": "OS::Swift::Container",
+            "Properties": {
+                "X-Container-Meta": {
+                    "Ref": "X-Container-Meta"
+                },
+                "X-Container-Write": {
+                    "Ref": "X-Container-Write"
+                },
+                "name": {
+                    "Ref": "name"
+                },
+                "X-Account-Meta": {
+                    "Ref": "X-Account-Meta"
+                },
+                "X-Container-Read": {
+                    "Ref": "X-Container-Read"
+                }
+            }
+        }
+    },
+    "Parameters": {
+        "X-Container-Meta": {
+            "Default": { },
+            "Type": "Json",
+            "Description": "A map of user-defined meta data to associate with the container. Each key in the map will set the header X-Container-Meta-{key} with the corresponding value."
+        },
+        "X-Container-Write": {
+            "Type": "String",
+            "Description": "Specify the ACL permissions on who can write objects to the container."
+        },
+        "name": {
+            "Type": "String",
+            "Description": "Name for the container. If not specified, a unique name will be generated."
+        },
+        "X-Account-Meta": {
+            "Default": { },
+            "Type": "Json",
+            "Description": "A map of user-defined meta data to associate with the account. Each key in the map will set the header X-Account-Meta-{key} with the corresponding value."
+        },
+        "X-Container-Read": {
+            "Type": "String",
+            "Description": "Specify the ACL permissions on who can read objects in the container."
+        }
+    }
+}

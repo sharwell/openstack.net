@@ -15,6 +15,7 @@
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
     using OpenStack.Net;
@@ -34,13 +35,13 @@
         /// This prefix is used for metadata keys created by unit tests, to avoid overwriting metadata created by other
         /// applications.
         /// </summary>
-        private const string TestKeyPrefix = "UnitTestMetadataKey-";
+        internal const string TestKeyPrefix = "UnitTestMetadataKey-";
 
         /// <summary>
         /// This prefix is used for containers created by unit tests, to avoid overwriting containers created by other
         /// applications.
         /// </summary>
-        private const string TestContainerPrefix = "UnitTestContainer-";
+        internal const string TestContainerPrefix = "UnitTestContainer-";
 
         /// <summary>
         /// The minimum character allowed in metadata keys. This is drawn from the HTTP/1.1 specification, which does
@@ -340,6 +341,7 @@
                     Console.WriteLine("  {0}", container.Name);
                     Console.WriteLine("    Objects: {0}", container.ObjectCount);
                     Console.WriteLine("    Bytes: {0}", container.Size);
+                    Console.WriteLine("    JSON: {0}", JsonConvert.SerializeObject(container));
                 }
             }
         }
