@@ -6,7 +6,6 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
@@ -15,6 +14,7 @@
     using net.openstack.Providers.Rackspace;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using Xunit;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using HttpWebRequest = System.Net.HttpWebRequest;
@@ -25,7 +25,6 @@
     using WebResponse = System.Net.WebResponse;
 
     /// <preliminary/>
-    [TestClass]
     public class UserQueuesTests
     {
         /// <summary>
@@ -51,8 +50,8 @@
         /// system connection limit.
         /// </para>
         /// </remarks>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupTestQueues()
         {
             IQueueingService provider = CreateProvider();
@@ -69,21 +68,21 @@
             Task.WaitAll(deleteTasks);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestGetHome()
         {
             IQueueingService provider = CreateProvider();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10)));
             HomeDocument document = await provider.GetHomeAsync(cancellationTokenSource.Token);
-            Assert.IsNotNull(document);
+            Assert.NotNull(document);
             Console.WriteLine(JsonConvert.SerializeObject(document, Formatting.Indented));
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestGetNodeHealth()
         {
             IQueueingService provider = CreateProvider();
@@ -91,9 +90,9 @@
             await provider.GetNodeHealthAsync(cancellationTokenSource.Token);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestCreateQueue()
         {
             IQueueingService provider = CreateProvider();
@@ -101,17 +100,17 @@
             QueueName queueName = CreateRandomQueueName();
 
             bool created = await provider.CreateQueueAsync(queueName, cancellationTokenSource.Token);
-            Assert.IsTrue(created);
+            Assert.True(created);
 
             bool recreated = await provider.CreateQueueAsync(queueName, cancellationTokenSource.Token);
-            Assert.IsFalse(recreated);
+            Assert.False(recreated);
 
             await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestListQueues()
         {
             IQueueingService provider = CreateProvider();
@@ -128,9 +127,9 @@
             await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestQueueExists()
         {
             IQueueingService provider = CreateProvider();
@@ -138,14 +137,14 @@
             QueueName queueName = CreateRandomQueueName();
 
             await provider.CreateQueueAsync(queueName, cancellationTokenSource.Token);
-            Assert.IsTrue(await provider.QueueExistsAsync(queueName, cancellationTokenSource.Token));
+            Assert.True(await provider.QueueExistsAsync(queueName, cancellationTokenSource.Token));
             await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
-            Assert.IsFalse(await provider.QueueExistsAsync(queueName, cancellationTokenSource.Token));
+            Assert.False(await provider.QueueExistsAsync(queueName, cancellationTokenSource.Token));
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestQueueMetadataStatic()
         {
             IQueueingService provider = CreateProvider();
@@ -155,20 +154,20 @@
             await provider.CreateQueueAsync(queueName, cancellationTokenSource.Token);
 
             SampleMetadata metadata = new SampleMetadata(3, "yes");
-            Assert.AreEqual(3, metadata.ValueA);
-            Assert.AreEqual("yes", metadata.ValueB);
+            Assert.Equal(3, metadata.ValueA);
+            Assert.Equal("yes", metadata.ValueB);
 
             await provider.SetQueueMetadataAsync(queueName, metadata, cancellationTokenSource.Token);
             SampleMetadata result = await provider.GetQueueMetadataAsync<SampleMetadata>(queueName, cancellationTokenSource.Token);
-            Assert.AreEqual(metadata.ValueA, result.ValueA);
-            Assert.AreEqual(metadata.ValueB, result.ValueB);
+            Assert.Equal(metadata.ValueA, result.ValueA);
+            Assert.Equal(metadata.ValueB, result.ValueB);
 
             await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestQueueMetadataDynamic()
         {
             IQueueingService provider = CreateProvider();
@@ -183,8 +182,8 @@
 
             await provider.SetQueueMetadataAsync(queueName, metadata, cancellationTokenSource.Token);
             JObject result = await provider.GetQueueMetadataAsync(queueName, cancellationTokenSource.Token);
-            Assert.AreEqual(3, result["valueA"]);
-            Assert.AreEqual("yes", result["valueB"]);
+            Assert.Equal(3, result["valueA"]);
+            Assert.Equal("yes", result["valueB"]);
 
             await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
         }
@@ -213,9 +212,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestQueueStatistics()
         {
             IQueueingService provider = CreateProvider();
@@ -225,15 +224,15 @@
             await provider.CreateQueueAsync(queueName, cancellationTokenSource.Token);
 
             QueueStatistics statistics = await provider.GetQueueStatisticsAsync(queueName, cancellationTokenSource.Token);
-            Assert.IsNotNull(statistics);
+            Assert.NotNull(statistics);
 
             QueueMessagesStatistics messageStatistics = statistics.MessageStatistics;
-            Assert.IsNotNull(messageStatistics);
-            Assert.AreEqual(messageStatistics.Free, 0);
-            Assert.AreEqual(messageStatistics.Claimed, 0);
-            Assert.AreEqual(messageStatistics.Total, 0);
-            Assert.IsNull(messageStatistics.Oldest);
-            Assert.IsNull(messageStatistics.Newest);
+            Assert.NotNull(messageStatistics);
+            Assert.Equal(messageStatistics.Free, 0);
+            Assert.Equal(messageStatistics.Claimed, 0);
+            Assert.Equal(messageStatistics.Total, 0);
+            Assert.Null(messageStatistics.Oldest);
+            Assert.Null(messageStatistics.Newest);
 
             Console.WriteLine("Statistics:");
             Console.WriteLine();
@@ -242,15 +241,15 @@
             await provider.PostMessagesAsync(queueName, cancellationTokenSource.Token, new Message<SampleMetadata>(TimeSpan.FromSeconds(120), new SampleMetadata(3, "yes")));
 
             statistics = await provider.GetQueueStatisticsAsync(queueName, cancellationTokenSource.Token);
-            Assert.IsNotNull(statistics);
+            Assert.NotNull(statistics);
 
             messageStatistics = statistics.MessageStatistics;
-            Assert.IsNotNull(messageStatistics);
-            Assert.AreEqual(messageStatistics.Free, 1);
-            Assert.AreEqual(messageStatistics.Claimed, 0);
-            Assert.AreEqual(messageStatistics.Total, 1);
-            Assert.IsNotNull(messageStatistics.Oldest);
-            Assert.IsNotNull(messageStatistics.Newest);
+            Assert.NotNull(messageStatistics);
+            Assert.Equal(messageStatistics.Free, 1);
+            Assert.Equal(messageStatistics.Claimed, 0);
+            Assert.Equal(messageStatistics.Total, 1);
+            Assert.NotNull(messageStatistics.Oldest);
+            Assert.NotNull(messageStatistics.Newest);
 
             Console.WriteLine("Statistics:");
             Console.WriteLine();
@@ -259,9 +258,9 @@
             await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestListAllQueueMessagesWithUpdates()
         {
             IQueueingService provider = CreateProvider();
@@ -283,7 +282,7 @@
 
                 QueuedMessageList messages = await provider.ListMessagesAsync(queueName, null, null, true, false, cancellationTokenSource.Token);
                 foreach (QueuedMessage message in messages)
-                    Assert.IsTrue(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
+                    Assert.True(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
 
                 int deletedMessage = messages[0].Body.ToObject<SampleMetadata>().ValueA;
                 await provider.DeleteMessageAsync(queueName, messages[0].Id, null, cancellationTokenSource.Token);
@@ -293,30 +292,30 @@
                     QueuedMessageList tempList = await provider.ListMessagesAsync(queueName, messages.NextPageId, null, true, false, cancellationTokenSource.Token);
                     if (tempList.Count > 0)
                     {
-                        Assert.IsTrue(locatedMessages.Add(tempList[0].Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
+                        Assert.True(locatedMessages.Add(tempList[0].Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
                         await provider.DeleteMessageAsync(queueName, tempList[0].Id, null, cancellationTokenSource.Token);
                     }
 
                     messages = await provider.ListMessagesAsync(queueName, messages.NextPageId, null, true, false, cancellationTokenSource.Token);
                     foreach (QueuedMessage message in messages)
                     {
-                        Assert.IsTrue(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
+                        Assert.True(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
                     }
                 }
 
-                Assert.AreEqual(28, locatedMessages.Count);
+                Assert.Equal(28, locatedMessages.Count);
                 for (int i = 0; i < 28; i++)
                 {
-                    Assert.IsTrue(locatedMessages.Contains(i), "The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i);
+                    Assert.True(locatedMessages.Contains(i), string.Format("The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i));
                 }
 
                 await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestListAllQueueMessages()
         {
             IQueueingService provider = CreateProvider();
@@ -338,12 +337,12 @@
 
                 ReadOnlyCollection<QueuedMessage> messages = await ListAllMessagesAsync(provider, queueName, null, true, false, cancellationTokenSource.Token, null);
                 foreach (QueuedMessage message in messages)
-                    Assert.IsTrue(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
+                    Assert.True(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
 
-                Assert.AreEqual(28, locatedMessages.Count);
+                Assert.Equal(28, locatedMessages.Count);
                 for (int i = 0; i < 28; i++)
                 {
-                    Assert.IsTrue(locatedMessages.Contains(i), "The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i);
+                    Assert.True(locatedMessages.Contains(i), string.Format("The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i));
                 }
 
                 await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
@@ -355,9 +354,9 @@
         /// and <see cref="IQueueingService.PostMessagesAsync(QueueName, IEnumerable{Message}, CancellationToken)"/>
         /// methods when posting 0 messages.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestPostQueueMessages_Generic_0()
         {
             IQueueingService provider = CreateProvider();
@@ -374,28 +373,28 @@
                 //
 
                 enqueued = await provider.PostMessagesAsync(queueName, cancellationTokenSource.Token);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.AreEqual(0, enqueued.Ids.Count());
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreSame(MessagesEnqueued.Empty, enqueued);
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.Equal(0, enqueued.Ids.Count());
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Same(MessagesEnqueued.Empty, enqueued);
 
                 enqueued = await provider.PostMessagesAsync(queueName, Enumerable.Empty<Message>(), cancellationTokenSource.Token);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(0, enqueued.Ids.Count());
-                Assert.AreSame(MessagesEnqueued.Empty, enqueued);
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(0, enqueued.Ids.Count());
+                Assert.Same(MessagesEnqueued.Empty, enqueued);
 
                 //
                 // Validation
                 //
 
                 ReadOnlyCollection<QueuedMessage> messages = await ListAllMessagesAsync(provider, queueName, null, true, true, cancellationTokenSource.Token, null);
-                Assert.IsNotNull(messages);
-                Assert.AreEqual(0, messages.Count);
+                Assert.NotNull(messages);
+                Assert.Equal(0, messages.Count);
 
                 //
                 // Cleanup
@@ -410,9 +409,9 @@
         /// and <see cref="IQueueingService.PostMessagesAsync(QueueName, IEnumerable{Message}, CancellationToken)"/>
         /// methods when posting 1 message.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestPostQueueMessages_Generic_1()
         {
             IQueueingService provider = CreateProvider();
@@ -431,26 +430,26 @@
                 //
 
                 enqueued = await provider.PostMessagesAsync(queueName, cancellationTokenSource.Token, genericMessage);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(1, enqueued.Ids.Count());
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(1, enqueued.Ids.Count());
 
                 enqueued = await provider.PostMessagesAsync(queueName, new[] { genericMessage }, cancellationTokenSource.Token);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(1, enqueued.Ids.Count());
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(1, enqueued.Ids.Count());
 
                 //
                 // Validation
                 //
 
                 ReadOnlyCollection<QueuedMessage> messages = await ListAllMessagesAsync(provider, queueName, null, true, true, cancellationTokenSource.Token, null);
-                Assert.IsNotNull(messages);
-                Assert.AreEqual(2, messages.Count);
+                Assert.NotNull(messages);
+                Assert.Equal(2, messages.Count);
 
                 //
                 // Cleanup
@@ -465,9 +464,9 @@
         /// and <see cref="IQueueingService.PostMessagesAsync(QueueName, IEnumerable{Message}, CancellationToken)"/>
         /// methods when posting 2 messages.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestPostQueueMessages_Generic_2()
         {
             IQueueingService provider = CreateProvider();
@@ -486,28 +485,28 @@
                 //
 
                 enqueued = await provider.PostMessagesAsync(queueName, cancellationTokenSource.Token, genericMessage, genericMessage);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(2, enqueued.Ids.Count());
-                Assert.AreEqual(false, enqueued.Partial);
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(2, enqueued.Ids.Count());
+                Assert.Equal(false, enqueued.Partial);
 
                 enqueued = await provider.PostMessagesAsync(queueName, new[] { genericMessage, genericMessage }, cancellationTokenSource.Token);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(2, enqueued.Ids.Count());
-                Assert.AreEqual(false, enqueued.Partial);
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(2, enqueued.Ids.Count());
+                Assert.Equal(false, enqueued.Partial);
 
                 //
                 // Validation
                 //
 
                 ReadOnlyCollection<QueuedMessage> messages = await ListAllMessagesAsync(provider, queueName, null, true, true, cancellationTokenSource.Token, null);
-                Assert.IsNotNull(messages);
-                Assert.AreEqual(4, messages.Count);
+                Assert.NotNull(messages);
+                Assert.Equal(4, messages.Count);
 
                 //
                 // Cleanup
@@ -522,9 +521,9 @@
         /// and <see cref="IQueueingService.PostMessagesAsync{T}(QueueName, IEnumerable{Message{T}}, CancellationToken)"/>
         /// methods when posting 0 messages.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestPostQueueMessages_Typed_0()
         {
             IQueueingService provider = CreateProvider();
@@ -543,28 +542,28 @@
                 //
 
                 enqueued = await provider.PostMessagesAsync<SampleMetadata>(queueName, cancellationTokenSource.Token);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(0, enqueued.Ids.Count());
-                Assert.AreSame(MessagesEnqueued.Empty, enqueued);
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(0, enqueued.Ids.Count());
+                Assert.Same(MessagesEnqueued.Empty, enqueued);
 
                 enqueued = await provider.PostMessagesAsync<SampleMetadata>(queueName, Enumerable.Empty<Message<SampleMetadata>>(), cancellationTokenSource.Token);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(0, enqueued.Ids.Count());
-                Assert.AreSame(MessagesEnqueued.Empty, enqueued);
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(0, enqueued.Ids.Count());
+                Assert.Same(MessagesEnqueued.Empty, enqueued);
 
                 //
                 // Validation
                 //
 
                 ReadOnlyCollection<QueuedMessage> messages = await ListAllMessagesAsync(provider, queueName, null, true, true, cancellationTokenSource.Token, null);
-                Assert.IsNotNull(messages);
-                Assert.AreEqual(0, messages.Count);
+                Assert.NotNull(messages);
+                Assert.Equal(0, messages.Count);
 
                 //
                 // Cleanup
@@ -579,9 +578,9 @@
         /// and <see cref="IQueueingService.PostMessagesAsync{T}(QueueName, IEnumerable{Message{T}}, CancellationToken)"/>
         /// methods when posting 1 message.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestPostQueueMessages_Typed_1()
         {
             IQueueingService provider = CreateProvider();
@@ -600,26 +599,26 @@
                 //
 
                 enqueued = await provider.PostMessagesAsync<SampleMetadata>(queueName, cancellationTokenSource.Token, typedMessage);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(1, enqueued.Ids.Count());
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(1, enqueued.Ids.Count());
 
                 enqueued = await provider.PostMessagesAsync<SampleMetadata>(queueName, new[] { typedMessage }, cancellationTokenSource.Token);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(1, enqueued.Ids.Count());
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(1, enqueued.Ids.Count());
 
                 //
                 // Validation
                 //
 
                 ReadOnlyCollection<QueuedMessage> messages = await ListAllMessagesAsync(provider, queueName, null, true, true, cancellationTokenSource.Token, null);
-                Assert.IsNotNull(messages);
-                Assert.AreEqual(2, messages.Count);
+                Assert.NotNull(messages);
+                Assert.Equal(2, messages.Count);
 
                 //
                 // Cleanup
@@ -634,9 +633,9 @@
         /// and <see cref="IQueueingService.PostMessagesAsync{T}(QueueName, IEnumerable{Message{T}}, CancellationToken)"/>
         /// methods when posting 2 messages.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestPostQueueMessages_Typed_2()
         {
             IQueueingService provider = CreateProvider();
@@ -655,26 +654,26 @@
                 //
 
                 enqueued = await provider.PostMessagesAsync<SampleMetadata>(queueName, cancellationTokenSource.Token, typedMessage, typedMessage);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(2, enqueued.Ids.Count());
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(2, enqueued.Ids.Count());
 
                 enqueued = await provider.PostMessagesAsync<SampleMetadata>(queueName, new[] { typedMessage, typedMessage }, cancellationTokenSource.Token);
-                Assert.IsNotNull(enqueued);
-                Assert.AreEqual(false, enqueued.Partial);
-                Assert.IsNotNull(enqueued.Ids);
-                Assert.IsFalse(enqueued.Ids.Contains(null));
-                Assert.AreEqual(2, enqueued.Ids.Count());
+                Assert.NotNull(enqueued);
+                Assert.Equal(false, enqueued.Partial);
+                Assert.NotNull(enqueued.Ids);
+                Assert.False(enqueued.Ids.Contains(null));
+                Assert.Equal(2, enqueued.Ids.Count());
 
                 //
                 // Validation
                 //
 
                 ReadOnlyCollection<QueuedMessage> messages = await ListAllMessagesAsync(provider, queueName, null, true, true, cancellationTokenSource.Token, null);
-                Assert.IsNotNull(messages);
-                Assert.AreEqual(4, messages.Count);
+                Assert.NotNull(messages);
+                Assert.Equal(4, messages.Count);
 
                 //
                 // Cleanup
@@ -688,16 +687,16 @@
         /// Tests the queueing service message functionality by creating two queues
         /// and two sub-processes and using them for two-way communication.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestQueueMessages()
         {
             int clientCount = 3;
             int serverCount = 2;
 
-            Assert.IsTrue(clientCount > 0);
-            Assert.IsTrue(serverCount > 0);
+            Assert.True(clientCount > 0);
+            Assert.True(serverCount > 0);
 
             QueueName requestQueueName = CreateRandomQueueName();
             QueueName[] responseQueueNames = Enumerable.Range(0, clientCount).Select(i => CreateRandomQueueName()).ToArray();
@@ -752,7 +751,7 @@
             await Task.Factory.ContinueWhenAll(responseQueueNames.Select(queueName => provider.DeleteQueueAsync(queueName, testCancellationTokenSource.Token)).ToArray(), TaskExtrasExtensions.PropagateExceptions);
 
             if (clientTotal == 0)
-                Assert.Inconclusive("No messages were fully processed by the test.");
+                Assert.False(true, "No messages were fully processed by the test.");
         }
 
         private async Task<int> PublishMessages(QueueName requestQueueName, QueueName replyQueueName, CancellationToken token)
@@ -783,8 +782,8 @@
                                 if (result._id == message.Body._id)
                                 {
                                     // this is the reply to this thread's operation
-                                    Assert.AreEqual(message.Body._operand1 + message.Body._operand2, result._result);
-                                    Assert.AreEqual(x + y, result._result);
+                                    Assert.Equal(message.Body._operand1 + message.Body._operand2, result._result);
+                                    Assert.Equal(x + y, result._result);
                                     await queueingService.DeleteMessageAsync(replyQueueName, queuedMessage.Id, claim, token);
                                     processedMessages++;
                                     handled = true;
@@ -982,9 +981,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Queues)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Queues, "")]
         public async Task TestQueueClaims()
         {
             IQueueingService provider = CreateProvider();
@@ -998,28 +997,28 @@
             QueueStatistics statistics;
             using (Claim claim = await provider.ClaimMessageAsync(queueName, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(1), cancellationTokenSource.Token))
             {
-                Assert.AreEqual(TimeSpan.FromMinutes(5), claim.TimeToLive);
+                Assert.Equal(TimeSpan.FromMinutes(5), claim.TimeToLive);
 
-                Assert.IsNotNull(claim.Messages);
-                Assert.AreEqual(1, claim.Messages.Count);
+                Assert.NotNull(claim.Messages);
+                Assert.Equal(1, claim.Messages.Count);
 
                 statistics = await provider.GetQueueStatisticsAsync(queueName, cancellationTokenSource.Token);
-                Assert.AreEqual(1, statistics.MessageStatistics.Claimed);
+                Assert.Equal(1, statistics.MessageStatistics.Claimed);
 
                 QueuedMessage message = await provider.GetMessageAsync(queueName, claim.Messages[0].Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(message);
+                Assert.NotNull(message);
 
                 TimeSpan age = claim.Age;
                 await Task.Delay(TimeSpan.FromSeconds(2));
                 await claim.RefreshAsync(cancellationTokenSource.Token);
-                Assert.IsTrue(claim.Age >= age + TimeSpan.FromSeconds(2));
+                Assert.True(claim.Age >= age + TimeSpan.FromSeconds(2));
 
                 await claim.RenewAsync(TimeSpan.FromMinutes(10), cancellationTokenSource.Token);
-                Assert.AreEqual(TimeSpan.FromMinutes(10), claim.TimeToLive);
+                Assert.Equal(TimeSpan.FromMinutes(10), claim.TimeToLive);
             }
 
             statistics = await provider.GetQueueStatisticsAsync(queueName, cancellationTokenSource.Token);
-            Assert.AreEqual(0, statistics.MessageStatistics.Claimed);
+            Assert.Equal(0, statistics.MessageStatistics.Claimed);
 
             await provider.DeleteQueueAsync(queueName, cancellationTokenSource.Token);
         }

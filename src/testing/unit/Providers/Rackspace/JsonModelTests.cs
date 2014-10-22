@@ -2,7 +2,7 @@
 {
     using System;
     using System.Net;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using net.openstack.Core;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Domain.Converters;
     using net.openstack.Providers.Rackspace;
@@ -10,114 +10,114 @@
     using net.openstack.Providers.Rackspace.Objects.Response;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using Xunit;
     using Encoding = System.Text.Encoding;
 
-    [TestClass]
     public class JsonModelTests
     {
         /// <seealso cref="PasswordCredential"/>
         /// <seealso href="http://docs.openstack.org/api/openstack-identity-service/2.0/content/POST_updateUserCredential_v2.0_users__userId__OS-KSADM_credentials__credential-type__.html">Update User Credentials (OpenStack Identity Service API v2.0 Reference)</seealso>
-        [TestMethod]
+        [Fact]
         public void TestPasswordCredential()
         {
             string json = @"{ ""username"" : ""test_user"", ""password"" : ""mypass"" }";
             PasswordCredential credentials = JsonConvert.DeserializeObject<PasswordCredential>(json);
-            Assert.IsNotNull(credentials);
-            Assert.AreEqual("test_user", credentials.Username);
-            Assert.AreEqual("mypass", credentials.Password);
+            Assert.NotNull(credentials);
+            Assert.Equal("test_user", credentials.Username);
+            Assert.Equal("mypass", credentials.Password);
         }
 
         /// <seealso cref="PasswordCredentialResponse"/>
         /// <seealso href="http://docs.openstack.org/api/openstack-identity-service/2.0/content/POST_updateUserCredential_v2.0_users__userId__OS-KSADM_credentials__credential-type__.html">Update User Credentials (OpenStack Identity Service API v2.0 Reference)</seealso>
-        [TestMethod]
+        [Fact]
         public void TestPasswordCredentialResponse()
         {
             string json = @"{ ""passwordCredentials"" : { username : ""test_user"", password : ""mypass"" } }";
             PasswordCredentialResponse response = JsonConvert.DeserializeObject<PasswordCredentialResponse>(json);
-            Assert.IsNotNull(response);
-            Assert.IsNotNull(response.PasswordCredential);
-            Assert.AreEqual("test_user", response.PasswordCredential.Username);
-            Assert.AreEqual("mypass", response.PasswordCredential.Password);
+            Assert.NotNull(response);
+            Assert.NotNull(response.PasswordCredential);
+            Assert.Equal("test_user", response.PasswordCredential.Username);
+            Assert.Equal("mypass", response.PasswordCredential.Password);
         }
 
         /// <seealso href="http://docs.openstack.org/api/openstack-compute/2/content/ServerUpdate.html">Update Server (OpenStack Compute API v2 and Extensions Reference)</seealso>
-        [TestMethod]
+        [Fact]
         public void TestUpdateServerRequest()
         {
             UpdateServerRequest request = new UpdateServerRequest("new-name", IPAddress.Parse("10.0.0.1"), IPAddress.Parse("2607:f0d0:1002:51::4"));
             string expectedJson = @"{""server"":{""name"":""new-name"",""accessIPv4"":""10.0.0.1"",""accessIPv6"":""2607:f0d0:1002:51::4""}}";
             string actual = JsonConvert.SerializeObject(request, Formatting.None);
-            Assert.AreEqual(expectedJson, actual);
+            Assert.Equal(expectedJson, actual);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestIPAddressDetailsConverter()
         {
             IPAddressDetailsConverter converter = new IPAddressDetailsConverter();
 
             string json = @"{ ""version"" : 4, ""addr"" : ""10.0.0.1"" }";
             IPAddress address = JsonConvert.DeserializeObject<IPAddress>(json, converter);
-            Assert.AreEqual(IPAddress.Parse("10.0.0.1"), address);
+            Assert.Equal(IPAddress.Parse("10.0.0.1"), address);
 
             json = @"{ ""version"" : 6, ""addr"" : ""::babe:4317:0A83"" }";
             address = JsonConvert.DeserializeObject<IPAddress>(json, converter);
-            Assert.AreEqual(IPAddress.Parse("::babe:4317:0A83"), address);
+            Assert.Equal(IPAddress.Parse("::babe:4317:0A83"), address);
 
             json = JsonConvert.SerializeObject(IPAddress.Parse("10.0.0.1"), converter);
-            Assert.AreEqual(@"{""addr"":""10.0.0.1"",""version"":""4""}", json);
+            Assert.Equal(@"{""addr"":""10.0.0.1"",""version"":""4""}", json);
 
             json = JsonConvert.SerializeObject(IPAddress.Parse("::babe:4317:0A83"), converter);
-            Assert.AreEqual(@"{""addr"":""::babe:4317:a83"",""version"":""6""}", json);
+            Assert.Equal(@"{""addr"":""::babe:4317:a83"",""version"":""6""}", json);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestIPAddressSimpleConverter()
         {
             IPAddressSimpleConverter converter = new IPAddressSimpleConverter();
 
             string json = @"""10.0.0.1""";
             IPAddress address = JsonConvert.DeserializeObject<IPAddress>(json, converter);
-            Assert.AreEqual(IPAddress.Parse("10.0.0.1"), address);
+            Assert.Equal(IPAddress.Parse("10.0.0.1"), address);
 
             json = @"""::babe:4317:0A83""";
             address = JsonConvert.DeserializeObject<IPAddress>(json, converter);
-            Assert.AreEqual(IPAddress.Parse("::babe:4317:0A83"), address);
+            Assert.Equal(IPAddress.Parse("::babe:4317:0A83"), address);
 
             json = JsonConvert.SerializeObject(IPAddress.Parse("10.0.0.1"), converter);
-            Assert.AreEqual(@"""10.0.0.1""", json);
+            Assert.Equal(@"""10.0.0.1""", json);
 
             json = JsonConvert.SerializeObject(IPAddress.Parse("::babe:4317:0A83"), converter);
-            Assert.AreEqual(@"""::babe:4317:a83""", json);
+            Assert.Equal(@"""::babe:4317:a83""", json);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestPersonalityJsonModel()
         {
             string expectedPath = "/usr/lib/stuff";
             string expectedText = "Example text";
             Personality personality = new Personality(expectedPath, expectedText, Encoding.UTF8);
-            Assert.AreEqual(expectedPath, personality.Path);
-            Assert.AreEqual(expectedText, Encoding.UTF8.GetString(personality.Content));
+            Assert.Equal(expectedPath, personality.Path);
+            Assert.Equal(expectedText, Encoding.UTF8.GetString(personality.Content));
 
             string json = JsonConvert.SerializeObject(personality);
             Personality personality2 = JsonConvert.DeserializeObject<Personality>(json);
-            Assert.AreEqual(expectedPath, personality.Path);
-            Assert.AreEqual(expectedText, Encoding.UTF8.GetString(personality.Content));
+            Assert.Equal(expectedPath, personality.Path);
+            Assert.Equal(expectedText, Encoding.UTF8.GetString(personality.Content));
 
             // make sure the JSON was Base-64 encoded
             JObject personalityObject = JsonConvert.DeserializeObject<JObject>(json);
-            Assert.IsInstanceOfType(personalityObject["contents"], typeof(JValue));
+            Assert.IsAssignableFrom<JValue>(personalityObject["contents"]);
             byte[] encodedText = Convert.FromBase64String((string)((JValue)personalityObject["contents"]).Value);
-            Assert.AreEqual(expectedText, Encoding.UTF8.GetString(encodedText));
-            Assert.AreEqual(personality.Content.Length, encodedText.Length);
+            Assert.Equal(expectedText, Encoding.UTF8.GetString(encodedText));
+            Assert.Equal(personality.Content.Length, encodedText.Length);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestImpersonationRequest()
         {
             CloudIdentityProviderWrapper provider = new CloudIdentityProviderWrapper();
             JObject requestBody = provider.BuildImpersonationRequestJsonAccessor("myUser", 27);
-            Assert.AreEqual(@"{""RAX-AUTH:impersonation"":{""user"":{""username"":""myUser"",""expire-in-seconds"":27}}}", requestBody.ToString(Formatting.None));
+            Assert.Equal(@"{""RAX-AUTH:impersonation"":{""user"":{""username"":""myUser"",""expire-in-seconds"":27}}}", requestBody.ToString(Formatting.None));
         }
 
         protected class CloudIdentityProviderWrapper : CloudIdentityProvider
@@ -128,43 +128,43 @@
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TestDiskConfigurationConversions()
         {
             TestExtensibleEnumSerialization(DiskConfiguration.Auto, "OTHER", DiskConfiguration.FromName);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestImageState()
         {
             TestExtensibleEnumSerialization(ImageState.Active, "OTHER", ImageState.FromName);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestImageType()
         {
             TestExtensibleEnumSerialization(ImageType.Base, "OTHER", ImageType.FromName);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestRebootType()
         {
             TestExtensibleEnumSerialization(RebootType.Hard, "OTHER", RebootType.FromName);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestServerState()
         {
             TestExtensibleEnumSerialization(ServerState.Build, "OTHER", ServerState.FromName);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestSnapshotState()
         {
             TestExtensibleEnumSerialization(SnapshotState.Available, "OTHER", SnapshotState.FromName);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestVolumeState()
         {
             TestExtensibleEnumSerialization(VolumeState.Creating, "OTHER", VolumeState.FromName);
@@ -176,31 +176,35 @@
                 throw new ArgumentNullException("fromName");
 
             T obj = JsonConvert.DeserializeObject<T>("null");
-            Assert.IsNull(obj);
+            Assert.Null(obj);
 
             obj = JsonConvert.DeserializeObject<T>(@"""""");
-            Assert.IsNull(obj);
+            Assert.Null(obj);
 
             // matching case, predefined value
             obj = JsonConvert.DeserializeObject<T>('"' + standardItem.ToString() + '"');
-            Assert.AreEqual(standardItem, obj);
+            Assert.Equal(standardItem, obj);
 
             // different case, predefined value
-            Assert.AreNotEqual(standardItem.ToString(), standardItem.ToString().ToLowerInvariant());
-            obj = JsonConvert.DeserializeObject<T>('"' + standardItem.ToString().ToLowerInvariant() + '"');
-            Assert.AreEqual(standardItem, obj);
+            string altered = standardItem.ToString().ToLowerInvariant();
+            if (altered.Equals(standardItem.ToString()))
+                altered = standardItem.ToString().ToUpperInvariant();
+
+            Assert.NotEqual(standardItem.ToString(), altered);
+            obj = JsonConvert.DeserializeObject<T>('"' + altered + '"');
+            Assert.Equal(standardItem, obj);
 
             // new value
             obj = JsonConvert.DeserializeObject<T>('"' + nonStandardName + '"');
-            Assert.AreEqual(fromName(nonStandardName), obj);
+            Assert.Equal(fromName(nonStandardName), obj);
 
             // different case, same as value encountered before
-            Assert.AreNotEqual(nonStandardName, nonStandardName.ToLowerInvariant());
+            Assert.NotEqual(nonStandardName, nonStandardName.ToLowerInvariant());
             obj = JsonConvert.DeserializeObject<T>('"' + nonStandardName.ToLowerInvariant() + '"');
-            Assert.AreEqual(fromName(nonStandardName), obj);
+            Assert.Equal(fromName(nonStandardName), obj);
 
             string json = JsonConvert.SerializeObject(standardItem);
-            Assert.AreEqual('"' + standardItem.ToString() + '"', json);
+            Assert.Equal('"' + standardItem.ToString() + '"', json);
         }
     }
 }

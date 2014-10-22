@@ -44,25 +44,25 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
            
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Authenticate_Test_Identity()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testIdentity);
             var userAccess = serviceProvider.Authenticate();
 
-            Assert.IsNotNull(userAccess);
+            Assert.NotNull(userAccess);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Authenticate_Test_Admin_Identity()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testAdminIdentity);
             var userAccess = serviceProvider.Authenticate();
 
-            Assert.IsNotNull(userAccess);
+            Assert.NotNull(userAccess);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Throw_Error_When_Authenticating_With_Invalid_Password()
         {
             var identity = new RackspaceCloudIdentity()
@@ -81,11 +81,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
             catch (net.openstack.Core.Exceptions.Response.ResponseException)
             {
-                Assert.IsTrue(true);
+                Assert.True(true);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Throw_Error_When_Authenticating_With_Invalid_API_Key()
         {
             var identity = new RackspaceCloudIdentity()
@@ -104,11 +104,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
             catch(net.openstack.Core.Exceptions.Response.ResponseException)
             {
-                Assert.IsTrue(true);
+                Assert.True(true);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Throw_Error_When_Authenticating_With_Invalid_Username()
         {
             var identity = new RackspaceCloudIdentity()
@@ -126,65 +126,65 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
             catch (net.openstack.Core.Exceptions.Response.ResponseException)
             {
-                Assert.IsTrue(true);
+                Assert.True(true);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_List_Only_User_In_Account_When_Retrieving_List_Of_Users_With_User_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testIdentity);
 
             var users = serviceProvider.ListUsers();
 
-            Assert.IsTrue(users.Any());
-            Assert.AreEqual(_testIdentity.Username, users.First().Username);
+            Assert.True(users.Any());
+            Assert.Equal(_testIdentity.Username, users.First().Username);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_List_Multiple_Users_When_Retrieving_List_Of_Users_With_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testAdminIdentity);
 
             var users = serviceProvider.ListUsers();
 
-            Assert.IsTrue(users.Any());
+            Assert.True(users.Any());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_List_Details_Of_Self_When_Retrieving_User_By_Name_With_Non_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testIdentity);
 
             _userDetails = serviceProvider.GetUserByName(_testIdentity.Username);
 
-            Assert.IsNotNull(_userDetails);
-            Assert.AreEqual(_testIdentity.Username, _userDetails.Username);
+            Assert.NotNull(_userDetails);
+            Assert.Equal(_testIdentity.Username, _userDetails.Username);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_List_Details_Of_Self_When_Retrieving_User_By_Name_With_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testAdminIdentity);
 
             _adminUserDetails = serviceProvider.GetUserByName(_testAdminIdentity.Username);
 
-            Assert.IsNotNull(_adminUserDetails);
-            Assert.AreEqual(_testAdminIdentity.Username, _adminUserDetails.Username);
+            Assert.NotNull(_adminUserDetails);
+            Assert.Equal(_testAdminIdentity.Username, _adminUserDetails.Username);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_List_Details_Of_Other_User_When_Retrieving_User_By_Name_With_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testAdminIdentity);
 
             var details = serviceProvider.GetUserByName(_testIdentity.Username);
 
-            Assert.IsNotNull(details);
-            Assert.AreEqual(_testIdentity.Username, details.Username);
+            Assert.NotNull(details);
+            Assert.Equal(_testIdentity.Username, details.Username);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Throw_Exception_When_Trying_To_Get_Details_Of_A_Different_User_When_Retrieving_User_By_Name_With_Non_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testIdentity);
@@ -197,44 +197,44 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
             catch (net.openstack.Core.Exceptions.Response.ResponseException)
             {
-                Assert.IsTrue(true);
+                Assert.True(true);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_List_Details_Of_Self_When_Retrieving_User_By_Id_With_Non_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testIdentity);
 
             _userDetails = serviceProvider.GetUser(_userDetails.Id);
 
-            Assert.IsNotNull(_userDetails);
-            Assert.AreEqual(_testIdentity.Username, _userDetails.Username);
+            Assert.NotNull(_userDetails);
+            Assert.Equal(_testIdentity.Username, _userDetails.Username);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_List_Details_Of_Self_When_Retrieving_User_By_Id_With_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testAdminIdentity);
 
             _adminUserDetails = serviceProvider.GetUser(_adminUserDetails.Id);
 
-            Assert.IsNotNull(_adminUserDetails);
-            Assert.AreEqual(_testAdminIdentity.Username, _adminUserDetails.Username);
+            Assert.NotNull(_adminUserDetails);
+            Assert.Equal(_testAdminIdentity.Username, _adminUserDetails.Username);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_List_Details_Of_Other_User_When_Retrieving_User_By_Id_With_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testAdminIdentity);
 
             var details = serviceProvider.GetUser(_userDetails.Id);
 
-            Assert.IsNotNull(details);
-            Assert.AreEqual(_testIdentity.Username, details.Username);
+            Assert.NotNull(details);
+            Assert.Equal(_testIdentity.Username, details.Username);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Throw_Exception_When_Trying_To_Get_Details_Of_A_Different_User_When_Retrieving_User_By_Id_With_Non_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(_testIdentity);
@@ -247,11 +247,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
             catch (net.openstack.Core.Exceptions.Response.ResponseException)
             {
-                Assert.IsTrue(true);
+                Assert.True(true);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Add_New_User_1_Without_Specifying_A_Password_Or_Default_Region_To_Account_When_Requesting_As_User_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
@@ -259,30 +259,30 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var newTestUser = provider.AddUser(new NewUser("openstacknettestuser1", "newuser@me.com", enabled : true));
 
             _newTestUserPassword = newTestUser.Password;
-            Assert.IsNotNull(newTestUser);
-            Assert.AreEqual("openstacknettestuser1", newTestUser.Username);
-            Assert.AreEqual("newuser@me.com", newTestUser.Email);
-            Assert.AreEqual(true, newTestUser.Enabled);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(newTestUser.Password));
+            Assert.NotNull(newTestUser);
+            Assert.Equal("openstacknettestuser1", newTestUser.Username);
+            Assert.Equal("newuser@me.com", newTestUser.Email);
+            Assert.Equal(true, newTestUser.Enabled);
+            Assert.False(string.IsNullOrWhiteSpace(newTestUser.Password));
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Retrieve_New_User_1_As_User_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testAdminIdentity);
 
             _testUser = provider.GetUserByName("openstacknettestuser1");
 
-            Assert.IsNotNull(_testUser);
-            Assert.AreEqual("openstacknettestuser1", _testUser.Username);
-            Assert.AreEqual("newuser@me.com", _testUser.Email);
-            Assert.AreEqual(true, _testUser.Enabled);
+            Assert.NotNull(_testUser);
+            Assert.Equal("openstacknettestuser1", _testUser.Username);
+            Assert.Equal("newuser@me.com", _testUser.Email);
+            Assert.Equal(true, _testUser.Enabled);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Authenticate_NewUser()
         {
-            Assert.IsNotNull(_testUser);
+            Assert.NotNull(_testUser);
 
             IIdentityProvider provider = new CloudIdentityProvider();
 
@@ -290,10 +290,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 provider.Authenticate(new RackspaceCloudIdentity
                                           {Username = _testUser.Username, Password = _newTestUserPassword});
 
-            Assert.IsNotNull(userAccess);
+            Assert.NotNull(userAccess);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Update_NewUser_Username_And_Email_When_Requesting_As_User_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
@@ -304,24 +304,24 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             user.Enabled = true;
             var updatedUser = provider.UpdateUser(user);
 
-            Assert.IsNotNull(updatedUser);
-            Assert.AreEqual("openstacknettestuser12", updatedUser.Username);
-            Assert.AreEqual("newuser2@me.com", updatedUser.Email);
-            Assert.AreEqual(true, updatedUser.Enabled);
-            Assert.IsTrue(string.IsNullOrWhiteSpace(updatedUser.DefaultRegion));
+            Assert.NotNull(updatedUser);
+            Assert.Equal("openstacknettestuser12", updatedUser.Username);
+            Assert.Equal("newuser2@me.com", updatedUser.Email);
+            Assert.Equal(true, updatedUser.Enabled);
+            Assert.True(string.IsNullOrWhiteSpace(updatedUser.DefaultRegion));
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Delete_NewUser_When_Requesting_As_User_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
 
             var response = provider.DeleteUser(_testUser.Id);
 
-            Assert.IsTrue(response);
+            Assert.True(response);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Throw_Exception_When_Requesting_The_NewUser_After_It_Has_Been_Deleted_When_Requesting_As_User_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
@@ -334,11 +334,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
             catch(Exception )
             {
-                Assert.IsTrue(true);
+                Assert.True(true);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Add_New_User_2_With_Specifying_A_Password_But_Not_Default_Region_To_Account_When_Requesting_As_User_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
@@ -346,28 +346,28 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var newUser = provider.AddUser(new NewUser("openstacknettestuser2", "newuser2@me.com", enabled : true, password : NewUserPassword));
             _newTestUserPassword = newUser.Password;
 
-            Assert.IsNotNull(newUser);
-            Assert.AreEqual("openstacknettestuser2", newUser.Username);
-            Assert.AreEqual("newuser2@me.com", newUser.Email);
-            Assert.AreEqual(true, newUser.Enabled);
-            Assert.AreEqual(NewUserPassword, newUser.Password);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(newUser.Password));
+            Assert.NotNull(newUser);
+            Assert.Equal("openstacknettestuser2", newUser.Username);
+            Assert.Equal("newuser2@me.com", newUser.Email);
+            Assert.Equal(true, newUser.Enabled);
+            Assert.Equal(NewUserPassword, newUser.Password);
+            Assert.False(string.IsNullOrWhiteSpace(newUser.Password));
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Retrieve_New_User_2_As_User_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testAdminIdentity);
 
             _testUser = provider.GetUserByName("openstacknettestuser2");
 
-            Assert.IsNotNull(_testUser);
-            Assert.AreEqual("openstacknettestuser2", _testUser.Username);
-            Assert.AreEqual("newuser2@me.com", _testUser.Email);
-            Assert.AreEqual(true, _testUser.Enabled);
+            Assert.NotNull(_testUser);
+            Assert.Equal("openstacknettestuser2", _testUser.Username);
+            Assert.Equal("newuser2@me.com", _testUser.Email);
+            Assert.Equal(true, _testUser.Enabled);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Update_NewUser_Username_And_Email_And_Default_Region_When_Requesting_As_User_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
@@ -379,24 +379,24 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             user.DefaultRegion = "DFW";
             var updatedUser = provider.UpdateUser(user);
 
-            Assert.IsNotNull(updatedUser);
-            Assert.AreEqual("openstacknettestuser32", updatedUser.Username);
-            Assert.AreEqual("newuser32@me.com", updatedUser.Email);
-            Assert.AreEqual(true, updatedUser.Enabled);
-            Assert.AreEqual("DFW", updatedUser.DefaultRegion);
+            Assert.NotNull(updatedUser);
+            Assert.Equal("openstacknettestuser32", updatedUser.Username);
+            Assert.Equal("newuser32@me.com", updatedUser.Email);
+            Assert.Equal(true, updatedUser.Enabled);
+            Assert.Equal("DFW", updatedUser.DefaultRegion);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_NewUser_When_Requesting_As_Self()
         {
             IIdentityProvider provider = new CloudIdentityProvider(new RackspaceCloudIdentity { Username = _testUser.Username, Password = _newTestUserPassword });
 
             var user = provider.GetUser(_testUser.Id);
 
-            Assert.IsNotNull(user);
+            Assert.NotNull(user);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Update_NewUser_Username_And_Email_When_Requesting_As_Self()
         {
             IIdentityProvider provider = new CloudIdentityProvider(new RackspaceCloudIdentity { Username = _testUser.Username, Password = _newTestUserPassword });
@@ -407,67 +407,67 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             user.Enabled = true;
             var updatedUser = provider.UpdateUser(user);
 
-            Assert.IsNotNull(updatedUser);
-            Assert.AreEqual("openstacknettestuser42", updatedUser.Username);
-            Assert.AreEqual("newuser42@me.com", updatedUser.Email);
-            Assert.AreEqual(true, updatedUser.Enabled);
+            Assert.NotNull(updatedUser);
+            Assert.Equal("openstacknettestuser42", updatedUser.Username);
+            Assert.Equal("newuser42@me.com", updatedUser.Email);
+            Assert.Equal(true, updatedUser.Enabled);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_List_Only_Self_When_Retrieving_List_Of_Users_With_Non_Admin_Account()
         {
             IIdentityProvider serviceProvider = new CloudIdentityProvider(new RackspaceCloudIdentity { Username = _testUser.Username, Password = _newTestUserPassword });
 
             var users = serviceProvider.ListUsers();
 
-            Assert.IsTrue(users.Count() == 1);
-            Assert.AreEqual(_testUser.Username, users.First().Username);
+            Assert.True(users.Count() == 1);
+            Assert.Equal(_testUser.Username, users.First().Username);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_The_Users_Tenant_When_Requesting_As_Non_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
 
             var tenants = provider.ListTenants();
 
-            Assert.IsTrue(tenants.Any());
+            Assert.True(tenants.Any());
 
             if(!string.IsNullOrWhiteSpace(_testIdentity.TenantId))
             {
-                Assert.IsTrue(tenants.Any(t => t.Id == _testIdentity.TenantId));
+                Assert.True(tenants.Any(t => t.Id == _testIdentity.TenantId));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_List_Of_Users_Credentials_When_Requesting_As_Non_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
 
             var creds = provider.ListUserCredentials(_userDetails.Id);
 
-            Assert.IsNotNull(creds);
-            Assert.IsTrue(creds.Any());
+            Assert.NotNull(creds);
+            Assert.True(creds.Any());
 
             foreach (var cred in creds)
             {
-                Assert.IsFalse(string.IsNullOrWhiteSpace(cred.Name));
-                Assert.IsFalse(string.IsNullOrWhiteSpace(cred.APIKey));
-                Assert.IsFalse(string.IsNullOrWhiteSpace(cred.Username));
+                Assert.False(string.IsNullOrWhiteSpace(cred.Name));
+                Assert.False(string.IsNullOrWhiteSpace(cred.APIKey));
+                Assert.False(string.IsNullOrWhiteSpace(cred.Username));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_User_API_Credential_When_Requesting_As_Non_Admin()
         {
             IIdentityProvider provider = new CloudIdentityProvider(_testIdentity);
 
             var cred = provider.GetUserCredential(_userDetails.Id, "RAX-KSKEY:apiKeyCredentials");
 
-            Assert.IsNotNull(cred);
-            Assert.AreEqual("RAX-KSKEY:apiKeyCredentials", cred.Name);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(cred.APIKey));
-            Assert.IsFalse(string.IsNullOrWhiteSpace(cred.Username));
+            Assert.NotNull(cred);
+            Assert.Equal("RAX-KSKEY:apiKeyCredentials", cred.Name);
+            Assert.False(string.IsNullOrWhiteSpace(cred.APIKey));
+            Assert.False(string.IsNullOrWhiteSpace(cred.Username));
         }
     }
 }

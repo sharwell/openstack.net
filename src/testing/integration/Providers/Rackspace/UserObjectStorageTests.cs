@@ -10,7 +10,6 @@
     using ICSharpCode.SharpZipLib.BZip2;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Exceptions;
@@ -20,6 +19,7 @@
     using net.openstack.Providers.Rackspace.Objects;
     using net.openstack.Providers.Rackspace.Objects.Response;
     using Newtonsoft.Json;
+    using Xunit;
     using Container = net.openstack.Core.Domain.Container;
     using File = System.IO.File;
     using FileInfo = System.IO.FileInfo;
@@ -38,7 +38,6 @@
     /// (Cloud Files) that can be run with user (non-admin) credentials.
     /// </summary>
     /// <seealso cref="CloudFilesProvider"/>
-    [TestClass]
     public class UserObjectStorageTests
     {
         /// <summary>
@@ -92,9 +91,8 @@
         /// This test is normally disabled. To run the cleanup method, comment out or remove the
         /// <see cref="IgnoreAttribute"/>.
         /// </remarks>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
-        [Ignore]
+        [Fact(Skip = "This test is normally disabled.")]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupAllContainerMetadata()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -110,8 +108,8 @@
         /// This unit test clears the metadata associated with every container which is
         /// created by the unit tests in this class.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupTestContainerMetadata()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -127,8 +125,8 @@
         /// This unit test deletes all containers created by the unit tests, including all
         /// objects within those containers.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupTestContainers()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -162,15 +160,15 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestListContainers()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             IEnumerable<Container> containers = ListAllContainers(provider);
             if (!containers.Any())
-                Assert.Inconclusive("The account does not have any containers in the region.");
+                Assert.False(true, "The account does not have any containers in the region.");
 
             Console.WriteLine("Containers");
             foreach (Container container in containers)
@@ -181,15 +179,15 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestContainerProperties()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             IEnumerable<Container> containers = ListAllContainers(provider);
             if (!containers.Any())
-                Assert.Inconclusive("The account does not have any containers in the region.");
+                Assert.False(true, "The account does not have any containers in the region.");
 
             int containersTested = 0;
             long objectsTested = 0;
@@ -198,8 +196,8 @@
             int nonEmptyBytesContainersTested = 0;
             foreach (Container container in containers)
             {
-                Assert.IsTrue(container.Count >= 0);
-                Assert.IsTrue(container.Bytes >= 0);
+                Assert.True(container.Count >= 0);
+                Assert.True(container.Bytes >= 0);
 
                 containersTested++;
                 if (container.Count > 0)
@@ -218,15 +216,15 @@
                 objectsTested += objectCount;
                 totalSizeTested += objectSize;
 
-                Assert.AreEqual(container.Count, objectCount);
-                Assert.AreEqual(container.Bytes, objectSize);
+                Assert.Equal(container.Count, objectCount);
+                Assert.Equal(container.Bytes, objectSize);
 
                 if (containersTested >= 5 && nonEmptyContainersTested >= 5 && nonEmptyBytesContainersTested >= 5)
                     break;
             }
 
             if (containersTested == 0 || nonEmptyContainersTested == 0 || nonEmptyBytesContainersTested == 0)
-                Assert.Inconclusive("The account does not have any non-empty containers in the region.");
+                Assert.False(true, "The account does not have any non-empty containers in the region.");
 
             Console.WriteLine("Verified container properties for:");
             Console.WriteLine("  {0} containers", containersTested);
@@ -234,26 +232,26 @@
             Console.WriteLine("  {0} bytes", totalSizeTested);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestCreateContainer()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             string containerName = TestContainerPrefix + Path.GetRandomFileName();
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerExists, result);
+            Assert.Equal(ObjectStore.ContainerExists, result);
 
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestVersionedContainer()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -261,16 +259,16 @@
             string versionsContainerName = TestContainerPrefix + Path.GetRandomFileName();
 
             ObjectStore result = provider.CreateContainer(versionsContainerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             result = provider.CreateContainer(containerName, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { CloudFilesProvider.VersionsLocation, UriUtility.UriEncode(versionsContainerName, UriPart.Any, Encoding.UTF8) } });
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Dictionary<string, string> headers = provider.GetContainerHeader(containerName);
             string location;
-            Assert.IsTrue(headers.TryGetValue(CloudFilesProvider.VersionsLocation, out location));
+            Assert.True(headers.TryGetValue(CloudFilesProvider.VersionsLocation, out location));
             location = UriUtility.UriDecode(location);
-            Assert.AreEqual(versionsContainerName, location);
+            Assert.Equal(versionsContainerName, location);
 
             string objectName = Path.GetRandomFileName();
             string fileData1 = "first-content";
@@ -286,7 +284,7 @@
             }
 
             string actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData1, actualData);
+            Assert.Equal(fileData1, actualData);
 
             /*
              * Overwrite the object
@@ -298,7 +296,7 @@
             }
 
             actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData2, actualData);
+            Assert.Equal(fileData2, actualData);
 
             /*
              * Delete the object once
@@ -307,7 +305,7 @@
             provider.DeleteObject(containerName, objectName);
 
             actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData1, actualData);
+            Assert.Equal(fileData1, actualData);
 
             /*
              * Cleanup
@@ -317,9 +315,9 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestDeleteContainer()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -328,7 +326,7 @@
             string fileContents = "File contents!";
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileContents));
             provider.CreateObject(containerName, stream, objectName);
@@ -336,7 +334,7 @@
             try
             {
                 provider.DeleteContainer(containerName, deleteObjects: false);
-                Assert.Fail("Expected a ContainerNotEmptyException");
+                Assert.True(false, "Expected a ContainerNotEmptyException");
             }
             catch (ContainerNotEmptyException)
             {
@@ -345,16 +343,16 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestGetContainerHeader()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             string containerName = TestContainerPrefix + Path.GetRandomFileName();
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Dictionary<string, string> headers = provider.GetContainerHeader(containerName);
             Console.WriteLine("Container Headers");
@@ -364,16 +362,16 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestGetContainerMetaData()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             string containerName = TestContainerPrefix + Path.GetRandomFileName();
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Dictionary<string, string> metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -393,16 +391,16 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestContainerHeaderKeyCharacters()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             string containerName = TestContainerPrefix + Path.GetRandomFileName();
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             List<char> keyCharList = new List<char>();
             for (char i = MinHeaderKeyCharacter; i <= MaxHeaderKeyCharacter; i++)
@@ -422,11 +420,11 @@
                 });
 
             Dictionary<string, string> metadata = provider.GetContainerMetaData(containerName);
-            Assert.IsNotNull(metadata);
+            Assert.NotNull(metadata);
 
             string value;
-            Assert.IsTrue(metadata.TryGetValue(key, out value));
-            Assert.AreEqual("Value", value);
+            Assert.True(metadata.TryGetValue(key, out value));
+            Assert.Equal("Value", value);
 
             provider.UpdateContainerMetadata(
                 containerName,
@@ -436,22 +434,22 @@
                 });
 
             metadata = provider.GetContainerMetaData(containerName);
-            Assert.IsNotNull(metadata);
-            Assert.IsFalse(metadata.TryGetValue(key, out value));
+            Assert.NotNull(metadata);
+            Assert.False(metadata.TryGetValue(key, out value));
 
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestContainerInvalidHeaderKeyCharacters()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             string containerName = TestContainerPrefix + Path.GetRandomFileName();
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             List<char> validKeyCharList = new List<char>();
             for (char i = MinHeaderKeyCharacter; i <= MaxHeaderKeyCharacter; i++)
@@ -475,7 +473,7 @@
                         {
                             { invalidKey, "Value" }
                         });
-                    Assert.Fail("Should throw an exception for invalid keys.");
+                    Assert.True(false, "Should throw an exception for invalid keys.");
                 }
                 catch (ArgumentException)
                 {
@@ -491,16 +489,16 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestUpdateContainerMetadata()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             string containerName = TestContainerPrefix + Path.GetRandomFileName();
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Dictionary<string, string> metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -534,16 +532,16 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestDeleteContainerMetadata()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             string containerName = TestContainerPrefix + Path.GetRandomFileName();
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Dictionary<string, string> metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -606,9 +604,9 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestListCDNContainers()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -624,9 +622,9 @@
         /// <summary>
         /// This test covers most of the CDN functionality exposed by <see cref="IObjectStorageProvider"/>.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestCDNOnContainer()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -635,23 +633,23 @@
             string fileContents = "File contents!";
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileContents));
             provider.CreateObject(containerName, stream, objectName);
 
             Dictionary<string, string> cdnHeaders = provider.EnableCDNOnContainer(containerName, false);
-            Assert.IsNotNull(cdnHeaders);
+            Assert.NotNull(cdnHeaders);
             Console.WriteLine("CDN Headers from EnableCDNOnContainer");
             foreach (var pair in cdnHeaders)
                 Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
 
             ContainerCDN containerHeader = provider.GetContainerCDNHeader(containerName);
-            Assert.IsNotNull(containerHeader);
+            Assert.NotNull(containerHeader);
             Console.WriteLine(JsonConvert.SerializeObject(containerHeader, Formatting.Indented));
-            Assert.IsTrue(containerHeader.CDNEnabled);
-            Assert.IsFalse(containerHeader.LogRetention);
-            Assert.IsTrue(
+            Assert.True(containerHeader.CDNEnabled);
+            Assert.False(containerHeader.LogRetention);
+            Assert.True(
                 containerHeader.CDNUri != null
                 || containerHeader.CDNIosUri != null
                 || containerHeader.CDNSslUri != null
@@ -661,28 +659,28 @@
             cdnHeaders = provider.EnableCDNOnContainer(containerName, containerHeader.Ttl);
             ContainerCDN updatedHeader = provider.GetContainerCDNHeader(containerName);
             Console.WriteLine(JsonConvert.SerializeObject(updatedHeader, Formatting.Indented));
-            Assert.IsNotNull(updatedHeader);
-            Assert.IsTrue(updatedHeader.CDNEnabled);
-            Assert.IsFalse(updatedHeader.LogRetention);
-            Assert.IsTrue(
+            Assert.NotNull(updatedHeader);
+            Assert.True(updatedHeader.CDNEnabled);
+            Assert.False(updatedHeader.LogRetention);
+            Assert.True(
                 updatedHeader.CDNUri != null
                 || updatedHeader.CDNIosUri != null
                 || updatedHeader.CDNSslUri != null
                 || updatedHeader.CDNStreamingUri != null);
-            Assert.AreEqual(containerHeader.Ttl, updatedHeader.Ttl);
+            Assert.Equal(containerHeader.Ttl, updatedHeader.Ttl);
 
             cdnHeaders = provider.EnableCDNOnContainer(containerName, containerHeader.Ttl, true);
             updatedHeader = provider.GetContainerCDNHeader(containerName);
             Console.WriteLine(JsonConvert.SerializeObject(updatedHeader, Formatting.Indented));
-            Assert.IsNotNull(updatedHeader);
-            Assert.IsTrue(updatedHeader.CDNEnabled);
-            Assert.IsTrue(updatedHeader.LogRetention);
-            Assert.IsTrue(
+            Assert.NotNull(updatedHeader);
+            Assert.True(updatedHeader.CDNEnabled);
+            Assert.True(updatedHeader.LogRetention);
+            Assert.True(
                 updatedHeader.CDNUri != null
                 || updatedHeader.CDNIosUri != null
                 || updatedHeader.CDNSslUri != null
                 || updatedHeader.CDNStreamingUri != null);
-            Assert.AreEqual(containerHeader.Ttl, updatedHeader.Ttl);
+            Assert.Equal(containerHeader.Ttl, updatedHeader.Ttl);
 
             // update the container CDN properties
             Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -695,15 +693,15 @@
             provider.UpdateContainerCdnHeaders(containerName, headers);
             updatedHeader = provider.GetContainerCDNHeader(containerName);
             Console.WriteLine(JsonConvert.SerializeObject(updatedHeader, Formatting.Indented));
-            Assert.IsNotNull(updatedHeader);
-            Assert.IsTrue(updatedHeader.CDNEnabled);
-            Assert.IsFalse(updatedHeader.LogRetention);
-            Assert.IsTrue(
+            Assert.NotNull(updatedHeader);
+            Assert.True(updatedHeader.CDNEnabled);
+            Assert.False(updatedHeader.LogRetention);
+            Assert.True(
                 updatedHeader.CDNUri != null
                 || updatedHeader.CDNIosUri != null
                 || updatedHeader.CDNSslUri != null
                 || updatedHeader.CDNStreamingUri != null);
-            Assert.AreEqual(containerHeader.Ttl + 1, updatedHeader.Ttl);
+            Assert.Equal(containerHeader.Ttl + 1, updatedHeader.Ttl);
 
             // attempt to access the container over the CDN
             if (containerHeader.CDNUri != null || containerHeader.CDNSslUri != null)
@@ -716,12 +714,12 @@
                     Stream cdnStream = response.GetResponseStream();
                     StreamReader reader = new StreamReader(cdnStream, Encoding.UTF8);
                     string text = reader.ReadToEnd();
-                    Assert.AreEqual(fileContents, text);
+                    Assert.Equal(fileContents, text);
                 }
             }
             else
             {
-                Assert.Inconclusive("This integration test relies on cdn_uri or cdn_ssl_uri.");
+                Assert.False(true, "This integration test relies on cdn_uri or cdn_ssl_uri.");
             }
 
             IEnumerable<ContainerCDN> containers = ListAllCDNContainers(provider);
@@ -732,29 +730,29 @@
             }
 
             cdnHeaders = provider.DisableCDNOnContainer(containerName);
-            Assert.IsNotNull(cdnHeaders);
+            Assert.NotNull(cdnHeaders);
             Console.WriteLine("CDN Headers from DisableCDNOnContainer");
             foreach (var pair in cdnHeaders)
                 Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
 
             updatedHeader = provider.GetContainerCDNHeader(containerName);
             Console.WriteLine(JsonConvert.SerializeObject(updatedHeader, Formatting.Indented));
-            Assert.IsNotNull(updatedHeader);
-            Assert.IsFalse(updatedHeader.CDNEnabled);
-            Assert.IsFalse(updatedHeader.LogRetention);
-            Assert.IsTrue(
+            Assert.NotNull(updatedHeader);
+            Assert.False(updatedHeader.CDNEnabled);
+            Assert.False(updatedHeader.LogRetention);
+            Assert.True(
                 updatedHeader.CDNUri != null
                 || updatedHeader.CDNIosUri != null
                 || updatedHeader.CDNSslUri != null
                 || updatedHeader.CDNStreamingUri != null);
-            Assert.AreEqual(containerHeader.Ttl + 1, updatedHeader.Ttl);
+            Assert.Equal(containerHeader.Ttl + 1, updatedHeader.Ttl);
 
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestStaticWebOnContainer()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -763,13 +761,13 @@
             string fileContents = "File contents!";
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileContents));
             provider.CreateObject(containerName, stream, objectName);
 
             Dictionary<string, string> cdnHeaders = provider.EnableCDNOnContainer(containerName, false);
-            Assert.IsNotNull(cdnHeaders);
+            Assert.NotNull(cdnHeaders);
             Console.WriteLine("CDN Headers");
             foreach (var pair in cdnHeaders)
                 Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
@@ -788,35 +786,35 @@
         /// This is a regression test for openstacknetsdk/openstack.net#333.
         /// </summary>
         /// <seealso href="https://github.com/openstacknetsdk/openstack.net/issues/333">Chunked Encoding Issues (#333)</seealso>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestProtocolViolation()
         {
             try
             {
                 TestTempUrlWithControlCharactersInObjectName();
-                Assert.Inconclusive("This test relies on the previous call throwing a WebException placing the ServicePoint in a bad state.");
+                Assert.False(true, "This test relies on the previous call throwing a WebException placing the ServicePoint in a bad state.");
             }
             catch (WebException ex)
             {
-                Assert.IsNotNull(ex.Response);
+                Assert.NotNull(ex.Response);
 
                 ServicePoint servicePoint = ServicePointManager.FindServicePoint(ex.Response.ResponseUri);
                 if (servicePoint.ProtocolVersion >= HttpVersion.Version11)
-                    Assert.Inconclusive("The ServicePoint must be set to HTTP/1.0 in order to test the ProtocolViolationException handling.");
+                    Assert.False(true, "The ServicePoint must be set to HTTP/1.0 in order to test the ProtocolViolationException handling.");
             }
 
             TestTempUrlExpired();
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestTempUrlValid()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
-            Assert.IsInstanceOfType(provider, typeof(CloudFilesProvider), "Temp URLs are a Rackspace-specific extension to the Object Storage service.");
+            Assert.IsAssignableFrom<CloudFilesProvider>(provider); //, typeof(CloudFilesProvider), "Temp URLs are a Rackspace-specific extension to the Object Storage service.");
 
             string containerName = TestContainerPrefix + Path.GetRandomFileName();
             string objectName = Path.GetRandomFileName();
@@ -833,7 +831,7 @@
             }
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileContents));
             provider.CreateObject(containerName, stream, objectName);
@@ -847,19 +845,19 @@
                 Stream cdnStream = response.GetResponseStream();
                 StreamReader reader = new StreamReader(cdnStream, Encoding.UTF8);
                 string text = reader.ReadToEnd();
-                Assert.AreEqual(fileContents, text);
+                Assert.Equal(fileContents, text);
             }
 
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestTempUrlExpired()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
-            Assert.IsInstanceOfType(provider, typeof(CloudFilesProvider), "Temp URLs are a Rackspace-specific extension to the Object Storage service.");
+            Assert.IsAssignableFrom<CloudFilesProvider>(provider);//, typeof(CloudFilesProvider), "Temp URLs are a Rackspace-specific extension to the Object Storage service.");
 
             string containerName = TestContainerPrefix + Path.GetRandomFileName();
             string objectName = Path.GetRandomFileName();
@@ -876,7 +874,7 @@
             }
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileContents));
             provider.CreateObject(containerName, stream, objectName);
@@ -892,20 +890,20 @@
                     Stream cdnStream = response.GetResponseStream();
                     StreamReader reader = new StreamReader(cdnStream, Encoding.UTF8);
                     string text = reader.ReadToEnd();
-                    Assert.Fail("Expected an exception");
+                    Assert.True(false, "Expected an exception");
                 }
             }
             catch (WebException ex)
             {
-                Assert.AreEqual(HttpStatusCode.Unauthorized, ((HttpWebResponse)ex.Response).StatusCode);
+                Assert.Equal(HttpStatusCode.Unauthorized, ((HttpWebResponse)ex.Response).StatusCode);
             }
 
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestTempUrlWithSpecialCharactersInObjectName()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -926,7 +924,7 @@
             }
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileContents));
             provider.CreateObject(containerName, stream, objectName);
@@ -940,15 +938,15 @@
                 Stream cdnStream = response.GetResponseStream();
                 StreamReader reader = new StreamReader(cdnStream, Encoding.UTF8);
                 string text = reader.ReadToEnd();
-                Assert.AreEqual(fileContents, text);
+                Assert.Equal(fileContents, text);
             }
 
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestTempUrlWithControlCharactersInObjectName()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -969,7 +967,7 @@
             }
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileContents));
             provider.CreateObject(containerName, stream, objectName);
@@ -983,15 +981,15 @@
                 Stream cdnStream = response.GetResponseStream();
                 StreamReader reader = new StreamReader(cdnStream, Encoding.UTF8);
                 string text = reader.ReadToEnd();
-                Assert.AreEqual(fileContents, text);
+                Assert.Equal(fileContents, text);
             }
 
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestFormPostValid()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1012,7 +1010,7 @@
             }
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(fileContents));
             provider.CreateObject(containerName, stream, objectName);
@@ -1047,7 +1045,7 @@
             }
 
             string actualData = ReadAllObjectText(provider, containerName, objectName + "file1", Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileContents, actualData);
+            Assert.Equal(fileContents, actualData);
 
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
@@ -1133,9 +1131,9 @@
 
         #region Objects
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestGetObjectHeaders()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1144,25 +1142,25 @@
             string objectData = "";
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(objectData));
             provider.CreateObject(containerName, stream, objectName);
             Dictionary<string, string> headers = provider.GetObjectHeaders(containerName, objectName);
-            Assert.IsNotNull(headers);
+            Assert.NotNull(headers);
             Console.WriteLine("Headers");
             foreach (var pair in headers)
             {
-                Assert.IsFalse(string.IsNullOrEmpty(pair.Key));
+                Assert.False(string.IsNullOrEmpty(pair.Key));
                 Console.WriteLine("  {0}: {1}", pair.Key, pair.Value);
             }
 
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestGetObjectMetaData()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1171,7 +1169,7 @@
             string objectData = "";
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(objectData));
             provider.CreateObject(containerName, stream, objectName);
@@ -1193,9 +1191,9 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestUpdateObjectMetaData()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1205,11 +1203,11 @@
             string contentType = "text/plain-jane";
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(objectData));
             provider.CreateObject(containerName, stream, objectName, contentType);
-            Assert.AreEqual(contentType, GetObjectContentType(provider, containerName, objectName));
+            Assert.Equal(contentType, GetObjectContentType(provider, containerName, objectName));
 
             Dictionary<string, string> metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -1218,7 +1216,7 @@
             };
 
             provider.UpdateObjectMetadata(containerName, objectName, new Dictionary<string, string>(metadata, StringComparer.OrdinalIgnoreCase));
-            Assert.AreEqual(contentType, GetObjectContentType(provider, containerName, objectName));
+            Assert.Equal(contentType, GetObjectContentType(provider, containerName, objectName));
 
             Dictionary<string, string> actualMetadata = provider.GetObjectMetaData(containerName, objectName);
             Console.WriteLine("Object Metadata");
@@ -1233,7 +1231,7 @@
                 { "Key2", "Value 2" }
             };
             provider.UpdateObjectMetadata(containerName, objectName, new Dictionary<string, string>(updatedMetadata, StringComparer.OrdinalIgnoreCase));
-            Assert.AreEqual(contentType, GetObjectContentType(provider, containerName, objectName));
+            Assert.Equal(contentType, GetObjectContentType(provider, containerName, objectName));
 
             actualMetadata = provider.GetObjectMetaData(containerName, objectName);
             Console.WriteLine("Object Metadata");
@@ -1245,9 +1243,9 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestDeleteObjectMetaData()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1256,7 +1254,7 @@
             string objectData = "";
 
             ObjectStore result = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, result);
+            Assert.Equal(ObjectStore.ContainerCreated, result);
 
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(objectData));
             provider.CreateObject(containerName, stream, objectName);
@@ -1321,9 +1319,9 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestListObjects()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1333,7 +1331,7 @@
             string fileData = Path.GetRandomFileName();
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             foreach (string objectName in objectNames)
             {
@@ -1354,9 +1352,9 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestSpecialCharacters()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1372,7 +1370,7 @@
                 string containerName = TestContainerPrefix + Path.GetRandomFileName() + containerSuffix;
 
                 ObjectStore containerResult = provider.CreateContainer(containerName);
-                Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+                Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
                 foreach (string objectName in specialNames)
                 {
@@ -1394,9 +1392,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestCreateObjectFromFile_UseFileName()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1407,7 +1405,7 @@
             string tempFilePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             try
             {
@@ -1417,7 +1415,7 @@
                 // it's ok to create the same file twice
                 ProgressMonitor progressMonitor = new ProgressMonitor(new FileInfo(tempFilePath).Length);
                 provider.CreateObjectFromFile(containerName, tempFilePath, progressUpdated: progressMonitor.Updated);
-                Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                Assert.True(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
             }
             finally
             {
@@ -1425,16 +1423,16 @@
             }
 
             string actualData = ReadAllObjectText(provider, containerName, Path.GetFileName(tempFilePath), Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             /* Cleanup
              */
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestCreateObjectFromFile_UseCustomObjectName()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1445,7 +1443,7 @@
             string tempFilePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             try
             {
@@ -1455,7 +1453,7 @@
                 // it's ok to create the same file twice
                 ProgressMonitor progressMonitor = new ProgressMonitor(new FileInfo(tempFilePath).Length);
                 provider.CreateObjectFromFile(containerName, tempFilePath, objectName, progressUpdated: progressMonitor.Updated);
-                Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                Assert.True(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
             }
             finally
             {
@@ -1463,16 +1461,16 @@
             }
 
             string actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             /* Cleanup
              */
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestCreateObject()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1482,7 +1480,7 @@
             string fileData = Path.GetRandomFileName();
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
             {
@@ -1492,20 +1490,20 @@
                 uploadStream.Position = 0;
                 ProgressMonitor progressMonitor = new ProgressMonitor(uploadStream.Length);
                 provider.CreateObject(containerName, uploadStream, objectName, progressUpdated: progressMonitor.Updated);
-                Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                Assert.True(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
             }
 
             string actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             /* Cleanup
              */
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestCreateObjectIfNoneMatch()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1519,7 +1517,7 @@
             string fileData = new string(fileDataChars);
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
             {
@@ -1535,39 +1533,39 @@
                 try
                 {
                     provider.CreateObject(containerName, uploadStream, objectName, headers: headers, progressUpdated: progressMonitor.Updated);
-                    Assert.Fail("Expected a 412 (Precondition Failed)");
+                    Assert.True(false, "Expected a 412 (Precondition Failed)");
                 }
                 catch (ResponseException ex)
                 {
-                    Assert.IsNotNull(ex.Response);
-                    Assert.AreEqual(HttpStatusCode.PreconditionFailed, ex.Response.StatusCode);
-                    Assert.AreEqual(0, uploadStream.Position);
+                    Assert.NotNull(ex.Response);
+                    Assert.Equal(HttpStatusCode.PreconditionFailed, ex.Response.StatusCode);
+                    Assert.Equal(0, uploadStream.Position);
                 }
 
                 try
                 {
                     provider.CreateObject(containerName, uploadStream, objectName, headers: headers, progressUpdated: progressMonitor.Updated);
-                    Assert.Fail("Expected a 412 (Precondition Failed)");
+                    Assert.True(false, "Expected a 412 (Precondition Failed)");
                 }
                 catch (ResponseException ex)
                 {
-                    Assert.IsNotNull(ex.Response);
-                    Assert.AreEqual(HttpStatusCode.PreconditionFailed, ex.Response.StatusCode);
-                    Assert.AreEqual(0, uploadStream.Position);
+                    Assert.NotNull(ex.Response);
+                    Assert.Equal(HttpStatusCode.PreconditionFailed, ex.Response.StatusCode);
+                    Assert.Equal(0, uploadStream.Position);
                 }
             }
 
             string actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             /* Cleanup
              */
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestCreateObjectWithMetadata()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1577,7 +1575,7 @@
             string fileData = Path.GetRandomFileName();
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
             {
@@ -1591,22 +1589,22 @@
             }
 
             string actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             Dictionary<string, string> metadata = provider.GetObjectMetaData(containerName, objectName);
-            Assert.AreEqual("ProjectCode", metadata["projectcode"]);
-            Assert.AreEqual("FileDescription", metadata["fileDesc"]);
-            Assert.AreEqual("User Code", metadata["usercode"]);
+            Assert.Equal("ProjectCode", metadata["projectcode"]);
+            Assert.Equal("FileDescription", metadata["fileDesc"]);
+            Assert.Equal("User Code", metadata["usercode"]);
 
             /* Cleanup
              */
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
-        [DeploymentItem("DarkKnightRises.jpg")]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
+        //[DeploymentItem("DarkKnightRises.jpg")]
         public void TestCreateLargeObject()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1617,26 +1615,26 @@
             byte[] content = File.ReadAllBytes("DarkKnightRises.jpg");
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             ProgressMonitor progressMonitor = new ProgressMonitor(content.Length);
             provider.CreateObjectFromFile(containerName, sourceFileName, progressUpdated: progressMonitor.Updated);
-            Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+            Assert.True(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
 
             using (MemoryStream downloadStream = new MemoryStream())
             {
                 provider.GetObject(containerName, sourceFileName, downloadStream);
-                Assert.AreEqual(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
+                Assert.Equal(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
 
                 downloadStream.Position = 0;
                 byte[] actualData = new byte[downloadStream.Length];
                 downloadStream.Read(actualData, 0, actualData.Length);
-                Assert.AreEqual(content.Length, actualData.Length);
+                Assert.Equal(content.Length, actualData.Length);
                 using (MD5 md5 = MD5.Create())
                 {
                     byte[] contentMd5 = md5.ComputeHash(content);
                     byte[] actualMd5 = md5.ComputeHash(actualData);
-                    Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                    Assert.Equal(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
                 }
             }
 
@@ -1645,10 +1643,10 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
-        [DeploymentItem("DarkKnightRises.jpg")]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
+        //[DeploymentItem("DarkKnightRises.jpg")]
         public void TestVerifyLargeObjectETag()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1659,11 +1657,11 @@
             byte[] content = File.ReadAllBytes("DarkKnightRises.jpg");
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             ProgressMonitor progressMonitor = new ProgressMonitor(content.Length);
             provider.CreateObjectFromFile(containerName, sourceFileName, progressUpdated: progressMonitor.Updated);
-            Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+            Assert.True(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
 
             try
             {
@@ -1671,17 +1669,17 @@
                 {
                     provider.GetObject(containerName, sourceFileName, downloadStream, verifyEtag: true);
 
-                    Assert.AreEqual(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
+                    Assert.Equal(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
 
                     downloadStream.Position = 0;
                     byte[] actualData = new byte[downloadStream.Length];
                     downloadStream.Read(actualData, 0, actualData.Length);
-                    Assert.AreEqual(content.Length, actualData.Length);
+                    Assert.Equal(content.Length, actualData.Length);
                     using (MD5 md5 = MD5.Create())
                     {
                         byte[] contentMd5 = md5.ComputeHash(content);
                         byte[] actualMd5 = md5.ComputeHash(actualData);
-                        Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                        Assert.Equal(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
                     }
                 }
 
@@ -1691,14 +1689,14 @@
             }
             catch (NotSupportedException)
             {
-                Assert.Inconclusive("The provider does not support verifying ETags for large objects.");
+                Assert.False(true, "The provider does not support verifying ETags for large objects.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
-        [DeploymentItem("DarkKnightRises.jpg")]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
+        //[DeploymentItem("DarkKnightRises.jpg")]
         public void TestExtractArchiveTar()
         {
             CloudFilesProvider provider = (CloudFilesProvider)Bootstrapper.CreateObjectStorageProvider();
@@ -1719,26 +1717,26 @@
                 outputStream.Flush();
                 outputStream.Position = 0;
                 ExtractArchiveResponse response = provider.ExtractArchive(outputStream, containerName, ArchiveFormat.Tar);
-                Assert.IsNotNull(response);
-                Assert.AreEqual(1, response.CreatedFiles);
-                Assert.IsNotNull(response.Errors);
-                Assert.AreEqual(0, response.Errors.Count);
+                Assert.NotNull(response);
+                Assert.Equal(1, response.CreatedFiles);
+                Assert.NotNull(response.Errors);
+                Assert.Equal(0, response.Errors.Count);
             }
 
             using (MemoryStream downloadStream = new MemoryStream())
             {
                 provider.GetObject(containerName, sourceFileName, downloadStream, verifyEtag: true);
-                Assert.AreEqual(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
+                Assert.Equal(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
 
                 downloadStream.Position = 0;
                 byte[] actualData = new byte[downloadStream.Length];
                 downloadStream.Read(actualData, 0, actualData.Length);
-                Assert.AreEqual(content.Length, actualData.Length);
+                Assert.Equal(content.Length, actualData.Length);
                 using (MD5 md5 = MD5.Create())
                 {
                     byte[] contentMd5 = md5.ComputeHash(content);
                     byte[] actualMd5 = md5.ComputeHash(actualData);
-                    Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                    Assert.Equal(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
                 }
             }
 
@@ -1747,10 +1745,10 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
-        [DeploymentItem("DarkKnightRises.jpg")]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
+        //[DeploymentItem("DarkKnightRises.jpg")]
         public void TestExtractArchiveTarGz()
         {
             CloudFilesProvider provider = (CloudFilesProvider)Bootstrapper.CreateObjectStorageProvider();
@@ -1776,26 +1774,26 @@
                 outputStream.Flush();
                 outputStream.Position = 0;
                 ExtractArchiveResponse response = provider.ExtractArchive(outputStream, containerName, ArchiveFormat.TarGz);
-                Assert.IsNotNull(response);
-                Assert.AreEqual(1, response.CreatedFiles);
-                Assert.IsNotNull(response.Errors);
-                Assert.AreEqual(0, response.Errors.Count);
+                Assert.NotNull(response);
+                Assert.Equal(1, response.CreatedFiles);
+                Assert.NotNull(response.Errors);
+                Assert.Equal(0, response.Errors.Count);
             }
 
             using (MemoryStream downloadStream = new MemoryStream())
             {
                 provider.GetObject(containerName, sourceFileName, downloadStream, verifyEtag: true);
-                Assert.AreEqual(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
+                Assert.Equal(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
 
                 downloadStream.Position = 0;
                 byte[] actualData = new byte[downloadStream.Length];
                 downloadStream.Read(actualData, 0, actualData.Length);
-                Assert.AreEqual(content.Length, actualData.Length);
+                Assert.Equal(content.Length, actualData.Length);
                 using (MD5 md5 = MD5.Create())
                 {
                     byte[] contentMd5 = md5.ComputeHash(content);
                     byte[] actualMd5 = md5.ComputeHash(actualData);
-                    Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                    Assert.Equal(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
                 }
             }
 
@@ -1804,10 +1802,10 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
-        [DeploymentItem("DarkKnightRises.jpg")]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
+        //[DeploymentItem("DarkKnightRises.jpg")]
         public void TestExtractArchiveTarBz2()
         {
             CloudFilesProvider provider = (CloudFilesProvider)Bootstrapper.CreateObjectStorageProvider();
@@ -1832,26 +1830,26 @@
                 outputStream.Flush();
                 outputStream.Position = 0;
                 ExtractArchiveResponse response = provider.ExtractArchive(outputStream, containerName, ArchiveFormat.TarBz2);
-                Assert.IsNotNull(response);
-                Assert.AreEqual(1, response.CreatedFiles);
-                Assert.IsNotNull(response.Errors);
-                Assert.AreEqual(0, response.Errors.Count);
+                Assert.NotNull(response);
+                Assert.Equal(1, response.CreatedFiles);
+                Assert.NotNull(response.Errors);
+                Assert.Equal(0, response.Errors.Count);
             }
 
             using (MemoryStream downloadStream = new MemoryStream())
             {
                 provider.GetObject(containerName, sourceFileName, downloadStream, verifyEtag: true);
-                Assert.AreEqual(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
+                Assert.Equal(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
 
                 downloadStream.Position = 0;
                 byte[] actualData = new byte[downloadStream.Length];
                 downloadStream.Read(actualData, 0, actualData.Length);
-                Assert.AreEqual(content.Length, actualData.Length);
+                Assert.Equal(content.Length, actualData.Length);
                 using (MD5 md5 = MD5.Create())
                 {
                     byte[] contentMd5 = md5.ComputeHash(content);
                     byte[] actualMd5 = md5.ComputeHash(actualData);
-                    Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                    Assert.Equal(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
                 }
             }
 
@@ -1860,10 +1858,10 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
-        [DeploymentItem("DarkKnightRises.jpg")]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
+        //[DeploymentItem("DarkKnightRises.jpg")]
         public void TestExtractArchiveTarGzCreateContainer()
         {
             CloudFilesProvider provider = (CloudFilesProvider)Bootstrapper.CreateObjectStorageProvider();
@@ -1891,26 +1889,26 @@
                 outputStream.Flush();
                 outputStream.Position = 0;
                 ExtractArchiveResponse response = provider.ExtractArchive(outputStream, "", ArchiveFormat.TarGz);
-                Assert.IsNotNull(response);
-                Assert.AreEqual(1, response.CreatedFiles);
-                Assert.IsNotNull(response.Errors);
-                Assert.AreEqual(0, response.Errors.Count);
+                Assert.NotNull(response);
+                Assert.Equal(1, response.CreatedFiles);
+                Assert.NotNull(response.Errors);
+                Assert.Equal(0, response.Errors.Count);
             }
 
             using (MemoryStream downloadStream = new MemoryStream())
             {
                 provider.GetObject(containerName, sourceFileName, downloadStream, verifyEtag: true);
-                Assert.AreEqual(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
+                Assert.Equal(content.Length, GetContainerObjectSize(provider, containerName, sourceFileName));
 
                 downloadStream.Position = 0;
                 byte[] actualData = new byte[downloadStream.Length];
                 downloadStream.Read(actualData, 0, actualData.Length);
-                Assert.AreEqual(content.Length, actualData.Length);
+                Assert.Equal(content.Length, actualData.Length);
                 using (MD5 md5 = MD5.Create())
                 {
                     byte[] contentMd5 = md5.ComputeHash(content);
                     byte[] actualMd5 = md5.ComputeHash(actualData);
-                    Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                    Assert.Equal(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
                 }
             }
 
@@ -1945,16 +1943,16 @@
 
             public void Updated(long value)
             {
-                Assert.IsTrue(value >= 0);
-                Assert.IsTrue(value <= _maxValue);
-                Assert.IsTrue(value >= _currentValue);
+                Assert.True(value >= 0);
+                Assert.True(value <= _maxValue);
+                Assert.True(value >= _currentValue);
                 _currentValue = value;
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestGetObjectSaveToFile()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -1964,7 +1962,7 @@
             string fileData = Path.GetRandomFileName();
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
             {
@@ -1974,12 +1972,12 @@
             try
             {
                 provider.GetObjectSaveToFile(containerName, Path.GetTempPath(), objectName, verifyEtag: true);
-                Assert.AreEqual(fileData, File.ReadAllText(Path.Combine(Path.GetTempPath(), objectName), Encoding.UTF8));
+                Assert.Equal(fileData, File.ReadAllText(Path.Combine(Path.GetTempPath(), objectName), Encoding.UTF8));
 
                 // it's ok to download the same file twice
                 ProgressMonitor progressMonitor = new ProgressMonitor(GetContainerObjectSize(provider, containerName, objectName));
                 provider.GetObjectSaveToFile(containerName, Path.GetTempPath(), objectName, progressUpdated: progressMonitor.Updated, verifyEtag: true);
-                Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                Assert.True(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
             }
             finally
             {
@@ -1990,12 +1988,12 @@
             try
             {
                 provider.GetObjectSaveToFile(containerName, Path.GetTempPath(), objectName, tempFileName, verifyEtag: true);
-                Assert.AreEqual(fileData, File.ReadAllText(Path.Combine(Path.GetTempPath(), tempFileName), Encoding.UTF8));
+                Assert.Equal(fileData, File.ReadAllText(Path.Combine(Path.GetTempPath(), tempFileName), Encoding.UTF8));
 
                 // it's ok to download the same file twice
                 ProgressMonitor progressMonitor = new ProgressMonitor(GetContainerObjectSize(provider, containerName, objectName));
                 provider.GetObjectSaveToFile(containerName, Path.GetTempPath(), objectName, progressUpdated: progressMonitor.Updated, verifyEtag: true);
-                Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                Assert.True(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
             }
             finally
             {
@@ -2007,9 +2005,9 @@
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestCopyObject()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -2021,7 +2019,7 @@
             string contentType = "text/plain-jane";
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
             {
@@ -2029,30 +2027,30 @@
             }
 
             string actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             provider.CopyObject(containerName, objectName, containerName, copiedName);
 
             // make sure the item is available at the copied location
             actualData = ReadAllObjectText(provider, containerName, copiedName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             // make sure the original object still exists
             actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             // make sure the content type was not changed by the copy operation
-            Assert.AreEqual(contentType, GetObjectContentType(provider, containerName, objectName));
-            Assert.AreEqual(contentType, GetObjectContentType(provider, containerName, copiedName));
+            Assert.Equal(contentType, GetObjectContentType(provider, containerName, objectName));
+            Assert.Equal(contentType, GetObjectContentType(provider, containerName, copiedName));
 
             /* Cleanup
              */
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestMoveObject()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -2063,7 +2061,7 @@
             string fileData = Path.GetRandomFileName();
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
             {
@@ -2071,7 +2069,7 @@
             }
 
             string actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             provider.MoveObject(containerName, objectName, containerName, movedName);
 
@@ -2082,23 +2080,23 @@
                     provider.GetObject(containerName, objectName, downloadStream, verifyEtag: true);
                 }
 
-                Assert.Fail("Expected an exception (object should not exist)");
+                Assert.True(false, "Expected an exception (object should not exist)");
             }
             catch (ItemNotFoundException)
             {
             }
 
             actualData = ReadAllObjectText(provider, containerName, movedName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             /* Cleanup
              */
             provider.DeleteContainer(containerName, deleteObjects: true);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestDeleteObject()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -2108,7 +2106,7 @@
             string fileData = Path.GetRandomFileName();
 
             ObjectStore containerResult = provider.CreateContainer(containerName);
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerResult);
+            Assert.Equal(ObjectStore.ContainerCreated, containerResult);
 
             using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
             {
@@ -2116,7 +2114,7 @@
             }
 
             string actualData = ReadAllObjectText(provider, containerName, objectName, Encoding.UTF8, verifyEtag: true);
-            Assert.AreEqual(fileData, actualData);
+            Assert.Equal(fileData, actualData);
 
             provider.DeleteObject(containerName, objectName);
 
@@ -2127,7 +2125,7 @@
                     provider.GetObject(containerName, objectName, downloadStream, verifyEtag: true);
                 }
 
-                Assert.Fail("Expected an exception (object should not exist)");
+                Assert.True(false, "Expected an exception (object should not exist)");
             }
             catch (ItemNotFoundException)
             {
@@ -2149,9 +2147,8 @@
         /// This test is normally disabled. To run the cleanup method, comment out or remove the
         /// <see cref="IgnoreAttribute"/>.
         /// </remarks>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
-        [Ignore]
+        [Fact(Skip = "This test is normally disabled.")]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupAllAccountMetadata()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -2164,8 +2161,8 @@
         /// This unit test clears the metadata associated with the account which is
         /// created by the unit tests in this class.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupTestAccountMetadata()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -2174,71 +2171,71 @@
             provider.UpdateAccountMetadata(removedMetadata);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestGetAccountHeaders()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             Dictionary<string, string> headers = provider.GetAccountHeaders();
-            Assert.IsNotNull(headers);
+            Assert.NotNull(headers);
 
             Console.WriteLine("Account Headers:");
             foreach (var pair in headers)
             {
-                Assert.IsNotNull(pair.Key);
-                Assert.IsNotNull(pair.Value);
-                Assert.IsFalse(string.IsNullOrEmpty(pair.Key));
+                Assert.NotNull(pair.Key);
+                Assert.NotNull(pair.Value);
+                Assert.False(string.IsNullOrEmpty(pair.Key));
                 Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
             }
 
-            Assert.AreEqual(StringComparer.OrdinalIgnoreCase, headers.Comparer);
+            Assert.Equal(StringComparer.OrdinalIgnoreCase, headers.Comparer);
 
             string containerCountText;
-            Assert.IsTrue(headers.TryGetValue(CloudFilesProvider.AccountContainerCount, out containerCountText));
+            Assert.True(headers.TryGetValue(CloudFilesProvider.AccountContainerCount, out containerCountText));
             long containerCount;
-            Assert.IsTrue(long.TryParse(containerCountText, out containerCount));
-            Assert.IsTrue(containerCount >= 0);
+            Assert.True(long.TryParse(containerCountText, out containerCount));
+            Assert.True(containerCount >= 0);
 
             string accountBytesText;
-            Assert.IsTrue(headers.TryGetValue(CloudFilesProvider.AccountBytesUsed, out accountBytesText));
+            Assert.True(headers.TryGetValue(CloudFilesProvider.AccountBytesUsed, out accountBytesText));
             long accountBytes;
-            Assert.IsTrue(long.TryParse(accountBytesText, out accountBytes));
-            Assert.IsTrue(accountBytes >= 0);
+            Assert.True(long.TryParse(accountBytesText, out accountBytes));
+            Assert.True(accountBytes >= 0);
 
             string objectCountText;
             if (headers.TryGetValue(CloudFilesProvider.AccountObjectCount, out objectCountText))
             {
                 // the X-Account-Object-Count header is optional, but when included should be a non-negative integer
                 long objectCount;
-                Assert.IsTrue(long.TryParse(objectCountText, out objectCount));
-                Assert.IsTrue(objectCount >= 0);
+                Assert.True(long.TryParse(objectCountText, out objectCount));
+                Assert.True(objectCount >= 0);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestGetAccountMetaData()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             Dictionary<string, string> metadata = provider.GetAccountMetaData();
-            Assert.IsNotNull(metadata);
-            Assert.AreEqual(StringComparer.OrdinalIgnoreCase, metadata.Comparer);
+            Assert.NotNull(metadata);
+            Assert.Equal(StringComparer.OrdinalIgnoreCase, metadata.Comparer);
 
             Console.WriteLine("Account MetaData:");
             foreach (var pair in metadata)
             {
-                Assert.IsNotNull(pair.Key);
-                Assert.IsNotNull(pair.Value);
-                Assert.IsFalse(string.IsNullOrEmpty(pair.Key));
+                Assert.NotNull(pair.Key);
+                Assert.NotNull(pair.Value);
+                Assert.False(string.IsNullOrEmpty(pair.Key));
                 Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestAccountHeaderKeyCharacters()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -2260,11 +2257,11 @@
                 });
 
             Dictionary<string, string> metadata = provider.GetAccountMetaData();
-            Assert.IsNotNull(metadata);
+            Assert.NotNull(metadata);
 
             string value;
-            Assert.IsTrue(metadata.TryGetValue(key, out value));
-            Assert.AreEqual("Value", value);
+            Assert.True(metadata.TryGetValue(key, out value));
+            Assert.Equal("Value", value);
 
             provider.UpdateAccountMetadata(
                 new Dictionary<string, string>
@@ -2273,13 +2270,13 @@
                 });
 
             metadata = provider.GetAccountMetaData();
-            Assert.IsNotNull(metadata);
-            Assert.IsFalse(metadata.TryGetValue(key, out value));
+            Assert.NotNull(metadata);
+            Assert.False(metadata.TryGetValue(key, out value));
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestAccountInvalidHeaderKeyCharacters()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
@@ -2305,7 +2302,7 @@
                         {
                             { invalidKey, "Value" }
                         });
-                    Assert.Fail("Should throw an exception for invalid keys.");
+                    Assert.True(false, "Should throw an exception for invalid keys.");
                 }
                 catch (ArgumentException)
                 {
@@ -2319,16 +2316,16 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public void TestUpdateAccountMetadata()
         {
             IObjectStorageProvider provider = Bootstrapper.CreateObjectStorageProvider();
             Dictionary<string, string> metadata = provider.GetAccountMetaData();
             if (metadata.Any(i => i.Key.StartsWith(TestKeyPrefix, StringComparison.OrdinalIgnoreCase)))
             {
-                Assert.Inconclusive("The account contains metadata from a previous unit test run. Run CleanupTestAccountMetadata and try again.");
+                Assert.False(true, "The account contains metadata from a previous unit test run. Run CleanupTestAccountMetadata and try again.");
                 return;
             }
 
@@ -2398,14 +2395,14 @@
 
         private static void CheckMetadataCollections(Dictionary<string, string> expected, Dictionary<string, string> actual)
         {
-            Assert.AreEqual(expected.Count, actual.Count);
+            Assert.Equal(expected.Count, actual.Count);
             CheckMetadataSubset(expected, actual);
         }
 
         private static void CheckMetadataSubset(Dictionary<string, string> expected, Dictionary<string, string> actual)
         {
             foreach (var pair in expected)
-                Assert.IsTrue(actual.Contains(pair), "Expected metadata item {{ {0} : {1} }} not found.", pair.Key, pair.Value);
+                Assert.True(actual.Contains(pair), string.Format("Expected metadata item {{ {0} : {1} }} not found.", pair.Key, pair.Value));
         }
 
         private static string ReadAllObjectText(IObjectStorageProvider provider, string containerName, string objectName, Encoding encoding, int chunkSize = 65536, Dictionary<string, string> headers = null, string region = null, bool verifyEtag = false, Action<long> progressUpdated = null, bool useInternalUrl = false, CloudIdentity identity = null)

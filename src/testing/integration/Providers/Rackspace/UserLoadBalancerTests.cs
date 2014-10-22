@@ -10,7 +10,6 @@
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace;
@@ -18,6 +17,7 @@
     using Newtonsoft.Json;
     using Security.Cryptography;
     using Security.Cryptography.X509Certificates;
+    using Xunit;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
@@ -28,7 +28,6 @@
     using StringBuilder = System.Text.StringBuilder;
 
     /// <preliminary/>
-    [TestClass]
     public class UserLoadBalancerTests
     {
         /// <summary>
@@ -54,8 +53,8 @@
         /// default system connection limit.
         /// </para>
         /// </remarks>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupTestLoadBalancers()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -84,9 +83,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestListLoadBalancers()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -94,16 +93,16 @@
             {
                 ReadOnlyCollection<LoadBalancer> loadBalancers = await ListAllLoadBalancersAsync(provider, null, cancellationTokenSource.Token);
                 if (!loadBalancers.Any())
-                    Assert.Inconclusive("The account does not appear to contain any load balancers");
+                    Assert.False(true, "The account does not appear to contain any load balancers");
 
                 foreach (LoadBalancer loadBalancer in loadBalancers)
                     Console.WriteLine("{0}: {1}", loadBalancer.Id, loadBalancer.Name);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestGetLoadBalancer()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -121,9 +120,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestCreateLoadBalancer()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -160,9 +159,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestUpdateLoadBalancer()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -190,23 +189,23 @@
                     timeout: null,
                     sessionPersistence: null);
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.IsNotNull(tempLoadBalancer);
-                Assert.AreEqual(loadBalancerName, tempLoadBalancer.Name);
+                Assert.NotNull(tempLoadBalancer);
+                Assert.Equal(loadBalancerName, tempLoadBalancer.Name);
 
                 LoadBalancerUpdate updatedConfiguration = new LoadBalancerUpdate(name: loadBalancerRename);
                 await provider.UpdateLoadBalancerAsync(tempLoadBalancer.Id, updatedConfiguration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 LoadBalancer renamed = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(renamed);
-                Assert.AreEqual(tempLoadBalancer.Id, renamed.Id);
-                Assert.AreEqual(loadBalancerRename, renamed.Name);
+                Assert.NotNull(renamed);
+                Assert.Equal(tempLoadBalancer.Id, renamed.Id);
+                Assert.Equal(loadBalancerRename, renamed.Name);
 
                 await provider.RemoveLoadBalancerAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestRemoveLoadBalancerRange()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -254,8 +253,8 @@
                 Task<LoadBalancer> tempLoadBalancer2 = provider.CreateLoadBalancerAsync(configuration2, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 await Task.Factory.ContinueWhenAll(new Task[] { tempLoadBalancer, tempLoadBalancer2 }, TaskExtrasExtensions.PropagateExceptions);
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Result.Status);
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer2.Result.Status);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer.Result.Status);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer2.Result.Status);
 
                 /* Cleanup
                  */
@@ -264,9 +263,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestGetErrorPage()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -274,7 +273,7 @@
             {
                 ReadOnlyCollection<LoadBalancer> loadBalancers = await ListAllLoadBalancersAsync(provider, null, cancellationTokenSource.Token);
                 if (!loadBalancers.Any())
-                    Assert.Inconclusive("The account does not appear to contain any load balancers");
+                    Assert.False(true, "The account does not appear to contain any load balancers");
 
                 foreach (LoadBalancer loadBalancer in loadBalancers)
                 {
@@ -294,9 +293,9 @@
         /// </list>
         /// </summary>
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestModifyErrorPage()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -323,7 +322,7 @@
                     timeout: null,
                     sessionPersistence: null);
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Status);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer.Status);
 
                 Console.WriteLine("Error page:");
                 string defaultErrorPage = await provider.GetErrorPageAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
@@ -331,13 +330,13 @@
 
                 await provider.SetErrorPageAsync(tempLoadBalancer.Id, customErrorPage, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 LoadBalancer details = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.AreEqual(LoadBalancerStatus.Active, details.Status);
-                Assert.AreEqual(customErrorPage, await provider.GetErrorPageAsync(tempLoadBalancer.Id, cancellationTokenSource.Token));
+                Assert.Equal(LoadBalancerStatus.Active, details.Status);
+                Assert.Equal(customErrorPage, await provider.GetErrorPageAsync(tempLoadBalancer.Id, cancellationTokenSource.Token));
 
                 await provider.RemoveErrorPageAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 details = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.AreEqual(LoadBalancerStatus.Active, details.Status);
-                Assert.AreEqual(defaultErrorPage, await provider.GetErrorPageAsync(tempLoadBalancer.Id, cancellationTokenSource.Token));
+                Assert.Equal(LoadBalancerStatus.Active, details.Status);
+                Assert.Equal(defaultErrorPage, await provider.GetErrorPageAsync(tempLoadBalancer.Id, cancellationTokenSource.Token));
 
                 /* Cleanup
                  */
@@ -346,9 +345,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestGetStatistics()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -356,7 +355,7 @@
             {
                 ReadOnlyCollection<LoadBalancer> loadBalancers = await ListAllLoadBalancersAsync(provider, null, cancellationTokenSource.Token);
                 if (!loadBalancers.Any())
-                    Assert.Inconclusive("The account does not appear to contain any load balancers");
+                    Assert.False(true, "The account does not appear to contain any load balancers");
 
                 foreach (LoadBalancer loadBalancer in loadBalancers)
                 {
@@ -380,9 +379,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestAddNode()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -402,30 +401,30 @@
                     virtualAddresses: new[] { new LoadBalancerVirtualAddress(LoadBalancerVirtualAddressType.ServiceNet) },
                     algorithm: LoadBalancingAlgorithm.RoundRobin);
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Status);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer.Status);
 
                 NodeConfiguration nodeConfiguration = new NodeConfiguration(entry.AddressList[0], 80, NodeCondition.Enabled, NodeType.Primary, null);
                 Node node = await provider.AddNodeAsync(tempLoadBalancer.Id, nodeConfiguration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
-                Assert.AreEqual(NodeStatus.Online, node.Status);
-                Assert.AreEqual(nodeConfiguration.Address, node.Address);
+                Assert.Equal(NodeStatus.Online, node.Status);
+                Assert.Equal(nodeConfiguration.Address, node.Address);
 
                 LoadBalancer loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(loadBalancer.Nodes);
-                Assert.AreEqual(1, loadBalancer.Nodes.Count);
+                Assert.NotNull(loadBalancer.Nodes);
+                Assert.Equal(1, loadBalancer.Nodes.Count);
 
                 ReadOnlyCollection<Node> listNodes = (await provider.ListNodesAsync(tempLoadBalancer.Id, cancellationTokenSource.Token)).ToList().AsReadOnly();
-                Assert.IsNotNull(listNodes);
-                Assert.AreEqual(1, listNodes.Count);
+                Assert.NotNull(listNodes);
+                Assert.Equal(1, listNodes.Count);
 
                 Node getNode = await provider.GetNodeAsync(tempLoadBalancer.Id, listNodes[0].Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(getNode);
-                Assert.AreEqual(node.Id, getNode.Id);
+                Assert.NotNull(getNode);
+                Assert.Equal(node.Id, getNode.Id);
 
                 await provider.RemoveNodeAsync(tempLoadBalancer.Id, node.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
                 if (loadBalancer.Nodes != null)
-                    Assert.AreEqual(0, loadBalancer.Nodes.Count);
+                    Assert.Equal(0, loadBalancer.Nodes.Count);
 
                 /* Cleanup
                  */
@@ -434,9 +433,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestAddNodes()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -457,7 +456,7 @@
                     virtualAddresses: new[] { new LoadBalancerVirtualAddress(LoadBalancerVirtualAddressType.ServiceNet) },
                     algorithm: LoadBalancingAlgorithm.RoundRobin);
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Status);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer.Status);
 
                 NodeConfiguration[] nodeConfigurations =
                     new[]
@@ -468,29 +467,29 @@
 
                 IEnumerable<Node> nodes = await provider.AddNodeRangeAsync(tempLoadBalancer.Id, nodeConfigurations, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Node[] nodesArray = nodes.ToArray();
-                Assert.AreEqual(2, nodesArray.Length);
+                Assert.Equal(2, nodesArray.Length);
 
-                Assert.AreEqual(NodeStatus.Online, nodesArray[0].Status);
-                Assert.AreEqual(NodeStatus.Online, nodesArray[1].Status);
+                Assert.Equal(NodeStatus.Online, nodesArray[0].Status);
+                Assert.Equal(NodeStatus.Online, nodesArray[1].Status);
 
                 if (nodeConfigurations[0].Address == nodesArray[1].Address)
                     nodesArray[1] = Interlocked.Exchange(ref nodesArray[0], nodesArray[1]);
 
-                Assert.AreEqual(nodeConfigurations[0].Address, nodesArray[0].Address);
-                Assert.AreEqual(nodeConfigurations[1].Address, nodesArray[1].Address);
+                Assert.Equal(nodeConfigurations[0].Address, nodesArray[0].Address);
+                Assert.Equal(nodeConfigurations[1].Address, nodesArray[1].Address);
 
                 LoadBalancer loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(loadBalancer.Nodes);
-                Assert.AreEqual(2, loadBalancer.Nodes.Count);
+                Assert.NotNull(loadBalancer.Nodes);
+                Assert.Equal(2, loadBalancer.Nodes.Count);
 
                 ReadOnlyCollection<Node> listNodes = (await provider.ListNodesAsync(tempLoadBalancer.Id, cancellationTokenSource.Token)).ToList().AsReadOnly();
-                Assert.IsNotNull(listNodes);
-                Assert.AreEqual(2, listNodes.Count);
+                Assert.NotNull(listNodes);
+                Assert.Equal(2, listNodes.Count);
 
                 await provider.RemoveNodeRangeAsync(tempLoadBalancer.Id, nodesArray.Select(i => i.Id), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
                 if (loadBalancer.Nodes != null)
-                    Assert.AreEqual(0, loadBalancer.Nodes.Count);
+                    Assert.Equal(0, loadBalancer.Nodes.Count);
 
                 /* Cleanup
                  */
@@ -499,9 +498,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestUpdateNode()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -522,7 +521,7 @@
                     algorithm: LoadBalancingAlgorithm.RoundRobin);
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Node node = tempLoadBalancer.Nodes.Single();
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Status);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer.Status);
 
                 NodeUpdate updatedNodeConfiguration = new NodeUpdate(condition: NodeCondition.Draining);
                 await provider.UpdateNodeAsync(tempLoadBalancer.Id, node.Id, updatedNodeConfiguration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
@@ -534,9 +533,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestListNodeServiceEvents()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -557,14 +556,14 @@
                     algorithm: LoadBalancingAlgorithm.RoundRobin);
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Node node = tempLoadBalancer.Nodes.Single();
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Status);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer.Status);
 
                 NodeUpdate updatedNodeConfiguration = new NodeUpdate(condition: NodeCondition.Draining);
                 await provider.UpdateNodeAsync(tempLoadBalancer.Id, node.Id, updatedNodeConfiguration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 ReadOnlyCollection<NodeServiceEvent> serviceEvents = await ListAllNodeServiceEventsAsync(provider, tempLoadBalancer.Id, null, cancellationTokenSource.Token);
                 if (!serviceEvents.Any())
-                    Assert.Inconclusive("The load balancer did not report any node service events.");
+                    Assert.False(true, "The load balancer did not report any node service events.");
 
                 /* Cleanup
                  */
@@ -573,9 +572,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestListVirtualAddresses()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -596,7 +595,7 @@
 
                 IEnumerable<LoadBalancerVirtualAddress> addresses = await provider.ListVirtualAddressesAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
                 if (!addresses.Any())
-                    Assert.Inconclusive("The load balancer did not report any virtual addresses.");
+                    Assert.False(true, "The load balancer did not report any virtual addresses.");
 
                 foreach (var address in addresses)
                 {
@@ -610,9 +609,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestAddRemoveVirtualAddresses()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -633,7 +632,7 @@
 
                 IEnumerable<LoadBalancerVirtualAddress> addresses = await provider.ListVirtualAddressesAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
                 if (!addresses.Any())
-                    Assert.Inconclusive("The load balancer did not report any virtual addresses.");
+                    Assert.False(true, "The load balancer did not report any virtual addresses.");
 
                 Console.WriteLine("Initial virtual addresses");
                 foreach (var address in addresses)
@@ -645,9 +644,9 @@
                 {
                     // add a virtual address
                     LoadBalancerVirtualAddress addedAddress = await provider.AddVirtualAddressAsync(tempLoadBalancer.Id, LoadBalancerVirtualAddressType.Public, AddressFamily.InterNetworkV6, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                    Assert.IsNotNull(addedAddress);
-                    Assert.IsNotNull(addedAddress.Address);
-                    Assert.AreEqual(AddressFamily.InterNetworkV6, addedAddress.Address.AddressFamily);
+                    Assert.NotNull(addedAddress);
+                    Assert.NotNull(addedAddress.Address);
+                    Assert.Equal(AddressFamily.InterNetworkV6, addedAddress.Address.AddressFamily);
                     addedAddresses.Add(addedAddress);
                 }
 
@@ -677,9 +676,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestListAllowedDomains()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -687,22 +686,22 @@
             {
                 Console.WriteLine("Allowed domains:");
                 IEnumerable<string> allowedDomains = await provider.ListAllowedDomainsAsync(cancellationTokenSource.Token);
-                Assert.IsNotNull(allowedDomains);
+                Assert.NotNull(allowedDomains);
 
                 foreach (string domain in allowedDomains)
                 {
-                    Assert.IsNotNull(domain);
+                    Assert.NotNull(domain);
                     Console.WriteLine("    {0}", domain);
                 }
 
                 if (!allowedDomains.Any())
-                    Assert.Inconclusive("No allowed domains were returned by the call.");
+                    Assert.False(true, "No allowed domains were returned by the call.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestListBillableLoadBalancers()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -722,10 +721,10 @@
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 IEnumerable<LoadBalancer> billable = await provider.ListBillableLoadBalancersAsync(DateTimeOffset.Now.Date.AddDays(-60), DateTimeOffset.Now.Date.AddDays(1), null, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(billable);
+                Assert.NotNull(billable);
                 LoadBalancer[] loadBalancers = billable.ToArray();
                 if (loadBalancers.Length == 0)
-                    Assert.Inconclusive("No billable load balancers were reported.");
+                    Assert.False(true, "No billable load balancers were reported.");
 
                 Console.WriteLine("Billable Load Balancers:");
                 foreach (LoadBalancer loadBalancer in loadBalancers)
@@ -738,9 +737,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestListAccountLevelUsage()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -760,10 +759,10 @@
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 IEnumerable<LoadBalancerUsage> usage = await provider.ListAccountLevelUsageAsync(DateTimeOffset.Now.Date.AddDays(-60), DateTimeOffset.Now.Date.AddDays(1), cancellationTokenSource.Token);
-                Assert.IsNotNull(usage);
+                Assert.NotNull(usage);
                 LoadBalancerUsage[] usageRecords = usage.ToArray();
                 if (usageRecords.Length == 0)
-                    Assert.Inconclusive("No account level usage was reported.");
+                    Assert.False(true, "No account level usage was reported.");
 
                 Console.WriteLine("Account Level Usage ({0} records)", usageRecords.Length);
                 foreach (LoadBalancerUsage usageRecord in usageRecords)
@@ -776,9 +775,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestListHistoricalUsage()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -798,10 +797,10 @@
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 IEnumerable<LoadBalancerUsage> usage = await provider.ListHistoricalUsageAsync(tempLoadBalancer.Id, DateTimeOffset.Now.Date.AddDays(-60), DateTimeOffset.Now.Date.AddDays(1), cancellationTokenSource.Token);
-                Assert.IsNotNull(usage);
+                Assert.NotNull(usage);
                 LoadBalancerUsage[] usageRecords = usage.ToArray();
                 if (usageRecords.Length == 0)
-                    Assert.Inconclusive("No historical usage was reported for load balancer: {0}", tempLoadBalancer.Id);
+                    Assert.False(true, string.Format("No historical usage was reported for load balancer: {0}", tempLoadBalancer.Id));
 
                 Console.WriteLine("Historical Load Balancer Usage ({0} records)", usageRecords.Length);
                 foreach (LoadBalancerUsage usageRecord in usageRecords)
@@ -814,9 +813,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestListCurrentUsage()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -836,10 +835,10 @@
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 IEnumerable<LoadBalancerUsage> usage = await provider.ListCurrentUsageAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(usage);
+                Assert.NotNull(usage);
                 LoadBalancerUsage[] usageRecords = usage.ToArray();
                 if (usageRecords.Length == 0)
-                    Assert.Inconclusive("No current usage was reported for load balancer: {0}", tempLoadBalancer.Id);
+                    Assert.False(true, string.Format("No current usage was reported for load balancer: {0}", tempLoadBalancer.Id));
 
                 Console.WriteLine("Current Load Balancer Usage ({0} records)", usageRecords.Length);
                 foreach (LoadBalancerUsage usageRecord in usageRecords)
@@ -852,9 +851,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestAccessLists()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -875,8 +874,8 @@
 
                 // verify initially null
                 IEnumerable<NetworkItem> accessList = await provider.ListAccessListAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(accessList);
-                Assert.IsFalse(accessList.Any());
+                Assert.NotNull(accessList);
+                Assert.False(accessList.Any());
 
                 // allow docs.rackspace.com
                 IPHostEntry resolved = await Task.Factory.FromAsync<IPHostEntry>(Dns.BeginGetHostEntry("docs.rackspace.com", null, null), Dns.EndGetHostEntry);
@@ -884,15 +883,15 @@
                 await provider.CreateAccessListAsync(tempLoadBalancer.Id, firstNetworkItem, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 //List<NetworkItem> expected = new List<NetworkItem> { firstNetworkItem };
                 LoadBalancer loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(loadBalancer.AccessList);
-                Assert.AreEqual(1, loadBalancer.AccessList.Count);
-                Assert.AreEqual(firstNetworkItem.Address, loadBalancer.AccessList[0].Address);
-                Assert.AreEqual(firstNetworkItem.AccessType, loadBalancer.AccessList[0].AccessType);
+                Assert.NotNull(loadBalancer.AccessList);
+                Assert.Equal(1, loadBalancer.AccessList.Count);
+                Assert.Equal(firstNetworkItem.Address, loadBalancer.AccessList[0].Address);
+                Assert.Equal(firstNetworkItem.AccessType, loadBalancer.AccessList[0].AccessType);
 
                 //for (int i = 0; i < expected.Count; i++)
                 //{
-                //    Assert.AreEqual(expected[i].Address, loadBalancer.AccessList[i].Address);
-                //    Assert.AreEqual(expected[i].AccessType, loadBalancer.AccessList[i].AccessType);
+                //    Assert.Equal(expected[i].Address, loadBalancer.AccessList[i].Address);
+                //    Assert.Equal(expected[i].AccessType, loadBalancer.AccessList[i].AccessType);
                 //}
 
                 // allow developer.rackspace.com
@@ -919,26 +918,26 @@
                 await provider.CreateAccessListAsync(tempLoadBalancer.Id, batch, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 //expected.AddRange(batch.AsEnumerable().Reverse());
                 loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(loadBalancer.AccessList);
-                Assert.AreEqual(6, loadBalancer.AccessList.Count);
+                Assert.NotNull(loadBalancer.AccessList);
+                Assert.Equal(6, loadBalancer.AccessList.Count);
 
                 //for (int i = 0; i < expected.Count; i++)
                 //{
-                //    Assert.AreEqual(expected[i].Address, loadBalancer.AccessList[i].Address);
-                //    Assert.AreEqual(expected[i].AccessType, loadBalancer.AccessList[i].AccessType);
+                //    Assert.Equal(expected[i].Address, loadBalancer.AccessList[i].Address);
+                //    Assert.Equal(expected[i].AccessType, loadBalancer.AccessList[i].AccessType);
                 //}
 
                 // remove a single item from the middle of the access list: developer.rackspace.com
                 await provider.RemoveAccessListAsync(tempLoadBalancer.Id, loadBalancer.AccessList[2].Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 //expected.RemoveAt(2);
                 loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(loadBalancer.AccessList);
-                Assert.AreEqual(5, loadBalancer.AccessList.Count);
+                Assert.NotNull(loadBalancer.AccessList);
+                Assert.Equal(5, loadBalancer.AccessList.Count);
 
                 //for (int i = 0; i < expected.Count; i++)
                 //{
-                //    Assert.AreEqual(expected[i].Address, loadBalancer.AccessList[i].Address);
-                //    Assert.AreEqual(expected[i].AccessType, loadBalancer.AccessList[i].AccessType);
+                //    Assert.Equal(expected[i].Address, loadBalancer.AccessList[i].Address);
+                //    Assert.Equal(expected[i].AccessType, loadBalancer.AccessList[i].AccessType);
                 //}
 
                 // remove two items from the middle of the access list: developer.rackspace.com
@@ -946,13 +945,13 @@
                 //expected.RemoveAt(2);
                 //expected.RemoveAt(0);
                 loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(loadBalancer.AccessList);
-                Assert.AreEqual(3, loadBalancer.AccessList.Count);
+                Assert.NotNull(loadBalancer.AccessList);
+                Assert.Equal(3, loadBalancer.AccessList.Count);
 
                 //for (int i = 0; i < expected.Count; i++)
                 //{
-                //    Assert.AreEqual(expected[i].Address, loadBalancer.AccessList[i].Address);
-                //    Assert.AreEqual(expected[i].AccessType, loadBalancer.AccessList[i].AccessType);
+                //    Assert.Equal(expected[i].Address, loadBalancer.AccessList[i].Address);
+                //    Assert.Equal(expected[i].AccessType, loadBalancer.AccessList[i].AccessType);
                 //}
 
                 // clear the access list
@@ -983,7 +982,7 @@
                             if (response == null)
                                 return false;
 
-                            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+                            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                             return true;
                         });
                 }
@@ -994,9 +993,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestHealthMonitorConnection()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1016,8 +1015,8 @@
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 // verify initially null
-                Assert.IsNull(tempLoadBalancer.HealthMonitor);
-                Assert.IsNull(await provider.GetHealthMonitorAsync(tempLoadBalancer.Id, cancellationTokenSource.Token));
+                Assert.Null(tempLoadBalancer.HealthMonitor);
+                Assert.Null(await provider.GetHealthMonitorAsync(tempLoadBalancer.Id, cancellationTokenSource.Token));
 
                 // configure the health monitor
                 int attemptsBeforeDeactivation = 3;
@@ -1031,21 +1030,21 @@
 
                 // verify the health monitor
                 HealthMonitor healthMonitor = await provider.GetHealthMonitorAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsInstanceOfType(healthMonitor, typeof(ConnectionHealthMonitor));
-                Assert.AreEqual(HealthMonitorType.Connect, healthMonitor.Type);
-                Assert.AreEqual(attemptsBeforeDeactivation, healthMonitor.AttemptsBeforeDeactivation);
-                Assert.AreEqual(timeout, healthMonitor.Timeout);
-                Assert.AreEqual(delay, healthMonitor.Delay);
+                Assert.IsAssignableFrom<ConnectionHealthMonitor>(healthMonitor);
+                Assert.Equal(HealthMonitorType.Connect, healthMonitor.Type);
+                Assert.Equal(attemptsBeforeDeactivation, healthMonitor.AttemptsBeforeDeactivation);
+                Assert.Equal(timeout, healthMonitor.Timeout);
+                Assert.Equal(delay, healthMonitor.Delay);
 
                 // verify the information in the load balancer details
                 LoadBalancer loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.AreEqual(tempLoadBalancer.Id, loadBalancer.Id);
+                Assert.Equal(tempLoadBalancer.Id, loadBalancer.Id);
 
-                Assert.IsInstanceOfType(loadBalancer.HealthMonitor, typeof(ConnectionHealthMonitor));
-                Assert.AreEqual(HealthMonitorType.Connect, loadBalancer.HealthMonitor.Type);
-                Assert.AreEqual(attemptsBeforeDeactivation, loadBalancer.HealthMonitor.AttemptsBeforeDeactivation);
-                Assert.AreEqual(timeout, loadBalancer.HealthMonitor.Timeout);
-                Assert.AreEqual(delay, loadBalancer.HealthMonitor.Delay);
+                Assert.IsAssignableFrom<ConnectionHealthMonitor>(loadBalancer.HealthMonitor);
+                Assert.Equal(HealthMonitorType.Connect, loadBalancer.HealthMonitor.Type);
+                Assert.Equal(attemptsBeforeDeactivation, loadBalancer.HealthMonitor.AttemptsBeforeDeactivation);
+                Assert.Equal(timeout, loadBalancer.HealthMonitor.Timeout);
+                Assert.Equal(delay, loadBalancer.HealthMonitor.Delay);
 
                 // remove the health monitor
                 await provider.RemoveHealthMonitorAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
@@ -1075,7 +1074,7 @@
                             if (response == null)
                                 return false;
 
-                            Assert.AreEqual((HttpStatusCode)422, response.StatusCode);
+                            Assert.Equal((HttpStatusCode)422, response.StatusCode);
                             return true;
                         });
                 }
@@ -1086,9 +1085,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestHealthMonitorHttp()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1108,8 +1107,8 @@
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 // verify initially null
-                Assert.IsNull(tempLoadBalancer.HealthMonitor);
-                Assert.IsNull(await provider.GetHealthMonitorAsync(tempLoadBalancer.Id, cancellationTokenSource.Token));
+                Assert.Null(tempLoadBalancer.HealthMonitor);
+                Assert.Null(await provider.GetHealthMonitorAsync(tempLoadBalancer.Id, cancellationTokenSource.Token));
 
                 // configure the health monitor
                 bool https = false;
@@ -1127,29 +1126,29 @@
 
                 // verify the health monitor
                 HealthMonitor healthMonitor = await provider.GetHealthMonitorAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsInstanceOfType(healthMonitor, typeof(WebServerHealthMonitor));
+                Assert.IsAssignableFrom<WebServerHealthMonitor>(healthMonitor);
                 WebServerHealthMonitor webServerHealthMonitor = (WebServerHealthMonitor)healthMonitor;
-                Assert.AreEqual(monitor.Type, healthMonitor.Type);
-                Assert.AreEqual(attemptsBeforeDeactivation, healthMonitor.AttemptsBeforeDeactivation);
-                Assert.AreEqual(timeout, healthMonitor.Timeout);
-                Assert.AreEqual(delay, healthMonitor.Delay);
-                Assert.AreEqual(bodyRegex, webServerHealthMonitor.BodyRegex);
-                Assert.AreEqual(path, webServerHealthMonitor.Path);
-                Assert.AreEqual(statusRegex, webServerHealthMonitor.StatusRegex);
+                Assert.Equal(monitor.Type, healthMonitor.Type);
+                Assert.Equal(attemptsBeforeDeactivation, healthMonitor.AttemptsBeforeDeactivation);
+                Assert.Equal(timeout, healthMonitor.Timeout);
+                Assert.Equal(delay, healthMonitor.Delay);
+                Assert.Equal(bodyRegex, webServerHealthMonitor.BodyRegex);
+                Assert.Equal(path, webServerHealthMonitor.Path);
+                Assert.Equal(statusRegex, webServerHealthMonitor.StatusRegex);
 
                 // verify the information in the load balancer details
                 LoadBalancer loadBalancer = await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.AreEqual(tempLoadBalancer.Id, loadBalancer.Id);
+                Assert.Equal(tempLoadBalancer.Id, loadBalancer.Id);
 
-                Assert.IsInstanceOfType(loadBalancer.HealthMonitor, typeof(WebServerHealthMonitor));
+                Assert.IsAssignableFrom<WebServerHealthMonitor>(loadBalancer.HealthMonitor);
                 webServerHealthMonitor = (WebServerHealthMonitor)loadBalancer.HealthMonitor;
-                Assert.AreEqual(monitor.Type, loadBalancer.HealthMonitor.Type);
-                Assert.AreEqual(attemptsBeforeDeactivation, loadBalancer.HealthMonitor.AttemptsBeforeDeactivation);
-                Assert.AreEqual(timeout, loadBalancer.HealthMonitor.Timeout);
-                Assert.AreEqual(delay, loadBalancer.HealthMonitor.Delay);
-                Assert.AreEqual(bodyRegex, webServerHealthMonitor.BodyRegex);
-                Assert.AreEqual(path, webServerHealthMonitor.Path);
-                Assert.AreEqual(statusRegex, webServerHealthMonitor.StatusRegex);
+                Assert.Equal(monitor.Type, loadBalancer.HealthMonitor.Type);
+                Assert.Equal(attemptsBeforeDeactivation, loadBalancer.HealthMonitor.AttemptsBeforeDeactivation);
+                Assert.Equal(timeout, loadBalancer.HealthMonitor.Timeout);
+                Assert.Equal(delay, loadBalancer.HealthMonitor.Delay);
+                Assert.Equal(bodyRegex, webServerHealthMonitor.BodyRegex);
+                Assert.Equal(path, webServerHealthMonitor.Path);
+                Assert.Equal(statusRegex, webServerHealthMonitor.StatusRegex);
 
                 // remove the health monitor
                 await provider.RemoveHealthMonitorAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
@@ -1179,7 +1178,7 @@
                             if (response == null)
                                 return false;
 
-                            Assert.AreEqual((HttpStatusCode)422, response.StatusCode);
+                            Assert.Equal((HttpStatusCode)422, response.StatusCode);
                             return true;
                         });
                 }
@@ -1190,9 +1189,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestSetHttpCookieSessionPersistence()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1222,20 +1221,20 @@
 
                 // verify initially null
                 SessionPersistence sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.IsNull(sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Null(sessionPersistence.PersistenceType);
 
                 // set to cookie
                 await provider.SetSessionPersistenceAsync(tempLoadBalancer.Id, new SessionPersistence(SessionPersistenceType.HttpCookie), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.AreEqual(SessionPersistenceType.HttpCookie, sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Equal(SessionPersistenceType.HttpCookie, sessionPersistence.PersistenceType);
 
                 // set to cookie again
                 await provider.SetSessionPersistenceAsync(tempLoadBalancer.Id, new SessionPersistence(SessionPersistenceType.HttpCookie), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.AreEqual(SessionPersistenceType.HttpCookie, sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Equal(SessionPersistenceType.HttpCookie, sessionPersistence.PersistenceType);
 
                 // should fail to set to source address
                 try
@@ -1243,7 +1242,7 @@
                     try
                     {
                         await provider.SetSessionPersistenceAsync(tempLoadBalancer.Id, new SessionPersistence(SessionPersistenceType.SourceAddress), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                        Assert.Fail("Expected a WebException");
+                        Assert.True(false, "Expected a WebException");
                     }
                     catch (WebException ex)
                     {
@@ -1263,20 +1262,20 @@
                             if (response == null)
                                 return false;
 
-                            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+                            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                             return true;
                         });
                 }
 
                 sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.AreEqual(SessionPersistenceType.HttpCookie, sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Equal(SessionPersistenceType.HttpCookie, sessionPersistence.PersistenceType);
 
                 // set to none
                 await provider.RemoveSessionPersistenceAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.IsNull(sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Null(sessionPersistence.PersistenceType);
 
                 try
                 {
@@ -1284,7 +1283,7 @@
                     {
                         // set to none again
                         await provider.RemoveSessionPersistenceAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                        Assert.Fail("Expected a WebException");
+                        Assert.True(false, "Expected a WebException");
                     }
                     catch (WebException ex)
                     {
@@ -1304,14 +1303,14 @@
                             if (response == null)
                                 return false;
 
-                            Assert.AreEqual((HttpStatusCode)422, response.StatusCode);
+                            Assert.Equal((HttpStatusCode)422, response.StatusCode);
                             return true;
                         });
                 }
 
                 sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.IsNull(sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Null(sessionPersistence.PersistenceType);
 
                 /* Cleanup
                  */
@@ -1320,9 +1319,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestSetSourceAddressSessionPersistence()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1352,20 +1351,20 @@
 
                 // verify initially null
                 SessionPersistence sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.IsNull(sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Null(sessionPersistence.PersistenceType);
 
                 // set to source address
                 await provider.SetSessionPersistenceAsync(tempLoadBalancer.Id, new SessionPersistence(SessionPersistenceType.SourceAddress), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.AreEqual(SessionPersistenceType.SourceAddress, sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Equal(SessionPersistenceType.SourceAddress, sessionPersistence.PersistenceType);
 
                 // set to source address again
                 await provider.SetSessionPersistenceAsync(tempLoadBalancer.Id, new SessionPersistence(SessionPersistenceType.SourceAddress), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.AreEqual(SessionPersistenceType.SourceAddress, sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Equal(SessionPersistenceType.SourceAddress, sessionPersistence.PersistenceType);
 
                 // should fail to set to HTTP cookie
                 try
@@ -1373,7 +1372,7 @@
                     try
                     {
                         await provider.SetSessionPersistenceAsync(tempLoadBalancer.Id, new SessionPersistence(SessionPersistenceType.HttpCookie), AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                        Assert.Fail("Expected a WebException");
+                        Assert.True(false, "Expected a WebException");
                     }
                     catch (WebException ex)
                     {
@@ -1393,20 +1392,20 @@
                             if (response == null)
                                 return false;
 
-                            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+                            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                             return true;
                         });
                 }
 
                 sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.AreEqual(SessionPersistenceType.SourceAddress, sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Equal(SessionPersistenceType.SourceAddress, sessionPersistence.PersistenceType);
 
                 // set to none
                 await provider.RemoveSessionPersistenceAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.IsNull(sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Null(sessionPersistence.PersistenceType);
 
                 try
                 {
@@ -1414,7 +1413,7 @@
                     {
                         // set to none again
                         await provider.RemoveSessionPersistenceAsync(tempLoadBalancer.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                        Assert.Fail("Expected a WebException");
+                        Assert.True(false, "Expected a WebException");
                     }
                     catch (WebException ex)
                     {
@@ -1434,14 +1433,14 @@
                             if (response == null)
                                 return false;
 
-                            Assert.AreEqual((HttpStatusCode)422, response.StatusCode);
+                            Assert.Equal((HttpStatusCode)422, response.StatusCode);
                             return true;
                         });
                 }
 
                 sessionPersistence = await provider.GetSessionPersistenceAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(sessionPersistence);
-                Assert.IsNull(sessionPersistence.PersistenceType);
+                Assert.NotNull(sessionPersistence);
+                Assert.Null(sessionPersistence.PersistenceType);
 
                 /* Cleanup
                  */
@@ -1450,9 +1449,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestSetConnectionLogging()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1482,27 +1481,27 @@
 
                 // verify initially false
                 bool connectionLogging = await provider.GetConnectionLoggingAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsFalse(connectionLogging);
+                Assert.False(connectionLogging);
 
                 // set to true
                 await provider.SetConnectionLoggingAsync(tempLoadBalancer.Id, true, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 connectionLogging = await provider.GetConnectionLoggingAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsTrue(connectionLogging);
+                Assert.True(connectionLogging);
 
                 // set to true again
                 await provider.SetConnectionLoggingAsync(tempLoadBalancer.Id, true, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 connectionLogging = await provider.GetConnectionLoggingAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsTrue(connectionLogging);
+                Assert.True(connectionLogging);
 
                 // set to false
                 await provider.SetConnectionLoggingAsync(tempLoadBalancer.Id, false, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 connectionLogging = await provider.GetConnectionLoggingAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsFalse(connectionLogging);
+                Assert.False(connectionLogging);
 
                 // set to false again
                 await provider.SetConnectionLoggingAsync(tempLoadBalancer.Id, false, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 connectionLogging = await provider.GetConnectionLoggingAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsFalse(connectionLogging);
+                Assert.False(connectionLogging);
 
                 /* Cleanup
                  */
@@ -1511,9 +1510,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestConnectionThrottleInitialization()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1546,20 +1545,20 @@
                     timeout: null,
                     sessionPersistence: null);
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Status);
-                Assert.IsNotNull(tempLoadBalancer.ConnectionThrottles);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer.Status);
+                Assert.NotNull(tempLoadBalancer.ConnectionThrottles);
 
                 throttles = tempLoadBalancer.ConnectionThrottles;
-                Assert.AreEqual(maxConnectionRate, throttles.MaxConnectionRate);
-                Assert.AreEqual(maxConnections, throttles.MaxConnections);
-                Assert.AreEqual(minConnections, throttles.MinConnections);
-                Assert.AreEqual(rateInterval, throttles.RateInterval);
+                Assert.Equal(maxConnectionRate, throttles.MaxConnectionRate);
+                Assert.Equal(maxConnections, throttles.MaxConnections);
+                Assert.Equal(minConnections, throttles.MinConnections);
+                Assert.Equal(rateInterval, throttles.RateInterval);
 
                 throttles = await provider.ListThrottlesAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.AreEqual(maxConnectionRate, throttles.MaxConnectionRate);
-                Assert.AreEqual(maxConnections, throttles.MaxConnections);
-                Assert.AreEqual(minConnections, throttles.MinConnections);
-                Assert.AreEqual(rateInterval, throttles.RateInterval);
+                Assert.Equal(maxConnectionRate, throttles.MaxConnectionRate);
+                Assert.Equal(maxConnections, throttles.MaxConnections);
+                Assert.Equal(minConnections, throttles.MinConnections);
+                Assert.Equal(rateInterval, throttles.RateInterval);
 
                 /* Cleanup
                  */
@@ -1568,9 +1567,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestConnectionThrottleConfiguration()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1597,8 +1596,8 @@
                     timeout: null,
                     sessionPersistence: null);
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Status);
-                Assert.IsNull(tempLoadBalancer.ConnectionThrottles);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer.Status);
+                Assert.Null(tempLoadBalancer.ConnectionThrottles);
                 Console.WriteLine("Reported by create:");
                 Console.WriteLine(JsonConvert.SerializeObject(tempLoadBalancer.ConnectionThrottles, Formatting.Indented));
 
@@ -1614,10 +1613,10 @@
                 await provider.UpdateThrottlesAsync(tempLoadBalancer.Id, throttles, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 throttles = await provider.ListThrottlesAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.AreEqual(maxConnectionRate, throttles.MaxConnectionRate);
-                Assert.AreEqual(maxConnections, throttles.MaxConnections);
-                Assert.AreEqual(minConnections, throttles.MinConnections);
-                Assert.AreEqual(rateInterval, throttles.RateInterval);
+                Assert.Equal(maxConnectionRate, throttles.MaxConnectionRate);
+                Assert.Equal(maxConnections, throttles.MaxConnections);
+                Assert.Equal(minConnections, throttles.MinConnections);
+                Assert.Equal(rateInterval, throttles.RateInterval);
                 Console.WriteLine("After update:");
                 Console.WriteLine(JsonConvert.SerializeObject(throttles, Formatting.Indented));
 
@@ -1633,9 +1632,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestSetContentCaching()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1665,27 +1664,27 @@
 
                 // verify initially false
                 bool contentCaching = await provider.GetContentCachingAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsFalse(contentCaching);
+                Assert.False(contentCaching);
 
                 // set to true
                 await provider.SetContentCachingAsync(tempLoadBalancer.Id, true, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 contentCaching = await provider.GetContentCachingAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsTrue(contentCaching);
+                Assert.True(contentCaching);
 
                 // set to true again
                 await provider.SetContentCachingAsync(tempLoadBalancer.Id, true, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 contentCaching = await provider.GetContentCachingAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsTrue(contentCaching);
+                Assert.True(contentCaching);
 
                 // set to false
                 await provider.SetContentCachingAsync(tempLoadBalancer.Id, false, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 contentCaching = await provider.GetContentCachingAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsFalse(contentCaching);
+                Assert.False(contentCaching);
 
                 // set to false again
                 await provider.SetContentCachingAsync(tempLoadBalancer.Id, false, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 contentCaching = await provider.GetContentCachingAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsFalse(contentCaching);
+                Assert.False(contentCaching);
 
                 /* Cleanup
                  */
@@ -1694,9 +1693,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestListProtocols()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1704,15 +1703,15 @@
 
             IEnumerable<LoadBalancingProtocol> protocols = await provider.ListProtocolsAsync(cancellationTokenSource.Token);
             if (!protocols.Any())
-                Assert.Inconclusive("No load balancer protocols were returned by the server.");
+                Assert.False(true, "No load balancer protocols were returned by the server.");
 
             foreach (LoadBalancingProtocol protocol in protocols)
                 Console.WriteLine("{0} ({1})", protocol.Name, protocol.Port);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestListAlgorithms()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1720,21 +1719,21 @@
 
             IEnumerable<LoadBalancingAlgorithm> algorithms = await provider.ListAlgorithmsAsync(cancellationTokenSource.Token);
             if (!algorithms.Any())
-                Assert.Inconclusive("No load balancer algorithms were returned by the server.");
+                Assert.False(true, "No load balancer algorithms were returned by the server.");
 
             foreach (LoadBalancingAlgorithm algorithm in algorithms)
                 Console.WriteLine(algorithm.Name);
 
-            Assert.IsTrue(algorithms.Contains(LoadBalancingAlgorithm.LeastConnections));
-            Assert.IsTrue(algorithms.Contains(LoadBalancingAlgorithm.Random));
-            Assert.IsTrue(algorithms.Contains(LoadBalancingAlgorithm.RoundRobin));
-            Assert.IsTrue(algorithms.Contains(LoadBalancingAlgorithm.WeightedLeastConnections));
-            Assert.IsTrue(algorithms.Contains(LoadBalancingAlgorithm.WeightedRoundRobin));
+            Assert.True(algorithms.Contains(LoadBalancingAlgorithm.LeastConnections));
+            Assert.True(algorithms.Contains(LoadBalancingAlgorithm.Random));
+            Assert.True(algorithms.Contains(LoadBalancingAlgorithm.RoundRobin));
+            Assert.True(algorithms.Contains(LoadBalancingAlgorithm.WeightedLeastConnections));
+            Assert.True(algorithms.Contains(LoadBalancingAlgorithm.WeightedRoundRobin));
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestSslTermination()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1805,9 +1804,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestLoadBalancerMetadata()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1828,49 +1827,49 @@
                     algorithm: LoadBalancingAlgorithm.RoundRobin,
                     metadata: new[] { new LoadBalancerMetadataItem(expectedKey, expectedValue) });
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Status);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer.Status);
 
                 IEnumerable<LoadBalancerMetadataItem> metadata = await provider.ListLoadBalancerMetadataAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(metadata);
+                Assert.NotNull(metadata);
 
                 LoadBalancerMetadataItem expectedItem = null;
                 foreach (LoadBalancerMetadataItem item in metadata)
                 {
                     Console.WriteLine("  {0}: {1} = {2}", item.Id, item.Key, item.Value);
                     LoadBalancerMetadataItem singleItem = await provider.GetLoadBalancerMetadataItemAsync(tempLoadBalancer.Id, item.Id, cancellationTokenSource.Token);
-                    Assert.AreEqual(item.Id, singleItem.Id);
-                    Assert.AreEqual(item.Key, singleItem.Key);
-                    Assert.AreEqual(item.Value, singleItem.Value);
+                    Assert.Equal(item.Id, singleItem.Id);
+                    Assert.Equal(item.Key, singleItem.Key);
+                    Assert.Equal(item.Value, singleItem.Value);
 
                     if (item.Key == expectedKey)
                         expectedItem = item;
                 }
 
-                Assert.IsNotNull(expectedItem);
-                Assert.AreEqual(expectedKey, expectedItem.Key);
-                Assert.AreEqual(expectedValue, expectedItem.Value);
+                Assert.NotNull(expectedItem);
+                Assert.Equal(expectedKey, expectedItem.Key);
+                Assert.Equal(expectedValue, expectedItem.Value);
 
                 string updatedValue = "My new value.";
                 await provider.UpdateLoadBalancerMetadataItemAsync(tempLoadBalancer.Id, expectedItem.Id, updatedValue, cancellationTokenSource.Token);
                 // verify that the update command did not place the load balancer in the "PendingUpdate" state
-                Assert.AreEqual(LoadBalancerStatus.Active, (await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token)).Status);
+                Assert.Equal(LoadBalancerStatus.Active, (await provider.GetLoadBalancerAsync(tempLoadBalancer.Id, cancellationTokenSource.Token)).Status);
                 expectedItem = await provider.GetLoadBalancerMetadataItemAsync(tempLoadBalancer.Id, expectedItem.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(expectedItem);
-                Assert.AreEqual(expectedKey, expectedItem.Key);
-                Assert.AreEqual(updatedValue, expectedItem.Value);
+                Assert.NotNull(expectedItem);
+                Assert.Equal(expectedKey, expectedItem.Key);
+                Assert.Equal(updatedValue, expectedItem.Value);
 
                 string expectedSecondKey = "key2";
                 Dictionary<string, string> updatedMetadata = new Dictionary<string, string> { { expectedSecondKey, expectedValue } };
                 IEnumerable<LoadBalancerMetadataItem> updateMetadataItems = await provider.AddLoadBalancerMetadataAsync(tempLoadBalancer.Id, updatedMetadata, cancellationTokenSource.Token);
                 LoadBalancerMetadataItem secondItem = updateMetadataItems.SingleOrDefault();
-                Assert.IsNotNull(secondItem);
-                Assert.AreEqual(expectedSecondKey, secondItem.Key);
-                Assert.AreEqual(expectedValue, secondItem.Value);
+                Assert.NotNull(secondItem);
+                Assert.Equal(expectedSecondKey, secondItem.Key);
+                Assert.Equal(expectedValue, secondItem.Value);
 
                 await provider.RemoveLoadBalancerMetadataItemAsync(tempLoadBalancer.Id, new[] { expectedItem.Id, secondItem.Id }, cancellationTokenSource.Token);
                 metadata = await provider.ListLoadBalancerMetadataAsync(tempLoadBalancer.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(metadata);
-                Assert.IsFalse(metadata.Any());
+                Assert.NotNull(metadata);
+                Assert.False(metadata.Any());
 
                 /* Cleanup
                  */
@@ -1879,9 +1878,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.LoadBalancers)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.LoadBalancers, "")]
         public async Task TestNodeMetadata()
         {
             ILoadBalancerService provider = CreateProvider();
@@ -1904,52 +1903,52 @@
                     algorithm: LoadBalancingAlgorithm.RoundRobin);
                 LoadBalancer tempLoadBalancer = await provider.CreateLoadBalancerAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 Node node = tempLoadBalancer.Nodes.Single();
-                Assert.AreEqual(LoadBalancerStatus.Active, tempLoadBalancer.Status);
+                Assert.Equal(LoadBalancerStatus.Active, tempLoadBalancer.Status);
 
                 // can't set node metadata during the initial creation, so we set it right afterwards
                 await provider.AddNodeMetadataAsync(tempLoadBalancer.Id, node.Id, new Dictionary<string, string> { { expectedKey, expectedValue } }, cancellationTokenSource.Token);
 
                 IEnumerable<LoadBalancerMetadataItem> metadata = await provider.ListNodeMetadataAsync(tempLoadBalancer.Id, node.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(metadata);
+                Assert.NotNull(metadata);
 
                 LoadBalancerMetadataItem expectedItem = null;
                 foreach (LoadBalancerMetadataItem item in metadata)
                 {
                     Console.WriteLine("  {0}: {1} = {2}", item.Id, item.Key, item.Value);
                     LoadBalancerMetadataItem singleItem = await provider.GetNodeMetadataItemAsync(tempLoadBalancer.Id, node.Id, item.Id, cancellationTokenSource.Token);
-                    Assert.AreEqual(item.Id, singleItem.Id);
-                    Assert.AreEqual(item.Key, singleItem.Key);
-                    Assert.AreEqual(item.Value, singleItem.Value);
+                    Assert.Equal(item.Id, singleItem.Id);
+                    Assert.Equal(item.Key, singleItem.Key);
+                    Assert.Equal(item.Value, singleItem.Value);
 
                     if (item.Key == expectedKey)
                         expectedItem = item;
                 }
 
-                Assert.IsNotNull(expectedItem);
-                Assert.AreEqual(expectedKey, expectedItem.Key);
-                Assert.AreEqual(expectedValue, expectedItem.Value);
+                Assert.NotNull(expectedItem);
+                Assert.Equal(expectedKey, expectedItem.Key);
+                Assert.Equal(expectedValue, expectedItem.Value);
 
                 string updatedValue = "My new value.";
                 await provider.UpdateNodeMetadataItemAsync(tempLoadBalancer.Id, node.Id, expectedItem.Id, updatedValue, cancellationTokenSource.Token);
                 // verify that the update command did not place the load balancer in the "PendingUpdate" state
-                Assert.AreEqual(NodeStatus.Online, (await provider.GetNodeAsync(tempLoadBalancer.Id, node.Id, cancellationTokenSource.Token)).Status);
+                Assert.Equal(NodeStatus.Online, (await provider.GetNodeAsync(tempLoadBalancer.Id, node.Id, cancellationTokenSource.Token)).Status);
                 expectedItem = await provider.GetNodeMetadataItemAsync(tempLoadBalancer.Id, node.Id, expectedItem.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(expectedItem);
-                Assert.AreEqual(expectedKey, expectedItem.Key);
-                Assert.AreEqual(updatedValue, expectedItem.Value);
+                Assert.NotNull(expectedItem);
+                Assert.Equal(expectedKey, expectedItem.Key);
+                Assert.Equal(updatedValue, expectedItem.Value);
 
                 string expectedSecondKey = "key2";
                 Dictionary<string, string> updatedMetadata = new Dictionary<string, string> { { expectedSecondKey, expectedValue } };
                 IEnumerable<LoadBalancerMetadataItem> updateMetadataItems = await provider.AddNodeMetadataAsync(tempLoadBalancer.Id, node.Id, updatedMetadata, cancellationTokenSource.Token);
                 LoadBalancerMetadataItem secondItem = updateMetadataItems.SingleOrDefault();
-                Assert.IsNotNull(secondItem);
-                Assert.AreEqual(expectedSecondKey, secondItem.Key);
-                Assert.AreEqual(expectedValue, secondItem.Value);
+                Assert.NotNull(secondItem);
+                Assert.Equal(expectedSecondKey, secondItem.Key);
+                Assert.Equal(expectedValue, secondItem.Value);
 
                 await provider.RemoveNodeMetadataItemAsync(tempLoadBalancer.Id, node.Id, new[] { expectedItem.Id, secondItem.Id }, cancellationTokenSource.Token);
                 metadata = await provider.ListNodeMetadataAsync(tempLoadBalancer.Id, node.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(metadata);
-                Assert.IsFalse(metadata.Any());
+                Assert.NotNull(metadata);
+                Assert.False(metadata.Any());
 
                 /* Cleanup
                  */

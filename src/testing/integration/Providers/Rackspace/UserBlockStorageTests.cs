@@ -3,12 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Exceptions.Response;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
     using Newtonsoft.Json;
+    using Xunit;
     using Path = System.IO.Path;
 
     /// <summary>
@@ -17,7 +17,6 @@
     /// </summary>
     /// <seealso cref="IBlockStorageProvider"/>
     /// <seealso cref="CloudBlockStorageProvider"/>
-    [TestClass]
     public class UserBlockStorageTests
     {
         /// <summary>
@@ -40,8 +39,8 @@
 
         #region Volume
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupTestVolumes()
         {
             IBlockStorageProvider provider = Bootstrapper.CreateBlockStorageProvider();
@@ -59,54 +58,54 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.BlockStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.BlockStorage, "")]
         public void TestListVolumes()
         {
             IBlockStorageProvider provider = Bootstrapper.CreateBlockStorageProvider();
             IEnumerable<Volume> volumes = provider.ListVolumes();
-            Assert.IsNotNull(volumes);
+            Assert.NotNull(volumes);
             if (!volumes.Any())
-                Assert.Inconclusive("The test could not proceed because the specified account and/or region does not appear to contain any configured volumes.");
+                Assert.False(true, "The test could not proceed because the specified account and/or region does not appear to contain any configured volumes.");
 
             Console.WriteLine("Volumes");
             foreach (Volume volume in volumes)
             {
-                Assert.IsNotNull(volume);
-                Assert.IsFalse(string.IsNullOrEmpty(volume.Id));
+                Assert.NotNull(volume);
+                Assert.False(string.IsNullOrEmpty(volume.Id));
                 Console.WriteLine(JsonConvert.SerializeObject(volume, Formatting.Indented));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.BlockStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.BlockStorage, "")]
         public void TestBasicVolumeFeatures()
         {
             IBlockStorageProvider provider = Bootstrapper.CreateBlockStorageProvider();
             string displayName = UnitTestVolumePrefix + Path.GetRandomFileName();
             Volume result = provider.CreateVolume(MinimumVolumeSize, displayName: displayName);
-            Assert.IsNotNull(result);
-            Assert.IsNotNull(result.Id);
+            Assert.NotNull(result);
+            Assert.NotNull(result.Id);
 
             Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
 
             Volume updated = provider.WaitForVolumeAvailable(result.Id);
-            Assert.IsNotNull(updated);
-            Assert.AreEqual(result.Id, updated.Id);
-            Assert.AreEqual(VolumeState.Available, updated.Status);
+            Assert.NotNull(updated);
+            Assert.Equal(result.Id, updated.Id);
+            Assert.Equal(VolumeState.Available, updated.Status);
 
             bool deleted = provider.DeleteVolume(result.Id);
-            Assert.IsTrue(deleted);
+            Assert.True(deleted);
 
             deleted = provider.WaitForVolumeDeleted(result.Id);
-            Assert.IsTrue(deleted);
+            Assert.True(deleted);
 
             try
             {
                 provider.ShowVolume(result.Id);
-                Assert.Fail("Expected an exception after a volume is deleted.");
+                Assert.True(false, "Expected an exception after a volume is deleted.");
             }
             catch (ItemNotFoundException)
             {
@@ -122,73 +121,73 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.BlockStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.BlockStorage, "")]
         public void TestShowVolume()
         {
             IBlockStorageProvider provider = Bootstrapper.CreateBlockStorageProvider();
             IEnumerable<Volume> volumes = provider.ListVolumes();
-            Assert.IsNotNull(volumes);
+            Assert.NotNull(volumes);
             if (!volumes.Any())
-                Assert.Inconclusive("The test could not proceed because the specified account and/or region does not appear to contain any configured volumes.");
+                Assert.False(true, "The test could not proceed because the specified account and/or region does not appear to contain any configured volumes.");
 
             foreach (Volume volume in volumes)
             {
-                Assert.IsNotNull(volume);
-                Assert.IsFalse(string.IsNullOrEmpty(volume.Id));
+                Assert.NotNull(volume);
+                Assert.False(string.IsNullOrEmpty(volume.Id));
                 Volume showVolume = provider.ShowVolume(volume.Id);
-                Assert.IsNotNull(showVolume);
-                Assert.AreEqual(volume.AvailabilityZone, showVolume.AvailabilityZone);
-                Assert.AreEqual(volume.CreatedAt, showVolume.CreatedAt);
-                Assert.AreEqual(volume.DisplayDescription, showVolume.DisplayDescription);
-                Assert.AreEqual(volume.DisplayName, showVolume.DisplayName);
-                Assert.AreEqual(volume.Id, showVolume.Id);
-                Assert.AreEqual(volume.Size, showVolume.Size);
-                Assert.AreEqual(volume.SnapshotId, showVolume.SnapshotId);
-                Assert.IsNotNull(volume.Status);
-                Assert.AreEqual(volume.VolumeType, showVolume.VolumeType);
+                Assert.NotNull(showVolume);
+                Assert.Equal(volume.AvailabilityZone, showVolume.AvailabilityZone);
+                Assert.Equal(volume.CreatedAt, showVolume.CreatedAt);
+                Assert.Equal(volume.DisplayDescription, showVolume.DisplayDescription);
+                Assert.Equal(volume.DisplayName, showVolume.DisplayName);
+                Assert.Equal(volume.Id, showVolume.Id);
+                Assert.Equal(volume.Size, showVolume.Size);
+                Assert.Equal(volume.SnapshotId, showVolume.SnapshotId);
+                Assert.NotNull(volume.Status);
+                Assert.Equal(volume.VolumeType, showVolume.VolumeType);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.BlockStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.BlockStorage, "")]
         public void TestListVolumeTypes()
         {
             IBlockStorageProvider provider = Bootstrapper.CreateBlockStorageProvider();
             IEnumerable<VolumeType> volumeTypes = provider.ListVolumeTypes();
-            Assert.IsNotNull(volumeTypes);
+            Assert.NotNull(volumeTypes);
             if (!volumeTypes.Any())
-                Assert.Inconclusive("The test could not proceed because the specified account and/or region does not appear to contain any volume types.");
+                Assert.False(true, "The test could not proceed because the specified account and/or region does not appear to contain any volume types.");
 
             Console.WriteLine("Volume Types");
             foreach (VolumeType volumeType in volumeTypes)
             {
-                Assert.IsNotNull(volumeType);
+                Assert.NotNull(volumeType);
                 Console.WriteLine(JsonConvert.SerializeObject(volumeType, Formatting.Indented));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.BlockStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.BlockStorage, "")]
         public void TestDescribeVolumeType()
         {
             IBlockStorageProvider provider = Bootstrapper.CreateBlockStorageProvider();
             IEnumerable<VolumeType> volumeTypes = provider.ListVolumeTypes();
-            Assert.IsNotNull(volumeTypes);
+            Assert.NotNull(volumeTypes);
             if (!volumeTypes.Any())
-                Assert.Inconclusive("The test could not proceed because the specified account and/or region does not appear to contain any volume types.");
+                Assert.False(true, "The test could not proceed because the specified account and/or region does not appear to contain any volume types.");
 
             foreach (VolumeType volumeType in volumeTypes)
             {
-                Assert.IsNotNull(volumeType);
-                Assert.IsFalse(string.IsNullOrEmpty(volumeType.Id));
+                Assert.NotNull(volumeType);
+                Assert.False(string.IsNullOrEmpty(volumeType.Id));
                 VolumeType type = provider.DescribeVolumeType(volumeType.Id);
-                Assert.IsNotNull(type);
-                Assert.AreEqual(volumeType.Id, type.Id);
-                Assert.AreEqual(volumeType.Name, type.Name);
+                Assert.NotNull(type);
+                Assert.Equal(volumeType.Id, type.Id);
+                Assert.Equal(volumeType.Name, type.Name);
             }
         }
 
@@ -196,8 +195,8 @@
 
         #region Snapshot
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupTestSnapshots()
         {
             IBlockStorageProvider provider = Bootstrapper.CreateBlockStorageProvider();
@@ -215,29 +214,29 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.BlockStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.BlockStorage, "")]
         public void TestListSnapshots()
         {
             IBlockStorageProvider provider = Bootstrapper.CreateBlockStorageProvider();
             IEnumerable<Snapshot> snapshots = provider.ListSnapshots();
-            Assert.IsNotNull(snapshots);
+            Assert.NotNull(snapshots);
             if (!snapshots.Any())
-                Assert.Inconclusive("The test could not proceed because the specified account and/or region does not appear to contain any snapshots.");
+                Assert.False(true, "The test could not proceed because the specified account and/or region does not appear to contain any snapshots.");
 
             Console.WriteLine("Snapshots");
             foreach (Snapshot snapshot in snapshots)
             {
-                Assert.IsNotNull(snapshot);
-                Assert.IsFalse(string.IsNullOrEmpty(snapshot.Id));
+                Assert.NotNull(snapshot);
+                Assert.False(string.IsNullOrEmpty(snapshot.Id));
                 Console.WriteLine(JsonConvert.SerializeObject(snapshot, Formatting.Indented));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.BlockStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.BlockStorage, "")]
         public void TestBasicSnapshotFeatures()
         {
             IBlockStorageProvider provider = Bootstrapper.CreateBlockStorageProvider();
@@ -255,15 +254,15 @@
                 Console.WriteLine("No SSD volume type is available for the snapshot test... falling back to the default.");
 
             Volume result = provider.CreateVolume(MinimumVolumeSize, displayName: volumeDisplayName, volumeType: ssdType != null ? ssdType.Id : null);
-            Assert.IsNotNull(result);
-            Assert.IsNotNull(result.Id);
+            Assert.NotNull(result);
+            Assert.NotNull(result.Id);
 
             Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
 
             Volume updated = provider.WaitForVolumeAvailable(result.Id);
-            Assert.IsNotNull(updated);
-            Assert.AreEqual(result.Id, updated.Id);
-            Assert.AreEqual(VolumeState.Available, updated.Status);
+            Assert.NotNull(updated);
+            Assert.Equal(result.Id, updated.Id);
+            Assert.Equal(VolumeState.Available, updated.Status);
 
             //
             // Snapshot testing
@@ -271,26 +270,26 @@
 
             string snapshotDisplayName = UnitTestSnapshotPrefix + Path.GetRandomFileName();
             Snapshot snapshot = provider.CreateSnapshot(result.Id, displayName: snapshotDisplayName);
-            Assert.IsNotNull(snapshot);
-            Assert.IsNotNull(snapshot.Id);
+            Assert.NotNull(snapshot);
+            Assert.NotNull(snapshot.Id);
 
             Console.WriteLine(JsonConvert.SerializeObject(snapshot, Formatting.Indented));
 
             Snapshot updatedSnapshot = provider.WaitForSnapshotAvailable(snapshot.Id);
-            Assert.IsNotNull(updatedSnapshot);
-            Assert.AreEqual(snapshot.Id, updatedSnapshot.Id);
-            Assert.AreEqual(SnapshotState.Available, updatedSnapshot.Status);
+            Assert.NotNull(updatedSnapshot);
+            Assert.Equal(snapshot.Id, updatedSnapshot.Id);
+            Assert.Equal(SnapshotState.Available, updatedSnapshot.Status);
 
             bool deleted = provider.DeleteSnapshot(snapshot.Id);
-            Assert.IsTrue(deleted);
+            Assert.True(deleted);
 
             deleted = provider.WaitForSnapshotDeleted(snapshot.Id);
-            Assert.IsTrue(deleted);
+            Assert.True(deleted);
 
             try
             {
                 provider.ShowSnapshot(snapshot.Id);
-                Assert.Fail("Expected an exception after a snapshot is deleted.");
+                Assert.True(false, "Expected an exception after a snapshot is deleted.");
             }
             catch (ItemNotFoundException)
             {
@@ -310,10 +309,10 @@
             //
 
             bool deletedVolume = provider.DeleteVolume(result.Id);
-            Assert.IsTrue(deletedVolume);
+            Assert.True(deletedVolume);
 
             deletedVolume = provider.WaitForVolumeDeleted(result.Id);
-            Assert.IsTrue(deletedVolume);
+            Assert.True(deletedVolume);
         }
 
         public static VolumeType GetSsdVolumeTypeOrDefault(IBlockStorageProvider provider)
@@ -327,31 +326,31 @@
             return null;
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.BlockStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.BlockStorage, "")]
         public void TestShowSnapshot()
         {
             IBlockStorageProvider provider = Bootstrapper.CreateBlockStorageProvider();
             IEnumerable<Snapshot> snapshots = provider.ListSnapshots();
-            Assert.IsNotNull(snapshots);
+            Assert.NotNull(snapshots);
             if (!snapshots.Any())
-                Assert.Inconclusive("The test could not proceed because the specified account and/or region does not appear to contain any snapshots.");
+                Assert.False(true, "The test could not proceed because the specified account and/or region does not appear to contain any snapshots.");
 
             Console.WriteLine("Snapshots");
             foreach (Snapshot snapshot in snapshots)
             {
-                Assert.IsNotNull(snapshot);
-                Assert.IsFalse(string.IsNullOrEmpty(snapshot.Id));
+                Assert.NotNull(snapshot);
+                Assert.False(string.IsNullOrEmpty(snapshot.Id));
                 Snapshot showSnapshot = provider.ShowSnapshot(snapshot.Id);
-                Assert.IsNotNull(showSnapshot);
-                Assert.AreEqual(snapshot.CreatedAt, showSnapshot.CreatedAt);
-                Assert.AreEqual(snapshot.DisplayDescription, showSnapshot.DisplayDescription);
-                Assert.AreEqual(snapshot.DisplayName, showSnapshot.DisplayName);
-                Assert.AreEqual(snapshot.Id, showSnapshot.Id);
-                Assert.AreEqual(snapshot.Size, showSnapshot.Size);
-                //Assert.AreEqual(snapshot.Status, showSnapshot.Status);
-                Assert.AreEqual(snapshot.VolumeId, showSnapshot.VolumeId);
+                Assert.NotNull(showSnapshot);
+                Assert.Equal(snapshot.CreatedAt, showSnapshot.CreatedAt);
+                Assert.Equal(snapshot.DisplayDescription, showSnapshot.DisplayDescription);
+                Assert.Equal(snapshot.DisplayName, showSnapshot.DisplayName);
+                Assert.Equal(snapshot.Id, showSnapshot.Id);
+                Assert.Equal(snapshot.Size, showSnapshot.Size);
+                //Assert.Equal(snapshot.Status, showSnapshot.Status);
+                Assert.Equal(snapshot.VolumeId, showSnapshot.VolumeId);
             }
         }
 

@@ -5,12 +5,12 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Net;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Exceptions.Response;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
     using Newtonsoft.Json;
+    using Xunit;
     using Path = System.IO.Path;
 
     /// <summary>
@@ -20,8 +20,7 @@
     /// </summary>
     /// <seealso cref="IComputeProvider"/>
     /// <seealso cref="CloudServersProvider"/>
-    [TestClass]
-    public class UserServerTests
+    public class UserServerTests : IUseFixture<T>
     {
         private static Server _server;
         private static string _password;
@@ -36,25 +35,25 @@
 
             Flavor flavor = UserComputeTests.ListAllFlavorsWithDetails(provider).OrderBy(i => i.RAMInMB).ThenBy(i => i.DiskSizeInGB).FirstOrDefault();
             if (flavor == null)
-                Assert.Inconclusive("Couldn't find a flavor to use for the test server.");
+                Assert.False(true, "Couldn't find a flavor to use for the test server.");
 
             SimpleServerImage[] images = UserComputeTests.ListAllImages(provider).ToArray();
             SimpleServerImage image = images.FirstOrDefault(i => i.Name.IndexOf(TestImageNameSubstring, StringComparison.OrdinalIgnoreCase) >= 0);
             if (image == null)
-                Assert.Inconclusive(string.Format("Couldn't find the {0} image to use for the test server.", TestImageNameSubstring));
+                Assert.False(true, string.Format("Couldn't find the {0} image to use for the test server.", TestImageNameSubstring));
 
             Stopwatch timer = Stopwatch.StartNew();
             Console.Write("Creating server for image {0}...", image.Name);
             NewServer server = provider.CreateServer(serverName, image.Id, flavor.Id, attachToServiceNetwork: true);
-            Assert.IsNotNull(server);
-            Assert.IsFalse(string.IsNullOrEmpty(server.Id));
+            Assert.NotNull(server);
+            Assert.False(string.IsNullOrEmpty(server.Id));
 
             _password = server.AdminPassword;
 
             _server = provider.WaitForServerActive(server.Id);
-            Assert.IsNotNull(_server);
-            Assert.AreEqual(server.Id, _server.Id);
-            Assert.AreEqual(ServerState.Active, _server.Status);
+            Assert.NotNull(_server);
+            Assert.Equal(server.Id, _server.Id);
+            Assert.Equal(ServerState.Active, _server.Status);
 
             Console.WriteLine("done. {0} seconds", timer.Elapsed.TotalSeconds);
         }
@@ -67,7 +66,7 @@
             Stopwatch timer = Stopwatch.StartNew();
             Console.Write("  Deleting...");
             bool deleted = provider.DeleteServer(_server.Id);
-            Assert.IsTrue(deleted);
+            Assert.True(deleted);
 
             provider.WaitForServerDeleted(_server.Id);
             Console.Write("done. {0} seconds", timer.Elapsed.TotalSeconds);
@@ -79,176 +78,176 @@
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
             Server server = provider.GetDetails(_server.Id);
             if (server.Status != ServerState.Active)
-                Assert.Inconclusive("Could not run test because the server is in the '{0}' state (expected '{1}').", server.Status, ServerState.Active);
+                Assert.False(true, "Could not run test because the server is in the '{0}' state (expected '{1}').", server.Status, ServerState.Active);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestListServers()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
             IEnumerable<SimpleServer> servers = UserComputeTests.ListAllServers(provider);
-            Assert.IsNotNull(servers);
+            Assert.NotNull(servers);
             if (!servers.Any())
-                Assert.Inconclusive("The test could not proceed because the specified account and/or region does not appear to contain any configured servers.");
+                Assert.False(true, "The test could not proceed because the specified account and/or region does not appear to contain any configured servers.");
 
             Console.WriteLine("Servers");
             foreach (SimpleServer server in servers)
             {
-                Assert.IsNotNull(server);
+                Assert.NotNull(server);
 
                 Console.WriteLine("    {0}: {1}", server.Id, server.Name);
 
-                Assert.IsFalse(string.IsNullOrEmpty(server.Id));
-                Assert.IsFalse(string.IsNullOrEmpty(server.Name));
+                Assert.False(string.IsNullOrEmpty(server.Id));
+                Assert.False(string.IsNullOrEmpty(server.Name));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestListServersWithDetails()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
             IEnumerable<Server> servers = UserComputeTests.ListAllServersWithDetails(provider);
-            Assert.IsNotNull(servers);
+            Assert.NotNull(servers);
             if (!servers.Any())
-                Assert.Inconclusive("The test could not proceed because the specified account and/or region does not appear to contain any configured servers.");
+                Assert.False(true, "The test could not proceed because the specified account and/or region does not appear to contain any configured servers.");
 
             Console.WriteLine("Servers (with details)");
             foreach (Server server in servers)
             {
-                Assert.IsNotNull(server);
+                Assert.NotNull(server);
 
                 Console.WriteLine("    {0}: {1}", server.Id, server.Name);
                 Console.WriteLine(JsonConvert.SerializeObject(server, Formatting.Indented));
 
-                Assert.IsFalse(string.IsNullOrEmpty(server.Id));
-                Assert.IsFalse(string.IsNullOrEmpty(server.Name));
+                Assert.False(string.IsNullOrEmpty(server.Id));
+                Assert.False(string.IsNullOrEmpty(server.Name));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestGetDetails()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
             IEnumerable<Server> servers = UserComputeTests.ListAllServersWithDetails(provider);
-            Assert.IsNotNull(servers);
+            Assert.NotNull(servers);
             if (!servers.Any())
-                Assert.Inconclusive("The test could not proceed because the specified account and/or region does not appear to contain any configured servers.");
+                Assert.False(true, "The test could not proceed because the specified account and/or region does not appear to contain any configured servers.");
 
             foreach (Server server in servers)
             {
-                Assert.IsNotNull(server);
+                Assert.NotNull(server);
                 Server details = provider.GetDetails(server.Id);
-                Assert.AreEqual(server.AccessIPv4, details.AccessIPv4);
-                Assert.AreEqual(server.AccessIPv6, details.AccessIPv6);
-                //Assert.AreEqual(server.Addresses, details.Addresses);
-                Assert.AreEqual(server.Created, details.Created);
-                Assert.AreEqual(server.DiskConfig, details.DiskConfig);
-                Assert.AreEqual(server.Flavor.Id, details.Flavor.Id);
-                Assert.AreEqual(server.HostId, details.HostId);
-                Assert.AreEqual(server.Id, details.Id);
-                Assert.AreEqual(server.Image.Id, details.Image.Id);
-                //Assert.AreEqual(server.Links, details.Links);
-                Assert.AreEqual(server.Name, details.Name);
-                Assert.AreEqual(server.PowerState, details.PowerState);
-                //Assert.AreEqual(server.Progress, details.Progress);
-                //Assert.AreEqual(server.Status, details.Status);
-                //Assert.AreEqual(server.TaskState, details.TaskState);
-                Assert.AreEqual(server.TenantId, details.TenantId);
-                Assert.AreEqual(server.Updated, details.Updated);
-                Assert.AreEqual(server.UserId, details.UserId);
-                //Assert.AreEqual(server.VMState, details.VMState);
+                Assert.Equal(server.AccessIPv4, details.AccessIPv4);
+                Assert.Equal(server.AccessIPv6, details.AccessIPv6);
+                //Assert.Equal(server.Addresses, details.Addresses);
+                Assert.Equal(server.Created, details.Created);
+                Assert.Equal(server.DiskConfig, details.DiskConfig);
+                Assert.Equal(server.Flavor.Id, details.Flavor.Id);
+                Assert.Equal(server.HostId, details.HostId);
+                Assert.Equal(server.Id, details.Id);
+                Assert.Equal(server.Image.Id, details.Image.Id);
+                //Assert.Equal(server.Links, details.Links);
+                Assert.Equal(server.Name, details.Name);
+                Assert.Equal(server.PowerState, details.PowerState);
+                //Assert.Equal(server.Progress, details.Progress);
+                //Assert.Equal(server.Status, details.Status);
+                //Assert.Equal(server.TaskState, details.TaskState);
+                Assert.Equal(server.TenantId, details.TenantId);
+                Assert.Equal(server.Updated, details.Updated);
+                Assert.Equal(server.UserId, details.UserId);
+                //Assert.Equal(server.VMState, details.VMState);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestChangeAdministratorPassword()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
 
             string password = Path.GetTempPath();
             bool changePasswordResult = provider.ChangeAdministratorPassword(_server.Id, password);
-            Assert.IsTrue(changePasswordResult);
+            Assert.True(changePasswordResult);
             _password = password;
             Server changePasswordServer = provider.WaitForServerActive(_server.Id);
-            Assert.AreEqual(ServerState.Active, changePasswordServer.Status);
+            Assert.Equal(ServerState.Active, changePasswordServer.Status);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestHardRebootServer()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
             bool rebootResult = provider.RebootServer(_server.Id, RebootType.Hard);
-            Assert.IsTrue(rebootResult);
+            Assert.True(rebootResult);
             Server rebootServer = provider.WaitForServerActive(_server.Id);
-            Assert.AreEqual(ServerState.Active, rebootServer.Status);
+            Assert.Equal(ServerState.Active, rebootServer.Status);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestSoftRebootServer()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
             bool rebootResult = provider.RebootServer(_server.Id, RebootType.Soft);
-            Assert.IsTrue(rebootResult);
+            Assert.True(rebootResult);
             Server rebootServer = provider.WaitForServerActive(_server.Id);
-            Assert.AreEqual(ServerState.Active, rebootServer.Status);
+            Assert.Equal(ServerState.Active, rebootServer.Status);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestRescueServer()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
 
             string rescueResult = provider.RescueServer(_server.Id);
-            Assert.IsFalse(string.IsNullOrEmpty(rescueResult));
+            Assert.False(string.IsNullOrEmpty(rescueResult));
             Server rescueServer = provider.WaitForServerState(_server.Id, ServerState.Rescue, new[] { ServerState.Active, ServerState.Error, ServerState.Unknown, ServerState.Suspended });
-            Assert.AreEqual(ServerState.Rescue, rescueServer.Status);
+            Assert.Equal(ServerState.Rescue, rescueServer.Status);
 
             bool unrescueResult = provider.UnRescueServer(_server.Id);
-            Assert.IsTrue(unrescueResult);
+            Assert.True(unrescueResult);
             Server unrescueServer = provider.WaitForServerActive(_server.Id);
-            Assert.AreEqual(ServerState.Active, unrescueServer.Status);
+            Assert.Equal(ServerState.Active, unrescueServer.Status);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestUpdateServer()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
 
             string newName = UserComputeTests.UnitTestServerPrefix + Path.GetRandomFileName() + "²";
             bool updated = provider.UpdateServer(_server.Id, name: newName);
-            Assert.IsTrue(updated);
+            Assert.True(updated);
             Server updatedServer = provider.GetDetails(_server.Id);
-            Assert.AreEqual(_server.Id, updatedServer.Id);
-            Assert.AreEqual(newName, updatedServer.Name);
-            Assert.AreNotEqual(_server.Name, updatedServer.Name);
+            Assert.Equal(_server.Id, updatedServer.Id);
+            Assert.Equal(newName, updatedServer.Name);
+            Assert.NotEqual(_server.Name, updatedServer.Name);
             _server = updatedServer;
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestListAddresses()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
             ServerAddresses serverAddresses = provider.ListAddresses(_server.Id);
             if (serverAddresses.Count == 0)
-                Assert.Inconclusive("Couldn't find any addresses listed for the server.");
+                Assert.False(true, "Couldn't find any addresses listed for the server.");
 
             bool foundAddress = false;
             foreach (KeyValuePair<string, IPAddressList> addresses in serverAddresses)
@@ -262,12 +261,12 @@
             }
 
             if (!foundAddress)
-                Assert.Inconclusive("Couldn't find addresses on any network for the server.");
+                Assert.False(true, "Couldn't find addresses on any network for the server.");
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestListAddressesByNetwork()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
@@ -292,35 +291,35 @@
             }
 
             if (!foundAddress)
-                Assert.Inconclusive("Couldn't find addresses on any network for the server.");
+                Assert.False(true, "Couldn't find addresses on any network for the server.");
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestRebuildServer()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
 
             Flavor flavor = UserComputeTests.ListAllFlavorsWithDetails(provider).OrderBy(i => i.RAMInMB).ThenBy(i => i.DiskSizeInGB).FirstOrDefault();
             if (flavor == null)
-                Assert.Inconclusive("Couldn't find a flavor to use for the test server.");
+                Assert.False(true, "Couldn't find a flavor to use for the test server.");
 
             SimpleServerImage[] images = UserComputeTests.ListAllImages(provider).ToArray();
             SimpleServerImage image = images.FirstOrDefault(i => i.Name.IndexOf(TestImageNameSubstring, StringComparison.OrdinalIgnoreCase) >= 0);
             if (image == null)
-                Assert.Inconclusive(string.Format("Couldn't find the {0} image to use for the test server.", TestImageNameSubstring));
+                Assert.False(true, string.Format("Couldn't find the {0} image to use for the test server.", TestImageNameSubstring));
 
             Server rebuilt = provider.RebuildServer(_server.Id, null, image.Id, flavor.Id, _password);
-            Assert.IsNotNull(rebuilt);
+            Assert.NotNull(rebuilt);
             Server rebuiltServer = provider.WaitForServerActive(rebuilt.Id);
-            Assert.AreEqual(ServerState.Active, rebuiltServer.Status);
+            Assert.Equal(ServerState.Active, rebuiltServer.Status);
             _server = rebuiltServer;
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestConfirmServerResize()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
@@ -329,24 +328,24 @@
 
             Flavor flavor = UserComputeTests.ListAllFlavorsWithDetails(provider).OrderBy(i => i.RAMInMB).ThenBy(i => i.DiskSizeInGB).FirstOrDefault(i => !i.Id.Equals(_server.Flavor.Id, StringComparison.OrdinalIgnoreCase));
             if (flavor == null)
-                Assert.Inconclusive("Couldn't find a flavor to use for the test server.");
+                Assert.False(true, "Couldn't find a flavor to use for the test server.");
 
             bool resized = provider.ResizeServer(_server.Id, serverName, flavor.Id);
-            Assert.IsTrue(resized);
+            Assert.True(resized);
             Server resizedServer = provider.WaitForServerState(_server.Id, ServerState.VerifyResize, new[] { ServerState.Active, ServerState.Error, ServerState.Unknown, ServerState.Suspended });
-            Assert.AreEqual(ServerState.VerifyResize, resizedServer.Status);
+            Assert.Equal(ServerState.VerifyResize, resizedServer.Status);
             _server = resizedServer;
 
             bool confirmed = provider.ConfirmServerResize(resizedServer.Id);
-            Assert.IsTrue(confirmed);
+            Assert.True(confirmed);
             Server confirmedServer = provider.WaitForServerActive(_server.Id);
-            Assert.AreEqual(ServerState.Active, confirmedServer.Status);
+            Assert.Equal(ServerState.Active, confirmedServer.Status);
             _server = confirmedServer;
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestRevertServerResize()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
@@ -355,24 +354,24 @@
 
             Flavor flavor = UserComputeTests.ListAllFlavorsWithDetails(provider).OrderBy(i => i.RAMInMB).ThenBy(i => i.DiskSizeInGB).FirstOrDefault(i => !i.Id.Equals(_server.Flavor.Id, StringComparison.OrdinalIgnoreCase));
             if (flavor == null)
-                Assert.Inconclusive("Couldn't find a flavor to use for the test server.");
+                Assert.False(true, "Couldn't find a flavor to use for the test server.");
 
             bool resized = provider.ResizeServer(_server.Id, serverName, flavor.Id);
-            Assert.IsTrue(resized);
+            Assert.True(resized);
             Server resizedServer = provider.WaitForServerState(_server.Id, ServerState.VerifyResize, new[] { ServerState.Active, ServerState.Error, ServerState.Unknown, ServerState.Suspended });
-            Assert.AreEqual(ServerState.VerifyResize, resizedServer.Status);
+            Assert.Equal(ServerState.VerifyResize, resizedServer.Status);
             _server = resizedServer;
 
             bool reverted = provider.RevertServerResize(resizedServer.Id);
-            Assert.IsTrue(reverted);
+            Assert.True(reverted);
             Server revertedServer = provider.WaitForServerActive(_server.Id);
-            Assert.AreEqual(ServerState.Active, revertedServer.Status);
+            Assert.Equal(ServerState.Active, revertedServer.Status);
             _server = revertedServer;
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestCreateImage()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
@@ -381,63 +380,63 @@
              */
             string imageName = UserComputeTests.UnitTestImagePrefix + Path.GetRandomFileName();
             bool imaged = provider.CreateImage(_server.Id, imageName);
-            Assert.IsTrue(imaged);
+            Assert.True(imaged);
             ServerImage[] images = provider.ListImagesWithDetails(server: _server.Id, imageName: imageName).ToArray();
-            Assert.IsNotNull(images);
-            Assert.AreEqual(1, images.Length);
+            Assert.NotNull(images);
+            Assert.Equal(1, images.Length);
 
             ServerImage image = images[0];
-            Assert.AreEqual(imageName, image.Name);
-            Assert.IsFalse(string.IsNullOrEmpty(image.Id));
+            Assert.Equal(imageName, image.Name);
+            Assert.False(string.IsNullOrEmpty(image.Id));
 
-            Assert.AreEqual(ImageState.Active, provider.WaitForImageActive(image.Id).Status);
+            Assert.Equal(ImageState.Active, provider.WaitForImageActive(image.Id).Status);
 
             /* Test metadata operations on the image
              */
-            Assert.IsTrue(provider.SetImageMetadataItem(image.Id, "Item 1", "Value"));
-            Assert.AreEqual("Value", provider.GetImageMetadataItem(image.Id, "Item 1"));
-            Assert.IsTrue(provider.SetImageMetadataItem(image.Id, "Item 2", "Value ²"));
-            Assert.AreEqual("Value ²", provider.GetImageMetadataItem(image.Id, "Item 2"));
+            Assert.True(provider.SetImageMetadataItem(image.Id, "Item 1", "Value"));
+            Assert.Equal("Value", provider.GetImageMetadataItem(image.Id, "Item 1"));
+            Assert.True(provider.SetImageMetadataItem(image.Id, "Item 2", "Value ²"));
+            Assert.Equal("Value ²", provider.GetImageMetadataItem(image.Id, "Item 2"));
 
             // setting the same key overwrites the previous value
-            Assert.IsTrue(provider.SetImageMetadataItem(image.Id, "Item 1", "Value 1"));
-            Assert.AreEqual("Value 1", provider.GetImageMetadataItem(image.Id, "Item 1"));
+            Assert.True(provider.SetImageMetadataItem(image.Id, "Item 1", "Value 1"));
+            Assert.Equal("Value 1", provider.GetImageMetadataItem(image.Id, "Item 1"));
 
-            Assert.IsTrue(provider.DeleteImageMetadataItem(image.Id, "Item 1"));
-            Assert.IsFalse(provider.ListImageMetadata(image.Id).ContainsKey("Item 1"));
+            Assert.True(provider.DeleteImageMetadataItem(image.Id, "Item 1"));
+            Assert.False(provider.ListImageMetadata(image.Id).ContainsKey("Item 1"));
 
             Metadata metadata = new Metadata()
             {
                 { "Different", "Variables" },
             };
 
-            Assert.IsTrue(provider.UpdateImageMetadata(image.Id, metadata));
+            Assert.True(provider.UpdateImageMetadata(image.Id, metadata));
             Metadata actual = provider.ListImageMetadata(image.Id);
-            Assert.IsNotNull(actual);
-            Assert.AreEqual("Value ²", actual["Item 2"]);
-            Assert.AreEqual("Variables", actual["Different"]);
+            Assert.NotNull(actual);
+            Assert.Equal("Value ²", actual["Item 2"]);
+            Assert.Equal("Variables", actual["Different"]);
 
             // a slight tweak
             metadata["Different"] = "Values";
-            Assert.IsTrue(provider.SetImageMetadata(image.Id, metadata));
+            Assert.True(provider.SetImageMetadata(image.Id, metadata));
             actual = provider.ListImageMetadata(image.Id);
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(1, actual.Count);
-            Assert.AreEqual("Values", actual["Different"]);
+            Assert.NotNull(actual);
+            Assert.Equal(1, actual.Count);
+            Assert.Equal("Values", actual["Different"]);
 
-            Assert.IsTrue(provider.SetImageMetadata(image.Id, new Metadata()));
-            Assert.AreEqual(0, provider.ListImageMetadata(image.Id).Count);
+            Assert.True(provider.SetImageMetadata(image.Id, new Metadata()));
+            Assert.Equal(0, provider.ListImageMetadata(image.Id).Count);
 
             /* Cleanup
              */
             bool deleted = provider.DeleteImage(images[0].Id);
-            Assert.IsTrue(deleted);
+            Assert.True(deleted);
             provider.WaitForImageDeleted(images[0].Id);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestAttachServerVolume()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
@@ -446,49 +445,49 @@
             VolumeType volumeType = UserBlockStorageTests.GetSsdVolumeTypeOrDefault(blockStorageProvider);
             string volumeName = UserBlockStorageTests.UnitTestVolumePrefix + Path.GetRandomFileName();
             Volume volume = blockStorageProvider.CreateVolume(UserBlockStorageTests.MinimumVolumeSize, displayName: volumeName, volumeType: volumeType != null ? volumeType.Id : null);
-            Assert.AreEqual(VolumeState.Available, blockStorageProvider.WaitForVolumeAvailable(volume.Id).Status);
+            Assert.Equal(VolumeState.Available, blockStorageProvider.WaitForVolumeAvailable(volume.Id).Status);
 
             /* AttachServerVolume
              */
             ServerVolume serverVolume = provider.AttachServerVolume(_server.Id, volume.Id);
-            Assert.IsNotNull(serverVolume);
-            Assert.IsFalse(string.IsNullOrEmpty(serverVolume.Id));
-            Assert.AreEqual(_server.Id, serverVolume.ServerId);
-            Assert.AreEqual(volume.Id, serverVolume.VolumeId);
+            Assert.NotNull(serverVolume);
+            Assert.False(string.IsNullOrEmpty(serverVolume.Id));
+            Assert.Equal(_server.Id, serverVolume.ServerId);
+            Assert.Equal(volume.Id, serverVolume.VolumeId);
 
-            Assert.AreEqual(VolumeState.InUse, blockStorageProvider.WaitForVolumeState(volume.Id, VolumeState.InUse, new[] { VolumeState.Available, VolumeState.Error }).Status);
+            Assert.Equal(VolumeState.InUse, blockStorageProvider.WaitForVolumeState(volume.Id, VolumeState.InUse, new[] { VolumeState.Available, VolumeState.Error }).Status);
 
             /* ListServerVolumes
              */
             ServerVolume[] serverVolumes = provider.ListServerVolumes(_server.Id).ToArray();
-            Assert.IsNotNull(serverVolumes);
-            Assert.AreEqual(1, serverVolumes.Length);
-            Assert.AreEqual(serverVolume.Id, serverVolumes[0].Id);
-            Assert.AreEqual(serverVolume.ServerId, serverVolumes[0].ServerId);
-            Assert.AreEqual(serverVolume.VolumeId, serverVolumes[0].VolumeId);
+            Assert.NotNull(serverVolumes);
+            Assert.Equal(1, serverVolumes.Length);
+            Assert.Equal(serverVolume.Id, serverVolumes[0].Id);
+            Assert.Equal(serverVolume.ServerId, serverVolumes[0].ServerId);
+            Assert.Equal(serverVolume.VolumeId, serverVolumes[0].VolumeId);
 
             /* GetServerVolumeDetails
              */
             ServerVolume volumeDetails = provider.GetServerVolumeDetails(_server.Id, volume.Id);
-            Assert.IsNotNull(volumeDetails);
-            Assert.AreEqual(serverVolume.Id, volumeDetails.Id);
-            Assert.AreEqual(serverVolume.ServerId, volumeDetails.ServerId);
-            Assert.AreEqual(serverVolume.VolumeId, volumeDetails.VolumeId);
+            Assert.NotNull(volumeDetails);
+            Assert.Equal(serverVolume.Id, volumeDetails.Id);
+            Assert.Equal(serverVolume.ServerId, volumeDetails.ServerId);
+            Assert.Equal(serverVolume.VolumeId, volumeDetails.VolumeId);
 
             bool detach = provider.DetachServerVolume(_server.Id, volume.Id);
-            Assert.IsTrue(detach);
+            Assert.True(detach);
             provider.WaitForServerActive(_server.Id);
             ServerVolume[] remainingVolumes = provider.ListServerVolumes(_server.Id).ToArray();
-            Assert.AreEqual(0, remainingVolumes.Length);
+            Assert.Equal(0, remainingVolumes.Length);
 
-            Assert.AreEqual(VolumeState.Available, blockStorageProvider.WaitForVolumeAvailable(volume.Id).Status);
+            Assert.Equal(VolumeState.Available, blockStorageProvider.WaitForVolumeAvailable(volume.Id).Status);
             bool deleted = blockStorageProvider.DeleteVolume(volume.Id);
-            Assert.IsTrue(blockStorageProvider.WaitForVolumeDeleted(volume.Id));
+            Assert.True(blockStorageProvider.WaitForVolumeDeleted(volume.Id));
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestVirtualInterfaces()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
@@ -496,22 +495,22 @@
             CloudNetwork publicNetwork = networksProvider.ListNetworks().Single(i => i.Label.Equals("public", StringComparison.OrdinalIgnoreCase));
 
             VirtualInterface publicVirtualInterface = provider.CreateVirtualInterface(_server.Id, publicNetwork.Id);
-            Assert.IsNotNull(publicVirtualInterface);
-            Assert.IsFalse(string.IsNullOrEmpty(publicVirtualInterface.Id));
-            Assert.IsNotNull(publicVirtualInterface.MACAddress);
+            Assert.NotNull(publicVirtualInterface);
+            Assert.False(string.IsNullOrEmpty(publicVirtualInterface.Id));
+            Assert.NotNull(publicVirtualInterface.MACAddress);
 
             IEnumerable<VirtualInterface> virtualInterfaces = provider.ListVirtualInterfaces(_server.Id);
-            Assert.IsNotNull(virtualInterfaces);
-            Assert.IsTrue(virtualInterfaces.Where(i => i.Id.Equals(publicVirtualInterface.Id, StringComparison.OrdinalIgnoreCase)).Any());
+            Assert.NotNull(virtualInterfaces);
+            Assert.True(virtualInterfaces.Where(i => i.Id.Equals(publicVirtualInterface.Id, StringComparison.OrdinalIgnoreCase)).Any());
 
             bool deleted;
             deleted = provider.DeleteVirtualInterface(_server.Id, publicVirtualInterface.Id);
-            Assert.IsTrue(deleted);
+            Assert.True(deleted);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Compute)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Compute, "")]
         public void TestServerMetadata()
         {
             IComputeProvider provider = Bootstrapper.CreateComputeProvider();
@@ -523,43 +522,43 @@
                 foreach (KeyValuePair<string, string> meta in initialMetadata)
                     Console.WriteLine("  {0}: {1}", meta.Key, meta.Value);
 
-                Assert.Inconclusive("Expected the server to not have any initial metadata.");
+                Assert.False(true, "Expected the server to not have any initial metadata.");
             }
 
-            Assert.IsTrue(provider.SetServerMetadataItem(_server.Id, "Item 1", "Value"));
-            Assert.AreEqual("Value", provider.GetServerMetadataItem(_server.Id, "Item 1"));
-            Assert.IsTrue(provider.SetServerMetadataItem(_server.Id, "Item 2", "Value ²"));
-            Assert.AreEqual("Value ²", provider.GetServerMetadataItem(_server.Id, "Item 2"));
+            Assert.True(provider.SetServerMetadataItem(_server.Id, "Item 1", "Value"));
+            Assert.Equal("Value", provider.GetServerMetadataItem(_server.Id, "Item 1"));
+            Assert.True(provider.SetServerMetadataItem(_server.Id, "Item 2", "Value ²"));
+            Assert.Equal("Value ²", provider.GetServerMetadataItem(_server.Id, "Item 2"));
 
             // setting the same key overwrites the previous value
-            Assert.IsTrue(provider.SetServerMetadataItem(_server.Id, "Item 1", "Value 1"));
-            Assert.AreEqual("Value 1", provider.GetServerMetadataItem(_server.Id, "Item 1"));
+            Assert.True(provider.SetServerMetadataItem(_server.Id, "Item 1", "Value 1"));
+            Assert.Equal("Value 1", provider.GetServerMetadataItem(_server.Id, "Item 1"));
 
-            Assert.IsTrue(provider.DeleteServerMetadataItem(_server.Id, "Item 1"));
-            Assert.IsFalse(provider.ListServerMetadata(_server.Id).ContainsKey("Item 1"));
+            Assert.True(provider.DeleteServerMetadataItem(_server.Id, "Item 1"));
+            Assert.False(provider.ListServerMetadata(_server.Id).ContainsKey("Item 1"));
 
             Metadata metadata = new Metadata()
             {
                 { "Different", "Variables" },
             };
 
-            Assert.IsTrue(provider.UpdateServerMetadata(_server.Id, metadata));
+            Assert.True(provider.UpdateServerMetadata(_server.Id, metadata));
             Metadata actual = provider.ListServerMetadata(_server.Id);
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(2, actual.Count);
-            Assert.AreEqual("Value ²", actual["Item 2"]);
-            Assert.AreEqual("Variables", actual["Different"]);
+            Assert.NotNull(actual);
+            Assert.Equal(2, actual.Count);
+            Assert.Equal("Value ²", actual["Item 2"]);
+            Assert.Equal("Variables", actual["Different"]);
 
             // a slight tweak
             metadata["Different"] = "Values";
-            Assert.IsTrue(provider.SetServerMetadata(_server.Id, metadata));
+            Assert.True(provider.SetServerMetadata(_server.Id, metadata));
             actual = provider.ListServerMetadata(_server.Id);
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(1, actual.Count);
-            Assert.AreEqual("Values", actual["Different"]);
+            Assert.NotNull(actual);
+            Assert.Equal(1, actual.Count);
+            Assert.Equal("Values", actual["Different"]);
 
-            Assert.IsTrue(provider.SetServerMetadata(_server.Id, new Metadata()));
-            Assert.AreEqual(0, provider.ListServerMetadata(_server.Id).Count);
+            Assert.True(provider.SetServerMetadata(_server.Id, new Metadata()));
+            Assert.Equal(0, provider.ListServerMetadata(_server.Id).Count);
         }
     }
 }

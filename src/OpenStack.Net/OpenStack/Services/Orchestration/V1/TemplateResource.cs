@@ -12,7 +12,7 @@ namespace OpenStack.Services.Orchestration.V1
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class TemplateResource : ExtensibleJsonObject
+    public class TemplateResource : ExtensibleJsonObject, ITemplateResource
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>
@@ -80,7 +80,7 @@ namespace OpenStack.Services.Orchestration.V1
             }
         }
 
-        private ReadOnlyCollection<ResourceName> Dependencies
+        public ReadOnlyCollection<ResourceName> Dependencies
         {
             get
             {

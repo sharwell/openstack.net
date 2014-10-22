@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using net.openstack.Core.Domain;
 using net.openstack.Providers.Rackspace;
 using net.openstack.Providers.Rackspace.Objects;
+using Xunit;
 
 namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 {
@@ -38,16 +38,16 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         }
 
         #region Volume Tests
-        [TestMethod]
+        [Fact]
         public void Should_Return_Volume_Type_List()
         {
             var provider = new CloudBlockStorageProvider();
             var volumeTypeListResponse = provider.ListVolumeTypes(identity: _testIdentity);
-            Assert.IsNotNull(volumeTypeListResponse);
-            Assert.IsTrue(volumeTypeListResponse.Any());
+            Assert.NotNull(volumeTypeListResponse);
+            Assert.True(volumeTypeListResponse.Any());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Single_Volume_Type()
         {
             var provider = new CloudBlockStorageProvider();
@@ -57,34 +57,34 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             {
                 var firstVolumeTypeInList = volumeTypeListResponse.First();
                 var singleVolumeTypeResponse = provider.DescribeVolumeType(firstVolumeTypeInList.Id, identity: _testIdentity);
-                Assert.IsNotNull(singleVolumeTypeResponse);
-                Assert.IsTrue(singleVolumeTypeResponse.Id == firstVolumeTypeInList.Id);
+                Assert.NotNull(singleVolumeTypeResponse);
+                Assert.True(singleVolumeTypeResponse.Id == firstVolumeTypeInList.Id);
             }
             else
             {
-                Assert.Fail("No volumes types present to query.");
+                Assert.True(false, "No volumes types present to query.");
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Create_Volume_Only_Required_Parameters()
         {
             var provider = new CloudBlockStorageProvider();
             var volumeCreatedResponse = provider.CreateVolume(100, identity: _testIdentity);
-            Assert.IsNotNull(volumeCreatedResponse);
+            Assert.NotNull(volumeCreatedResponse);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Create_Volume_Full_Parameters()
         {
             var provider = new CloudBlockStorageProvider();
             var volumeCreatedResponse = provider.CreateVolume(100, volumeDisplayDescription, volumeDisplayName, null, "SATA", null, _testIdentity);
-            Assert.IsNotNull(volumeCreatedResponse);
+            Assert.NotNull(volumeCreatedResponse);
 
 
         }
 
-        [Timeout(1800000), TestMethod]
+        [Fact(Timeout = 1800000)]
         public void Should_Wait_Until_Test_Volume_Becomes_Available_Or_Exceeds_Timeout_For_Becoming_Available()
         {
             var provider = new CloudBlockStorageProvider();
@@ -94,30 +94,30 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 var testVolume = volumeListResponse.FirstOrDefault(x => x.DisplayName == volumeDisplayName);
                 if (testVolume == null)
                 {
-                    Assert.Fail("Could not find test volume to query for Available status.");
+                    Assert.True(false, "Could not find test volume to query for Available status.");
                 }
 
                 var volumeDetails = provider.WaitForVolumeAvailable(testVolume.Id, identity: _testIdentity);
-                Assert.IsNotNull(volumeDetails);
-                Assert.AreEqual(VolumeState.Available, volumeDetails.Status);
+                Assert.NotNull(volumeDetails);
+                Assert.Equal(VolumeState.Available, volumeDetails.Status);
 
             }
             else
             {
-                Assert.Fail("No volumes present to obtain Available status.");
+                Assert.True(false, "No volumes present to obtain Available status.");
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Volume_List()
         {
             var provider = new CloudBlockStorageProvider();
             var volumeListResponse = provider.ListVolumes(identity: _testIdentity);
-            Assert.IsNotNull(volumeListResponse);
-            Assert.IsTrue(volumeListResponse.Any());
+            Assert.NotNull(volumeListResponse);
+            Assert.True(volumeListResponse.Any());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Test_Volume()
         {
             var provider = new CloudBlockStorageProvider();
@@ -128,19 +128,19 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 var testVolume = volumeListResponse.FirstOrDefault(x => x.DisplayName == volumeDisplayName);
                 if (testVolume == null)
                 {
-                    Assert.Fail("Could not retrieve test volume.");
+                    Assert.True(false, "Could not retrieve test volume.");
                 }
                 var singleVolumeResponse = provider.ShowVolume(testVolume.Id, identity: _testIdentity);
-                Assert.IsNotNull(singleVolumeResponse);
-                Assert.IsTrue(singleVolumeResponse.Id == testVolume.Id);
+                Assert.NotNull(singleVolumeResponse);
+                Assert.True(singleVolumeResponse.Id == testVolume.Id);
             }
             else
             {
-                Assert.Fail("No volumes present to query.");
+                Assert.True(false, "No volumes present to query.");
             }
         }
 
-        [Timeout(1800000), TestMethod]
+        [Fact(Timeout = 1800000)]
         public void Should_Delete_Test_Volume()
         {
             var provider = new CloudBlockStorageProvider();
@@ -150,29 +150,29 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 var testVolume = volumeListResponse.FirstOrDefault(x => x.DisplayName == volumeDisplayName);
                 if (testVolume == null)
                 {
-                    Assert.Fail("Could not find test volume to delete.");
+                    Assert.True(false, "Could not find test volume to delete.");
                 }
                 var deleteVolumeResult = provider.DeleteVolume(testVolume.Id, identity: _testIdentity);
                 if (deleteVolumeResult)
                 {
                     var volumeWaitForDeletedResult = provider.WaitForVolumeDeleted(testVolume.Id, identity: _testIdentity);
-                    Assert.IsTrue(volumeWaitForDeletedResult);
+                    Assert.True(volumeWaitForDeletedResult);
                 }
                 else
                 {
-                    Assert.Fail("Test volume was not deleted.");
+                    Assert.True(false, "Test volume was not deleted.");
                 }
             }
             else
             {
-                Assert.Fail("No volumes present to test delete.");
+                Assert.True(false, "No volumes present to test delete.");
             }
         }
 
         #endregion
 
         #region Snapshot Tests
-        [TestMethod]
+        [Fact]
         public void Should_Create_Snapshot_Only_Required_Parameters()
         {
             var provider = new CloudBlockStorageProvider();
@@ -182,19 +182,19 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 var testVolume = volumeListResponse.FirstOrDefault(x => x.DisplayName == volumeDisplayName);
                 if (testVolume == null)
                 {
-                    Assert.Fail("Could not find test volume to create snapshot.");
+                    Assert.True(false, "Could not find test volume to create snapshot.");
                 }
 
                 var snapshotCreatedResponse = provider.CreateSnapshot(testVolume.Id, identity: _testIdentity);
-                Assert.IsNotNull(snapshotCreatedResponse);
+                Assert.NotNull(snapshotCreatedResponse);
             }
             else
             {
-                Assert.Fail("No volumes present to create a snapshot.");
+                Assert.True(false, "No volumes present to create a snapshot.");
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Create_Snapshot_Full_Parameters()
         {
             var provider = new CloudBlockStorageProvider();
@@ -204,21 +204,21 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 var testVolume = volumeListResponse.FirstOrDefault(x => x.DisplayName == volumeDisplayName);
                 if (testVolume == null)
                 {
-                    Assert.Fail("Could not find test volume to create snapshot.");
+                    Assert.True(false, "Could not find test volume to create snapshot.");
                 }
 
                 var snapshotCreatedResponse = provider.CreateSnapshot(testVolume.Id, true, snapshotDisplayName,
                                                                       snapshotDisplayDescription,
                                                                       identity: _testIdentity);
-                Assert.IsNotNull(snapshotCreatedResponse);
+                Assert.NotNull(snapshotCreatedResponse);
             }
             else
             {
-                Assert.Fail("No volumes present to create a snapshot.");
+                Assert.True(false, "No volumes present to create a snapshot.");
             }
         }
 
-        [Timeout(1800000), TestMethod]
+        [Fact(Timeout = 1800000)]
         public void Should_Wait_Until_Test_Snapshot_Becomes_Available_Or_Exceeds_Timeout_For_Becoming_Available()
         {
             var provider = new CloudBlockStorageProvider();
@@ -229,30 +229,30 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 var testSnapshot = snapshotListResponse.FirstOrDefault(x => x.DisplayName == snapshotDisplayName);
                 if (testSnapshot == null)
                 {
-                    Assert.Fail("Could not find test snapshot to query for Available status.");
+                    Assert.True(false, "Could not find test snapshot to query for Available status.");
                 }
 
                 var snapshotDetails = provider.WaitForSnapshotAvailable(testSnapshot.Id, identity: _testIdentity);
-                Assert.IsNotNull(snapshotDetails);
-                Assert.AreEqual(SnapshotState.Available, snapshotDetails.Status);
+                Assert.NotNull(snapshotDetails);
+                Assert.Equal(SnapshotState.Available, snapshotDetails.Status);
 
             }
             else
             {
-                Assert.Fail("No snapshots present to obtain Available status.");
+                Assert.True(false, "No snapshots present to obtain Available status.");
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Snapshot_List()
         {
             var provider = new CloudBlockStorageProvider();
             var snapshotListResponse = provider.ListSnapshots(identity: _testIdentity);
-            Assert.IsNotNull(snapshotListResponse);
-            Assert.IsTrue(snapshotListResponse.Any());
+            Assert.NotNull(snapshotListResponse);
+            Assert.True(snapshotListResponse.Any());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Test_Snapshot()
         {
             var provider = new CloudBlockStorageProvider();
@@ -263,19 +263,19 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 var testSnapshot = snapshotListResponse.FirstOrDefault(x => x.DisplayName == snapshotDisplayName);
                 if (testSnapshot == null)
                 {
-                    Assert.Fail("Could not retrieve test snapshot");
+                    Assert.True(false, "Could not retrieve test snapshot");
                 }
                 var singleSnapshotResponse = provider.ShowSnapshot(testSnapshot.Id, identity: _testIdentity);
-                Assert.IsNotNull(singleSnapshotResponse);
-                Assert.IsTrue(singleSnapshotResponse.Id == testSnapshot.Id);
+                Assert.NotNull(singleSnapshotResponse);
+                Assert.True(singleSnapshotResponse.Id == testSnapshot.Id);
             }
             else
             {
-                Assert.Fail("No snapshots present to query.");
+                Assert.True(false, "No snapshots present to query.");
             }
         }
 
-        [Timeout(1800000), TestMethod]
+        [Fact(Timeout = 1800000)]
         public void Should_Delete_Test_Snapshot()
         {
             var provider = new CloudBlockStorageProvider();
@@ -285,30 +285,30 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                 var testSnapshot = snapshotListResponse.FirstOrDefault(x => x.DisplayName == snapshotDisplayName);
                 if (testSnapshot == null)
                 {
-                    Assert.Fail("Could not find test snapshot to delete.");
+                    Assert.True(false, "Could not find test snapshot to delete.");
                 }
                 var deleteSnapshotResult = provider.DeleteSnapshot(testSnapshot.Id, identity: _testIdentity);
 
                 if (deleteSnapshotResult)
                 {
                     var snapshotDeleteDetails = provider.WaitForSnapshotDeleted(testSnapshot.Id, identity: _testIdentity);
-                    Assert.IsTrue(snapshotDeleteDetails);
+                    Assert.True(snapshotDeleteDetails);
                 }
                 else
                 {
-                    Assert.Fail("Test snapshot was not deleted.");
+                    Assert.True(false, "Test snapshot was not deleted.");
                 }
             }
             else
             {
-                Assert.Fail("No snapshots present to test delete.");
+                Assert.True(false, "No snapshots present to test delete.");
             }
         }
 
         #endregion
 
         #region Cleanup Routines
-        [TestMethod]
+        [Fact]
         public void Should_Cleanup_CloudBlockStorage_Environment()
         {
             var provider = new CloudBlockStorageProvider();
@@ -337,11 +337,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                             {
                                 var snapshotDeleteDetails = provider.WaitForSnapshotDeleted(testSnapshot.Id,
                                                                                             identity: _testIdentity);
-                                Assert.IsTrue(snapshotDeleteDetails);
+                                Assert.True(snapshotDeleteDetails);
                             }
                             else
                             {
-                                Assert.Fail(string.Format("Snapshot (Volume ID: {0} -- Snapshot ID:{1}) could not be deleted.", testVolume.Id, testSnapshot.Id));
+                                Assert.True(false, string.Format("Snapshot (Volume ID: {0} -- Snapshot ID:{1}) could not be deleted.", testVolume.Id, testSnapshot.Id));
                             }
 
                         }
@@ -352,9 +352,9 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             foreach (var testVolume in testVolumeList)
             {
                 var deleteVolumeResults = provider.DeleteVolume(testVolume.Id, identity: _testIdentity);
-                Assert.IsTrue(deleteVolumeResults);
+                Assert.True(deleteVolumeResults);
                 var volumeWaitForDeletedResult = provider.WaitForVolumeDeleted(testVolume.Id, identity: _testIdentity);
-                Assert.IsTrue(volumeWaitForDeletedResult);
+                Assert.True(volumeWaitForDeletedResult);
             }
         }
         #endregion

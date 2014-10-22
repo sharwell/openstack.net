@@ -1,9 +1,8 @@
 ﻿namespace OpenStackNetTests.Live
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
 
-    [TestClass]
-    public partial class IdentityV2Tests
+    public sealed partial class IdentityV2Tests : IDisposable
     {
         private LiveTestConfiguration _configuration;
 
@@ -15,14 +14,12 @@
             }
         }
 
-        [TestInitialize]
-        public void TestInitialize()
+        public IdentityV2Tests()
         {
             _configuration = LiveTestConfiguration.LoadDefaultConfiguration();
         }
 
-        [TestCleanup]
-        public void TestCleanup()
+        public void Dispose()
         {
         }
     }

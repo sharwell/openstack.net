@@ -9,7 +9,6 @@
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Core.Domain;
@@ -18,10 +17,10 @@
     using net.openstack.Providers.Rackspace.Objects.Dns;
     using net.openstack.Providers.Rackspace.Objects.LoadBalancers;
     using Newtonsoft.Json;
+    using Xunit;
     using Encoding = System.Text.Encoding;
     using Path = System.IO.Path;
 
-    [TestClass]
     public class UserDnsTests
     {
         /// <summary>
@@ -48,8 +47,8 @@
         /// default system connection limit.
         /// </para>
         /// </remarks>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupTestDomains()
         {
             const int BatchSize = 10;
@@ -83,59 +82,59 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestListLimits()
         {
             IDnsService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
             {
                 DnsServiceLimits limits = await provider.ListLimitsAsync(cancellationTokenSource.Token);
-                Assert.IsNotNull(limits);
-                Assert.IsNotNull(limits.RateLimits);
-                Assert.IsNotNull(limits.AbsoluteLimits);
+                Assert.NotNull(limits);
+                Assert.NotNull(limits.RateLimits);
+                Assert.NotNull(limits.AbsoluteLimits);
 
                 Console.WriteLine(await JsonConvert.SerializeObjectAsync(limits, Formatting.Indented));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestListLimitTypes()
         {
             IDnsService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
             {
                 IEnumerable<LimitType> limitTypes = await provider.ListLimitTypesAsync(cancellationTokenSource.Token);
-                Assert.IsNotNull(limitTypes);
+                Assert.NotNull(limitTypes);
 
                 if (!limitTypes.Any())
-                    Assert.Inconclusive("No limit types were returned by the server");
+                    Assert.False(true, "No limit types were returned by the server");
 
                 foreach (var limitType in limitTypes)
                     Console.WriteLine(limitType.Name);
 
-                Assert.IsTrue(limitTypes.Contains(LimitType.Rate));
-                Assert.IsTrue(limitTypes.Contains(LimitType.Domain));
-                Assert.IsTrue(limitTypes.Contains(LimitType.DomainRecord));
+                Assert.True(limitTypes.Contains(LimitType.Rate));
+                Assert.True(limitTypes.Contains(LimitType.Domain));
+                Assert.True(limitTypes.Contains(LimitType.DomainRecord));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestListSpecificLimit()
         {
             IDnsService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(10))))
             {
                 IEnumerable<LimitType> limitTypes = await provider.ListLimitTypesAsync(cancellationTokenSource.Token);
-                Assert.IsNotNull(limitTypes);
+                Assert.NotNull(limitTypes);
 
                 if (!limitTypes.Any())
-                    Assert.Inconclusive("No limit types were returned by the server");
+                    Assert.False(true, "No limit types were returned by the server");
 
                 foreach (var limitType in limitTypes)
                 {
@@ -148,19 +147,19 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestListDomains()
         {
             IDnsService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(30))))
             {
                 ReadOnlyCollection<DnsDomain> domains = await ListAllDomainsAsync(provider, null, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(domains);
+                Assert.NotNull(domains);
 
                 if (!domains.Any())
-                    Assert.Inconclusive("No domains were returned by the server");
+                    Assert.False(true, "No domains were returned by the server");
 
                 foreach (var domain in domains)
                 {
@@ -177,9 +176,9 @@
         /// <see cref="IDnsService.RemoveDomainsAsync"/> when performed on a single domain.
         /// </summary>
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestCreateDomain()
         {
             string domainName = CreateRandomDomainName();
@@ -201,7 +200,7 @@
                 if (createResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(createResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail();
+                    Assert.True(false);
                 }
                 else
                 {
@@ -210,10 +209,10 @@
                 }
 
                 ReadOnlyCollection<DnsDomain> domains = await ListAllDomainsAsync(provider, domainName, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(domains);
+                Assert.NotNull(domains);
 
                 if (!domains.Any())
-                    Assert.Inconclusive("No domains were returned by the server");
+                    Assert.False(true, "No domains were returned by the server");
 
                 foreach (var domain in domains)
                 {
@@ -227,7 +226,7 @@
                 if (deleteResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(deleteResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail("Failed to delete temporary domain created during the integration test.");
+                    Assert.True(false, "Failed to delete temporary domain created during the integration test.");
                 }
             }
         }
@@ -237,9 +236,9 @@
         /// on a single domain.
         /// </summary>
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestUpdateDomain()
         {
             string domainName = CreateRandomDomainName();
@@ -261,7 +260,7 @@
                 if (createResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(createResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail();
+                    Assert.True(false);
                 }
                 else
                 {
@@ -270,10 +269,10 @@
                 }
 
                 ReadOnlyCollection<DnsDomain> domains = await ListAllDomainsAsync(provider, domainName, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(domains);
+                Assert.NotNull(domains);
 
                 if (!domains.Any())
-                    Assert.Inconclusive("No domains were returned by the server");
+                    Assert.False(true, "No domains were returned by the server");
 
                 DnsUpdateConfiguration updateConfiguration = new DnsUpdateConfiguration(
                     new DnsDomainUpdateConfiguration(domains[0], comment: "Integration test domain 2"));
@@ -283,7 +282,7 @@
                 if (deleteResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(deleteResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail("Failed to delete temporary domain created during the integration test.");
+                    Assert.True(false, "Failed to delete temporary domain created during the integration test.");
                 }
             }
         }
@@ -292,9 +291,9 @@
         /// This tests the behavior of the <see cref="IDnsService.CloneDomainsAsync"/>.
         /// </summary>
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestCloneDomain()
         {
             string domainName = CreateRandomDomainName();
@@ -318,7 +317,7 @@
                 if (createResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(createResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail();
+                    Assert.True(false);
                 }
                 else
                 {
@@ -330,7 +329,7 @@
                 if (cloneResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(cloneResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail();
+                    Assert.True(false);
                 }
                 else
                 {
@@ -342,7 +341,7 @@
                 if (deleteResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(deleteResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail("Failed to delete temporary domain created during the integration test.");
+                    Assert.True(false, "Failed to delete temporary domain created during the integration test.");
                 }
             }
         }
@@ -351,9 +350,9 @@
         /// This tests the behavior of the <see cref="IDnsService.ExportDomainAsync"/> and <see cref="IDnsService.ImportDomainAsync"/>.
         /// </summary>
         /// <returns>A <see cref="Task"/> object representing the asynchronous operation.</returns>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestDomainExportImport()
         {
             string domainName = CreateRandomDomainName();
@@ -376,7 +375,7 @@
                 if (createResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(createResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail("Failed to create a test domain.");
+                    Assert.True(false, "Failed to create a test domain.");
                 }
                 else
                 {
@@ -388,11 +387,11 @@
                 if (exportedDomain.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(exportedDomain.Error.ToString(Formatting.Indented));
-                    Assert.Fail("Failed to export test domain.");
+                    Assert.True(false, "Failed to export test domain.");
                 }
 
-                Assert.AreEqual(DnsJobStatus.Completed, exportedDomain.Status);
-                Assert.IsNotNull(exportedDomain.Response);
+                Assert.Equal(DnsJobStatus.Completed, exportedDomain.Status);
+                Assert.NotNull(exportedDomain.Response);
 
                 Console.WriteLine("Exported domain:");
                 Console.WriteLine(JsonConvert.SerializeObject(exportedDomain.Response, Formatting.Indented));
@@ -400,16 +399,16 @@
                 Console.WriteLine("Formatted exported output:");
                 Console.WriteLine(exportedDomain.Response.Contents);
 
-                Assert.IsNotNull(exportedDomain.Response.Id);
-                Assert.IsNotNull(exportedDomain.Response.AccountId);
-                Assert.IsFalse(string.IsNullOrEmpty(exportedDomain.Response.Contents));
-                Assert.IsNotNull(exportedDomain.Response.ContentType);
+                Assert.NotNull(exportedDomain.Response.Id);
+                Assert.NotNull(exportedDomain.Response.AccountId);
+                Assert.False(string.IsNullOrEmpty(exportedDomain.Response.Contents));
+                Assert.NotNull(exportedDomain.Response.ContentType);
 
                 DnsJob deleteResponse = await provider.RemoveDomainsAsync(domainsToRemove, false, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 if (deleteResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(deleteResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail("Failed to delete temporary domain created during the integration test.");
+                    Assert.True(false, "Failed to delete temporary domain created during the integration test.");
                 }
 
                 domainsToRemove.Clear();
@@ -422,7 +421,7 @@
                 if (importedDomain.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(importedDomain.Error.ToString(Formatting.Indented));
-                    Assert.Fail("Failed to import the test domain.");
+                    Assert.True(false, "Failed to import the test domain.");
                 }
                 else
                 {
@@ -434,7 +433,7 @@
                 if (deleteResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(deleteResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail("Failed to delete temporary domain created during the integration test.");
+                    Assert.True(false, "Failed to delete temporary domain created during the integration test.");
                 }
             }
         }
@@ -452,9 +451,9 @@
             return expression.Replace(bind9Content, string.Empty);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestCreateSubdomain()
         {
             string domainName = CreateRandomDomainName();
@@ -483,7 +482,7 @@
                 if (createResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(createResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail();
+                    Assert.True(false);
                 }
                 else
                 {
@@ -492,10 +491,10 @@
                 }
 
                 ReadOnlyCollection<DnsDomain> domains = await ListAllDomainsAsync(provider, domainName, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(domains);
+                Assert.NotNull(domains);
 
                 if (!domains.Any())
-                    Assert.Inconclusive("No domains were returned by the server");
+                    Assert.False(true, "No domains were returned by the server");
 
                 foreach (var domain in domains)
                 {
@@ -507,8 +506,8 @@
 
                 DomainId domainId = createResponse.Response.Domains[0].Id;
                 ReadOnlyCollection<DnsSubdomain> subdomains = await ListAllSubdomainsAsync(provider, domainId, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(subdomains);
-                Assert.AreEqual(1, subdomains.Count);
+                Assert.NotNull(subdomains);
+                Assert.Equal(1, subdomains.Count);
                 foreach (var subdomain in subdomains)
                 {
                     Console.WriteLine();
@@ -521,14 +520,14 @@
                 if (deleteResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(deleteResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail("Failed to delete temporary domain created during the integration test.");
+                    Assert.True(false, "Failed to delete temporary domain created during the integration test.");
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestCreateRecords()
         {
             string domainName = CreateRandomDomainName();
@@ -550,7 +549,7 @@
                 if (createResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(createResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail();
+                    Assert.True(false);
                 }
                 else
                 {
@@ -559,8 +558,8 @@
                 }
 
                 ReadOnlyCollection<DnsDomain> domains = await ListAllDomainsAsync(provider, domainName, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(domains);
-                Assert.AreEqual(1, domains.Count);
+                Assert.NotNull(domains);
+                Assert.Equal(1, domains.Count);
 
                 foreach (var domain in domains)
                 {
@@ -589,16 +588,16 @@
                             priority: null)
                     };
                 DnsJob<DnsRecordsList> recordsResponse = await provider.AddRecordsAsync(domainId, recordConfigurations, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.IsNotNull(recordsResponse.Response);
-                Assert.IsNotNull(recordsResponse.Response.Records);
+                Assert.NotNull(recordsResponse.Response);
+                Assert.NotNull(recordsResponse.Response.Records);
                 DnsRecord[] records = recordsResponse.Response.Records.ToArray();
-                Assert.AreEqual(recordConfigurations.Length, records.Length);
+                Assert.Equal(recordConfigurations.Length, records.Length);
                 originalTimeToLive = records[0].TimeToLive;
-                Assert.AreNotEqual(originalTimeToLive, updatedTimeToLive);
+                Assert.NotEqual(originalTimeToLive, updatedTimeToLive);
 
-                Assert.AreEqual(originalData, records[0].Data);
-                Assert.AreEqual(originalTimeToLive, records[0].TimeToLive);
-                Assert.AreEqual(originalCommentValue, records[0].Comment);
+                Assert.Equal(originalData, records[0].Data);
+                Assert.Equal(originalTimeToLive, records[0].TimeToLive);
+                Assert.Equal(originalCommentValue, records[0].Comment);
 
                 foreach (var record in records)
                 {
@@ -611,26 +610,26 @@
                 DnsDomainRecordUpdateConfiguration recordUpdateConfiguration = new DnsDomainRecordUpdateConfiguration(records[0], records[0].Name, comment: updatedCommentValue);
                 await provider.UpdateRecordsAsync(domainId, new[] { recordUpdateConfiguration }, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 DnsRecord updatedRecord = await provider.ListRecordDetailsAsync(domainId, records[0].Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedRecord);
-                Assert.AreEqual(originalData, updatedRecord.Data);
-                Assert.AreEqual(originalTimeToLive, updatedRecord.TimeToLive);
-                Assert.AreEqual(updatedCommentValue, updatedRecord.Comment);
+                Assert.NotNull(updatedRecord);
+                Assert.Equal(originalData, updatedRecord.Data);
+                Assert.Equal(originalTimeToLive, updatedRecord.TimeToLive);
+                Assert.Equal(updatedCommentValue, updatedRecord.Comment);
 
                 recordUpdateConfiguration = new DnsDomainRecordUpdateConfiguration(records[0], records[0].Name, timeToLive: updatedTimeToLive);
                 await provider.UpdateRecordsAsync(domainId, new[] { recordUpdateConfiguration }, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 updatedRecord = await provider.ListRecordDetailsAsync(domainId, records[0].Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedRecord);
-                Assert.AreEqual(originalData, updatedRecord.Data);
-                Assert.AreEqual(updatedTimeToLive, updatedRecord.TimeToLive);
-                Assert.AreEqual(updatedCommentValue, updatedRecord.Comment);
+                Assert.NotNull(updatedRecord);
+                Assert.Equal(originalData, updatedRecord.Data);
+                Assert.Equal(updatedTimeToLive, updatedRecord.TimeToLive);
+                Assert.Equal(updatedCommentValue, updatedRecord.Comment);
 
                 recordUpdateConfiguration = new DnsDomainRecordUpdateConfiguration(records[0], records[0].Name, data: updatedData);
                 await provider.UpdateRecordsAsync(domainId, new[] { recordUpdateConfiguration }, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 updatedRecord = await provider.ListRecordDetailsAsync(domainId, records[0].Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedRecord);
-                Assert.AreEqual(updatedData, updatedRecord.Data);
-                Assert.AreEqual(updatedTimeToLive, updatedRecord.TimeToLive);
-                Assert.AreEqual(updatedCommentValue, updatedRecord.Comment);
+                Assert.NotNull(updatedRecord);
+                Assert.Equal(updatedData, updatedRecord.Data);
+                Assert.Equal(updatedTimeToLive, updatedRecord.TimeToLive);
+                Assert.Equal(updatedCommentValue, updatedRecord.Comment);
 
                 await provider.RemoveRecordsAsync(domainId, new[] { records[0].Id }, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
@@ -638,14 +637,14 @@
                 if (deleteResponse.Status == DnsJobStatus.Error)
                 {
                     Console.WriteLine(deleteResponse.Error.ToString(Formatting.Indented));
-                    Assert.Fail("Failed to delete temporary domain created during the integration test.");
+                    Assert.True(false, "Failed to delete temporary domain created during the integration test.");
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Dns)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Dns, "")]
         public async Task TestCreatePtrRecords()
         {
             string domainName = CreateRandomDomainName();
@@ -665,8 +664,8 @@
                     virtualAddresses: new[] { new LoadBalancerVirtualAddress(LoadBalancerVirtualAddressType.Public) },
                     algorithm: LoadBalancingAlgorithm.RoundRobin);
                 LoadBalancer loadBalancer = await loadBalancerProvider.CreateLoadBalancerAsync(loadBalancerConfiguration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.IsNotNull(loadBalancer.VirtualAddresses);
-                Assert.IsTrue(loadBalancer.VirtualAddresses.Count > 0);
+                Assert.NotNull(loadBalancer.VirtualAddresses);
+                Assert.True(loadBalancer.VirtualAddresses.Count > 0);
 
                 string originalData = loadBalancer.VirtualAddresses[0].Address.ToString();
                 string originalName = string.Format("www.{0}", domainName);
@@ -689,16 +688,16 @@
                 string serviceName = "cloudLoadBalancers";
                 Uri deviceResourceUri = await ((UserLoadBalancerTests.TestCloudLoadBalancerProvider)loadBalancerProvider).GetDeviceResourceUri(loadBalancer, cancellationTokenSource.Token);
                 DnsJob<DnsRecordsList> recordsResponse = await provider.AddPtrRecordsAsync(serviceName, deviceResourceUri, recordConfigurations, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.IsNotNull(recordsResponse.Response);
-                Assert.IsNotNull(recordsResponse.Response.Records);
+                Assert.NotNull(recordsResponse.Response);
+                Assert.NotNull(recordsResponse.Response.Records);
                 DnsRecord[] records = recordsResponse.Response.Records.ToArray();
-                Assert.AreEqual(recordConfigurations.Length, records.Length);
+                Assert.Equal(recordConfigurations.Length, records.Length);
                 originalTimeToLive = records[0].TimeToLive;
-                Assert.AreNotEqual(originalTimeToLive, updatedTimeToLive);
+                Assert.NotEqual(originalTimeToLive, updatedTimeToLive);
 
-                Assert.AreEqual(originalData, records[0].Data);
-                Assert.AreEqual(originalTimeToLive, records[0].TimeToLive);
-                Assert.AreEqual(originalCommentValue, records[0].Comment);
+                Assert.Equal(originalData, records[0].Data);
+                Assert.Equal(originalTimeToLive, records[0].TimeToLive);
+                Assert.Equal(originalCommentValue, records[0].Comment);
 
                 foreach (var record in records)
                 {
@@ -712,31 +711,31 @@
                 DnsDomainRecordUpdateConfiguration recordUpdateConfiguration = new DnsDomainRecordUpdateConfiguration(records[0], originalName, originalData, comment: updatedCommentValue);
                 await provider.UpdatePtrRecordsAsync(serviceName, deviceResourceUri, new[] { recordUpdateConfiguration }, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 DnsRecord updatedRecord = await provider.ListPtrRecordDetailsAsync(serviceName, deviceResourceUri, records[0].Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedRecord);
-                Assert.AreEqual(originalData, updatedRecord.Data);
-                Assert.AreEqual(originalName, updatedRecord.Name);
-                Assert.AreEqual(originalTimeToLive, updatedRecord.TimeToLive);
-                Assert.AreEqual(updatedCommentValue, updatedRecord.Comment);
+                Assert.NotNull(updatedRecord);
+                Assert.Equal(originalData, updatedRecord.Data);
+                Assert.Equal(originalName, updatedRecord.Name);
+                Assert.Equal(originalTimeToLive, updatedRecord.TimeToLive);
+                Assert.Equal(updatedCommentValue, updatedRecord.Comment);
 
                 // update the TTL and verify nothing else changed
                 recordUpdateConfiguration = new DnsDomainRecordUpdateConfiguration(records[0], originalName, originalData, timeToLive: updatedTimeToLive);
                 await provider.UpdatePtrRecordsAsync(serviceName, deviceResourceUri, new[] { recordUpdateConfiguration }, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 updatedRecord = await provider.ListPtrRecordDetailsAsync(serviceName, deviceResourceUri, records[0].Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedRecord);
-                Assert.AreEqual(originalData, updatedRecord.Data);
-                Assert.AreEqual(originalName, updatedRecord.Name);
-                Assert.AreEqual(updatedTimeToLive, updatedRecord.TimeToLive);
-                Assert.AreEqual(updatedCommentValue, updatedRecord.Comment);
+                Assert.NotNull(updatedRecord);
+                Assert.Equal(originalData, updatedRecord.Data);
+                Assert.Equal(originalName, updatedRecord.Name);
+                Assert.Equal(updatedTimeToLive, updatedRecord.TimeToLive);
+                Assert.Equal(updatedCommentValue, updatedRecord.Comment);
 
                 // update the name and verify nothing else changed
                 recordUpdateConfiguration = new DnsDomainRecordUpdateConfiguration(records[0], updatedName, originalData);
                 await provider.UpdatePtrRecordsAsync(serviceName, deviceResourceUri, new[] { recordUpdateConfiguration }, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
                 updatedRecord = await provider.ListPtrRecordDetailsAsync(serviceName, deviceResourceUri, records[0].Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedRecord);
-                Assert.AreEqual(originalData, updatedRecord.Data);
-                Assert.AreEqual(updatedName, updatedRecord.Name);
-                Assert.AreEqual(updatedTimeToLive, updatedRecord.TimeToLive);
-                Assert.AreEqual(updatedCommentValue, updatedRecord.Comment);
+                Assert.NotNull(updatedRecord);
+                Assert.Equal(originalData, updatedRecord.Data);
+                Assert.Equal(updatedName, updatedRecord.Name);
+                Assert.Equal(updatedTimeToLive, updatedRecord.TimeToLive);
+                Assert.Equal(updatedCommentValue, updatedRecord.Comment);
 
                 // remove the PTR record
                 // TODO: verify result?

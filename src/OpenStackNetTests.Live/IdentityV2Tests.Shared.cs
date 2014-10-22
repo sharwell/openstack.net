@@ -7,7 +7,6 @@
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using OpenStack.Collections;
     using OpenStack.Security.Authentication;
@@ -15,6 +14,7 @@
     using OpenStack.Services.Identity.V2;
     using Rackspace.Security.Authentication;
     using Rackspace.Services.Identity.V2;
+    using Xunit;
 
     partial class IdentityV2Tests
     {
@@ -54,9 +54,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public async Task TestListExtensions()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -68,13 +68,13 @@
                     ListExtensionsApiCall apiCall = await service.PrepareListExtensionsAsync(cancellationTokenSource.Token);
                     Tuple<HttpResponseMessage, ReadOnlyCollectionPage<Extension>> response = await apiCall.SendAsync(cancellationTokenSource.Token);
 
-                    Assert.IsNotNull(response);
-                    Assert.IsNotNull(response.Item2);
+                    Assert.NotNull(response);
+                    Assert.NotNull(response.Item2);
 
                     ReadOnlyCollectionPage<Extension> extensions = response.Item2;
-                    Assert.IsNotNull(extensions);
-                    Assert.AreNotEqual(0, extensions.Count);
-                    Assert.IsFalse(extensions.CanHaveNextPage);
+                    Assert.NotNull(extensions);
+                    Assert.NotEqual(0, extensions.Count);
+                    Assert.False(extensions.CanHaveNextPage);
 
                     foreach (Extension extension in extensions)
                         CheckExtension(extension);
@@ -82,9 +82,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public async Task TestListExtensionsSimple()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -94,9 +94,9 @@
                 using (IIdentityService service = CreateService())
                 {
                     ReadOnlyCollectionPage<Extension> extensions = await service.ListExtensionsAsync(cancellationTokenSource.Token);
-                    Assert.IsNotNull(extensions);
-                    Assert.AreNotEqual(0, extensions.Count);
-                    Assert.IsFalse(extensions.CanHaveNextPage);
+                    Assert.NotNull(extensions);
+                    Assert.NotEqual(0, extensions.Count);
+                    Assert.False(extensions.CanHaveNextPage);
 
                     foreach (Extension extension in extensions)
                         CheckExtension(extension);
@@ -104,9 +104,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public async Task TestGetExtension()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -118,33 +118,33 @@
                     ListExtensionsApiCall apiCall = await service.PrepareListExtensionsAsync(cancellationTokenSource.Token);
                     Tuple<HttpResponseMessage, ReadOnlyCollectionPage<Extension>> response = await apiCall.SendAsync(cancellationTokenSource.Token);
 
-                    Assert.IsNotNull(response);
-                    Assert.IsNotNull(response.Item2);
+                    Assert.NotNull(response);
+                    Assert.NotNull(response.Item2);
 
                     ReadOnlyCollectionPage<Extension> extensions = response.Item2;
-                    Assert.IsNotNull(extensions);
-                    Assert.AreNotEqual(0, extensions.Count);
-                    Assert.IsFalse(extensions.CanHaveNextPage);
+                    Assert.NotNull(extensions);
+                    Assert.NotEqual(0, extensions.Count);
+                    Assert.False(extensions.CanHaveNextPage);
 
                     foreach (Extension listedExtension in extensions)
                     {
-                        Assert.IsNotNull(listedExtension);
-                        Assert.IsNotNull(listedExtension.Alias);
+                        Assert.NotNull(listedExtension);
+                        Assert.NotNull(listedExtension.Alias);
 
                         GetExtensionApiCall getApiCall = await service.PrepareGetExtensionAsync(listedExtension.Alias, cancellationTokenSource.Token);
                         Tuple<HttpResponseMessage, ExtensionResponse> getResponse = await getApiCall.SendAsync(cancellationTokenSource.Token);
 
                         Extension extension = getResponse.Item2.Extension;
                         CheckExtension(extension);
-                        Assert.AreEqual(listedExtension.Alias, extension.Alias);
+                        Assert.Equal(listedExtension.Alias, extension.Alias);
                     }
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public async Task TestGetExtensionSimple()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -155,26 +155,26 @@
                 {
                     ReadOnlyCollectionPage<Extension> extensions = await service.ListExtensionsAsync(cancellationTokenSource.Token);
 
-                    Assert.IsNotNull(extensions);
-                    Assert.AreNotEqual(0, extensions.Count);
-                    Assert.IsFalse(extensions.CanHaveNextPage);
+                    Assert.NotNull(extensions);
+                    Assert.NotEqual(0, extensions.Count);
+                    Assert.False(extensions.CanHaveNextPage);
 
                     foreach (Extension listedExtension in extensions)
                     {
-                        Assert.IsNotNull(listedExtension);
-                        Assert.IsNotNull(listedExtension.Alias);
+                        Assert.NotNull(listedExtension);
+                        Assert.NotNull(listedExtension.Alias);
 
                         Extension extension = await service.GetExtensionAsync(listedExtension.Alias, cancellationTokenSource.Token);
                         CheckExtension(extension);
-                        Assert.AreEqual(listedExtension.Alias, extension.Alias);
+                        Assert.Equal(listedExtension.Alias, extension.Alias);
                     }
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public async Task TestAuthenticate()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -184,52 +184,52 @@
                 using (IIdentityService service = CreateService())
                 {
                     TestCredentials credentials = Credentials;
-                    Assert.IsNotNull(credentials);
+                    Assert.NotNull(credentials);
 
                     AuthenticationRequest request = credentials.AuthenticationRequest;
-                    Assert.IsNotNull(request);
+                    Assert.NotNull(request);
 
                     AuthenticateApiCall apiCall = await service.PrepareAuthenticateAsync(request, cancellationTokenSource.Token);
                     Tuple<HttpResponseMessage, AccessResponse> response = await apiCall.SendAsync(cancellationTokenSource.Token);
 
-                    Assert.IsNotNull(response);
-                    Assert.IsNotNull(response.Item2);
+                    Assert.NotNull(response);
+                    Assert.NotNull(response.Item2);
 
                     Access access = response.Item2.Access;
-                    Assert.IsNotNull(access);
-                    Assert.IsNotNull(access.Token);
-                    Assert.IsNotNull(access.ServiceCatalog);
-                    Assert.IsNotNull(access.User);
+                    Assert.NotNull(access);
+                    Assert.NotNull(access.Token);
+                    Assert.NotNull(access.ServiceCatalog);
+                    Assert.NotNull(access.User);
 
                     // check the token
                     Token token = access.Token;
-                    Assert.IsNotNull(token);
-                    Assert.IsNotNull(token.Id);
-                    Assert.IsNotNull(token.Tenant);
+                    Assert.NotNull(token);
+                    Assert.NotNull(token.Id);
+                    Assert.NotNull(token.Tenant);
 
                     // Rackspace does not return this property, and it doesn't seem to be particularly useful.
-                    //Assert.IsNotNull(token.IssuedAt);
+                    //Assert.NotNull(token.IssuedAt);
 
-                    Assert.IsNotNull(token.ExpiresAt);
+                    Assert.NotNull(token.ExpiresAt);
 
                     // check the user
                     User user = access.User;
-                    Assert.IsNotNull(user);
-                    Assert.IsNotNull(user.Id);
-                    Assert.IsNotNull(user.Name);
+                    Assert.NotNull(user);
+                    Assert.NotNull(user.Id);
+                    Assert.NotNull(user.Name);
 
                     // If the Username is null, it's presumed to be the same as the Name. (Rackspace does not return
                     // this property.)
-                    //Assert.IsNotNull(user.Username);
+                    //Assert.NotNull(user.Username);
 
-                    Assert.IsNotNull(user.Roles);
+                    Assert.NotNull(user.Roles);
 
-                    Assert.AreNotEqual(0, user.Roles.Count);
+                    Assert.NotEqual(0, user.Roles.Count);
                     foreach (Role role in user.Roles)
                     {
-                        Assert.IsNotNull(role);
-                        Assert.IsNotNull(role.Name);
-                        Assert.AreNotEqual(string.Empty, role.Name);
+                        Assert.NotNull(role);
+                        Assert.NotNull(role.Name);
+                        Assert.NotEqual(string.Empty, role.Name);
                     }
 
                     // At least Rackspace does not return the roles_links property.
@@ -237,38 +237,38 @@
                     {
                         foreach (Link link in user.RolesLinks)
                         {
-                            Assert.IsNotNull(link);
-                            Assert.IsNotNull(link.Relation);
-                            Assert.AreNotEqual(string.Empty, link.Relation);
-                            Assert.IsNotNull(link.Target);
-                            Assert.IsTrue(link.Target.IsAbsoluteUri);
+                            Assert.NotNull(link);
+                            Assert.NotNull(link.Relation);
+                            Assert.NotEqual(string.Empty, link.Relation);
+                            Assert.NotNull(link.Target);
+                            Assert.True(link.Target.IsAbsoluteUri);
                         }
                     }
 
                     // check the service catalog
                     ReadOnlyCollection<ServiceCatalogEntry> serviceCatalog = access.ServiceCatalog;
-                    Assert.IsNotNull(serviceCatalog);
-                    Assert.AreNotEqual(0, serviceCatalog.Count);
+                    Assert.NotNull(serviceCatalog);
+                    Assert.NotEqual(0, serviceCatalog.Count);
                     foreach (ServiceCatalogEntry entry in serviceCatalog)
                     {
-                        Assert.IsNotNull(entry);
-                        Assert.IsNotNull(entry.Name);
-                        Assert.IsNotNull(entry.Type);
-                        Assert.IsNotNull(entry.Endpoints);
+                        Assert.NotNull(entry);
+                        Assert.NotNull(entry.Name);
+                        Assert.NotNull(entry.Type);
+                        Assert.NotNull(entry.Endpoints);
 
-                        Assert.AreNotEqual(0, entry.Endpoints.Count);
+                        Assert.NotEqual(0, entry.Endpoints.Count);
                         foreach (Endpoint endpoint in entry.Endpoints)
                         {
-                            Assert.IsNotNull(endpoint);
+                            Assert.NotNull(endpoint);
 
                             // At least Rackspace does not return an ID with their endpoints. The ID doesn't seem
                             // necessary for API calls.
-                            //Assert.IsNotNull(endpoint.Id);
+                            //Assert.NotNull(endpoint.Id);
 
                             // Region-independent endpoints may have a null Region value.
-                            //Assert.IsNotNull(endpoint.Region);
+                            //Assert.NotNull(endpoint.Region);
 
-                            Assert.IsFalse(endpoint.PublicUrl == null && endpoint.InternalUrl == null && endpoint.AdminUrl == null);
+                            Assert.False(endpoint.PublicUrl == null && endpoint.InternalUrl == null && endpoint.AdminUrl == null);
                         }
 
                         // At least Rackspace does not return the endpoints_links property.
@@ -276,11 +276,11 @@
                         {
                             foreach (Link link in entry.EndpointsLinks)
                             {
-                                Assert.IsNotNull(link);
-                                Assert.IsNotNull(link.Relation);
-                                Assert.AreNotEqual(string.Empty, link.Relation);
-                                Assert.IsNotNull(link.Target);
-                                Assert.IsTrue(link.Target.IsAbsoluteUri);
+                                Assert.NotNull(link);
+                                Assert.NotNull(link.Relation);
+                                Assert.NotEqual(string.Empty, link.Relation);
+                                Assert.NotNull(link.Target);
+                                Assert.True(link.Target.IsAbsoluteUri);
                             }
                         }
                     }
@@ -288,9 +288,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public async Task TestListTenants()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -298,10 +298,10 @@
                 cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(10)));
 
                 TestCredentials credentials = Credentials;
-                Assert.IsNotNull(credentials);
+                Assert.NotNull(credentials);
 
                 AuthenticationRequest request = credentials.AuthenticationRequest;
-                Assert.IsNotNull(request);
+                Assert.NotNull(request);
 
                 IdentityV2AuthenticationService authenticationService = new IdentityV2AuthenticationService(CreateService(), request);
 
@@ -310,32 +310,32 @@
                     ListTenantsApiCall apiCall = await service.PrepareListTenantsAsync(cancellationTokenSource.Token);
                     Tuple<HttpResponseMessage, ReadOnlyCollectionPage<Tenant>> response = await apiCall.SendAsync(cancellationTokenSource.Token);
 
-                    Assert.IsNotNull(response);
-                    Assert.IsNotNull(response.Item2);
+                    Assert.NotNull(response);
+                    Assert.NotNull(response.Item2);
 
                     ReadOnlyCollectionPage<Tenant> tenants = response.Item2;
-                    Assert.IsNotNull(tenants);
-                    Assert.AreNotEqual(0, tenants.Count);
-                    Assert.IsFalse(tenants.CanHaveNextPage);
+                    Assert.NotNull(tenants);
+                    Assert.NotEqual(0, tenants.Count);
+                    Assert.False(tenants.CanHaveNextPage);
 
                     foreach (Tenant tenant in tenants)
                         CheckTenant(tenant);
 
-                    Assert.IsTrue(tenants.Any(i => i.Enabled ?? false));
+                    Assert.True(tenants.Any(i => i.Enabled ?? false));
                 }
             }
         }
 
         protected void CheckExtension(Extension extension)
         {
-            Assert.IsNotNull(extension);
-            Assert.IsNotNull(extension.Alias);
-            Assert.IsNotNull(extension.Description);
-            Assert.IsNotNull(extension.Name);
-            Assert.IsNotNull(extension.Namespace);
+            Assert.NotNull(extension);
+            Assert.NotNull(extension.Alias);
+            Assert.NotNull(extension.Description);
+            Assert.NotNull(extension.Name);
+            Assert.NotNull(extension.Namespace);
             try
             {
-                Assert.IsNotNull(extension.LastModified);
+                Assert.NotNull(extension.LastModified);
             }
             catch (JsonException)
             {
@@ -346,17 +346,17 @@
 
         protected void CheckTenant(Tenant tenant)
         {
-            Assert.IsNotNull(tenant);
-            Assert.IsNotNull(tenant.Id);
-            Assert.IsNotNull(tenant.Name);
-            Assert.IsFalse(string.IsNullOrEmpty(tenant.Name));
+            Assert.NotNull(tenant);
+            Assert.NotNull(tenant.Id);
+            Assert.NotNull(tenant.Name);
+            Assert.False(string.IsNullOrEmpty(tenant.Name));
 
             // Caller should check for at least one enabled Tenant
-            //Assert.AreEqual(true, tenant.Enabled);
+            //Assert.Equal(true, tenant.Enabled);
 
             // At least Rackspace does not send back this property.
-            //Assert.IsNotNull(tenant.Description);
-            //Assert.IsFalse(string.IsNullOrEmpty(tenant.Description));
+            //Assert.NotNull(tenant.Description);
+            //Assert.False(string.IsNullOrEmpty(tenant.Description));
         }
 
         protected TimeSpan TestTimeout(TimeSpan timeSpan)

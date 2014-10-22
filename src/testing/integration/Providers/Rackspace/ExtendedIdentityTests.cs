@@ -57,7 +57,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             return new CloudIdentityProvider(restService, cache, baseUri);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test001_Should_Throw_Exception_When_Trying_To_Change_Password_For_Self_When_Changeing_Password_As_Non_Admin_Identity()
         {
             var provider = BuildProvider();
@@ -70,11 +70,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
             catch(ResponseException)
             {
-                Assert.IsTrue(true);
+                Assert.True(true);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Test002_Should_Throw_Exception_When_Trying_To_Change_Password_For_Other_User_When_Changeing_Password_As_Non_Admin_Identity()
         {
             var provider = BuildProvider();
@@ -87,21 +87,21 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
             catch (ResponseException)
             {
-                Assert.IsTrue(true);
+                Assert.True(true);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Test003_Should_Change_Password_For_Self_When_Changeing_Password_As_Admin_Identity()
         {
             var provider = BuildProvider();
 
             var result = provider.SetUserPassword(_adminUserDetails, AdminNewPassword, _testAdminIdentity);
 
-            Assert.IsTrue(result);
+            Assert.True(result);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test004_Should_Successfully_Authenticate_With_New_Password_For_Admin_User()
         {
             var provider = BuildProvider();
@@ -114,20 +114,20 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     Domain = _testAdminIdentity.Domain,
                 });
 
-            Assert.IsNotNull(userAcess);
+            Assert.NotNull(userAcess);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test005_Should_Change_Password_Back_For_Self_When_Changeing_Password_As_Admin_Identity()
         {
             var provider = BuildProvider();
 
             var result = provider.SetUserPassword(_adminUserDetails, _testAdminIdentity.Password, _testAdminIdentity);
 
-            Assert.IsTrue(result);
+            Assert.True(result);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test006_Should_Successfully_Authenticate_With_Old_Password_For_Admin_User()
         {
             var provider = BuildProvider();
@@ -135,20 +135,20 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var userAcess =
                 provider.Authenticate(_testAdminIdentity);
 
-            Assert.IsNotNull(userAcess);
+            Assert.NotNull(userAcess);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test007_Should_Change_Password_For_Other_User_When_Changeing_Password_As_Admin_Identity()
         {
             var provider = BuildProvider();
 
             var result = provider.SetUserPassword(_adminUserDetails, AdminNewPassword, _testAdminIdentity);
 
-            Assert.IsTrue(result);
+            Assert.True(result);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test008_Should_Successfully_Authenticate_With_New_Password_For_Non_Admin_User()
         {
             var provider = BuildProvider();
@@ -161,20 +161,20 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
                     Domain = _testAdminIdentity.Domain,
                 });
 
-            Assert.IsNotNull(userAcess);
+            Assert.NotNull(userAcess);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test009_Should_Change_Password_Back_For_Other_User_When_Changeing_Password_As_Admin_Identity()
         {
             var provider = BuildProvider();
 
             var result = provider.SetUserPassword(_adminUserDetails, _testAdminIdentity.Password, _testAdminIdentity);
 
-            Assert.IsTrue(result);
+            Assert.True(result);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test010_Should_Successfully_Authenticate_With_Old_Password_For_Non_Admin_User()
         {
             var provider = BuildProvider();
@@ -182,20 +182,20 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var userAcess =
                 provider.Authenticate(_testAdminIdentity);
 
-            Assert.IsNotNull(userAcess);
+            Assert.NotNull(userAcess);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test011_Should_Successfully_Authenticate_Using_Domain_Credentials()
         {
             var provider = BuildProvider();
 
             var creds = provider.Authenticate(_testDomainIdentity);
 
-            Assert.IsNotNull(creds);
-            Assert.IsNotNull(creds.Token);
-            Assert.IsNotNull(creds.User);
-            Assert.AreEqual(_testDomainIdentity.Username, creds.User.Id);
+            Assert.NotNull(creds);
+            Assert.NotNull(creds.Token);
+            Assert.NotNull(creds.User);
+            Assert.Equal(_testDomainIdentity.Username, creds.User.Id);
         }
     }
 }

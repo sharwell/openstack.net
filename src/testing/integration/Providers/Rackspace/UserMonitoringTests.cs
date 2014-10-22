@@ -8,12 +8,12 @@
     using System.Net;
     using System.Text;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Monitoring;
     using Newtonsoft.Json.Linq;
+    using Xunit;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
@@ -21,7 +21,6 @@
     using IIdentityProvider = net.openstack.Core.Providers.IIdentityProvider;
     using Path = System.IO.Path;
 
-    [TestClass]
     public class UserMonitoringTests
     {
         /// <summary>
@@ -44,8 +43,8 @@
         /// </summary>
         public static readonly string TestAgentTokenPrefix = "UnitTestAgentToken-";
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupMonitoringEntities()
         {
             IMonitoringService provider = CreateProvider();
@@ -67,22 +66,22 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupMonitoringChecks()
         {
             // these are cleaned up as part of the entity cleanup
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupMonitoringAlarms()
         {
             // these are cleaned up as part of the entity cleanup
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupMonitoringNotificationPlans()
         {
             IMonitoringService provider = CreateProvider();
@@ -104,8 +103,8 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupMonitoringNotifications()
         {
             IMonitoringService provider = CreateProvider();
@@ -127,8 +126,8 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupMonitoringAgentTokens()
         {
             IMonitoringService provider = CreateProvider();
@@ -150,60 +149,60 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetAccount()
         {
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 MonitoringAccount account = await provider.GetAccountAsync(cancellationTokenSource.Token);
-                Assert.IsNotNull(account);
-                Assert.IsNotNull(account.Id);
-                Assert.IsNotNull(account.WebhookToken);
+                Assert.NotNull(account);
+                Assert.NotNull(account.Id);
+                Assert.NotNull(account.WebhookToken);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestUpdateAccount()
         {
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 MonitoringAccount account = await provider.GetAccountAsync(cancellationTokenSource.Token);
-                Assert.IsNotNull(account);
-                Assert.IsNotNull(account.Id);
-                Assert.IsNotNull(account.WebhookToken);
+                Assert.NotNull(account);
+                Assert.NotNull(account.Id);
+                Assert.NotNull(account.WebhookToken);
 
                 // since changes are account-wide, we have to set the webhook token to the original value
                 await provider.UpdateAccountAsync(account.Id, new AccountConfiguration(account.WebhookToken), cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetLimits()
         {
             IMonitoringService provider = CreateProvider();
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TestTimeout(TimeSpan.FromSeconds(300))))
             {
                 MonitoringLimits limits = await provider.GetLimitsAsync(cancellationTokenSource.Token);
-                Assert.IsNotNull(limits);
-                Assert.IsNotNull(limits.RateLimits);
-                Assert.IsTrue(limits.RateLimits.ContainsKey("global"));
-                Assert.IsNotNull(limits.ResourceLimits);
-                Assert.IsTrue(limits.ResourceLimits.ContainsKey("checks"));
-                Assert.IsTrue(limits.ResourceLimits.ContainsKey("alarms"));
+                Assert.NotNull(limits);
+                Assert.NotNull(limits.RateLimits);
+                Assert.True(limits.RateLimits.ContainsKey("global"));
+                Assert.NotNull(limits.ResourceLimits);
+                Assert.True(limits.ResourceLimits.ContainsKey("checks"));
+                Assert.True(limits.ResourceLimits.ContainsKey("alarms"));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListAudits()
         {
             IMonitoringService provider = CreateProvider();
@@ -211,16 +210,16 @@
             {
                 ReadOnlyCollection<Audit> audits = await ListAllAuditsAsync(provider, null, null, null, cancellationTokenSource.Token);
                 if (audits.Count == 0)
-                    Assert.Inconclusive("The service did not report any audits.");
+                    Assert.False(true, "The service did not report any audits.");
 
                 foreach (Audit audit in audits)
                     Console.WriteLine("Audit {0} ({1})", audit.Url, audit.Id);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreateEntity()
         {
             IMonitoringService provider = CreateProvider();
@@ -229,20 +228,20 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 Entity entity = await provider.GetEntityAsync(entityId, cancellationTokenSource.Token);
-                Assert.IsNotNull(entity);
-                Assert.AreEqual(entityId, entity.Id);
-                Assert.AreEqual(entityName, entity.Label);
+                Assert.NotNull(entity);
+                Assert.Equal(entityId, entity.Id);
+                Assert.Equal(entityName, entity.Label);
 
                 await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreateEntityWithMetadata()
         {
             IMonitoringService provider = CreateProvider();
@@ -259,23 +258,23 @@
 
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, metadata);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 Entity entity = await provider.GetEntityAsync(entityId, cancellationTokenSource.Token);
-                Assert.IsNotNull(entity);
-                Assert.AreEqual(entityId, entity.Id);
-                Assert.AreEqual(entityName, entity.Label);
-                Assert.AreEqual("Value 1", entity.Metadata["Key 1"]);
-                Assert.AreEqual("value 1", entity.Metadata["key 1"]);
-                Assert.AreEqual("Value ²", entity.Metadata["Key ²"]);
+                Assert.NotNull(entity);
+                Assert.Equal(entityId, entity.Id);
+                Assert.Equal(entityName, entity.Label);
+                Assert.Equal("Value 1", entity.Metadata["Key 1"]);
+                Assert.Equal("value 1", entity.Metadata["key 1"]);
+                Assert.Equal("Value ²", entity.Metadata["Key ²"]);
 
                 await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListEntities()
         {
             IMonitoringService provider = CreateProvider();
@@ -283,16 +282,16 @@
             {
                 ReadOnlyCollection<Entity> entities = await ListAllEntitiesAsync(provider, null, cancellationTokenSource.Token);
                 if (entities.Count == 0)
-                    Assert.Inconclusive("The service did not report any entities.");
+                    Assert.False(true, "The service did not report any entities.");
 
                 foreach (Entity entity in entities)
                     Console.WriteLine("Entity {0} ({1})", entity.Label, entity.Id);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetEntity()
         {
             IMonitoringService provider = CreateProvider();
@@ -300,22 +299,22 @@
             {
                 ReadOnlyCollection<Entity> entities = await ListAllEntitiesAsync(provider, null, cancellationTokenSource.Token);
                 if (entities.Count == 0)
-                    Assert.Inconclusive("The service did not report any entities.");
+                    Assert.False(true, "The service did not report any entities.");
 
                 foreach (Entity entity in entities)
                 {
                     Entity singleEntity = await provider.GetEntityAsync(entity.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(singleEntity);
-                    Assert.AreEqual(entity.Id, singleEntity.Id);
-                    Assert.AreEqual(entity.AgentId, singleEntity.AgentId);
-                    Assert.AreEqual(entity.Label, singleEntity.Label);
+                    Assert.NotNull(singleEntity);
+                    Assert.Equal(entity.Id, singleEntity.Id);
+                    Assert.Equal(entity.AgentId, singleEntity.AgentId);
+                    Assert.Equal(entity.Label, singleEntity.Label);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestUpdateEntity()
         {
             IMonitoringService provider = CreateProvider();
@@ -324,28 +323,28 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 Entity entity = await provider.GetEntityAsync(entityId, cancellationTokenSource.Token);
-                Assert.IsNotNull(entity);
-                Assert.AreEqual(entityId, entity.Id);
-                Assert.AreEqual(entityName, entity.Label);
+                Assert.NotNull(entity);
+                Assert.Equal(entityId, entity.Id);
+                Assert.Equal(entityName, entity.Label);
 
                 string updatedEntityName = CreateRandomEntityName();
                 UpdateEntityConfiguration updateConfiguration = new UpdateEntityConfiguration(updatedEntityName);
                 await provider.UpdateEntityAsync(entityId, updateConfiguration, cancellationTokenSource.Token);
                 Entity updatedEntity = await provider.GetEntityAsync(entityId, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedEntity);
-                Assert.AreEqual(entityId, updatedEntity.Id);
-                Assert.AreEqual(updatedEntityName, updatedEntity.Label);
+                Assert.NotNull(updatedEntity);
+                Assert.Equal(entityId, updatedEntity.Id);
+                Assert.Equal(updatedEntityName, updatedEntity.Label);
 
                 await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreateCheck()
         {
             IMonitoringService provider = CreateProvider();
@@ -354,7 +353,7 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await ListAllMonitoringZonesAsync(provider, null, cancellationTokenSource.Token);
                 MonitoringZone zone = monitoringZones.FirstOrDefault(x => x.Label.IndexOf("DFW", StringComparison.OrdinalIgnoreCase) >= 0);
@@ -381,19 +380,19 @@
                 IDictionary<string, string> metadata = null;
                 NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkId);
+                Assert.NotNull(checkId);
 
                 Entity entity = await provider.GetEntityAsync(entityId, cancellationTokenSource.Token);
-                Assert.IsNotNull(entity);
-                Assert.AreEqual(entityId, entity.Id);
-                Assert.AreEqual(entityName, entity.Label);
+                Assert.NotNull(entity);
+                Assert.Equal(entityId, entity.Id);
+                Assert.Equal(entityName, entity.Label);
 
                 Check check = await provider.GetCheckAsync(entityId, checkId, cancellationTokenSource.Token);
-                Assert.IsNotNull(check);
-                Assert.AreEqual(checkId, check.Id);
-                Assert.AreEqual(checkLabel, check.Label);
-                Assert.AreEqual(checkTypeId, check.CheckTypeId);
-                Assert.IsInstanceOfType(check.Details, typeof(HttpCheckDetails));
+                Assert.NotNull(check);
+                Assert.Equal(checkId, check.Id);
+                Assert.Equal(checkLabel, check.Label);
+                Assert.Equal(checkTypeId, check.CheckTypeId);
+                Assert.IsAssignableFrom<HttpCheckDetails>(check.Details);
 
                 await provider.RemoveCheckAsync(entityId, checkId, cancellationTokenSource.Token);
 
@@ -401,9 +400,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestTestCheck()
         {
             IMonitoringService provider = CreateProvider();
@@ -412,10 +411,10 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
-                Assert.AreEqual(1, monitoringZones.Count);
+                Assert.Equal(1, monitoringZones.Count);
 
                 string checkLabel = CreateRandomCheckName();
                 CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
@@ -439,22 +438,22 @@
                 NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
 
                 ReadOnlyCollection<CheckData> checkData = await provider.TestCheckAsync(entityId, checkConfiguration, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkData);
-                Assert.IsTrue(checkData.Count > 0);
+                Assert.NotNull(checkData);
+                Assert.True(checkData.Count > 0);
                 foreach (CheckData data in checkData)
                 {
-                    Assert.AreEqual(true, data.Available);
-                    Assert.AreEqual(monitoringZones[0].Id, data.MonitoringZoneId);
-                    Assert.IsTrue(data.Timestamp >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
-                    Assert.IsTrue(data.Timestamp <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
+                    Assert.Equal(true, data.Available);
+                    Assert.Equal(monitoringZones[0].Id, data.MonitoringZoneId);
+                    Assert.True(data.Timestamp >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
+                    Assert.True(data.Timestamp <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
                     foreach (KeyValuePair<string, CheckData.CheckMetric> checkMetric in data.Metrics)
                     {
-                        Assert.IsNotNull(checkMetric.Key);
-                        Assert.IsFalse(string.IsNullOrEmpty(checkMetric.Key));
-                        Assert.IsNotNull(checkMetric.Value);
-                        Assert.IsNotNull(checkMetric.Value.Data);
-                        Assert.IsNotNull(checkMetric.Value.Type);
-                        Assert.IsNotNull(checkMetric.Value.Unit);
+                        Assert.NotNull(checkMetric.Key);
+                        Assert.False(string.IsNullOrEmpty(checkMetric.Key));
+                        Assert.NotNull(checkMetric.Value);
+                        Assert.NotNull(checkMetric.Value.Data);
+                        Assert.NotNull(checkMetric.Value.Type);
+                        Assert.NotNull(checkMetric.Value.Unit);
                     }
                 }
 
@@ -462,9 +461,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestTestExistingCheck()
         {
             IMonitoringService provider = CreateProvider();
@@ -473,10 +472,10 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
-                Assert.AreEqual(1, monitoringZones.Count);
+                Assert.Equal(1, monitoringZones.Count);
 
                 string checkLabel = CreateRandomCheckName();
                 CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
@@ -499,25 +498,25 @@
                 IDictionary<string, string> metadata = null;
                 NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkId);
+                Assert.NotNull(checkId);
 
                 ReadOnlyCollection<CheckData> checkData = await provider.TestExistingCheckAsync(entityId, checkId, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkData);
-                Assert.IsTrue(checkData.Count > 0);
+                Assert.NotNull(checkData);
+                Assert.True(checkData.Count > 0);
                 foreach (CheckData data in checkData)
                 {
-                    Assert.AreEqual(true, data.Available);
-                    Assert.AreEqual(monitoringZones[0].Id, data.MonitoringZoneId);
-                    Assert.IsTrue(data.Timestamp >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
-                    Assert.IsTrue(data.Timestamp <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
+                    Assert.Equal(true, data.Available);
+                    Assert.Equal(monitoringZones[0].Id, data.MonitoringZoneId);
+                    Assert.True(data.Timestamp >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
+                    Assert.True(data.Timestamp <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
                     foreach (KeyValuePair<string, CheckData.CheckMetric> checkMetric in data.Metrics)
                     {
-                        Assert.IsNotNull(checkMetric.Key);
-                        Assert.IsFalse(string.IsNullOrEmpty(checkMetric.Key));
-                        Assert.IsNotNull(checkMetric.Value);
-                        Assert.IsNotNull(checkMetric.Value.Data);
-                        Assert.IsNotNull(checkMetric.Value.Type);
-                        Assert.IsNotNull(checkMetric.Value.Unit);
+                        Assert.NotNull(checkMetric.Key);
+                        Assert.False(string.IsNullOrEmpty(checkMetric.Key));
+                        Assert.NotNull(checkMetric.Value);
+                        Assert.NotNull(checkMetric.Value.Data);
+                        Assert.NotNull(checkMetric.Value.Type);
+                        Assert.NotNull(checkMetric.Value.Unit);
                     }
                 }
 
@@ -527,9 +526,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListChecks()
         {
             IMonitoringService provider = CreateProvider();
@@ -538,10 +537,10 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
-                Assert.AreEqual(1, monitoringZones.Count);
+                Assert.Equal(1, monitoringZones.Count);
 
                 string checkLabel = CreateRandomCheckName();
                 CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
@@ -564,16 +563,16 @@
                 IDictionary<string, string> metadata = null;
                 NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkId);
+                Assert.NotNull(checkId);
 
                 string checkLabel2 = CreateRandomCheckName();
                 TargetResolverType resolverType2 = TargetResolverType.IPv6;
                 NewCheckConfiguration checkConfiguration2 = new NewCheckConfiguration(checkLabel2, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId2 = await provider.CreateCheckAsync(entityId, checkConfiguration2, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkId2);
+                Assert.NotNull(checkId2);
 
                 ReadOnlyCollection<Check> checks = await ListAllChecksAsync(provider, entityId, null, cancellationTokenSource.Token);
-                Assert.AreEqual(2, checks.Count);
+                Assert.Equal(2, checks.Count);
                 foreach (Check check in checks)
                     Console.WriteLine("Check {0} ({1})", check.Label, check.Id);
 
@@ -581,9 +580,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestUpdateCheck()
         {
             IMonitoringService provider = CreateProvider();
@@ -592,10 +591,10 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
-                Assert.AreEqual(1, monitoringZones.Count);
+                Assert.Equal(1, monitoringZones.Count);
 
                 string checkLabel = CreateRandomCheckName();
                 CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
@@ -618,14 +617,14 @@
                 IDictionary<string, string> metadata = null;
                 NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkId);
+                Assert.NotNull(checkId);
 
                 Check check = await provider.GetCheckAsync(entityId, checkId, cancellationTokenSource.Token);
-                Assert.IsNotNull(check);
-                Assert.AreEqual(checkId, check.Id);
-                Assert.AreEqual(checkLabel, check.Label);
-                Assert.AreEqual(resolverType, check.ResolverType);
-                Assert.IsInstanceOfType(check.Details, typeof(HttpCheckDetails));
+                Assert.NotNull(check);
+                Assert.Equal(checkId, check.Id);
+                Assert.Equal(checkLabel, check.Label);
+                Assert.Equal(resolverType, check.ResolverType);
+                Assert.IsAssignableFrom<HttpCheckDetails>(check.Details);
 
                 string checkLabel2 = CreateRandomCheckName();
                 TargetResolverType resolverType2 = TargetResolverType.IPv6;
@@ -633,19 +632,19 @@
                 await provider.UpdateCheckAsync(entityId, checkId, updateCheckConfiguration, cancellationTokenSource.Token);
 
                 Check updatedCheck = await provider.GetCheckAsync(entityId, checkId, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedCheck);
-                Assert.AreEqual(checkId, updatedCheck.Id);
-                Assert.AreEqual(checkLabel2, updatedCheck.Label);
-                Assert.AreEqual(resolverType2, updatedCheck.ResolverType);
-                Assert.IsInstanceOfType(updatedCheck.Details, typeof(HttpCheckDetails));
+                Assert.NotNull(updatedCheck);
+                Assert.Equal(checkId, updatedCheck.Id);
+                Assert.Equal(checkLabel2, updatedCheck.Label);
+                Assert.Equal(resolverType2, updatedCheck.ResolverType);
+                Assert.IsAssignableFrom<HttpCheckDetails>(updatedCheck.Details);
 
                 await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListCheckTypes()
         {
             IMonitoringService provider = CreateProvider();
@@ -653,7 +652,7 @@
             {
                 ReadOnlyCollection<CheckType> checkTypes = await ListAllCheckTypesAsync(provider, null, cancellationTokenSource.Token);
                 if (checkTypes.Count == 0)
-                    Assert.Inconclusive("The service did not report any check types.");
+                    Assert.False(true, "The service did not report any check types.");
 
                 foreach (CheckType checkType in checkTypes)
                 {
@@ -664,9 +663,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetCheckType()
         {
             IMonitoringService provider = CreateProvider();
@@ -674,35 +673,35 @@
             {
                 ReadOnlyCollection<CheckType> checkTypes = await ListAllCheckTypesAsync(provider, null, cancellationTokenSource.Token);
                 if (checkTypes.Count == 0)
-                    Assert.Inconclusive("The service did not report any check types.");
+                    Assert.False(true, "The service did not report any check types.");
 
                 foreach (CheckType checkType in checkTypes)
                 {
                     CheckType singleNotificationType = await provider.GetCheckTypeAsync(checkType.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(singleNotificationType);
-                    Assert.AreEqual(checkType.Id, singleNotificationType.Id);
-                    Assert.AreEqual(checkType.Type, singleNotificationType.Type);
+                    Assert.NotNull(singleNotificationType);
+                    Assert.Equal(checkType.Id, singleNotificationType.Id);
+                    Assert.Equal(checkType.Type, singleNotificationType.Type);
                     if (checkType.Fields == null)
                     {
-                        Assert.IsNull(singleNotificationType.Fields);
+                        Assert.Null(singleNotificationType.Fields);
                     }
                     else
                     {
-                        Assert.AreEqual(checkType.Fields.Count, singleNotificationType.Fields.Count);
+                        Assert.Equal(checkType.Fields.Count, singleNotificationType.Fields.Count);
                         for (int i = 0; i < checkType.Fields.Count; i++)
                         {
-                            Assert.AreEqual(checkType.Fields[i].Name, singleNotificationType.Fields[i].Name);
-                            Assert.AreEqual(checkType.Fields[i].Optional, singleNotificationType.Fields[i].Optional);
-                            Assert.AreEqual(checkType.Fields[i].Description, singleNotificationType.Fields[i].Description);
+                            Assert.Equal(checkType.Fields[i].Name, singleNotificationType.Fields[i].Name);
+                            Assert.Equal(checkType.Fields[i].Optional, singleNotificationType.Fields[i].Optional);
+                            Assert.Equal(checkType.Fields[i].Description, singleNotificationType.Fields[i].Description);
                         }
                     }
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListMetrics()
         {
             IMonitoringService provider = CreateProvider();
@@ -729,13 +728,13 @@
                 }
 
                 if (!foundMetrics)
-                    Assert.Inconclusive("The service did not report any metrics.");
+                    Assert.False(true, "The service did not report any metrics.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetDataPoints()
         {
             IMonitoringService provider = CreateProvider();
@@ -775,15 +774,15 @@
                 }
 
                 if (!foundMetrics)
-                    Assert.Inconclusive("The service did not report any metrics.");
+                    Assert.False(true, "The service did not report any metrics.");
                 if (!foundData)
-                    Assert.Inconclusive("The service did not report any data points for metrics within the past day.");
+                    Assert.False(true, "The service did not report any data points for metrics within the past day.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreateAlarm()
         {
             IMonitoringService provider = CreateProvider();
@@ -792,10 +791,10 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
-                Assert.AreEqual(1, monitoringZones.Count);
+                Assert.Equal(1, monitoringZones.Count);
 
                 string checkLabel = CreateRandomCheckName();
                 CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
@@ -818,7 +817,7 @@
                 IDictionary<string, string> metadata = null;
                 NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkId);
+                Assert.NotNull(checkId);
 
                 string notificationPlanLabel = CreateRandomNotificationPlanName();
                 NewNotificationPlanConfiguration notificationPlanConfiguration = new NewNotificationPlanConfiguration(notificationPlanLabel);
@@ -832,12 +831,12 @@
                 AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
 
                 Alarm alarm = await provider.GetAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
-                Assert.IsNotNull(alarm);
-                Assert.AreEqual(alarmId, alarm.Id);
-                Assert.AreEqual(notificationPlanId, alarm.NotificationPlanId);
-                Assert.AreEqual(alarmName, alarm.Label);
-                Assert.AreEqual(true, alarm.Enabled);
-                Assert.AreEqual(checkId, alarm.CheckId);
+                Assert.NotNull(alarm);
+                Assert.Equal(alarmId, alarm.Id);
+                Assert.Equal(notificationPlanId, alarm.NotificationPlanId);
+                Assert.Equal(alarmName, alarm.Label);
+                Assert.Equal(true, alarm.Enabled);
+                Assert.Equal(checkId, alarm.CheckId);
 
                 await provider.RemoveAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
 
@@ -849,9 +848,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestTestAlarm()
         {
             IMonitoringService provider = CreateProvider();
@@ -860,10 +859,10 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
-                Assert.AreEqual(1, monitoringZones.Count);
+                Assert.Equal(1, monitoringZones.Count);
 
                 string checkLabel = CreateRandomCheckName();
                 CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
@@ -887,8 +886,8 @@
                 NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
 
                 ReadOnlyCollection<CheckData> checkData = await provider.TestCheckAsync(entityId, checkConfiguration, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkData);
-                Assert.IsTrue(checkData.Count > 0);
+                Assert.NotNull(checkData);
+                Assert.True(checkData.Count > 0);
 
                 string criteria = "if (metric[\"code\"] == \"404\") { return new AlarmStatus(CRITICAL, \"not found\"); } return new AlarmStatus(OK);";
                 TestAlarmConfiguration testAlarmConfiguration = new TestAlarmConfiguration(criteria, checkData);
@@ -896,19 +895,19 @@
 
                 foreach (AlarmData data in alarmData)
                 {
-                    Assert.AreEqual(AlarmState.OK, data.State);
-                    Assert.AreEqual("Matched default return statement", data.Status);
-                    Assert.IsTrue(data.Timestamp >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
-                    Assert.IsTrue(data.Timestamp <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
+                    Assert.Equal(AlarmState.OK, data.State);
+                    Assert.Equal("Matched default return statement", data.Status);
+                    Assert.True(data.Timestamp >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
+                    Assert.True(data.Timestamp <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
                 }
 
                 await provider.RemoveEntityAsync(entityId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListAlarms()
         {
             IMonitoringService provider = CreateProvider();
@@ -917,10 +916,10 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
-                Assert.AreEqual(1, monitoringZones.Count);
+                Assert.Equal(1, monitoringZones.Count);
 
                 string checkLabel = CreateRandomCheckName();
                 CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
@@ -943,7 +942,7 @@
                 IDictionary<string, string> metadata = null;
                 NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkId);
+                Assert.NotNull(checkId);
 
                 string notificationPlanLabel = CreateRandomNotificationPlanName();
                 NewNotificationPlanConfiguration notificationPlanConfiguration = new NewNotificationPlanConfiguration(notificationPlanLabel);
@@ -963,29 +962,29 @@
                 }
 
                 ReadOnlyCollection<Alarm> alarms = await ListAllAlarmsAsync(provider, entityId, null, cancellationTokenSource.Token);
-                Assert.IsTrue(alarms.Count >= 3);
+                Assert.True(alarms.Count >= 3);
                 foreach (string alarmName in alarmNames)
                 {
                     Alarm alarm = alarms.Single(i => i.Label.Equals(alarmName));
-                    Assert.IsTrue(alarm.Created >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
-                    Assert.IsTrue(alarm.Created <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
-                    Assert.IsTrue(alarm.LastModified >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
-                    Assert.IsTrue(alarm.LastModified <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
-                    Assert.AreEqual(notificationPlanId, alarm.NotificationPlanId);
-                    Assert.AreEqual(true, alarm.Enabled);
-                    Assert.AreEqual(checkId, alarm.CheckId);
+                    Assert.True(alarm.Created >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
+                    Assert.True(alarm.Created <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
+                    Assert.True(alarm.LastModified >= DateTimeOffset.UtcNow - TimeSpan.FromHours(1));
+                    Assert.True(alarm.LastModified <= DateTimeOffset.UtcNow + TimeSpan.FromHours(1));
+                    Assert.Equal(notificationPlanId, alarm.NotificationPlanId);
+                    Assert.Equal(true, alarm.Enabled);
+                    Assert.Equal(checkId, alarm.CheckId);
 
                     Alarm singleAlarm = await provider.GetAlarmAsync(entityId, alarm.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(singleAlarm);
-                    Assert.AreEqual(alarmName, singleAlarm.Label);
-                    Assert.AreEqual(alarm.CheckId, singleAlarm.CheckId);
-                    Assert.AreEqual(alarm.Created, singleAlarm.Created);
-                    Assert.AreEqual(alarm.Criteria, singleAlarm.Criteria);
-                    Assert.AreEqual(alarm.Enabled, singleAlarm.Enabled);
-                    Assert.AreEqual(alarm.Id, singleAlarm.Id);
-                    Assert.AreEqual(alarm.Label, singleAlarm.Label);
-                    Assert.IsTrue(alarm.LastModified <= singleAlarm.LastModified);
-                    Assert.AreEqual(alarm.NotificationPlanId, singleAlarm.NotificationPlanId);
+                    Assert.NotNull(singleAlarm);
+                    Assert.Equal(alarmName, singleAlarm.Label);
+                    Assert.Equal(alarm.CheckId, singleAlarm.CheckId);
+                    Assert.Equal(alarm.Created, singleAlarm.Created);
+                    Assert.Equal(alarm.Criteria, singleAlarm.Criteria);
+                    Assert.Equal(alarm.Enabled, singleAlarm.Enabled);
+                    Assert.Equal(alarm.Id, singleAlarm.Id);
+                    Assert.Equal(alarm.Label, singleAlarm.Label);
+                    Assert.True(alarm.LastModified <= singleAlarm.LastModified);
+                    Assert.Equal(alarm.NotificationPlanId, singleAlarm.NotificationPlanId);
                 }
 
                 foreach (AlarmId alarmId in alarmIds)
@@ -999,9 +998,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestUpdateAlarm()
         {
             IMonitoringService provider = CreateProvider();
@@ -1010,10 +1009,10 @@
                 string entityName = CreateRandomEntityName();
                 NewEntityConfiguration configuration = new NewEntityConfiguration(entityName, null, null, null);
                 EntityId entityId = await provider.CreateEntityAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(entityId);
+                Assert.NotNull(entityId);
 
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await provider.ListMonitoringZonesAsync(null, 1, cancellationTokenSource.Token);
-                Assert.AreEqual(1, monitoringZones.Count);
+                Assert.Equal(1, monitoringZones.Count);
 
                 string checkLabel = CreateRandomCheckName();
                 CheckTypeId checkTypeId = CheckTypeId.RemoteHttp;
@@ -1036,7 +1035,7 @@
                 IDictionary<string, string> metadata = null;
                 NewCheckConfiguration checkConfiguration = new NewCheckConfiguration(checkLabel, checkTypeId, details, monitoringZonesPoll, timeout, period, targetAlias, targetHostname, resolverType, metadata);
                 CheckId checkId = await provider.CreateCheckAsync(entityId, checkConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(checkId);
+                Assert.NotNull(checkId);
 
                 string notificationPlanLabel = CreateRandomNotificationPlanName();
                 NewNotificationPlanConfiguration notificationPlanConfiguration = new NewNotificationPlanConfiguration(notificationPlanLabel);
@@ -1050,24 +1049,24 @@
                 AlarmId alarmId = await provider.CreateAlarmAsync(entityId, alarmConfiguration, cancellationTokenSource.Token);
 
                 Alarm alarm = await provider.GetAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
-                Assert.IsNotNull(alarm);
-                Assert.AreEqual(alarmId, alarm.Id);
-                Assert.AreEqual(notificationPlanId, alarm.NotificationPlanId);
-                Assert.AreEqual(alarmName, alarm.Label);
-                Assert.AreEqual(true, alarm.Enabled);
-                Assert.AreEqual(checkId, alarm.CheckId);
+                Assert.NotNull(alarm);
+                Assert.Equal(alarmId, alarm.Id);
+                Assert.Equal(notificationPlanId, alarm.NotificationPlanId);
+                Assert.Equal(alarmName, alarm.Label);
+                Assert.Equal(true, alarm.Enabled);
+                Assert.Equal(checkId, alarm.CheckId);
 
                 string updatedAlarmName = CreateRandomAlarmName();
                 UpdateAlarmConfiguration updateAlarmConfiguration = new UpdateAlarmConfiguration(label: updatedAlarmName);
                 await provider.UpdateAlarmAsync(entityId, alarmId, updateAlarmConfiguration, cancellationTokenSource.Token);
 
                 Alarm updatedAlarm = await provider.GetAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedAlarm);
-                Assert.AreEqual(alarmId, updatedAlarm.Id);
-                Assert.AreEqual(notificationPlanId, updatedAlarm.NotificationPlanId);
-                Assert.AreEqual(updatedAlarmName, updatedAlarm.Label);
-                Assert.AreEqual(true, updatedAlarm.Enabled);
-                Assert.AreEqual(checkId, updatedAlarm.CheckId);
+                Assert.NotNull(updatedAlarm);
+                Assert.Equal(alarmId, updatedAlarm.Id);
+                Assert.Equal(notificationPlanId, updatedAlarm.NotificationPlanId);
+                Assert.Equal(updatedAlarmName, updatedAlarm.Label);
+                Assert.Equal(true, updatedAlarm.Enabled);
+                Assert.Equal(checkId, updatedAlarm.CheckId);
 
                 await provider.RemoveAlarmAsync(entityId, alarmId, cancellationTokenSource.Token);
 
@@ -1079,9 +1078,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreateNotificationPlan()
         {
             IMonitoringService provider = CreateProvider();
@@ -1090,20 +1089,20 @@
                 string label = CreateRandomNotificationPlanName();
                 NewNotificationPlanConfiguration configuration = new NewNotificationPlanConfiguration(label);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationPlanId);
+                Assert.NotNull(notificationPlanId);
 
                 NotificationPlan notificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationPlan);
-                Assert.AreEqual(notificationPlanId, notificationPlan.Id);
-                Assert.AreEqual(label, notificationPlan.Label);
+                Assert.NotNull(notificationPlan);
+                Assert.Equal(notificationPlanId, notificationPlan.Id);
+                Assert.Equal(label, notificationPlan.Label);
 
                 await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreateNotificationPlanWithEmptyNotifications()
         {
             IMonitoringService provider = CreateProvider();
@@ -1113,23 +1112,23 @@
                 IEnumerable<NotificationId> emptyNotifications = Enumerable.Empty<NotificationId>();
                 NewNotificationPlanConfiguration configuration = new NewNotificationPlanConfiguration(label, emptyNotifications, emptyNotifications, emptyNotifications);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationPlanId);
+                Assert.NotNull(notificationPlanId);
 
                 NotificationPlan notificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationPlan);
-                Assert.AreEqual(notificationPlanId, notificationPlan.Id);
-                Assert.AreEqual(label, notificationPlan.Label);
-                CollectionAssert.AreEqual(emptyNotifications.ToArray(), notificationPlan.CriticalState);
-                CollectionAssert.AreEqual(emptyNotifications.ToArray(), notificationPlan.WarningState);
-                CollectionAssert.AreEqual(emptyNotifications.ToArray(), notificationPlan.OkState);
+                Assert.NotNull(notificationPlan);
+                Assert.Equal(notificationPlanId, notificationPlan.Id);
+                Assert.Equal(label, notificationPlan.Label);
+                CollectionAssert.Equal(emptyNotifications.ToArray(), notificationPlan.CriticalState);
+                CollectionAssert.Equal(emptyNotifications.ToArray(), notificationPlan.WarningState);
+                CollectionAssert.Equal(emptyNotifications.ToArray(), notificationPlan.OkState);
 
                 await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreateNotificationPlanWithMetadata()
         {
             IMonitoringService provider = CreateProvider();
@@ -1145,25 +1144,25 @@
                     };
                 NewNotificationPlanConfiguration configuration = new NewNotificationPlanConfiguration(label, metadata: metadata);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationPlanId);
+                Assert.NotNull(notificationPlanId);
 
                 NotificationPlan notificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationPlan);
-                Assert.AreEqual(notificationPlanId, notificationPlan.Id);
-                Assert.AreEqual(label, notificationPlan.Label);
+                Assert.NotNull(notificationPlan);
+                Assert.Equal(notificationPlanId, notificationPlan.Id);
+                Assert.Equal(label, notificationPlan.Label);
 
-                Assert.IsNotNull(notificationPlan.Metadata);
-                Assert.AreEqual("Value 1", notificationPlan.Metadata["Key 1"]);
-                Assert.AreEqual("value 1", notificationPlan.Metadata["key 1"]);
-                Assert.AreEqual("Value ²", notificationPlan.Metadata["Key ²"]);
+                Assert.NotNull(notificationPlan.Metadata);
+                Assert.Equal("Value 1", notificationPlan.Metadata["Key 1"]);
+                Assert.Equal("value 1", notificationPlan.Metadata["key 1"]);
+                Assert.Equal("Value ²", notificationPlan.Metadata["Key ²"]);
 
                 await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListNotificationPlans()
         {
             IMonitoringService provider = CreateProvider();
@@ -1171,16 +1170,16 @@
             {
                 ReadOnlyCollection<NotificationPlan> notificationPlans = await ListAllNotificationPlansAsync(provider, null, cancellationTokenSource.Token);
                 if (notificationPlans.Count == 0)
-                    Assert.Inconclusive("The service did not report any notification plans.");
+                    Assert.False(true, "The service did not report any notification plans.");
 
                 foreach (NotificationPlan notificationPlan in notificationPlans)
                     Console.WriteLine("Notification plan {0}", notificationPlan.Label);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetNotificationPlan()
         {
             IMonitoringService provider = CreateProvider();
@@ -1188,27 +1187,27 @@
             {
                 ReadOnlyCollection<NotificationPlan> notificationPlans = await ListAllNotificationPlansAsync(provider, null, cancellationTokenSource.Token);
                 if (notificationPlans.Count == 0)
-                    Assert.Inconclusive("The service did not report any notification plans.");
+                    Assert.False(true, "The service did not report any notification plans.");
 
                 foreach (NotificationPlan notificationPlan in notificationPlans)
                 {
                     NotificationPlan singlePlan = await provider.GetNotificationPlanAsync(notificationPlan.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(singlePlan);
-                    Assert.AreEqual(notificationPlan.Id, singlePlan.Id);
-                    Assert.AreEqual(notificationPlan.Label, singlePlan.Label);
-                    Assert.AreEqual(notificationPlan.Created, singlePlan.Created);
-                    Assert.AreEqual(notificationPlan.LastModified, singlePlan.LastModified);
-                    CollectionAssert.AreEqual(notificationPlan.CriticalState, singlePlan.CriticalState);
-                    CollectionAssert.AreEqual(notificationPlan.WarningState, singlePlan.WarningState);
-                    CollectionAssert.AreEqual(notificationPlan.OkState, singlePlan.OkState);
-                    CollectionAssert.AreEqual(notificationPlan.Metadata, singlePlan.Metadata);
+                    Assert.NotNull(singlePlan);
+                    Assert.Equal(notificationPlan.Id, singlePlan.Id);
+                    Assert.Equal(notificationPlan.Label, singlePlan.Label);
+                    Assert.Equal(notificationPlan.Created, singlePlan.Created);
+                    Assert.Equal(notificationPlan.LastModified, singlePlan.LastModified);
+                    CollectionAssert.Equal(notificationPlan.CriticalState, singlePlan.CriticalState);
+                    CollectionAssert.Equal(notificationPlan.WarningState, singlePlan.WarningState);
+                    CollectionAssert.Equal(notificationPlan.OkState, singlePlan.OkState);
+                    CollectionAssert.Equal(notificationPlan.Metadata, singlePlan.Metadata);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestUpdateNotificationPlan()
         {
             IMonitoringService provider = CreateProvider();
@@ -1217,29 +1216,29 @@
                 string label = CreateRandomNotificationPlanName();
                 NewNotificationPlanConfiguration configuration = new NewNotificationPlanConfiguration(label);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationPlanId);
+                Assert.NotNull(notificationPlanId);
 
                 NotificationPlan notificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationPlan);
-                Assert.AreEqual(notificationPlanId, notificationPlan.Id);
-                Assert.AreEqual(label, notificationPlan.Label);
+                Assert.NotNull(notificationPlan);
+                Assert.Equal(notificationPlanId, notificationPlan.Id);
+                Assert.Equal(label, notificationPlan.Label);
 
                 string newLabel = CreateRandomNotificationPlanName();
                 UpdateNotificationPlanConfiguration updateConfiguration = new UpdateNotificationPlanConfiguration(newLabel);
                 await provider.UpdateNotificationPlanAsync(notificationPlanId, updateConfiguration, cancellationTokenSource.Token);
 
                 NotificationPlan updatedNotificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedNotificationPlan);
-                Assert.AreEqual(notificationPlanId, updatedNotificationPlan.Id);
-                Assert.AreEqual(newLabel, updatedNotificationPlan.Label);
+                Assert.NotNull(updatedNotificationPlan);
+                Assert.Equal(notificationPlanId, updatedNotificationPlan.Id);
+                Assert.Equal(newLabel, updatedNotificationPlan.Label);
 
                 await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestUpdateNotificationPlanWithMetadata()
         {
             IMonitoringService provider = CreateProvider();
@@ -1255,17 +1254,17 @@
                     };
                 NewNotificationPlanConfiguration configuration = new NewNotificationPlanConfiguration(label, metadata: metadata);
                 NotificationPlanId notificationPlanId = await provider.CreateNotificationPlanAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationPlanId);
+                Assert.NotNull(notificationPlanId);
 
                 NotificationPlan notificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationPlan);
-                Assert.AreEqual(notificationPlanId, notificationPlan.Id);
-                Assert.AreEqual(label, notificationPlan.Label);
+                Assert.NotNull(notificationPlan);
+                Assert.Equal(notificationPlanId, notificationPlan.Id);
+                Assert.Equal(label, notificationPlan.Label);
 
-                Assert.IsNotNull(notificationPlan.Metadata);
-                Assert.AreEqual("Value 1", notificationPlan.Metadata["Key 1"]);
-                Assert.AreEqual("value 1", notificationPlan.Metadata["key 1"]);
-                Assert.AreEqual("Value ²", notificationPlan.Metadata["Key ²"]);
+                Assert.NotNull(notificationPlan.Metadata);
+                Assert.Equal("Value 1", notificationPlan.Metadata["Key 1"]);
+                Assert.Equal("value 1", notificationPlan.Metadata["key 1"]);
+                Assert.Equal("Value ²", notificationPlan.Metadata["Key ²"]);
 
                 // setting the label alone doesn't affect metadata
                 string newLabel = CreateRandomNotificationPlanName();
@@ -1273,14 +1272,14 @@
                 await provider.UpdateNotificationPlanAsync(notificationPlanId, updateConfiguration, cancellationTokenSource.Token);
 
                 NotificationPlan updatedNotificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedNotificationPlan);
-                Assert.AreEqual(notificationPlanId, updatedNotificationPlan.Id);
-                Assert.AreEqual(newLabel, updatedNotificationPlan.Label);
+                Assert.NotNull(updatedNotificationPlan);
+                Assert.Equal(notificationPlanId, updatedNotificationPlan.Id);
+                Assert.Equal(newLabel, updatedNotificationPlan.Label);
 
-                Assert.IsNotNull(notificationPlan.Metadata);
-                Assert.AreEqual("Value 1", updatedNotificationPlan.Metadata["Key 1"]);
-                Assert.AreEqual("value 1", updatedNotificationPlan.Metadata["key 1"]);
-                Assert.AreEqual("Value ²", updatedNotificationPlan.Metadata["Key ²"]);
+                Assert.NotNull(notificationPlan.Metadata);
+                Assert.Equal("Value 1", updatedNotificationPlan.Metadata["Key 1"]);
+                Assert.Equal("value 1", updatedNotificationPlan.Metadata["key 1"]);
+                Assert.Equal("Value ²", updatedNotificationPlan.Metadata["Key ²"]);
 
                 // setting metadata replaces all metadata
                 Dictionary<string, string> newMetadata =
@@ -1292,20 +1291,20 @@
                 await provider.UpdateNotificationPlanAsync(notificationPlanId, updateConfiguration, cancellationTokenSource.Token);
 
                 updatedNotificationPlan = await provider.GetNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedNotificationPlan);
-                Assert.AreEqual(notificationPlanId, updatedNotificationPlan.Id);
-                Assert.AreEqual(newLabel, updatedNotificationPlan.Label);
+                Assert.NotNull(updatedNotificationPlan);
+                Assert.Equal(notificationPlanId, updatedNotificationPlan.Id);
+                Assert.Equal(newLabel, updatedNotificationPlan.Label);
 
-                Assert.IsNotNull(updatedNotificationPlan.Metadata);
-                CollectionAssert.AreEqual(newMetadata, updatedNotificationPlan.Metadata);
+                Assert.NotNull(updatedNotificationPlan.Metadata);
+                CollectionAssert.Equal(newMetadata, updatedNotificationPlan.Metadata);
 
                 await provider.RemoveNotificationPlanAsync(notificationPlanId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListMonitoringZones()
         {
             IMonitoringService provider = CreateProvider();
@@ -1313,16 +1312,16 @@
             {
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await ListAllMonitoringZonesAsync(provider, null, cancellationTokenSource.Token);
                 if (monitoringZones.Count == 0)
-                    Assert.Inconclusive("The provider did not return any monitoring zones.");
+                    Assert.False(true, "The provider did not return any monitoring zones.");
 
                 foreach (MonitoringZone monitoringZone in monitoringZones)
                     Console.WriteLine("Monitoring zone '{0}'", monitoringZone.Label);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetMonitoringZone()
         {
             IMonitoringService provider = CreateProvider();
@@ -1330,23 +1329,23 @@
             {
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await ListAllMonitoringZonesAsync(provider, null, cancellationTokenSource.Token);
                 if (monitoringZones.Count == 0)
-                    Assert.Inconclusive("The provider did not return any monitoring zones.");
+                    Assert.False(true, "The provider did not return any monitoring zones.");
 
                 foreach (MonitoringZone monitoringZone in monitoringZones)
                 {
                     MonitoringZone singleMonitoringZone = await provider.GetMonitoringZoneAsync(monitoringZone.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(singleMonitoringZone);
-                    Assert.AreEqual(monitoringZone.Id, singleMonitoringZone.Id);
-                    Assert.AreEqual(monitoringZone.CountryCode, singleMonitoringZone.CountryCode);
-                    Assert.AreEqual(monitoringZone.Label, singleMonitoringZone.Label);
-                    CollectionAssert.AreEqual(monitoringZone.SourceAddresses, singleMonitoringZone.SourceAddresses);
+                    Assert.NotNull(singleMonitoringZone);
+                    Assert.Equal(monitoringZone.Id, singleMonitoringZone.Id);
+                    Assert.Equal(monitoringZone.CountryCode, singleMonitoringZone.CountryCode);
+                    Assert.Equal(monitoringZone.Label, singleMonitoringZone.Label);
+                    CollectionAssert.Equal(monitoringZone.SourceAddresses, singleMonitoringZone.SourceAddresses);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestTraceRouteFromMonitoringZone()
         {
             IMonitoringService provider = CreateProvider();
@@ -1354,7 +1353,7 @@
             {
                 ReadOnlyCollection<MonitoringZone> monitoringZones = await ListAllMonitoringZonesAsync(provider, null, cancellationTokenSource.Token);
                 if (monitoringZones.Count == 0)
-                    Assert.Inconclusive("The provider did not return any monitoring zones.");
+                    Assert.False(true, "The provider did not return any monitoring zones.");
 
                 string target = "docs.rackspace.com";
                 TraceRouteConfiguration configuration = new TraceRouteConfiguration(target, TargetResolverType.IPv4);
@@ -1365,7 +1364,7 @@
                     Console.WriteLine("  Total Hops: {0}", traceRoute.Hops.Count);
                     for (int i = 0; i < traceRoute.Hops.Count; i++)
                     {
-                        Assert.AreEqual(i + 1, traceRoute.Hops[i].Number);
+                        Assert.Equal(i + 1, traceRoute.Hops[i].Number);
                         Console.WriteLine("  {0}. {1}", traceRoute.Hops[i].Number, traceRoute.Hops[i].IPAddress);
                         foreach (TimeSpan responseTime in traceRoute.Hops[i].ResponseTimes)
                             Console.WriteLine("    {0}", responseTime.TotalSeconds);
@@ -1376,9 +1375,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListAlarmNotificationHistory()
         {
             IMonitoringService provider = CreateProvider();
@@ -1400,13 +1399,13 @@
                 }
 
                 if (!foundHistoryItem)
-                    Assert.Inconclusive("The provider did not return any alarm notification history items.");
+                    Assert.False(true, "The provider did not return any alarm notification history items.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetAlarmNotificationHistorySequential()
         {
             IMonitoringService provider = CreateProvider();
@@ -1424,28 +1423,28 @@
                             foreach (AlarmNotificationHistoryItem item in alarmNotificationHistory)
                             {
                                 AlarmNotificationHistoryItem singleItem = await provider.GetAlarmNotificationHistoryAsync(entity.Id, alarm.Id, checkId, item.Id, cancellationTokenSource.Token);
-                                Assert.IsNotNull(singleItem);
-                                Assert.AreEqual(item.Id, singleItem.Id);
-                                Assert.AreEqual(item.NotificationPlanId, singleItem.NotificationPlanId);
-                                Assert.AreEqual(item.PreviousState, singleItem.PreviousState);
-                                Assert.AreEqual(item.State, singleItem.State);
-                                Assert.AreEqual(item.Status, singleItem.Status);
-                                Assert.AreEqual(item.Timestamp, singleItem.Timestamp);
-                                Assert.AreEqual(item.TransactionId, singleItem.TransactionId);
+                                Assert.NotNull(singleItem);
+                                Assert.Equal(item.Id, singleItem.Id);
+                                Assert.Equal(item.NotificationPlanId, singleItem.NotificationPlanId);
+                                Assert.Equal(item.PreviousState, singleItem.PreviousState);
+                                Assert.Equal(item.State, singleItem.State);
+                                Assert.Equal(item.Status, singleItem.Status);
+                                Assert.Equal(item.Timestamp, singleItem.Timestamp);
+                                Assert.Equal(item.TransactionId, singleItem.TransactionId);
                                 if (item.Results == null)
                                 {
-                                    Assert.IsNull(singleItem.Results);
+                                    Assert.Null(singleItem.Results);
                                 }
                                 else
                                 {
-                                    Assert.AreEqual(item.Results.Count, singleItem.Results.Count);
+                                    Assert.Equal(item.Results.Count, singleItem.Results.Count);
                                     for (int i = 0; i < item.Results.Count; i++)
                                     {
-                                        Assert.AreEqual(item.Results[i].NotificationId, singleItem.Results[i].NotificationId);
-                                        Assert.AreEqual(item.Results[i].NotificationTypeId, singleItem.Results[i].NotificationTypeId);
-                                        Assert.AreEqual(item.Results[i].InProgress, singleItem.Results[i].InProgress);
-                                        Assert.AreEqual(item.Results[i].Success, singleItem.Results[i].Success);
-                                        Assert.AreEqual(item.Results[i].Message, singleItem.Results[i].Message);
+                                        Assert.Equal(item.Results[i].NotificationId, singleItem.Results[i].NotificationId);
+                                        Assert.Equal(item.Results[i].NotificationTypeId, singleItem.Results[i].NotificationTypeId);
+                                        Assert.Equal(item.Results[i].InProgress, singleItem.Results[i].InProgress);
+                                        Assert.Equal(item.Results[i].Success, singleItem.Results[i].Success);
+                                        Assert.Equal(item.Results[i].Message, singleItem.Results[i].Message);
                                     }
                                 }
                             }
@@ -1454,13 +1453,13 @@
                 }
 
                 if (!foundHistoryItem)
-                    Assert.Inconclusive("The provider did not return any alarm notification history items.");
+                    Assert.False(true, "The provider did not return any alarm notification history items.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetAlarmNotificationHistory()
         {
             IMonitoringService provider = CreateProvider();
@@ -1485,7 +1484,7 @@
                 Console.WriteLine("Elapsed time: {0}ms", stopwatch.ElapsedMilliseconds);
 
                 if (!foundHistoryItem)
-                    Assert.Inconclusive("The provider did not return any alarm notification history items.");
+                    Assert.False(true, "The provider did not return any alarm notification history items.");
             }
         }
 
@@ -1535,37 +1534,37 @@
         private async Task<bool> TestGetAlarmNotificationHistory(IMonitoringService provider, Entity entity, Alarm alarm, CheckId checkId, AlarmNotificationHistoryItem item, CancellationToken cancellationToken)
         {
             AlarmNotificationHistoryItem singleItem = await provider.GetAlarmNotificationHistoryAsync(entity.Id, alarm.Id, checkId, item.Id, cancellationToken);
-            Assert.IsNotNull(singleItem);
-            Assert.AreEqual(item.Id, singleItem.Id);
-            Assert.AreEqual(item.NotificationPlanId, singleItem.NotificationPlanId);
-            Assert.AreEqual(item.PreviousState, singleItem.PreviousState);
-            Assert.AreEqual(item.State, singleItem.State);
-            Assert.AreEqual(item.Status, singleItem.Status);
-            Assert.AreEqual(item.Timestamp, singleItem.Timestamp);
-            Assert.AreEqual(item.TransactionId, singleItem.TransactionId);
+            Assert.NotNull(singleItem);
+            Assert.Equal(item.Id, singleItem.Id);
+            Assert.Equal(item.NotificationPlanId, singleItem.NotificationPlanId);
+            Assert.Equal(item.PreviousState, singleItem.PreviousState);
+            Assert.Equal(item.State, singleItem.State);
+            Assert.Equal(item.Status, singleItem.Status);
+            Assert.Equal(item.Timestamp, singleItem.Timestamp);
+            Assert.Equal(item.TransactionId, singleItem.TransactionId);
             if (item.Results == null)
             {
-                Assert.IsNull(singleItem.Results);
+                Assert.Null(singleItem.Results);
             }
             else
             {
-                Assert.AreEqual(item.Results.Count, singleItem.Results.Count);
+                Assert.Equal(item.Results.Count, singleItem.Results.Count);
                 for (int i = 0; i < item.Results.Count; i++)
                 {
-                    Assert.AreEqual(item.Results[i].NotificationId, singleItem.Results[i].NotificationId);
-                    Assert.AreEqual(item.Results[i].NotificationTypeId, singleItem.Results[i].NotificationTypeId);
-                    Assert.AreEqual(item.Results[i].InProgress, singleItem.Results[i].InProgress);
-                    Assert.AreEqual(item.Results[i].Success, singleItem.Results[i].Success);
-                    Assert.AreEqual(item.Results[i].Message, singleItem.Results[i].Message);
+                    Assert.Equal(item.Results[i].NotificationId, singleItem.Results[i].NotificationId);
+                    Assert.Equal(item.Results[i].NotificationTypeId, singleItem.Results[i].NotificationTypeId);
+                    Assert.Equal(item.Results[i].InProgress, singleItem.Results[i].InProgress);
+                    Assert.Equal(item.Results[i].Success, singleItem.Results[i].Success);
+                    Assert.Equal(item.Results[i].Message, singleItem.Results[i].Message);
                 }
             }
 
             return true;
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreateWebhookNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1578,18 +1577,18 @@
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notification);
-                Assert.AreEqual(notificationId, notification.Id);
-                Assert.AreEqual(label, notification.Label);
-                Assert.AreEqual(configuration.Type, notification.Type);
+                Assert.NotNull(notification);
+                Assert.Equal(notificationId, notification.Id);
+                Assert.Equal(label, notification.Label);
+                Assert.Equal(configuration.Type, notification.Type);
 
                 await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreateEmailNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1602,18 +1601,18 @@
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notification);
-                Assert.AreEqual(notificationId, notification.Id);
-                Assert.AreEqual(label, notification.Label);
-                Assert.AreEqual(configuration.Type, notification.Type);
+                Assert.NotNull(notification);
+                Assert.Equal(notificationId, notification.Id);
+                Assert.Equal(label, notification.Label);
+                Assert.Equal(configuration.Type, notification.Type);
 
                 await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreatePagerDutyNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1626,18 +1625,18 @@
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notification);
-                Assert.AreEqual(notificationId, notification.Id);
-                Assert.AreEqual(label, notification.Label);
-                Assert.AreEqual(configuration.Type, notification.Type);
+                Assert.NotNull(notification);
+                Assert.Equal(notificationId, notification.Id);
+                Assert.Equal(label, notification.Label);
+                Assert.Equal(configuration.Type, notification.Type);
 
                 await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestTestWebhookNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1648,15 +1647,15 @@
                 NotificationDetails notificationDetails = new WebhookNotificationDetails(new Uri("http://example.com"));
                 NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationData notificationData = await provider.TestNotificationAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationData);
-                Assert.AreEqual("success", notificationData.Status);
-                Assert.AreEqual("Success: Webhook successfully executed", notificationData.Message);
+                Assert.NotNull(notificationData);
+                Assert.Equal("success", notificationData.Status);
+                Assert.Equal("Success: Webhook successfully executed", notificationData.Message);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestTestEmailNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1667,15 +1666,15 @@
                 NotificationDetails notificationDetails = new EmailNotificationDetails("sample@example.com");
                 NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationData notificationData = await provider.TestNotificationAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationData);
-                Assert.AreEqual("success", notificationData.Status);
-                Assert.AreEqual("Email successfully sent", notificationData.Message);
+                Assert.NotNull(notificationData);
+                Assert.Equal("success", notificationData.Status);
+                Assert.Equal("Email successfully sent", notificationData.Message);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestTestPagerDutyNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1686,15 +1685,15 @@
                 NotificationDetails notificationDetails = new PagerDutyNotificationDetails("XXXXX");
                 NewNotificationConfiguration configuration = new NewNotificationConfiguration(label, notificationTypeId, notificationDetails);
                 NotificationData notificationData = await provider.TestNotificationAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationData);
-                Assert.AreEqual("error", notificationData.Status);
-                Assert.AreEqual("Unexpected status code \"400\". Expected one of: /2[0-9]{2}/", notificationData.Message);
+                Assert.NotNull(notificationData);
+                Assert.Equal("error", notificationData.Status);
+                Assert.Equal("Unexpected status code \"400\". Expected one of: /2[0-9]{2}/", notificationData.Message);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestTestExistingWebhookNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1707,17 +1706,17 @@
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 NotificationData notificationData = await provider.TestExistingNotificationAsync(notificationId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationData);
-                Assert.AreEqual("success", notificationData.Status);
-                Assert.AreEqual("Success: Webhook successfully executed", notificationData.Message);
+                Assert.NotNull(notificationData);
+                Assert.Equal("success", notificationData.Status);
+                Assert.Equal("Success: Webhook successfully executed", notificationData.Message);
 
                 await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestTestExistingEmailNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1730,17 +1729,17 @@
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 NotificationData notificationData = await provider.TestExistingNotificationAsync(notificationId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationData);
-                Assert.AreEqual("success", notificationData.Status);
-                Assert.AreEqual("Email successfully sent", notificationData.Message);
+                Assert.NotNull(notificationData);
+                Assert.Equal("success", notificationData.Status);
+                Assert.Equal("Email successfully sent", notificationData.Message);
 
                 await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestTestExistingPagerDutyNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1753,17 +1752,17 @@
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 NotificationData notificationData = await provider.TestExistingNotificationAsync(notificationId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notificationData);
-                Assert.AreEqual("error", notificationData.Status);
-                Assert.AreEqual("Unexpected status code \"400\". Expected one of: /2[0-9]{2}/", notificationData.Message);
+                Assert.NotNull(notificationData);
+                Assert.Equal("error", notificationData.Status);
+                Assert.Equal("Unexpected status code \"400\". Expected one of: /2[0-9]{2}/", notificationData.Message);
 
                 await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListNotifications()
         {
             IMonitoringService provider = CreateProvider();
@@ -1776,8 +1775,8 @@
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 ReadOnlyCollection<Notification> notifications = await ListAllNotificationsAsync(provider, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(notifications);
-                Assert.IsTrue(notifications.Count > 0);
+                Assert.NotNull(notifications);
+                Assert.True(notifications.Count > 0);
 
                 foreach (Notification notification in notifications)
                     Console.WriteLine("Notification '{0}' ({1})", notification.Label, notification.Id);
@@ -1786,9 +1785,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1801,21 +1800,21 @@
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 ReadOnlyCollection<Notification> notifications = await ListAllNotificationsAsync(provider, null, cancellationTokenSource.Token);
-                Assert.IsNotNull(notifications);
-                Assert.IsTrue(notifications.Count > 0);
+                Assert.NotNull(notifications);
+                Assert.True(notifications.Count > 0);
 
                 foreach (Notification notification in notifications)
                 {
                     Notification singleNotification = await provider.GetNotificationAsync(notification.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(singleNotification);
-                    Assert.AreEqual(notification.Id, singleNotification.Id);
-                    Assert.AreEqual(notification.Label, singleNotification.Label);
-                    Assert.AreEqual(notification.Type, singleNotification.Type);
+                    Assert.NotNull(singleNotification);
+                    Assert.Equal(notification.Id, singleNotification.Id);
+                    Assert.Equal(notification.Label, singleNotification.Label);
+                    Assert.Equal(notification.Type, singleNotification.Type);
 
                     if (notification.Type != null)
                     {
                         NotificationType notificationType = await provider.GetNotificationTypeAsync(notification.Type, cancellationTokenSource.Token);
-                        Assert.IsNotNull(notificationType);
+                        Assert.NotNull(notificationType);
                     }
                 }
 
@@ -1823,9 +1822,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestUpdateNotification()
         {
             IMonitoringService provider = CreateProvider();
@@ -1838,28 +1837,28 @@
                 NotificationId notificationId = await provider.CreateNotificationAsync(configuration, cancellationTokenSource.Token);
 
                 Notification notification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
-                Assert.IsNotNull(notification);
-                Assert.AreEqual(notificationId, notification.Id);
-                Assert.AreEqual(label, notification.Label);
-                Assert.AreEqual(configuration.Type, notification.Type);
+                Assert.NotNull(notification);
+                Assert.Equal(notificationId, notification.Id);
+                Assert.Equal(label, notification.Label);
+                Assert.Equal(configuration.Type, notification.Type);
 
                 string updatedLabel = CreateRandomNotificationName();
                 UpdateNotificationConfiguration updateConfiguration = new UpdateNotificationConfiguration(label: updatedLabel);
                 await provider.UpdateNotificationAsync(notificationId, updateConfiguration, cancellationTokenSource.Token);
 
                 Notification updateNotification = await provider.GetNotificationAsync(notificationId, cancellationTokenSource.Token);
-                Assert.IsNotNull(updateNotification);
-                Assert.AreEqual(notificationId, updateNotification.Id);
-                Assert.AreEqual(updatedLabel, updateNotification.Label);
-                Assert.AreEqual(configuration.Type, updateNotification.Type);
+                Assert.NotNull(updateNotification);
+                Assert.Equal(notificationId, updateNotification.Id);
+                Assert.Equal(updatedLabel, updateNotification.Label);
+                Assert.Equal(configuration.Type, updateNotification.Type);
 
                 await provider.RemoveNotificationAsync(notificationId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListNotificationTypes()
         {
             IMonitoringService provider = CreateProvider();
@@ -1867,7 +1866,7 @@
             {
                 ReadOnlyCollection<NotificationType> notifications = await ListAllNotificationTypesAsync(provider, null, cancellationTokenSource.Token);
                 if (notifications.Count == 0)
-                    Assert.Inconclusive("The service did not report any notification types.");
+                    Assert.False(true, "The service did not report any notification types.");
 
                 foreach (NotificationType notificationType in notifications)
                 {
@@ -1878,9 +1877,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetNotificationType()
         {
             IMonitoringService provider = CreateProvider();
@@ -1888,34 +1887,34 @@
             {
                 ReadOnlyCollection<NotificationType> notifications = await ListAllNotificationTypesAsync(provider, null, cancellationTokenSource.Token);
                 if (notifications.Count == 0)
-                    Assert.Inconclusive("The service did not report any notification types.");
+                    Assert.False(true, "The service did not report any notification types.");
 
                 foreach (NotificationType notificationType in notifications)
                 {
                     NotificationType singleNotificationType = await provider.GetNotificationTypeAsync(notificationType.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(singleNotificationType);
-                    Assert.AreEqual(notificationType.Id, singleNotificationType.Id);
+                    Assert.NotNull(singleNotificationType);
+                    Assert.Equal(notificationType.Id, singleNotificationType.Id);
                     if (notificationType.Fields == null)
                     {
-                        Assert.IsNull(singleNotificationType.Fields);
+                        Assert.Null(singleNotificationType.Fields);
                     }
                     else
                     {
-                        Assert.AreEqual(notificationType.Fields.Count, singleNotificationType.Fields.Count);
+                        Assert.Equal(notificationType.Fields.Count, singleNotificationType.Fields.Count);
                         for (int i = 0; i < notificationType.Fields.Count; i++)
                         {
-                            Assert.AreEqual(notificationType.Fields[i].Name, singleNotificationType.Fields[i].Name);
-                            Assert.AreEqual(notificationType.Fields[i].Optional, singleNotificationType.Fields[i].Optional);
-                            Assert.AreEqual(notificationType.Fields[i].Description, singleNotificationType.Fields[i].Description);
+                            Assert.Equal(notificationType.Fields[i].Name, singleNotificationType.Fields[i].Name);
+                            Assert.Equal(notificationType.Fields[i].Optional, singleNotificationType.Fields[i].Optional);
+                            Assert.Equal(notificationType.Fields[i].Description, singleNotificationType.Fields[i].Description);
                         }
                     }
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListAlarmChangelogs()
         {
             IMonitoringService provider = CreateProvider();
@@ -1923,16 +1922,16 @@
             {
                 ReadOnlyCollection<AlarmChangelog> alarmChangelogs = await ListAllAlarmChangelogsAsync(provider, null, null, null, cancellationTokenSource.Token);
                 if (alarmChangelogs.Count == 0)
-                    Assert.Inconclusive("The service did not report any alarm changelogs.");
+                    Assert.False(true, "The service did not report any alarm changelogs.");
 
                 foreach (AlarmChangelog alarmChangelog in alarmChangelogs)
                     Console.WriteLine("Alarm changelog '{0}'", alarmChangelog.Id);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListAlarmChangelogsWithEntityFilter()
         {
             IMonitoringService provider = CreateProvider();
@@ -1940,21 +1939,21 @@
             {
                 ReadOnlyCollection<AlarmChangelog> alarmChangelogs = await ListAllAlarmChangelogsAsync(provider, null, null, null, cancellationTokenSource.Token);
                 if (alarmChangelogs.Count == 0)
-                    Assert.Inconclusive("The service did not report any alarm changelogs.");
+                    Assert.False(true, "The service did not report any alarm changelogs.");
 
                 ILookup<EntityId, AlarmChangelog> lookup = alarmChangelogs.ToLookup(i => i.EntityId);
                 foreach (IGrouping<EntityId, AlarmChangelog> group in lookup)
                 {
                     AlarmChangelog[] groupAlarmChangelogs = group.ToArray();
                     ReadOnlyCollection<AlarmChangelog> entityAlarmChangelogs = await ListAllAlarmChangelogsAsync(provider, group.Key, null, null, null, cancellationTokenSource.Token);
-                    Assert.AreEqual(groupAlarmChangelogs.Length, entityAlarmChangelogs.Count);
+                    Assert.Equal(groupAlarmChangelogs.Length, entityAlarmChangelogs.Count);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListEntityOverviews()
         {
             IMonitoringService provider = CreateProvider();
@@ -1962,7 +1961,7 @@
             {
                 ReadOnlyCollection<EntityOverview> entityOverviews = await ListAllEntityOverviewsAsync(provider, null, cancellationTokenSource.Token);
                 if (entityOverviews.Count == 0)
-                    Assert.Inconclusive("The service did not report any overview views.");
+                    Assert.False(true, "The service did not report any overview views.");
 
                 foreach (EntityOverview entity in entityOverviews)
                 {
@@ -1971,9 +1970,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListEntityOverviewsWithEntityFilter()
         {
             IMonitoringService provider = CreateProvider();
@@ -1981,8 +1980,8 @@
             {
                 ReadOnlyCollection<Entity> entities = await provider.ListEntitiesAsync(null, 7, cancellationTokenSource.Token);
                 if (entities.Count == 0)
-                    Assert.Inconclusive("The service did not report any entities");
-                Assert.IsTrue(entities.Count <= 7);
+                    Assert.False(true, "The service did not report any entities");
+                Assert.True(entities.Count <= 7);
 
                 Entity[] filteredEntities = entities.Skip(Math.Min(4, entities.Count - 1)).Take(3).ToArray();
                 Console.WriteLine("Filtering result to the following {0} entities:", filteredEntities.Length);
@@ -1991,22 +1990,22 @@
 
                 ReadOnlyCollection<EntityOverview> entityOverviews = await ListAllEntityOverviewsAsync(provider, null, filteredEntities.Select(i => i.Id), cancellationTokenSource.Token);
                 if (entityOverviews.Count == 0)
-                    Assert.Inconclusive("The service did not report any overview views.");
+                    Assert.False(true, "The service did not report any overview views.");
 
                 Console.WriteLine();
                 Console.WriteLine("Results:");
                 foreach (EntityOverview entity in entityOverviews)
                 {
-                    Assert.IsNotNull(entity);
-                    Assert.AreEqual(1, filteredEntities.Count(i => i.Id == entity.Entity.Id));
+                    Assert.NotNull(entity);
+                    Assert.Equal(1, filteredEntities.Count(i => i.Id == entity.Entity.Id));
                     Console.WriteLine("    Entity {0} ({1})", entity.Entity.Label, entity.Entity.Id);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListAlarmExamples()
         {
             IMonitoringService provider = CreateProvider();
@@ -2014,16 +2013,16 @@
             {
                 ReadOnlyCollection<AlarmExample> alarmExamples = await ListAllAlarmExamplesAsync(provider, null, cancellationTokenSource.Token);
                 if (alarmExamples.Count == 0)
-                    Assert.Inconclusive("The provider did not return any alarm examples.");
+                    Assert.False(true, "The provider did not return any alarm examples.");
 
                 foreach (AlarmExample alarmExample in alarmExamples)
                     Console.WriteLine(alarmExample.Label);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetAlarmExample()
         {
             IMonitoringService provider = CreateProvider();
@@ -2033,18 +2032,18 @@
                 foreach (AlarmExample alarmExample in alarmExamples)
                 {
                     AlarmExample example = await provider.GetAlarmExampleAsync(alarmExample.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(example);
-                    Assert.AreEqual(alarmExample.Id, example.Id);
-                    Assert.AreEqual(alarmExample.Label, example.Label);
-                    Assert.AreEqual(alarmExample.Description, example.Description);
-                    Assert.AreEqual(alarmExample.Criteria, example.Criteria);
+                    Assert.NotNull(example);
+                    Assert.Equal(alarmExample.Id, example.Id);
+                    Assert.Equal(alarmExample.Label, example.Label);
+                    Assert.Equal(alarmExample.Description, example.Description);
+                    Assert.Equal(alarmExample.Criteria, example.Criteria);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestEvaluateAlarmExample()
         {
             IMonitoringService provider = CreateProvider();
@@ -2052,7 +2051,7 @@
             {
                 ReadOnlyCollection<AlarmExample> alarmExamples = await ListAllAlarmExamplesAsync(provider, null, cancellationTokenSource.Token);
                 if (alarmExamples.Count == 0)
-                    Assert.Inconclusive("The provider did not return any alarm examples.");
+                    Assert.False(true, "The provider did not return any alarm examples.");
 
                 List<Task> tasks = new List<Task>();
                 foreach (AlarmExample alarmExample in alarmExamples)
@@ -2089,12 +2088,12 @@
             }
 
             BoundAlarmExample boundAlarmExample = await provider.EvaluateAlarmExampleAsync(alarmExample.Id, exampleParameters, cancellationToken);
-            Assert.AreEqual(expected, boundAlarmExample.BoundCriteria);
+            Assert.Equal(expected, boundAlarmExample.BoundCriteria);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListAgents()
         {
             IMonitoringService provider = CreateProvider();
@@ -2102,16 +2101,16 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 foreach (Agent agent in agents)
                     Console.WriteLine("Agent {0} last connected {1}", agent.Id, agent.LastConnected);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetAgent()
         {
             IMonitoringService provider = CreateProvider();
@@ -2119,21 +2118,21 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 foreach (Agent agent in agents)
                 {
                     Agent singleAgent = await provider.GetAgentAsync(agent.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(singleAgent);
-                    Assert.AreEqual(agent.Id, singleAgent.Id);
-                    Assert.IsTrue(agent.LastConnected <= singleAgent.LastConnected);
+                    Assert.NotNull(singleAgent);
+                    Assert.Equal(agent.Id, singleAgent.Id);
+                    Assert.True(agent.LastConnected <= singleAgent.LastConnected);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListAgentConnections()
         {
             IMonitoringService provider = CreateProvider();
@@ -2141,7 +2140,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 bool foundConnection = false;
                 foreach (Agent agent in agents)
@@ -2151,19 +2150,19 @@
                     foundConnection |= connections.Any();
                     foreach (AgentConnection connection in connections)
                     {
-                        Assert.AreEqual(agent.Id, connection.AgentId);
+                        Assert.Equal(agent.Id, connection.AgentId);
                         Console.WriteLine("    {0}", connection.Id);
                     }
                 }
 
                 if (!foundConnection)
-                    Assert.Inconclusive("The service did not report any agent connections.");
+                    Assert.False(true, "The service did not report any agent connections.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetAgentConnection()
         {
             IMonitoringService provider = CreateProvider();
@@ -2171,7 +2170,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 bool foundConnection = false;
                 foreach (Agent agent in agents)
@@ -2181,25 +2180,25 @@
                     foreach (AgentConnection connection in connections)
                     {
                         AgentConnection singleConnection = await provider.GetAgentConnectionAsync(agent.Id, connection.Id, cancellationTokenSource.Token);
-                        Assert.IsNotNull(singleConnection);
-                        Assert.AreEqual(connection.Id, singleConnection.Id);
-                        Assert.AreEqual(connection.Guid, singleConnection.Guid);
-                        Assert.AreEqual(connection.ProcessVersion, singleConnection.ProcessVersion);
-                        Assert.AreEqual(connection.Endpoint, singleConnection.Endpoint);
-                        Assert.AreEqual(connection.BundleVersion, singleConnection.BundleVersion);
-                        Assert.AreEqual(connection.AgentAddress, singleConnection.AgentAddress);
-                        Assert.AreEqual(connection.AgentId, singleConnection.AgentId);
+                        Assert.NotNull(singleConnection);
+                        Assert.Equal(connection.Id, singleConnection.Id);
+                        Assert.Equal(connection.Guid, singleConnection.Guid);
+                        Assert.Equal(connection.ProcessVersion, singleConnection.ProcessVersion);
+                        Assert.Equal(connection.Endpoint, singleConnection.Endpoint);
+                        Assert.Equal(connection.BundleVersion, singleConnection.BundleVersion);
+                        Assert.Equal(connection.AgentAddress, singleConnection.AgentAddress);
+                        Assert.Equal(connection.AgentId, singleConnection.AgentId);
                     }
                 }
 
                 if (!foundConnection)
-                    Assert.Inconclusive("The service did not report any agent connections.");
+                    Assert.False(true, "The service did not report any agent connections.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestCreateAgentToken()
         {
             IMonitoringService provider = CreateProvider();
@@ -2209,20 +2208,20 @@
                 AgentTokenConfiguration configuration = new AgentTokenConfiguration(label);
 
                 AgentTokenId agentTokenId = await provider.CreateAgentTokenAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(agentTokenId);
+                Assert.NotNull(agentTokenId);
 
                 AgentToken agentToken = await provider.GetAgentTokenAsync(agentTokenId, cancellationTokenSource.Token);
-                Assert.IsNotNull(agentToken);
-                Assert.AreEqual(agentTokenId, agentToken.Id);
-                Assert.AreEqual(label, agentToken.Label);
+                Assert.NotNull(agentToken);
+                Assert.Equal(agentTokenId, agentToken.Id);
+                Assert.Equal(label, agentToken.Label);
 
                 await provider.RemoveAgentTokenAsync(agentTokenId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListAgentTokens()
         {
             IMonitoringService provider = CreateProvider();
@@ -2230,16 +2229,16 @@
             {
                 ReadOnlyCollection<AgentToken> agentTokens = await ListAllAgentTokensAsync(provider, null, cancellationTokenSource.Token);
                 if (agentTokens.Count == 0)
-                    Assert.Inconclusive("The service did not report any agent tokens.");
+                    Assert.False(true, "The service did not report any agent tokens.");
 
                 foreach (AgentToken agentToken in agentTokens)
                     Console.WriteLine("Agent Token {0} ({1})", agentToken.Label, agentToken.Id);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestUpdateAgentToken()
         {
             IMonitoringService provider = CreateProvider();
@@ -2249,30 +2248,30 @@
                 AgentTokenConfiguration configuration = new AgentTokenConfiguration(label);
 
                 AgentTokenId agentTokenId = await provider.CreateAgentTokenAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(agentTokenId);
+                Assert.NotNull(agentTokenId);
 
                 AgentToken agentToken = await provider.GetAgentTokenAsync(agentTokenId, cancellationTokenSource.Token);
-                Assert.IsNotNull(agentToken);
-                Assert.AreEqual(agentTokenId, agentToken.Id);
-                Assert.AreEqual(label, agentToken.Label);
+                Assert.NotNull(agentToken);
+                Assert.Equal(agentTokenId, agentToken.Id);
+                Assert.Equal(label, agentToken.Label);
 
                 string updatedLabel = CreateRandomAgentTokenName();
                 AgentTokenConfiguration updateConfiguration = new AgentTokenConfiguration(updatedLabel);
                 await provider.UpdateAgentTokenAsync(agentTokenId, updateConfiguration, cancellationTokenSource.Token);
 
                 AgentToken updatedAgentToken = await provider.GetAgentTokenAsync(agentTokenId, cancellationTokenSource.Token);
-                Assert.IsNotNull(updatedAgentToken);
-                Assert.AreEqual(updatedLabel, updatedAgentToken.Label);
-                Assert.AreEqual(agentToken.Id, updatedAgentToken.Id);
-                Assert.AreEqual(agentToken.Token, updatedAgentToken.Token);
+                Assert.NotNull(updatedAgentToken);
+                Assert.Equal(updatedLabel, updatedAgentToken.Label);
+                Assert.Equal(agentToken.Id, updatedAgentToken.Id);
+                Assert.Equal(agentToken.Token, updatedAgentToken.Token);
 
                 await provider.RemoveAgentTokenAsync(agentTokenId, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetAgentHostInformation()
         {
             IMonitoringService provider = CreateProvider();
@@ -2280,7 +2279,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
@@ -2307,16 +2306,16 @@
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(string.Format("Agent host '{0}' information for agent {1}", HostInformationType.Cpus, agentId));
             HostInformation<JToken> information = await provider.GetAgentHostInformationAsync(agentId, HostInformationType.Cpus, cancellationToken);
-            Assert.IsNotNull(information);
+            Assert.NotNull(information);
             foreach (CpuInformation cpuInformation in information.Info.ToObject<CpuInformation[]>())
                 builder.AppendLine(string.Format("    {0} ({1} MHz)", cpuInformation.Model, cpuInformation.Frequency));
 
             return builder.ToString();
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetCpuInformation()
         {
             IMonitoringService provider = CreateProvider();
@@ -2324,7 +2323,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
@@ -2351,16 +2350,16 @@
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(string.Format("CPU information for agent {0}", agentId));
             HostInformation<ReadOnlyCollection<CpuInformation>> information = await provider.GetCpuInformationAsync(agentId, cancellationToken);
-            Assert.IsNotNull(information);
+            Assert.NotNull(information);
             foreach (CpuInformation cpuInformation in information.Info)
                 builder.AppendLine(string.Format("    {0} ({1} MHz)", cpuInformation.Model, cpuInformation.Frequency));
 
             return builder.ToString();
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetDiskInformation()
         {
             IMonitoringService provider = CreateProvider();
@@ -2368,7 +2367,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
@@ -2395,16 +2394,16 @@
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(string.Format("Disk information for agent {0}", agentId));
             HostInformation<ReadOnlyCollection<DiskInformation>> information = await provider.GetDiskInformationAsync(agentId, cancellationToken);
-            Assert.IsNotNull(information);
+            Assert.NotNull(information);
             foreach (DiskInformation diskInformation in information.Info)
                 builder.AppendLine(string.Format("    {0}", diskInformation.Name));
 
             return builder.ToString();
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetFilesystemInformation()
         {
             IMonitoringService provider = CreateProvider();
@@ -2412,7 +2411,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
@@ -2439,16 +2438,16 @@
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(string.Format("Filesystem information for agent {0}", agentId));
             HostInformation<ReadOnlyCollection<FilesystemInformation>> information = await provider.GetFilesystemInformationAsync(agentId, cancellationToken);
-            Assert.IsNotNull(information);
+            Assert.NotNull(information);
             foreach (FilesystemInformation filesystemInformation in information.Info)
                 builder.AppendLine(string.Format("    {0}", filesystemInformation));
 
             return builder.ToString();
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetMemoryInformation()
         {
             IMonitoringService provider = CreateProvider();
@@ -2456,7 +2455,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
@@ -2483,15 +2482,15 @@
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(string.Format("Memory information for agent {0}", agentId));
             HostInformation<MemoryInformation> information = await provider.GetMemoryInformationAsync(agentId, cancellationToken);
-            Assert.IsNotNull(information);
+            Assert.NotNull(information);
             builder.AppendLine(string.Format("    {0}", information.Info));
 
             return builder.ToString();
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetNetworkInterfaceInformation()
         {
             IMonitoringService provider = CreateProvider();
@@ -2499,7 +2498,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
@@ -2526,16 +2525,16 @@
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(string.Format("Network interface information for agent {0}", agentId));
             HostInformation<ReadOnlyCollection<NetworkInterfaceInformation>> information = await provider.GetNetworkInterfaceInformationAsync(agentId, cancellationToken);
-            Assert.IsNotNull(information);
+            Assert.NotNull(information);
             foreach (NetworkInterfaceInformation networkInterfaceInformation in information.Info)
                 builder.AppendLine(string.Format("    {0}", networkInterfaceInformation.Name));
 
             return builder.ToString();
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetProcessInformation()
         {
             IMonitoringService provider = CreateProvider();
@@ -2543,7 +2542,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
@@ -2570,16 +2569,16 @@
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(string.Format("Process information for agent {0}", agentId));
             HostInformation<ReadOnlyCollection<ProcessInformation>> information = await provider.GetProcessInformationAsync(agentId, cancellationToken);
-            Assert.IsNotNull(information);
+            Assert.NotNull(information);
             foreach (ProcessInformation processInformation in information.Info)
                 builder.AppendLine(string.Format("    {0}", processInformation.Name));
 
             return builder.ToString();
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetSystemInformation()
         {
             IMonitoringService provider = CreateProvider();
@@ -2587,7 +2586,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
@@ -2614,15 +2613,15 @@
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(string.Format("System information for agent {0}", agentId));
             HostInformation<SystemInformation> information = await provider.GetSystemInformationAsync(agentId, cancellationToken);
-            Assert.IsNotNull(information);
+            Assert.NotNull(information);
             builder.AppendLine(string.Format("    {0}", information.Info.Name));
 
             return builder.ToString();
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestGetLoginInformation()
         {
             IMonitoringService provider = CreateProvider();
@@ -2630,7 +2629,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 List<Task<string>> tasks = new List<Task<string>>();
                 foreach (Agent agent in agents)
@@ -2657,16 +2656,16 @@
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(string.Format("Login information for agent {0}", agentId));
             HostInformation<ReadOnlyCollection<LoginInformation>> information = await provider.GetLoginInformationAsync(agentId, cancellationToken);
-            Assert.IsNotNull(information);
+            Assert.NotNull(information);
             foreach (LoginInformation loginInformation in information.Info)
                 builder.AppendLine(string.Format("    {0}@{1}", loginInformation.User, loginInformation.Host));
 
             return builder.ToString();
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Monitoring)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Monitoring, "")]
         public async Task TestListAgentCheckTargets()
         {
             IMonitoringService provider = CreateProvider();
@@ -2674,7 +2673,7 @@
             {
                 ReadOnlyCollection<Agent> agents = await ListAllAgentsAsync(provider, null, cancellationTokenSource.Token);
                 if (agents.Count == 0)
-                    Assert.Inconclusive("The service did not report any agents.");
+                    Assert.False(true, "The service did not report any agents.");
 
                 Task<ReadOnlyCollectionPage<AgentConnection, AgentConnectionId>>[] agentConnectionTasks = Array.ConvertAll(agents.ToArray(), agent => provider.ListAgentConnectionsAsync(agent.Id, null, 1, cancellationTokenSource.Token));
                 await Task.Factory.ContinueWhenAll((Task[])agentConnectionTasks, TaskExtrasExtensions.PropagateExceptions);
@@ -2692,11 +2691,11 @@
                 CheckType[] agentCheckTypes = checkTypes.Where(i => i.Id.IsAgent).ToArray();
                 CheckType[] targetableAgentCheckTypes = agentCheckTypes.Where(i => i.Fields.Any(j => j.Name.Equals("target", StringComparison.OrdinalIgnoreCase))).ToArray();
                 if (targetableAgentCheckTypes.Length == 0)
-                    Assert.Inconclusive("The service did not report any targetable agent check types.");
+                    Assert.False(true, "The service did not report any targetable agent check types.");
 
                 ReadOnlyCollection<Entity> entities = await ListAllEntitiesAsync(provider, null, cancellationTokenSource.Token);
                 if (entities.Count == 0)
-                    Assert.Inconclusive("The service did not report any entities.");
+                    Assert.False(true, "The service did not report any entities.");
 
                 List<Task> tasks = new List<Task>();
                 foreach (Entity entity in entities)
@@ -2708,7 +2707,7 @@
                 }
 
                 if (tasks.Count == 0)
-                    Assert.Inconclusive("The service did not report any entities with connected agents.");
+                    Assert.False(true, "The service did not report any entities with connected agents.");
 
                 await Task.Factory.ContinueWhenAll(tasks.ToArray(), TaskExtrasExtensions.PropagateExceptions);
             }

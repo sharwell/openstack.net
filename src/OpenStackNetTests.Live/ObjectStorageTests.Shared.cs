@@ -14,7 +14,6 @@
     using ICSharpCode.SharpZipLib.BZip2;
     using ICSharpCode.SharpZipLib.GZip;
     using ICSharpCode.SharpZipLib.Tar;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
@@ -22,6 +21,7 @@
     using OpenStack.Security.Authentication;
     using OpenStack.Services;
     using OpenStack.Services.ObjectStorage.V1;
+    using Xunit;
     using Encoding = System.Text.Encoding;
     using File = System.IO.File;
     using MemoryStream = System.IO.MemoryStream;
@@ -72,9 +72,9 @@
 
         #region Discoverability
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestGetObjectStorageInfoAsync()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -85,8 +85,8 @@
                 IObjectStorageService service = CreateService();
                 var call = await service.PrepareGetObjectStorageInfoAsync(cancellationToken);
                 Tuple<HttpResponseMessage, ReadOnlyDictionary<string, JToken>> response = await call.SendAsync(cancellationToken);
-                Assert.IsNotNull(response);
-                Assert.IsNotNull(response.Item2);
+                Assert.NotNull(response);
+                Assert.NotNull(response.Item2);
             }
         }
 
@@ -102,9 +102,8 @@
         /// <para>This test is normally disabled. To run the cleanup method, comment out or remove the
         /// <see cref="IgnoreAttribute"/>.</para>
         /// </remarks>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
-        [Ignore]
+        [Fact(Skip = "This test is normally disabled.")]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupAllContainerMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -128,8 +127,8 @@
         /// This unit test clears the metadata associated with every container which is created by the unit tests in
         /// this class.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupTestContainerMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -156,8 +155,8 @@
         /// This unit test deletes all containers created by the unit tests, including all objects within those
         /// containers.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupTestContainers()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -320,9 +319,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestListContainers()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -333,7 +332,7 @@
                 IObjectStorageService service = CreateService();
                 ReadOnlyCollection<Container> containers = await ListAllContainersAsync(service, cancellationToken);
                 if (!containers.Any())
-                    Assert.Inconclusive("The account does not have any containers in the region.");
+                    Assert.False(true, "The account does not have any containers in the region.");
 
                 Console.WriteLine("Containers");
                 foreach (Container container in containers)
@@ -346,9 +345,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestContainerProperties()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -357,9 +356,22 @@
                 CancellationToken cancellationToken = cancellationTokenSource.Token;
 
                 IObjectStorageService service = CreateService();
+
+                ContainerName containerName = new ContainerName(TestContainerPrefix + Path.GetRandomFileName());
+                await service.CreateContainerAsync(containerName, cancellationToken);
+
+                ObjectName objectName = new ObjectName(Path.GetRandomFileName());
+                // another random name counts as random content
+                string fileData = Path.GetRandomFileName();
+
+                using (MemoryStream uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(fileData)))
+                {
+                    await service.CreateObjectAsync(containerName, objectName, uploadStream, cancellationToken, null);
+                }
+
                 ReadOnlyCollection<Container> containers = await ListAllContainersAsync(service, cancellationToken);
                 if (!containers.Any())
-                    Assert.Inconclusive("The account does not have any containers in the region.");
+                    Assert.False(true, "The account does not have any containers in the region.");
 
                 int containersTested = 0;
                 long? objectsTested = 0;
@@ -368,8 +380,8 @@
                 int nonEmptyBytesContainersTested = 0;
                 foreach (Container container in containers)
                 {
-                    Assert.IsTrue(container.ObjectCount >= 0);
-                    Assert.IsTrue(container.Size >= 0);
+                    Assert.True(container.ObjectCount >= 0);
+                    Assert.True(container.Size >= 0);
 
                     containersTested++;
                     if (container.ObjectCount > 0)
@@ -377,7 +389,7 @@
                     if (container.Size > 0)
                         nonEmptyBytesContainersTested++;
 
-                    long objectCount = 0;
+                    int? objectCount = 0;
                     long? objectSize = 0;
                     foreach (var obj in await ListAllObjectsAsync(service, container.Name, cancellationToken))
                     {
@@ -388,15 +400,15 @@
                     objectsTested += objectCount;
                     totalSizeTested += objectSize;
 
-                    Assert.AreEqual(container.ObjectCount, objectCount);
-                    Assert.AreEqual(container.Size, objectSize);
+                    Assert.Equal(container.ObjectCount, objectCount);
+                    Assert.Equal(container.Size, objectSize);
 
                     if (containersTested >= 5 && nonEmptyContainersTested >= 5 && nonEmptyBytesContainersTested >= 5)
                         break;
                 }
 
                 if (containersTested == 0 || nonEmptyContainersTested == 0 || nonEmptyBytesContainersTested == 0)
-                    Assert.Inconclusive("The account does not have any non-empty containers in the region.");
+                    Assert.False(true, "The account does not have any non-empty containers in the region.");
 
                 Console.WriteLine("Verified container properties for:");
                 Console.WriteLine("  {0} containers", containersTested);
@@ -405,9 +417,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestCreateContainer()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -423,19 +435,19 @@
 
                 apiCall = await service.PrepareCreateContainerAsync(container, cancellationToken);
                 result = await apiCall.SendAsync(cancellationToken);
-                Assert.AreEqual(HttpStatusCode.Created, result.Item1.StatusCode);
+                Assert.Equal(HttpStatusCode.Created, result.Item1.StatusCode);
 
                 apiCall = await service.PrepareCreateContainerAsync(container, cancellationToken);
                 result = await apiCall.SendAsync(cancellationToken);
-                Assert.AreEqual(HttpStatusCode.Accepted, result.Item1.StatusCode);
+                Assert.Equal(HttpStatusCode.Accepted, result.Item1.StatusCode);
 
                 await service.RemoveContainerAsync(container, cancellationToken);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestCreateContainerSimple()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -454,9 +466,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestVersionedContainer()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -476,7 +488,7 @@
                 await createCall.SendAsync(cancellationToken);
 
                 ContainerName location = await service.GetVersionsLocationAsync(containerName, cancellationToken);
-                Assert.AreEqual(versionsContainerName, location);
+                Assert.Equal(versionsContainerName, location);
 
                 ObjectName objectName = new ObjectName(Path.GetRandomFileName());
                 string fileData1 = "first-content";
@@ -491,7 +503,7 @@
                 }
 
                 string actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData1, actualData);
+                Assert.Equal(fileData1, actualData);
 
                 /*
                  * Overwrite the object
@@ -503,7 +515,7 @@
                 }
 
                 actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData2, actualData);
+                Assert.Equal(fileData2, actualData);
 
                 /*
                  * Delete the object once
@@ -512,7 +524,7 @@
                 await service.RemoveObjectAsync(containerName, objectName, cancellationToken);
 
                 actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData1, actualData);
+                Assert.Equal(fileData1, actualData);
 
                 /*
                  * Cleanup
@@ -523,9 +535,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestRemoveContainer()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -546,21 +558,21 @@
                 try
                 {
                     await service.RemoveContainerAsync(containerName, cancellationToken);
-                    Assert.Fail("Expected an exception");
+                    Assert.True(false, "Expected an exception");
                 }
                 catch (HttpWebException ex)
                 {
-                    Assert.IsNotNull(ex.ResponseMessage);
-                    Assert.AreEqual(HttpStatusCode.Conflict, ex.ResponseMessage.StatusCode);
+                    Assert.NotNull(ex.ResponseMessage);
+                    Assert.Equal(HttpStatusCode.Conflict, ex.ResponseMessage.StatusCode);
                 }
 
                 await RemoveContainerWithObjectsAsync(service, containerName, cancellationToken);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestGetContainerHeader()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -574,7 +586,7 @@
                 await service.CreateContainerAsync(containerName, cancellationToken);
 
                 ContainerMetadata metadata = await service.GetContainerMetadataAsync(containerName, cancellationToken);
-                Assert.IsNotNull(metadata);
+                Assert.NotNull(metadata);
 
                 IDictionary<string, string> headers = metadata.Headers;
                 Console.WriteLine("Container Headers");
@@ -585,9 +597,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestGetContainerMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -620,9 +632,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestContainerHeaderKeyCharacters()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -651,12 +663,12 @@
                 await service.UpdateContainerMetadataAsync(containerName, updatedMetadata, cancellationToken);
 
                 ContainerMetadata metadata = await service.GetContainerMetadataAsync(containerName, cancellationToken);
-                Assert.IsNotNull(metadata);
-                Assert.IsNotNull(metadata.Metadata);
+                Assert.NotNull(metadata);
+                Assert.NotNull(metadata.Metadata);
 
                 string value;
-                Assert.IsTrue(metadata.Metadata.TryGetValue(key, out value));
-                Assert.AreEqual("Value", value);
+                Assert.True(metadata.Metadata.TryGetValue(key, out value));
+                Assert.Equal("Value", value);
 
                 updatedMetadata = new ContainerMetadata(
                     ContainerMetadata.Empty.Headers,
@@ -664,17 +676,17 @@
                 await service.UpdateContainerMetadataAsync(containerName, updatedMetadata, cancellationToken);
 
                 metadata = await service.GetContainerMetadataAsync(containerName, cancellationToken);
-                Assert.IsNotNull(metadata);
-                Assert.IsNotNull(metadata.Metadata);
-                Assert.IsFalse(metadata.Metadata.TryGetValue(key, out value));
+                Assert.NotNull(metadata);
+                Assert.NotNull(metadata.Metadata);
+                Assert.False(metadata.Metadata.TryGetValue(key, out value));
 
                 await RemoveContainerWithObjectsAsync(service, containerName, cancellationToken);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestContainerInvalidHeaderKeyCharacters()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -687,16 +699,22 @@
 
                 await service.CreateContainerAsync(containerName, cancellationToken);
 
-                List<char> validKeyCharList = new List<char>();
+                bool[] separatorCharacters = new bool[char.MaxValue + 1];
+                bool[] notSupportedCharacters = new bool[char.MaxValue + 1];
+                bool[] validKeyCharacters = new bool[char.MaxValue + 1];
                 for (char i = MinHeaderKeyCharacter; i <= MaxHeaderKeyCharacter; i++)
                 {
-                    if (!SeparatorCharacters.Contains(i) && !NotSupportedCharacters.Contains(i))
-                        validKeyCharList.Add(i);
+                    if (SeparatorCharacters.Contains(i))
+                        separatorCharacters[i] = true;
+                    else if (NotSupportedCharacters.Contains(i))
+                        notSupportedCharacters[i] = true;
+                    else
+                        validKeyCharacters[i] = true;
                 }
 
                 for (int i = char.MinValue; i <= char.MaxValue; i++)
                 {
-                    if (validKeyCharList.BinarySearch((char)i) >= 0)
+                    if (validKeyCharacters[i])
                         continue;
 
                     string invalidKey = new string((char)i, 1);
@@ -706,17 +724,17 @@
                         ContainerMetadata updatedMetadata = new ContainerMetadata(
                             ContainerMetadata.Empty.Headers,
                             new Dictionary<string, string> { { invalidKey, "Value" } });
-                        await service.UpdateContainerMetadataAsync(containerName, updatedMetadata, cancellationToken);
-                        Assert.Fail("Should throw an exception for invalid keys.");
+                        await service.UpdateContainerMetadataAsync(containerName, updatedMetadata, cancellationToken).ConfigureAwait(false);
+                        Assert.True(false, "Should throw an exception for invalid keys.");
                     }
                     catch (FormatException)
                     {
                         if (i >= MinHeaderKeyCharacter && i <= MaxHeaderKeyCharacter)
-                            StringAssert.Contains(SeparatorCharacters, invalidKey);
+                            Assert.True(separatorCharacters[i]);
                     }
                     catch (NotSupportedException)
                     {
-                        StringAssert.Contains(NotSupportedCharacters, invalidKey);
+                        Assert.True(notSupportedCharacters[i]);
                     }
                 }
 
@@ -724,9 +742,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestUpdateContainerMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -772,9 +790,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestDeleteContainerMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -853,9 +871,9 @@
         /// This is a regression test for openstacknetsdk/openstack.net#333.
         /// </summary>
         /// <seealso href="https://github.com/openstacknetsdk/openstack.net/issues/333">Chunked Encoding Issues (#333)</seealso>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestProtocolViolation()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -866,24 +884,24 @@
                 try
                 {
                     await TestTempUrlWithControlCharactersInObjectName();
-                    Assert.Inconclusive("This test relies on the previous call throwing a WebException placing the ServicePoint in a bad state.");
+                    Assert.False(true, "This test relies on the previous call throwing a WebException placing the ServicePoint in a bad state.");
                 }
                 catch (WebException ex)
                 {
-                    Assert.IsNotNull(ex.Response);
+                    Assert.NotNull(ex.Response);
 
                     ServicePoint servicePoint = ServicePointManager.FindServicePoint(ex.Response.ResponseUri);
                     if (servicePoint.ProtocolVersion >= HttpVersion.Version11)
-                        Assert.Inconclusive("The ServicePoint must be set to HTTP/1.0 in order to test the ProtocolViolationException handling.");
+                        Assert.False(true, "The ServicePoint must be set to HTTP/1.0 in order to test the ProtocolViolationException handling.");
                 }
 
                 await TestTempUrlExpired();
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestTempUrlValid()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -925,7 +943,7 @@
                     Stream cdnStream = response.GetResponseStream();
                     StreamReader reader = new StreamReader(cdnStream, Encoding.UTF8);
                     string text = reader.ReadToEnd();
-                    Assert.AreEqual(fileContents, text);
+                    Assert.Equal(fileContents, text);
                 }
 
                 /* Cleanup
@@ -934,9 +952,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestTempUrlExpired()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -980,12 +998,12 @@
                         Stream cdnStream = response.GetResponseStream();
                         StreamReader reader = new StreamReader(cdnStream, Encoding.UTF8);
                         string text = reader.ReadToEnd();
-                        Assert.Fail("Expected an exception");
+                        Assert.True(false, "Expected an exception");
                     }
                 }
                 catch (WebException ex)
                 {
-                    Assert.AreEqual(HttpStatusCode.Unauthorized, ((HttpWebResponse)ex.Response).StatusCode);
+                    Assert.Equal(HttpStatusCode.Unauthorized, ((HttpWebResponse)ex.Response).StatusCode);
                 }
 
                 /* Cleanup
@@ -994,9 +1012,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestTempUrlWithSpecialCharactersInObjectName()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1038,7 +1056,7 @@
                     Stream cdnStream = response.GetResponseStream();
                     StreamReader reader = new StreamReader(cdnStream, Encoding.UTF8);
                     string text = reader.ReadToEnd();
-                    Assert.AreEqual(fileContents, text);
+                    Assert.Equal(fileContents, text);
                 }
 
                 /* Cleanup
@@ -1047,9 +1065,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestTempUrlWithControlCharactersInObjectName()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1091,7 +1109,7 @@
                     Stream cdnStream = response.GetResponseStream();
                     StreamReader reader = new StreamReader(cdnStream, Encoding.UTF8);
                     string text = reader.ReadToEnd();
-                    Assert.AreEqual(fileContents, text);
+                    Assert.Equal(fileContents, text);
                 }
 
                 /* Cleanup
@@ -1100,9 +1118,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestFormPostValid()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1162,7 +1180,7 @@
                 }
 
                 string actualData = await ReadAllObjectTextAsync(service, containerName, new ObjectName(objectName.Value + "file1"), Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileContents, actualData);
+                Assert.Equal(fileContents, actualData);
 
                 /* Cleanup
                  */
@@ -1203,9 +1221,9 @@
 
         #region Objects
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestGetObjectHeaders()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1223,12 +1241,12 @@
                 Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(objectData));
                 await service.CreateObjectAsync(containerName, objectName, stream, cancellationToken, null);
                 ObjectMetadata headers = await service.GetObjectMetadataAsync(containerName, objectName, cancellationToken);
-                Assert.IsNotNull(headers);
-                Assert.IsNotNull(headers.Headers);
+                Assert.NotNull(headers);
+                Assert.NotNull(headers.Headers);
                 Console.WriteLine("Headers");
                 foreach (var pair in headers.Headers)
                 {
-                    Assert.IsFalse(string.IsNullOrEmpty(pair.Key));
+                    Assert.False(string.IsNullOrEmpty(pair.Key));
                     Console.WriteLine("  {0}: {1}", pair.Key, pair.Value);
                 }
 
@@ -1236,9 +1254,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestGetObjectMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1274,9 +1292,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestUpdateObjectMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1297,7 +1315,7 @@
                 createCall.RequestMessage.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
                 await createCall.SendAsync(cancellationToken);
 
-                Assert.AreEqual(contentType, await GetObjectContentTypeAsync(service, containerName, objectName, cancellationToken));
+                Assert.Equal(contentType, await GetObjectContentTypeAsync(service, containerName, objectName, cancellationToken));
 
                 Dictionary<string, string> metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
@@ -1306,7 +1324,7 @@
                 };
 
                 await service.UpdateObjectMetadataAsync(containerName, objectName, new ObjectMetadata(ObjectMetadata.Empty.Headers, metadata), cancellationToken);
-                Assert.AreEqual(contentType, await GetObjectContentTypeAsync(service, containerName, objectName, cancellationToken));
+                Assert.Equal(contentType, await GetObjectContentTypeAsync(service, containerName, objectName, cancellationToken));
 
                 ObjectMetadata actualMetadata = await service.GetObjectMetadataAsync(containerName, objectName, cancellationToken);
                 Console.WriteLine("Object Metadata");
@@ -1321,7 +1339,7 @@
                     { "Key2", "Value 2" }
                 };
                 await service.UpdateObjectMetadataAsync(containerName, objectName, new ObjectMetadata(ObjectMetadata.Empty.Headers, updatedMetadata), cancellationToken);
-                Assert.AreEqual(contentType, await GetObjectContentTypeAsync(service, containerName, objectName, cancellationToken));
+                Assert.Equal(contentType, await GetObjectContentTypeAsync(service, containerName, objectName, cancellationToken));
 
                 actualMetadata = await service.GetObjectMetadataAsync(containerName, objectName, cancellationToken);
                 Console.WriteLine("Object Metadata");
@@ -1334,9 +1352,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestRemoveObjectMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1415,9 +1433,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestListObjects()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1453,14 +1471,14 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestSpecialCharacters()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
             {
-                cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(10)));
+                cancellationTokenSource.CancelAfter(TestTimeout(TimeSpan.FromSeconds(1)));
                 CancellationToken cancellationToken = cancellationTokenSource.Token;
 
                 IObjectStorageService service = CreateService();
@@ -1499,9 +1517,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestCreateObject()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1525,11 +1543,11 @@
                     uploadStream.Position = 0;
                     ProgressMonitor progressMonitor = new ProgressMonitor(uploadStream.Length);
                     await service.CreateObjectAsync(containerName, objectName, uploadStream, cancellationToken, progressMonitor);
-                    Assert.IsTrue(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
+                    Assert.True(progressMonitor.IsComplete, "Failed to notify progress monitor callback of status update.");
                 }
 
                 string actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData, actualData);
+                Assert.Equal(fileData, actualData);
 
                 /* Cleanup
                  */
@@ -1537,9 +1555,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestCreateObjectIfNoneMatch()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1568,34 +1586,34 @@
                     try
                     {
                         CreateObjectApiCall apiCall = await service.PrepareCreateObjectAsync(containerName, objectName, uploadStream, cancellationToken, progressMonitor);
-                        apiCall.RequestMessage.Headers.IfNoneMatch.Add(new EntityTagHeaderValue("*"));
+                        apiCall.RequestMessage.Headers.IfNoneMatch.Add(new EntityTagHeaderValue("\"*\""));
                         await apiCall.SendAsync(cancellationToken);
-                        Assert.Fail("Expected a 412 (Precondition Failed)");
+                        Assert.True(false, "Expected a 412 (Precondition Failed)");
                     }
                     catch (HttpWebException ex)
                     {
-                        Assert.IsNotNull(ex.ResponseMessage);
-                        Assert.AreEqual(HttpStatusCode.PreconditionFailed, ex.ResponseMessage.StatusCode);
-                        Assert.AreEqual(0, uploadStream.Position);
+                        Assert.NotNull(ex.ResponseMessage);
+                        Assert.Equal(HttpStatusCode.PreconditionFailed, ex.ResponseMessage.StatusCode);
+                        Assert.Equal(0, uploadStream.Position);
                     }
 
                     try
                     {
                         CreateObjectApiCall apiCall = await service.PrepareCreateObjectAsync(containerName, objectName, uploadStream, cancellationToken, progressMonitor);
-                        apiCall.RequestMessage.Headers.IfNoneMatch.Add(new EntityTagHeaderValue("*"));
+                        apiCall.RequestMessage.Headers.IfNoneMatch.Add(new EntityTagHeaderValue("\"*\""));
                         await apiCall.SendAsync(cancellationToken);
-                        Assert.Fail("Expected a 412 (Precondition Failed)");
+                        Assert.True(false, "Expected a 412 (Precondition Failed)");
                     }
                     catch (HttpWebException ex)
                     {
-                        Assert.IsNotNull(ex.ResponseMessage);
-                        Assert.AreEqual(HttpStatusCode.PreconditionFailed, ex.ResponseMessage.StatusCode);
-                        Assert.AreEqual(0, uploadStream.Position);
+                        Assert.NotNull(ex.ResponseMessage);
+                        Assert.Equal(HttpStatusCode.PreconditionFailed, ex.ResponseMessage.StatusCode);
+                        Assert.Equal(0, uploadStream.Position);
                     }
                 }
 
                 string actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData, actualData);
+                Assert.Equal(fileData, actualData);
 
                 /* Cleanup
                  */
@@ -1603,9 +1621,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestCreateObjectWithMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1631,12 +1649,12 @@
                 }
 
                 string actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData, actualData);
+                Assert.Equal(fileData, actualData);
 
                 ObjectMetadata metadata = await service.GetObjectMetadataAsync(containerName, objectName, cancellationToken);
-                Assert.AreEqual("ProjectCode", metadata.Metadata["Project-code"]);
-                Assert.AreEqual("FileDescription", metadata.Metadata["file-Description"]);
-                Assert.AreEqual("User Code", metadata.Metadata["user-code"]);
+                Assert.Equal("ProjectCode", metadata.Metadata["Project-code"]);
+                Assert.Equal("FileDescription", metadata.Metadata["file-Description"]);
+                Assert.Equal("User Code", metadata.Metadata["user-code"]);
 
                 /* Cleanup
                  */
@@ -1644,9 +1662,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestSupportsExtractArchive()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1656,14 +1674,14 @@
 
                 IObjectStorageService service = CreateService();
                 bool supportsExtractArchive = await service.SupportsExtractArchiveAsync(cancellationToken);
-                Assert.IsTrue(supportsExtractArchive);
+                Assert.True(supportsExtractArchive);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
-        [DeploymentItem("DarkKnightRises.jpg")]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
+        //[DeploymentItem("DarkKnightRises.jpg")]
         public async Task TestExtractArchiveTar()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1689,10 +1707,10 @@
                     outputStream.Flush();
                     outputStream.Position = 0;
                     ExtractArchiveResponse response = await service.ExtractArchiveAsync(containerName, outputStream, ArchiveFormat.Tar, cancellationToken, null);
-                    Assert.IsNotNull(response);
-                    Assert.AreEqual(1, response.CreatedFiles);
-                    Assert.IsNotNull(response.Errors);
-                    Assert.AreEqual(0, response.Errors.Count);
+                    Assert.NotNull(response);
+                    Assert.Equal(1, response.CreatedFiles);
+                    Assert.NotNull(response.Errors);
+                    Assert.Equal(0, response.Errors.Count);
                 }
 
                 using (MemoryStream downloadStream = new MemoryStream())
@@ -1700,17 +1718,17 @@
                     var result = await service.GetObjectAsync(containerName, sourceFileName, cancellationToken);
                     await result.Item2.CopyToAsync(downloadStream);
 
-                    Assert.AreEqual(content.Length, await GetContainerObjectSizeAsync(service, containerName, sourceFileName, cancellationToken));
+                    Assert.Equal(content.Length, await GetContainerObjectSizeAsync(service, containerName, sourceFileName, cancellationToken));
 
                     downloadStream.Position = 0;
                     byte[] actualData = new byte[downloadStream.Length];
                     downloadStream.Read(actualData, 0, actualData.Length);
-                    Assert.AreEqual(content.Length, actualData.Length);
+                    Assert.Equal(content.Length, actualData.Length);
                     using (MD5 md5 = MD5.Create())
                     {
                         byte[] contentMd5 = md5.ComputeHash(content);
                         byte[] actualMd5 = md5.ComputeHash(actualData);
-                        Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                        Assert.Equal(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
                     }
                 }
 
@@ -1720,10 +1738,10 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
-        [DeploymentItem("DarkKnightRises.jpg")]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
+        //[DeploymentItem("DarkKnightRises.jpg")]
         public async Task TestExtractArchiveTarGz()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1754,10 +1772,10 @@
                     outputStream.Flush();
                     outputStream.Position = 0;
                     ExtractArchiveResponse response = await service.ExtractArchiveAsync(containerName, outputStream, ArchiveFormat.TarGz, cancellationToken, null);
-                    Assert.IsNotNull(response);
-                    Assert.AreEqual(1, response.CreatedFiles);
-                    Assert.IsNotNull(response.Errors);
-                    Assert.AreEqual(0, response.Errors.Count);
+                    Assert.NotNull(response);
+                    Assert.Equal(1, response.CreatedFiles);
+                    Assert.NotNull(response.Errors);
+                    Assert.Equal(0, response.Errors.Count);
                 }
 
                 using (MemoryStream downloadStream = new MemoryStream())
@@ -1765,17 +1783,17 @@
                     var result = await service.GetObjectAsync(containerName, sourceFileName, cancellationToken);
                     await result.Item2.CopyToAsync(downloadStream);
 
-                    Assert.AreEqual(content.Length, await GetContainerObjectSizeAsync(service, containerName, sourceFileName, cancellationToken));
+                    Assert.Equal(content.Length, await GetContainerObjectSizeAsync(service, containerName, sourceFileName, cancellationToken));
 
                     downloadStream.Position = 0;
                     byte[] actualData = new byte[downloadStream.Length];
                     downloadStream.Read(actualData, 0, actualData.Length);
-                    Assert.AreEqual(content.Length, actualData.Length);
+                    Assert.Equal(content.Length, actualData.Length);
                     using (MD5 md5 = MD5.Create())
                     {
                         byte[] contentMd5 = md5.ComputeHash(content);
                         byte[] actualMd5 = md5.ComputeHash(actualData);
-                        Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                        Assert.Equal(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
                     }
                 }
 
@@ -1785,10 +1803,10 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
-        [DeploymentItem("DarkKnightRises.jpg")]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
+        //[DeploymentItem("DarkKnightRises.jpg")]
         public async Task TestExtractArchiveTarBz2()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1818,10 +1836,10 @@
                     outputStream.Flush();
                     outputStream.Position = 0;
                     ExtractArchiveResponse response = await service.ExtractArchiveAsync(containerName, outputStream, ArchiveFormat.TarBz2, cancellationToken, null);
-                    Assert.IsNotNull(response);
-                    Assert.AreEqual(1, response.CreatedFiles);
-                    Assert.IsNotNull(response.Errors);
-                    Assert.AreEqual(0, response.Errors.Count);
+                    Assert.NotNull(response);
+                    Assert.Equal(1, response.CreatedFiles);
+                    Assert.NotNull(response.Errors);
+                    Assert.Equal(0, response.Errors.Count);
                 }
 
                 using (MemoryStream downloadStream = new MemoryStream())
@@ -1829,17 +1847,17 @@
                     var result = await service.GetObjectAsync(containerName, sourceFileName, cancellationToken);
                     await result.Item2.CopyToAsync(downloadStream);
 
-                    Assert.AreEqual(content.Length, await GetContainerObjectSizeAsync(service, containerName, sourceFileName, cancellationToken));
+                    Assert.Equal(content.Length, await GetContainerObjectSizeAsync(service, containerName, sourceFileName, cancellationToken));
 
                     downloadStream.Position = 0;
                     byte[] actualData = new byte[downloadStream.Length];
                     downloadStream.Read(actualData, 0, actualData.Length);
-                    Assert.AreEqual(content.Length, actualData.Length);
+                    Assert.Equal(content.Length, actualData.Length);
                     using (MD5 md5 = MD5.Create())
                     {
                         byte[] contentMd5 = md5.ComputeHash(content);
                         byte[] actualMd5 = md5.ComputeHash(actualData);
-                        Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                        Assert.Equal(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
                     }
                 }
 
@@ -1849,10 +1867,10 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
-        [DeploymentItem("DarkKnightRises.jpg")]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
+        //[DeploymentItem("DarkKnightRises.jpg")]
         public async Task TestExtractArchiveTarGzCreateContainer()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1885,10 +1903,10 @@
                     outputStream.Flush();
                     outputStream.Position = 0;
                     ExtractArchiveResponse response = await service.ExtractArchiveAsync(outputStream, ArchiveFormat.TarGz, cancellationToken, null);
-                    Assert.IsNotNull(response);
-                    Assert.AreEqual(1, response.CreatedFiles);
-                    Assert.IsNotNull(response.Errors);
-                    Assert.AreEqual(0, response.Errors.Count);
+                    Assert.NotNull(response);
+                    Assert.Equal(1, response.CreatedFiles);
+                    Assert.NotNull(response.Errors);
+                    Assert.Equal(0, response.Errors.Count);
                 }
 
                 using (MemoryStream downloadStream = new MemoryStream())
@@ -1896,17 +1914,17 @@
                     var objectData = await service.GetObjectAsync(containerName, sourceFileName, cancellationToken);
                     await objectData.Item2.CopyToAsync(downloadStream);
 
-                    Assert.AreEqual(content.Length, await GetContainerObjectSizeAsync(service, containerName, sourceFileName, cancellationToken));
+                    Assert.Equal(content.Length, await GetContainerObjectSizeAsync(service, containerName, sourceFileName, cancellationToken));
 
                     downloadStream.Position = 0;
                     byte[] actualData = new byte[downloadStream.Length];
                     downloadStream.Read(actualData, 0, actualData.Length);
-                    Assert.AreEqual(content.Length, actualData.Length);
+                    Assert.Equal(content.Length, actualData.Length);
                     using (MD5 md5 = MD5.Create())
                     {
                         byte[] contentMd5 = md5.ComputeHash(content);
                         byte[] actualMd5 = md5.ComputeHash(actualData);
-                        Assert.AreEqual(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
+                        Assert.Equal(BitConverter.ToString(contentMd5), BitConverter.ToString(actualMd5));
                     }
                 }
 
@@ -1942,16 +1960,16 @@
 
             public void Report(long value)
             {
-                Assert.IsTrue(value >= 0);
-                Assert.IsTrue(value <= _maxValue);
-                Assert.IsTrue(value >= _currentValue);
+                Assert.True(value >= 0);
+                Assert.True(value <= _maxValue);
+                Assert.True(value >= _currentValue);
                 _currentValue = value;
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestCopyObject()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -1977,21 +1995,21 @@
                 }
 
                 string actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData, actualData);
+                Assert.Equal(fileData, actualData);
 
                 await service.CopyObjectAsync(containerName, objectName, containerName, copiedName, cancellationToken);
 
                 // make sure the item is available at the copied location
                 actualData = await ReadAllObjectTextAsync(service, containerName, copiedName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData, actualData);
+                Assert.Equal(fileData, actualData);
 
                 // make sure the original object still exists
                 actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData, actualData);
+                Assert.Equal(fileData, actualData);
 
                 // make sure the content type was not changed by the copy operation
-                Assert.AreEqual(contentType, await GetObjectContentTypeAsync(service, containerName, objectName, cancellationToken));
-                Assert.AreEqual(contentType, await GetObjectContentTypeAsync(service, containerName, copiedName, cancellationToken));
+                Assert.Equal(contentType, await GetObjectContentTypeAsync(service, containerName, objectName, cancellationToken));
+                Assert.Equal(contentType, await GetObjectContentTypeAsync(service, containerName, copiedName, cancellationToken));
 
                 /* Cleanup
                  */
@@ -1999,9 +2017,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestMoveObject()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -2027,7 +2045,7 @@
                 }
 
                 string actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData, actualData);
+                Assert.Equal(fileData, actualData);
 
                 await service.MoveObjectAsync(containerName, objectName, containerName, movedName, cancellationToken);
 
@@ -2038,20 +2056,20 @@
                         await service.GetObjectAsync(containerName, objectName, cancellationToken);
                     }
 
-                    Assert.Fail("Expected an exception (object should not exist)");
+                    Assert.True(false, "Expected an exception (object should not exist)");
                 }
                 catch (HttpWebException ex)
                 {
-                    Assert.IsNotNull(ex.ResponseMessage);
-                    Assert.AreEqual(HttpStatusCode.NotFound, ex.ResponseMessage.StatusCode);
+                    Assert.NotNull(ex.ResponseMessage);
+                    Assert.Equal(HttpStatusCode.NotFound, ex.ResponseMessage.StatusCode);
                 }
 
                 // make sure the item is available at the new location
                 actualData = await ReadAllObjectTextAsync(service, containerName, movedName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData, actualData);
+                Assert.Equal(fileData, actualData);
 
                 // make sure the content type was preserved by the move
-                Assert.AreEqual(contentType, await GetObjectContentTypeAsync(service, containerName, movedName, cancellationToken));
+                Assert.Equal(contentType, await GetObjectContentTypeAsync(service, containerName, movedName, cancellationToken));
 
                 /* Cleanup
                  */
@@ -2059,9 +2077,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestRemoveObject()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -2083,7 +2101,7 @@
                 }
 
                 string actualData = await ReadAllObjectTextAsync(service, containerName, objectName, Encoding.UTF8, cancellationToken);
-                Assert.AreEqual(fileData, actualData);
+                Assert.Equal(fileData, actualData);
 
                 await service.RemoveObjectAsync(containerName, objectName, cancellationToken);
 
@@ -2094,12 +2112,12 @@
                         await service.GetObjectAsync(containerName, objectName, cancellationToken);
                     }
 
-                    Assert.Fail("Expected an exception (object should not exist)");
+                    Assert.True(false, "Expected an exception (object should not exist)");
                 }
                 catch (HttpWebException ex)
                 {
-                    Assert.IsNotNull(ex.ResponseMessage);
-                    Assert.AreEqual(HttpStatusCode.NotFound, ex.ResponseMessage.StatusCode);
+                    Assert.NotNull(ex.ResponseMessage);
+                    Assert.Equal(HttpStatusCode.NotFound, ex.ResponseMessage.StatusCode);
                 }
 
                 /* Cleanup
@@ -2119,9 +2137,8 @@
         /// This test is normally disabled. To run the cleanup method, comment out or remove the
         /// <see cref="IgnoreAttribute"/>.
         /// </remarks>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
-        [Ignore]
+        [Fact(Skip = "")]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupAllAccountMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -2140,8 +2157,8 @@
         /// This unit test clears the metadata associated with the account which is
         /// created by the unit tests in this class.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupTestAccountMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -2156,9 +2173,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestGetAccountHeaders()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -2168,42 +2185,42 @@
 
                 IObjectStorageService service = CreateService();
                 AccountMetadata headers = await service.GetAccountMetadataAsync(cancellationToken);
-                Assert.IsNotNull(headers);
-                Assert.IsNotNull(headers.Headers);
+                Assert.NotNull(headers);
+                Assert.NotNull(headers.Headers);
                 if (headers.Headers.Count == 0)
-                    Assert.Inconclusive("The account did not appear to have any non-metadata headers.");
+                    Assert.False(true, "The account did not appear to have any non-metadata headers.");
 
                 Console.WriteLine("Account Headers:");
                 foreach (var pair in headers.Headers)
                 {
-                    Assert.IsNotNull(pair.Key);
-                    Assert.IsNotNull(pair.Value);
-                    Assert.IsFalse(string.IsNullOrEmpty(pair.Key));
+                    Assert.NotNull(pair.Key);
+                    Assert.NotNull(pair.Value);
+                    Assert.False(string.IsNullOrEmpty(pair.Key));
                     Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
 
                     // case insensitivity check
-                    Assert.IsTrue(headers.Headers.ContainsKey(pair.Key.ToUpperInvariant()));
-                    Assert.IsTrue(headers.Headers.ContainsKey(pair.Key.ToLowerInvariant()));
+                    Assert.True(headers.Headers.ContainsKey(pair.Key.ToUpperInvariant()));
+                    Assert.True(headers.Headers.ContainsKey(pair.Key.ToLowerInvariant()));
                 }
 
                 long? containerCount = headers.GetContainerCount();
-                Assert.IsTrue(containerCount >= 0);
+                Assert.True(containerCount >= 0);
 
                 long? accountBytes = headers.GetBytesUsed();
-                Assert.IsTrue(accountBytes >= 0);
+                Assert.True(accountBytes >= 0);
 
                 long? objectCount = headers.GetObjectCount();
                 if (objectCount.HasValue)
                 {
                     // the X-Account-Object-Count header is optional, but when included should be a non-negative integer
-                    Assert.IsTrue(objectCount >= 0);
+                    Assert.True(objectCount >= 0);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestGetAccountMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -2213,27 +2230,27 @@
 
                 IObjectStorageService service = CreateService();
                 AccountMetadata metadata = await service.GetAccountMetadataAsync(cancellationToken);
-                Assert.IsNotNull(metadata);
-                Assert.IsNotNull(metadata.Metadata);
+                Assert.NotNull(metadata);
+                Assert.NotNull(metadata.Metadata);
 
                 Console.WriteLine("Account Metadata:");
                 foreach (var pair in metadata.Metadata)
                 {
-                    Assert.IsNotNull(pair.Key);
-                    Assert.IsNotNull(pair.Value);
-                    Assert.IsFalse(string.IsNullOrEmpty(pair.Key));
+                    Assert.NotNull(pair.Key);
+                    Assert.NotNull(pair.Value);
+                    Assert.False(string.IsNullOrEmpty(pair.Key));
                     Console.WriteLine("    {0}: {1}", pair.Key, pair.Value);
 
                     // case insensitivity check
-                    Assert.IsTrue(metadata.Metadata.ContainsKey(pair.Key.ToUpperInvariant()));
-                    Assert.IsTrue(metadata.Metadata.ContainsKey(pair.Key.ToLowerInvariant()));
+                    Assert.True(metadata.Metadata.ContainsKey(pair.Key.ToUpperInvariant()));
+                    Assert.True(metadata.Metadata.ContainsKey(pair.Key.ToLowerInvariant()));
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestAccountHeaderKeyCharacters()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -2256,25 +2273,25 @@
                 await service.UpdateAccountMetadataAsync(new AccountMetadata(AccountMetadata.Empty.Headers, new Dictionary<string, string> { { key, "Value" } }), cancellationToken);
 
                 AccountMetadata metadata = await service.GetAccountMetadataAsync(cancellationToken);
-                Assert.IsNotNull(metadata);
-                Assert.IsNotNull(metadata.Metadata);
+                Assert.NotNull(metadata);
+                Assert.NotNull(metadata.Metadata);
 
                 string value;
-                Assert.IsTrue(metadata.Metadata.TryGetValue(key, out value));
-                Assert.AreEqual("Value", value);
+                Assert.True(metadata.Metadata.TryGetValue(key, out value));
+                Assert.Equal("Value", value);
 
                 await service.UpdateAccountMetadataAsync(new AccountMetadata(AccountMetadata.Empty.Headers, new Dictionary<string, string> { { key, null } }), cancellationToken);
 
                 metadata = await service.GetAccountMetadataAsync(cancellationToken);
-                Assert.IsNotNull(metadata);
-                Assert.IsNotNull(metadata.Metadata);
-                Assert.IsFalse(metadata.Metadata.TryGetValue(key, out value));
+                Assert.NotNull(metadata);
+                Assert.NotNull(metadata.Metadata);
+                Assert.False(metadata.Metadata.TryGetValue(key, out value));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestAccountInvalidHeaderKeyCharacters()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -2301,24 +2318,24 @@
                     try
                     {
                         await service.PrepareUpdateAccountMetadataAsync(new AccountMetadata(AccountMetadata.Empty.Headers, new Dictionary<string, string> { { invalidKey, "Value" } }), cancellationToken).ConfigureAwait(false);
-                        Assert.Fail("Should throw an exception during preparation of the request for invalid keys.");
+                        Assert.True(false, "Should throw an exception during preparation of the request for invalid keys.");
                     }
                     catch (FormatException)
                     {
                         if (i >= MinHeaderKeyCharacter && i <= MaxHeaderKeyCharacter)
-                            StringAssert.Contains(SeparatorCharacters, invalidKey);
+                            Assert.Contains(invalidKey, SeparatorCharacters);
                     }
                     catch (NotSupportedException)
                     {
-                        StringAssert.Contains(NotSupportedCharacters, invalidKey);
+                        Assert.Contains(invalidKey, NotSupportedCharacters);
                     }
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.ObjectStorage)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.ObjectStorage, "")]
         public async Task TestUpdateAccountMetadata()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -2330,7 +2347,7 @@
                 AccountMetadata metadata = await service.GetAccountMetadataAsync(cancellationToken);
                 if (metadata.Metadata.Any(i => i.Key.StartsWith(TestKeyPrefix, StringComparison.OrdinalIgnoreCase)))
                 {
-                    Assert.Inconclusive("The account contains metadata from a previous unit test run. Run CleanupTestAccountMetadata and try again.");
+                    Assert.False(true, "The account contains metadata from a previous unit test run. Run CleanupTestAccountMetadata and try again.");
                     return;
                 }
 
@@ -2387,14 +2404,14 @@
 
         private static void CheckMetadataCollections(IDictionary<string, string> expected, IDictionary<string, string> actual)
         {
-            Assert.AreEqual(expected.Count, actual.Count);
+            Assert.Equal(expected.Count, actual.Count);
             CheckMetadataSubset(expected, actual);
         }
 
         private static void CheckMetadataSubset(IDictionary<string, string> expected, IDictionary<string, string> actual)
         {
             foreach (var pair in expected)
-                Assert.IsTrue(actual.Contains(pair), "Expected metadata item {{ {0} : {1} }} not found.", pair.Key, pair.Value);
+                Assert.True(actual.Contains(pair), string.Format("Expected metadata item {{ {0} : {1} }} not found.", pair.Key, pair.Value));
         }
 
         private static async Task<string> ReadAllObjectTextAsync(IObjectStorageService service, ContainerName container, ObjectName @object, Encoding encoding/*, Dictionary<string, string> headers = null, string region = null, bool verifyEtag = false, Action<long> progressUpdated = null, bool useInternalUrl = false, CloudIdentity identity = null*/, CancellationToken cancellationToken, int chunkSize = 65536)
@@ -2415,7 +2432,7 @@
             if (Debugger.IsAttached)
                 return TimeSpan.FromDays(6);
 
-            return timeSpan;
+            return TimeSpan.FromTicks(timeSpan.Ticks * 10);
         }
 
         private IObjectStorageService CreateService()

@@ -1,13 +1,15 @@
 namespace OpenStack.Services.Orchestration.V1
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using OpenStack.ObjectModel;
 
     [JsonObject(MemberSerialization.OptIn)]
-    public class StackTemplate : ExtensibleJsonObject
+    public class StackTemplate : ExtensibleJsonObject, ITemplate
     {
         /// <summary>
         /// This is the backing field for the <see cref="TemplateVersion"/> property.
@@ -95,6 +97,18 @@ namespace OpenStack.Services.Orchestration.V1
             }
         }
 
+        /// <inheritdoc/>
+        ReadOnlyCollection<ITemplateParameterGroup> ITemplate.ParameterGroups
+        {
+            get
+            {
+                if (_parameterGroups == null)
+                    return null;
+
+                return new ReadOnlyCollection<ITemplateParameterGroup>(_parameterGroups);
+            }
+        }
+
         public ReadOnlyDictionary<TemplateParameterName, TemplateParameter> Parameters
         {
             get
@@ -103,6 +117,18 @@ namespace OpenStack.Services.Orchestration.V1
                     return null;
 
                 return new ReadOnlyDictionary<TemplateParameterName, TemplateParameter>(_parameters);
+            }
+        }
+
+        /// <inheritdoc/>
+        ReadOnlyDictionary<TemplateParameterName, ITemplateParameter> ITemplate.Parameters
+        {
+            get
+            {
+                if (_parameters == null)
+                    return null;
+
+                return new ReadOnlyDictionary<TemplateParameterName, ITemplateParameter>(_parameters.ToDictionary<KeyValuePair<TemplateParameterName, TemplateParameter>, TemplateParameterName, ITemplateParameter>(i => i.Key, i => i.Value));
             }
         }
 
@@ -117,6 +143,18 @@ namespace OpenStack.Services.Orchestration.V1
             }
         }
 
+        /// <inheritdoc/>
+        ReadOnlyDictionary<string, ITemplateResource> ITemplate.Resources
+        {
+            get
+            {
+                if (_resources == null)
+                    return null;
+
+                return new ReadOnlyDictionary<string, ITemplateResource>(_resources.ToDictionary<KeyValuePair<string, TemplateResource>, string, ITemplateResource>(i => i.Key, i => i.Value));
+            }
+        }
+
         public ReadOnlyDictionary<string, TemplateOutput> Outputs
         {
             get
@@ -125,6 +163,18 @@ namespace OpenStack.Services.Orchestration.V1
                     return null;
 
                 return new ReadOnlyDictionary<string, TemplateOutput>(_outputs);
+            }
+        }
+
+        /// <inheritdoc/>
+        ReadOnlyDictionary<string, ITemplateOutput> ITemplate.Outputs
+        {
+            get
+            {
+                if (_outputs == null)
+                    return null;
+
+                return new ReadOnlyDictionary<string, ITemplateOutput>(_outputs.ToDictionary<KeyValuePair<string, TemplateOutput>, string, ITemplateOutput>(i => i.Key, i => i.Value));
             }
         }
     }

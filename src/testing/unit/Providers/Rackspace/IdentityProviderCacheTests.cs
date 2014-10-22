@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.Net;
 using JSIStudios.SimpleRESTServices.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using net.openstack.Core.Caching;
 using net.openstack.Core.Domain;
 using net.openstack.Providers.Rackspace;
 using net.openstack.Providers.Rackspace.Objects;
 using net.openstack.Providers.Rackspace.Objects.Response;
+using Xunit;
 
 namespace OpenStackNet.Testing.Unit.Providers.Rackspace
 {
-    [TestClass]
     public class IdentityProviderCacheTests
     {
-        [TestMethod]
+        [Fact]
         public void Should_Not_Hit_Cache_When_Authenticating_The_First_Time()
         {
             var cacheMock = new Mock<ICache<UserAccess>>();
@@ -31,7 +30,7 @@ namespace OpenStackNet.Testing.Unit.Providers.Rackspace
             cacheMock.Verify(m => m.Get(It.IsAny<string>(), It.IsAny<Func<UserAccess>>(), true), Times.Once());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Always_Request_Fresh_Data_From_Cache_When_Authenticating()
         {
             var cacheMock = new Mock<ICache<UserAccess>>();

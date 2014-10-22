@@ -1,13 +1,12 @@
 ﻿namespace OpenStackNetTests.Live
 {
+    using System;
     using System.Threading;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using OpenStackNetTests.Unit;
     using OpenStackNetTests.Unit.Simulator.IdentityService.V2;
 
-    [TestClass]
-    public partial class IdentityV2Tests
+    public sealed partial class IdentityV2Tests : IDisposable
     {
         private SimulatedIdentityService _simulator;
 
@@ -19,15 +18,13 @@
             }
         }
 
-        [TestInitialize]
-        public void TestInitialize()
+        public IdentityV2Tests()
         {
             _simulator = new SimulatedIdentityService();
             _simulator.StartAsync(CancellationToken.None);
         }
 
-        [TestCleanup]
-        public void TestCleanup()
+        public void Dispose()
         {
             _simulator.Dispose();
             _simulator = null;

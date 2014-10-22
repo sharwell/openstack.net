@@ -6,13 +6,12 @@
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Databases;
+    using Xunit;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
 
-    [TestClass]
     public class UserDatabaseUserTests
     {
         private static DatabaseInstance _instance;
@@ -27,7 +26,7 @@
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = provider.ListFlavorsAsync(cancellationTokenSource.Token).Result;
                 if (flavors.Count == 0)
-                    Assert.Inconclusive("The service did not report any flavors.");
+                    Assert.False(true, "The service did not report any flavors.");
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = UserDatabaseTests.CreateRandomDatabaseInstanceName();
@@ -60,12 +59,12 @@
             //IComputeProvider provider = Bootstrapper.CreateComputeProvider();
             //Server server = provider.GetDetails(_server.Id);
             //if (server.Status != ServerState.Active)
-            //    Assert.Inconclusive("Could not run test because the server is in the '{0}' state (expected '{1}').", server.Status, ServerState.Active);
+            //    Assert.False(true, "Could not run test because the server is in the '{0}' state (expected '{1}').", server.Status, ServerState.Active);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestCreateUser()
         {
             IDatabaseService provider = UserDatabaseTests.CreateProvider();
@@ -83,9 +82,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestCreateUserWithGlobalHost()
         {
             IDatabaseService provider = UserDatabaseTests.CreateProvider();
@@ -103,9 +102,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestCreateUserWithSpecificHost()
         {
             IDatabaseService provider = UserDatabaseTests.CreateProvider();
@@ -123,9 +122,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestCreateUserWithSingleDatabaseAccess()
         {
             IDatabaseService provider = UserDatabaseTests.CreateProvider();
@@ -143,9 +142,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestCreateUserWithMultipleDatabaseAccess()
         {
             IDatabaseService provider = UserDatabaseTests.CreateProvider();
@@ -163,9 +162,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestListUsers()
         {
             IDatabaseService provider = UserDatabaseTests.CreateProvider();
@@ -183,9 +182,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestSetUserPassword()
         {
             IDatabaseService provider = UserDatabaseTests.CreateProvider();
@@ -203,9 +202,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestUpdateUser()
         {
             IDatabaseService provider = UserDatabaseTests.CreateProvider();
@@ -224,9 +223,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestGetUser()
         {
             IDatabaseService provider = UserDatabaseTests.CreateProvider();
@@ -244,9 +243,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestUserDatabaseAccess()
         {
             IDatabaseService provider = UserDatabaseTests.CreateProvider();
@@ -287,7 +286,7 @@
                     try
                     {
                         await provider.RevokeUserAccessAsync(_instance.Id, _databaseName, userName, cancellationTokenSource.Token);
-                        Assert.Fail("Expected a 404 response.");
+                        Assert.True(false, "Expected a 404 response.");
                     }
                     catch (WebException webException)
                     {
@@ -308,7 +307,7 @@
                     if (response == null)
                         throw;
 
-                    Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
                 }
 
                 accessible = await provider.ListUserAccessAsync(_instance.Id, userName, cancellationTokenSource.Token);

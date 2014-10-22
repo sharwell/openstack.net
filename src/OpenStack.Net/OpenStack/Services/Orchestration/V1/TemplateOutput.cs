@@ -18,7 +18,7 @@ namespace OpenStack.Services.Orchestration.V1
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class TemplateOutput : ExtensibleJsonObject
+    public class TemplateOutput : ExtensibleJsonObject, ITemplateOutput
     {
         /// <summary>
         /// This is the backing field for the <see cref="Description"/> property.

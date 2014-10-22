@@ -1,18 +1,17 @@
 ﻿namespace OpenStackNet.Testing.Unit
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using net.openstack.Core;
     using System;
     using System.Collections.ObjectModel;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
+    using net.openstack.Core;
+    using Xunit;
 
     /// <preliminary/>
-    [TestClass]
     public class AsyncWebRequestTests
     {
-        [TestMethod]
+        [Fact]
         public void TestAsyncWebRequest()
         {
             Uri uri = new Uri("http://google.com");
@@ -21,7 +20,7 @@
             response.Wait();
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAsyncWebRequestTimeout()
         {
             Uri uri = new Uri("http://google.com");
@@ -31,22 +30,22 @@
             try
             {
                 response.Wait();
-                Assert.Fail("Expected an exception");
+                Assert.True(false, "Expected an exception");
             }
             catch (AggregateException exception)
             {
-                Assert.AreEqual(TaskStatus.Faulted, response.Status);
+                Assert.Equal(TaskStatus.Faulted, response.Status);
 
                 ReadOnlyCollection<Exception> exceptions = exception.InnerExceptions;
-                Assert.AreEqual(1, exceptions.Count);
-                Assert.IsInstanceOfType(exceptions[0], typeof(WebException));
+                Assert.Equal(1, exceptions.Count);
+                Assert.IsAssignableFrom<WebException>(exceptions[0]);
 
                 WebException webException = (WebException)exceptions[0];
-                Assert.AreEqual(WebExceptionStatus.Timeout, webException.Status);
+                Assert.Equal(WebExceptionStatus.Timeout, webException.Status);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAsyncWebRequestCancellation()
         {
             Uri uri = new Uri("http://google.com");
@@ -57,19 +56,19 @@
             try
             {
                 response.Wait();
-                Assert.Fail("Expected an exception");
+                Assert.True(false, "Expected an exception");
             }
             catch (AggregateException exception)
             {
-                Assert.AreEqual(TaskStatus.Canceled, response.Status);
+                Assert.Equal(TaskStatus.Canceled, response.Status);
 
                 ReadOnlyCollection<Exception> exceptions = exception.InnerExceptions;
-                Assert.AreEqual(1, exceptions.Count);
-                Assert.IsInstanceOfType(exceptions[0], typeof(OperationCanceledException));
+                Assert.Equal(1, exceptions.Count);
+                Assert.IsAssignableFrom<OperationCanceledException>(exceptions[0]);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAsyncWebRequestError()
         {
             Uri uri = new Uri("http://google.com/fail");
@@ -78,18 +77,18 @@
             try
             {
                 response.Wait();
-                Assert.Fail("Expected an exception");
+                Assert.True(false, "Expected an exception");
             }
             catch (AggregateException exception)
             {
-                Assert.AreEqual(TaskStatus.Faulted, response.Status);
+                Assert.Equal(TaskStatus.Faulted, response.Status);
 
                 ReadOnlyCollection<Exception> exceptions = exception.InnerExceptions;
-                Assert.AreEqual(1, exceptions.Count);
-                Assert.IsInstanceOfType(exceptions[0], typeof(WebException));
+                Assert.Equal(1, exceptions.Count);
+                Assert.IsAssignableFrom<WebException>(exceptions[0]);
 
                 WebException webException = (WebException)exceptions[0];
-                Assert.AreEqual(HttpStatusCode.NotFound, ((HttpWebResponse)webException.Response).StatusCode);
+                Assert.Equal(HttpStatusCode.NotFound, ((HttpWebResponse)webException.Response).StatusCode);
             }
         }
     }

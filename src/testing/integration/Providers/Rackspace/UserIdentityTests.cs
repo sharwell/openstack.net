@@ -3,12 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Exceptions.Response;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
     using Newtonsoft.Json;
+    using Xunit;
     using HttpStatusCode = System.Net.HttpStatusCode;
     using Path = System.IO.Path;
 
@@ -18,7 +18,6 @@
     /// </summary>
     /// <seealso cref="IIdentityProvider"/>
     /// <seealso cref="CloudIdentityProvider"/>
-    [TestClass]
     public class UserIdentityTests
     {
         /// <summary>
@@ -46,25 +45,25 @@
         /// This method tests the basic functionality of the <see cref="IIdentityProvider.Authenticate"/>
         /// method for correct credentials.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestAuthenticate()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             UserAccess userAccess = provider.Authenticate();
 
-            Assert.IsNotNull(userAccess);
-            Assert.IsNotNull(userAccess.Token);
-            Assert.IsNotNull(userAccess.Token.Id);
-            Assert.IsNotNull(userAccess.Token.Expires);
-            Assert.IsFalse(userAccess.Token.IsExpired);
+            Assert.NotNull(userAccess);
+            Assert.NotNull(userAccess.Token);
+            Assert.NotNull(userAccess.Token.Id);
+            Assert.NotNull(userAccess.Token.Expires);
+            Assert.False(userAccess.Token.IsExpired);
 
-            Assert.IsNotNull(userAccess.User);
-            Assert.IsNotNull(userAccess.User.Id);
-            Assert.IsNotNull(userAccess.User.Name);
+            Assert.NotNull(userAccess.User);
+            Assert.NotNull(userAccess.User.Id);
+            Assert.NotNull(userAccess.User.Name);
 
-            Assert.IsNotNull(userAccess.ServiceCatalog);
+            Assert.NotNull(userAccess.ServiceCatalog);
 
             Console.Error.WriteLine(JsonConvert.SerializeObject(userAccess, Formatting.Indented));
 
@@ -81,36 +80,36 @@
         /// This method tests the basic functionality of the <see cref="IIdentityProvider.ValidateToken"/>
         /// method for a validated token.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestValidateToken()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             UserAccess userAccess = provider.Authenticate();
 
-            Assert.IsNotNull(userAccess);
-            Assert.IsNotNull(userAccess.Token);
-            Assert.IsNotNull(userAccess.Token.Id);
+            Assert.NotNull(userAccess);
+            Assert.NotNull(userAccess.Token);
+            Assert.NotNull(userAccess.Token.Id);
 
             try
             {
                 UserAccess validated = provider.ValidateToken(userAccess.Token.Id);
-                Assert.IsNotNull(validated);
-                Assert.IsNotNull(validated.Token);
-                Assert.AreEqual(userAccess.Token.Id, validated.Token.Id);
+                Assert.NotNull(validated);
+                Assert.NotNull(validated.Token);
+                Assert.Equal(userAccess.Token.Id, validated.Token.Id);
 
-                Assert.IsNotNull(validated.User);
-                Assert.AreEqual(userAccess.User.Id, validated.User.Id);
-                Assert.AreEqual(userAccess.User.Name, validated.User.Name);
-                Assert.AreEqual(userAccess.User.DefaultRegion, validated.User.DefaultRegion);
+                Assert.NotNull(validated.User);
+                Assert.Equal(userAccess.User.Id, validated.User.Id);
+                Assert.Equal(userAccess.User.Name, validated.User.Name);
+                Assert.Equal(userAccess.User.DefaultRegion, validated.User.DefaultRegion);
             }
             catch (UserNotAuthorizedException ex)
             {
                 if (ex.Response.StatusCode != HttpStatusCode.Forbidden)
                     throw;
 
-                Assert.Inconclusive("The service does not allow this user to access the Validate Token API.");
+                Assert.False(true, "The service does not allow this user to access the Validate Token API.");
             }
         }
 
@@ -118,16 +117,16 @@
         /// This method tests the basic functionality of the <see cref="IIdentityProvider.ListEndpoints"/>
         /// method for an authenticated user.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestListEndpoints()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             UserAccess userAccess = provider.Authenticate();
-            Assert.IsNotNull(userAccess);
-            Assert.IsNotNull(userAccess.Token);
-            Assert.IsNotNull(userAccess.Token.Id);
+            Assert.NotNull(userAccess);
+            Assert.NotNull(userAccess.Token);
+            Assert.NotNull(userAccess.Token.Id);
 
             try
             {
@@ -139,42 +138,42 @@
                 if (ex.Response.StatusCode != HttpStatusCode.Forbidden)
                     throw;
 
-                Assert.Inconclusive("The service does not allow this user to access the List Endpoints API.");
+                Assert.False(true, "The service does not allow this user to access the List Endpoints API.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestGetToken()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
 
             IdentityToken token = provider.GetToken();
-            Assert.IsNotNull(token);
+            Assert.NotNull(token);
 
             // ensure the provider is caching the access token
             IdentityToken cachedToken = provider.GetToken();
-            Assert.AreSame(token, cachedToken);
+            Assert.Same(token, cachedToken);
 
             // ensure that the provider refreshes the token upon request
             IdentityToken newToken = provider.GetToken(forceCacheRefresh: true);
-            Assert.AreNotSame(token, newToken);
+            Assert.NotSame(token, newToken);
 
             // ensure the the refresh was applied to the cache
             IdentityToken newCachedToken = provider.GetToken();
-            Assert.AreSame(newToken, newCachedToken);
+            Assert.Same(newToken, newCachedToken);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestListRoles()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             IExtendedCloudIdentityProvider extendedProvider = provider as IExtendedCloudIdentityProvider;
             if (extendedProvider == null)
-                Assert.Inconclusive("The current identity provider does not implement {0}", typeof(IExtendedCloudIdentityProvider).Name);
+                Assert.False(true, string.Format("The current identity provider does not implement {0}", typeof(IExtendedCloudIdentityProvider).Name));
 
             IEnumerable<Role> roles = extendedProvider.ListRoles(limit: 500);
             Console.WriteLine("Roles:");
@@ -186,20 +185,20 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestGetRolesByUser()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
 
             UserAccess userAccess = provider.GetUserAccess();
-            Assert.IsNotNull(userAccess);
-            Assert.IsNotNull(userAccess.User);
+            Assert.NotNull(userAccess);
+            Assert.NotNull(userAccess.User);
 
             IEnumerable<Role> roles = provider.GetRolesByUser(userAccess.User.Id);
-            Assert.IsNotNull(roles);
-            Assert.IsTrue(roles.Any());
+            Assert.NotNull(roles);
+            Assert.True(roles.Any());
 
             foreach (Role role in roles)
             {
@@ -212,8 +211,8 @@
         /// <summary>
         /// This method can be used to clean up users created during integration testing.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupUsers()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
@@ -227,19 +226,19 @@
                     continue;
 
                 bool deleted = provider.DeleteUser(user.Id);
-                Assert.IsTrue(deleted);
+                Assert.True(deleted);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestListUsers()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             IEnumerable<User> users = provider.ListUsers();
-            Assert.IsNotNull(users);
-            Assert.IsTrue(users.Any());
+            Assert.NotNull(users);
+            Assert.True(users.Any());
 
             foreach (User user in users)
             {
@@ -255,16 +254,16 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestGetUserByName()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             User user = provider.GetUserByName(Bootstrapper.Settings.TestIdentity.Username);
-            Assert.IsNotNull(user);
-            Assert.AreEqual(Bootstrapper.Settings.TestIdentity.Username, user.Username);
-            Assert.IsNotNull(user.Id);
+            Assert.NotNull(user);
+            Assert.Equal(Bootstrapper.Settings.TestIdentity.Username, user.Username);
+            Assert.NotNull(user.Id);
 
             Console.WriteLine("User \"{0}\" (id: {1})", user.Username, user.Id);
             if (!user.Enabled)
@@ -277,21 +276,21 @@
                 Console.WriteLine("    Domain ID: {0}", user.DomainId);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestGetUser()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             User userByName = provider.GetUserByName(Bootstrapper.Settings.TestIdentity.Username);
-            Assert.IsNotNull(userByName);
-            Assert.AreEqual(Bootstrapper.Settings.TestIdentity.Username, userByName.Username);
-            Assert.IsNotNull(userByName.Id);
+            Assert.NotNull(userByName);
+            Assert.Equal(Bootstrapper.Settings.TestIdentity.Username, userByName.Username);
+            Assert.NotNull(userByName.Id);
 
             User user = provider.GetUser(userByName.Id);
-            Assert.IsNotNull(user);
-            Assert.AreEqual(Bootstrapper.Settings.TestIdentity.Username, user.Username);
-            Assert.AreEqual(userByName.Id, user.Id);
+            Assert.NotNull(user);
+            Assert.Equal(Bootstrapper.Settings.TestIdentity.Username, user.Username);
+            Assert.Equal(userByName.Id, user.Id);
 
             Console.WriteLine("User \"{0}\" (id: {1})", user.Username, user.Id);
             if (!user.Enabled)
@@ -304,9 +303,9 @@
                 Console.WriteLine("    Domain ID: {0}", user.DomainId);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestAddUserUpdateUserDeleteUser()
         {
             string username = GenerateUsername();
@@ -315,23 +314,23 @@
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             NewUser user = provider.AddUser(newUser);
 
-            Assert.IsNotNull(user);
-            Assert.AreEqual(username, user.Username);
-            Assert.IsFalse(string.IsNullOrEmpty(user.Id));
-            Assert.IsFalse(string.IsNullOrEmpty(user.Password));
+            Assert.NotNull(user);
+            Assert.Equal(username, user.Username);
+            Assert.False(string.IsNullOrEmpty(user.Id));
+            Assert.False(string.IsNullOrEmpty(user.Password));
 
             IEnumerable<Role> roles = provider.GetRolesByUser(user.Id);
             Console.WriteLine("Roles for the created user:");
             foreach (Role role in roles)
                 Console.WriteLine("    {0} ({1}) # {2}", role.Name, role.Id, role.Description);
 
-            Assert.IsTrue(roles.Any(i => string.Equals(i.Name, "identity:default", StringComparison.OrdinalIgnoreCase)));
+            Assert.True(roles.Any(i => string.Equals(i.Name, "identity:default", StringComparison.OrdinalIgnoreCase)));
 
             try
             {
                 // make sure we can't add the same user twice
                 provider.AddUser(newUser);
-                Assert.Fail("Expected a conflict");
+                Assert.True(false, "Expected a conflict");
             }
             catch (ServiceConflictException)
             {
@@ -351,8 +350,8 @@
             current.Email = username + "2@example.com";
             User updated = provider.UpdateUser(current);
             Console.WriteLine(JsonConvert.SerializeObject(updated, Formatting.Indented));
-            Assert.AreNotSame(current, updated);
-            Assert.AreEqual(current.Email, updated.Email);
+            Assert.NotSame(current, updated);
+            Assert.Equal(current.Email, updated.Email);
 
             Console.WriteLine();
             Console.WriteLine("Updating username...");
@@ -361,8 +360,8 @@
             current.Username = username + "2";
             updated = provider.UpdateUser(current);
             Console.WriteLine(JsonConvert.SerializeObject(updated, Formatting.Indented));
-            Assert.AreNotSame(current, updated);
-            Assert.AreEqual(current.Username, updated.Username);
+            Assert.NotSame(current, updated);
+            Assert.Equal(current.Username, updated.Username);
 
             Console.WriteLine();
             Console.WriteLine("Updating default region...");
@@ -371,8 +370,8 @@
             current.DefaultRegion = current.DefaultRegion == "SYD" ? "DFW" : "SYD";
             updated = provider.UpdateUser(current);
             Console.WriteLine(JsonConvert.SerializeObject(updated, Formatting.Indented));
-            Assert.AreNotSame(current, updated);
-            Assert.AreEqual(current.DefaultRegion, updated.DefaultRegion);
+            Assert.NotSame(current, updated);
+            Assert.Equal(current.DefaultRegion, updated.DefaultRegion);
 
             Console.WriteLine();
             Console.WriteLine("Updating enabled (toggling twice)...");
@@ -381,23 +380,23 @@
             current.Enabled = !current.Enabled;
             updated = provider.UpdateUser(current);
             Console.WriteLine(JsonConvert.SerializeObject(updated, Formatting.Indented));
-            Assert.AreNotSame(current, updated);
-            Assert.AreEqual(current.Enabled, updated.Enabled);
+            Assert.NotSame(current, updated);
+            Assert.Equal(current.Enabled, updated.Enabled);
 
             current.Enabled = !current.Enabled;
             updated = provider.UpdateUser(current);
             Console.WriteLine(JsonConvert.SerializeObject(updated, Formatting.Indented));
-            Assert.AreNotSame(current, updated);
-            Assert.AreEqual(current.Enabled, updated.Enabled);
+            Assert.NotSame(current, updated);
+            Assert.Equal(current.Enabled, updated.Enabled);
 
-            Assert.IsNotNull(provider.GetUser(user.Id));
+            Assert.NotNull(provider.GetUser(user.Id));
 
             bool deleted = provider.DeleteUser(user.Id);
-            Assert.IsTrue(deleted);
+            Assert.True(deleted);
             try
             {
                 provider.GetUser(user.Id);
-                Assert.Fail("Expected an exception");
+                Assert.True(false, "Expected an exception");
             }
             catch (ItemNotFoundException)
             {
@@ -413,16 +412,16 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestListUserCredentials()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             User user = provider.GetUserByName(Bootstrapper.Settings.TestIdentity.Username);
             IEnumerable<UserCredential> credentials = provider.ListUserCredentials(user.Id);
-            Assert.IsNotNull(credentials);
-            Assert.IsTrue(credentials.Any());
+            Assert.NotNull(credentials);
+            Assert.True(credentials.Any());
 
             foreach (IGrouping<string, UserCredential> grouping in credentials.GroupBy(i => i.Name))
             {
@@ -432,15 +431,15 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestListTenants()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             IEnumerable<Tenant> tenants = provider.ListTenants();
-            Assert.IsNotNull(tenants);
-            Assert.IsTrue(tenants.Any());
+            Assert.NotNull(tenants);
+            Assert.True(tenants.Any());
 
             foreach (Tenant tenant in tenants)
             {
@@ -448,64 +447,64 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestGetUserAccess()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
 
             UserAccess userAccess = provider.GetUserAccess();
-            Assert.IsNotNull(userAccess);
-            Assert.IsNotNull(userAccess.Token);
+            Assert.NotNull(userAccess);
+            Assert.NotNull(userAccess.Token);
 
             // ensure the provider is caching the access token
             UserAccess cachedUserAccess = provider.GetUserAccess();
-            Assert.AreSame(userAccess, cachedUserAccess);
+            Assert.Same(userAccess, cachedUserAccess);
 
             // ensure that the provider refreshes the userAccess upon request
             UserAccess newUserAccess = provider.GetUserAccess(forceCacheRefresh: true);
-            Assert.AreNotSame(userAccess, newUserAccess);
+            Assert.NotSame(userAccess, newUserAccess);
 
             // ensure the the refresh was applied to the cache
             UserAccess newCachedUserAccess = provider.GetUserAccess();
-            Assert.AreSame(newUserAccess, newCachedUserAccess);
+            Assert.Same(newUserAccess, newCachedUserAccess);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestGetUserCredential()
         {
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider();
             User user = provider.GetUserByName(Bootstrapper.Settings.TestIdentity.Username);
             IEnumerable<UserCredential> credentials = provider.ListUserCredentials(user.Id);
-            Assert.IsNotNull(credentials);
-            Assert.IsTrue(credentials.Any());
+            Assert.NotNull(credentials);
+            Assert.True(credentials.Any());
 
             foreach (UserCredential credential in credentials)
             {
                 UserCredential value = provider.GetUserCredential(user.Id, credential.Name);
-                Assert.AreEqual(credential.Username, value.Username);
-                Assert.AreEqual(credential.Name, value.Name);
-                Assert.AreEqual(credential.APIKey, value.APIKey);
+                Assert.Equal(credential.Username, value.Username);
+                Assert.Equal(credential.Name, value.Name);
+                Assert.Equal(credential.APIKey, value.APIKey);
             }
 
             Console.WriteLine(JsonConvert.SerializeObject(credentials, Formatting.Indented));
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Identity)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Identity, "")]
         public void TestDefaultIdentity()
         {
             CloudIdentity identity = Bootstrapper.Settings.TestIdentity;
 
             IIdentityProvider provider = Bootstrapper.CreateIdentityProvider(identity);
-            Assert.AreEqual(identity, provider.DefaultIdentity);
+            Assert.Equal(identity, provider.DefaultIdentity);
 
             IIdentityProvider defaultProvider = Bootstrapper.CreateIdentityProvider();
-            Assert.IsNotNull(defaultProvider.DefaultIdentity);
+            Assert.NotNull(defaultProvider.DefaultIdentity);
         }
     }
 }

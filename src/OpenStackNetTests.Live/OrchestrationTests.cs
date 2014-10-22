@@ -1,9 +1,8 @@
 ﻿namespace OpenStackNetTests.Live
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
 
-    [TestClass]
-    public partial class OrchestrationTests
+    public sealed partial class OrchestrationTests : IDisposable
     {
         private LiveTestConfiguration _configuration;
 
@@ -18,14 +17,12 @@
             }
         }
 
-        [TestInitialize]
-        public void TestInitialize()
+        public OrchestrationTests()
         {
             _configuration = LiveTestConfiguration.LoadDefaultConfiguration();
         }
 
-        [TestCleanup]
-        public void TestCleanup()
+        public void Dispose()
         {
         }
     }

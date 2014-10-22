@@ -12,7 +12,7 @@ namespace OpenStack.Services.Orchestration.V1
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonObject(MemberSerialization.OptIn)]
-    public class TemplateParameter : ExtensibleJsonObject
+    public class TemplateParameter : ExtensibleJsonObject, ITemplateParameter
     {
         /// <summary>
         /// This is the backing field for the <see cref="Type"/> property.
@@ -143,6 +143,14 @@ namespace OpenStack.Services.Orchestration.V1
             get
             {
                 return _type;
+            }
+        }
+
+        ITemplateParameterType ITemplateParameter.Type
+        {
+            get
+            {
+                return Type;
             }
         }
 

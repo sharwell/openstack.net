@@ -5,13 +5,13 @@
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Domain.Queues;
     using net.openstack.Core.Providers;
     using net.openstack.Core.Synchronous;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using Xunit;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using Path = System.IO.Path;
@@ -19,7 +19,6 @@
 
     /// <preliminary/>
     [Obsolete]
-    [TestClass]
     public class UserQueuesTestsSynchronous
     {
         /// <summary>
@@ -37,7 +36,7 @@
         /// (i.e., queues whose name starts with <see cref="TestQueuePrefix"/>), and
         /// attempts to delete them.
         /// </remarks>
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.Cleanup)]
         public void SynchronousCleanupTestQueues()
         {
@@ -53,18 +52,18 @@
             }
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestGetHome()
         {
             IQueueingService provider = CreateProvider();
             HomeDocument document = provider.GetHome();
-            Assert.IsNotNull(document);
+            Assert.NotNull(document);
             Console.WriteLine(JsonConvert.SerializeObject(document, Formatting.Indented));
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestGetNodeHealth()
@@ -73,7 +72,7 @@
             provider.GetNodeHealth();
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestCreateQueue()
@@ -82,15 +81,15 @@
             QueueName queueName = CreateRandomQueueName();
 
             bool created = provider.CreateQueue(queueName);
-            Assert.IsTrue(created);
+            Assert.True(created);
 
             bool recreated = provider.CreateQueue(queueName);
-            Assert.IsFalse(recreated);
+            Assert.False(recreated);
 
             provider.DeleteQueue(queueName);
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestListQueues()
@@ -106,7 +105,7 @@
             provider.DeleteQueue(queueName);
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueExists()
@@ -115,12 +114,12 @@
             QueueName queueName = CreateRandomQueueName();
 
             provider.CreateQueue(queueName);
-            Assert.IsTrue(provider.QueueExists(queueName));
+            Assert.True(provider.QueueExists(queueName));
             provider.DeleteQueue(queueName);
-            Assert.IsFalse(provider.QueueExists(queueName));
+            Assert.False(provider.QueueExists(queueName));
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueMetadataStatic()
@@ -131,18 +130,18 @@
             provider.CreateQueue(queueName);
 
             SampleMetadata metadata = new SampleMetadata(3, "yes");
-            Assert.AreEqual(3, metadata.ValueA);
-            Assert.AreEqual("yes", metadata.ValueB);
+            Assert.Equal(3, metadata.ValueA);
+            Assert.Equal("yes", metadata.ValueB);
 
             provider.SetQueueMetadata(queueName, metadata);
             SampleMetadata result = provider.GetQueueMetadata<SampleMetadata>(queueName);
-            Assert.AreEqual(metadata.ValueA, result.ValueA);
-            Assert.AreEqual(metadata.ValueB, result.ValueB);
+            Assert.Equal(metadata.ValueA, result.ValueA);
+            Assert.Equal(metadata.ValueB, result.ValueB);
 
             provider.DeleteQueue(queueName);
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueMetadataDynamic()
@@ -158,8 +157,8 @@
 
             provider.SetQueueMetadata(queueName, metadata);
             JObject result = provider.GetQueueMetadata(queueName);
-            Assert.AreEqual(3, result["valueA"]);
-            Assert.AreEqual("yes", result["valueB"]);
+            Assert.Equal(3, result["valueA"]);
+            Assert.Equal("yes", result["valueB"]);
 
             provider.DeleteQueue(queueName);
         }
@@ -188,7 +187,7 @@
             }
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueStatistics()
@@ -199,15 +198,15 @@
             provider.CreateQueue(queueName);
 
             QueueStatistics statistics = provider.GetQueueStatistics(queueName);
-            Assert.IsNotNull(statistics);
+            Assert.NotNull(statistics);
 
             QueueMessagesStatistics messageStatistics = statistics.MessageStatistics;
-            Assert.IsNotNull(messageStatistics);
-            Assert.AreEqual(messageStatistics.Free, 0);
-            Assert.AreEqual(messageStatistics.Claimed, 0);
-            Assert.AreEqual(messageStatistics.Total, 0);
-            Assert.IsNull(messageStatistics.Oldest);
-            Assert.IsNull(messageStatistics.Newest);
+            Assert.NotNull(messageStatistics);
+            Assert.Equal(messageStatistics.Free, 0);
+            Assert.Equal(messageStatistics.Claimed, 0);
+            Assert.Equal(messageStatistics.Total, 0);
+            Assert.Null(messageStatistics.Oldest);
+            Assert.Null(messageStatistics.Newest);
 
             Console.WriteLine("Statistics:");
             Console.WriteLine();
@@ -216,15 +215,15 @@
             provider.PostMessages(queueName, new Message<SampleMetadata>(TimeSpan.FromSeconds(120), new SampleMetadata(3, "yes")));
 
             statistics = provider.GetQueueStatistics(queueName);
-            Assert.IsNotNull(statistics);
+            Assert.NotNull(statistics);
 
             messageStatistics = statistics.MessageStatistics;
-            Assert.IsNotNull(messageStatistics);
-            Assert.AreEqual(messageStatistics.Free, 1);
-            Assert.AreEqual(messageStatistics.Claimed, 0);
-            Assert.AreEqual(messageStatistics.Total, 1);
-            Assert.IsNotNull(messageStatistics.Oldest);
-            Assert.IsNotNull(messageStatistics.Newest);
+            Assert.NotNull(messageStatistics);
+            Assert.Equal(messageStatistics.Free, 1);
+            Assert.Equal(messageStatistics.Claimed, 0);
+            Assert.Equal(messageStatistics.Total, 1);
+            Assert.NotNull(messageStatistics.Oldest);
+            Assert.NotNull(messageStatistics.Newest);
 
             Console.WriteLine("Statistics:");
             Console.WriteLine();
@@ -233,7 +232,7 @@
             provider.DeleteQueue(queueName);
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestListAllQueueMessagesWithUpdates()
@@ -252,7 +251,7 @@
 
             QueuedMessageList messages = provider.ListMessages(queueName, null, null, true, false);
             foreach (QueuedMessage message in messages)
-                Assert.IsTrue(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
+                Assert.True(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
 
             int deletedMessage = messages[0].Body.ToObject<SampleMetadata>().ValueA;
             provider.DeleteMessage(queueName, messages[0].Id, null);
@@ -262,27 +261,27 @@
                 QueuedMessageList tempList = provider.ListMessages(queueName, messages.NextPageId, null, true, false);
                 if (tempList.Count > 0)
                 {
-                    Assert.IsTrue(locatedMessages.Add(tempList[0].Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
+                    Assert.True(locatedMessages.Add(tempList[0].Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
                     provider.DeleteMessage(queueName, tempList[0].Id, null);
                 }
 
                 messages = provider.ListMessages(queueName, messages.NextPageId, null, true, false);
                 foreach (QueuedMessage message in messages)
                 {
-                    Assert.IsTrue(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
+                    Assert.True(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
                 }
             }
 
-            Assert.AreEqual(28, locatedMessages.Count);
+            Assert.Equal(28, locatedMessages.Count);
             for (int i = 0; i < 28; i++)
             {
-                Assert.IsTrue(locatedMessages.Contains(i), "The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i);
+                Assert.True(locatedMessages.Contains(i), "The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i);
             }
 
             provider.DeleteQueue(queueName);
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestListAllQueueMessages()
@@ -301,12 +300,12 @@
 
             ReadOnlyCollection<QueuedMessage> messages = ListAllMessages(provider, queueName, null, true, false);
             foreach (QueuedMessage message in messages)
-                Assert.IsTrue(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
+                Assert.True(locatedMessages.Add(message.Body.ToObject<SampleMetadata>().ValueA), "Received the same message more than once.");
 
-            Assert.AreEqual(28, locatedMessages.Count);
+            Assert.Equal(28, locatedMessages.Count);
             for (int i = 0; i < 28; i++)
             {
-                Assert.IsTrue(locatedMessages.Contains(i), "The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i);
+                Assert.True(locatedMessages.Contains(i), "The message listing did not include message '{0}', which was in the queue when the listing started and still in it afterwards.", i);
             }
 
             provider.DeleteQueue(queueName);
@@ -317,7 +316,7 @@
         /// and <see cref="QueueingServiceExtensions.PostMessages(QueueName, IEnumerable{Message}, CancellationToken)"/>
         /// methods when posting 0 messages.
         /// </summary>
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestPostQueueMessages_Generic_0()
@@ -334,19 +333,19 @@
             //
 
             enqueued = provider.PostMessages(queueName);
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.AreEqual(0, enqueued.Ids.Count());
-            Assert.IsFalse(enqueued.Ids.Contains(null));
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.Equal(0, enqueued.Ids.Count());
+            Assert.False(enqueued.Ids.Contains(null));
             Assert.AreSame(MessagesEnqueued.Empty, enqueued);
 
             enqueued = provider.PostMessages(queueName, Enumerable.Empty<Message>());
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(0, enqueued.Ids.Count());
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(0, enqueued.Ids.Count());
             Assert.AreSame(MessagesEnqueued.Empty, enqueued);
 
             //
@@ -354,8 +353,8 @@
             //
 
             ReadOnlyCollection<QueuedMessage> messages = ListAllMessages(provider, queueName, null, true, true);
-            Assert.IsNotNull(messages);
-            Assert.AreEqual(0, messages.Count);
+            Assert.NotNull(messages);
+            Assert.Equal(0, messages.Count);
 
             //
             // Cleanup
@@ -369,7 +368,7 @@
         /// and <see cref="QueueingServiceExtensions.PostMessages(QueueName, IEnumerable{Message}, CancellationToken)"/>
         /// methods when posting 1 message.
         /// </summary>
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestPostQueueMessages_Generic_1()
@@ -388,26 +387,26 @@
             //
 
             enqueued = provider.PostMessages(queueName, genericMessage);
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(1, enqueued.Ids.Count());
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(1, enqueued.Ids.Count());
 
             enqueued = provider.PostMessages(queueName, new[] { genericMessage });
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(1, enqueued.Ids.Count());
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(1, enqueued.Ids.Count());
 
             //
             // Validation
             //
 
             ReadOnlyCollection<QueuedMessage> messages = ListAllMessages(provider, queueName, null, true, true);
-            Assert.IsNotNull(messages);
-            Assert.AreEqual(2, messages.Count);
+            Assert.NotNull(messages);
+            Assert.Equal(2, messages.Count);
 
             //
             // Cleanup
@@ -421,7 +420,7 @@
         /// and <see cref="QueueingServiceExtensions.PostMessages(QueueName, IEnumerable{Message}, CancellationToken)"/>
         /// methods when posting 2 messages.
         /// </summary>
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestPostQueueMessages_Generic_2()
@@ -440,28 +439,28 @@
             //
 
             enqueued = provider.PostMessages(queueName, genericMessage, genericMessage);
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(2, enqueued.Ids.Count());
-            Assert.AreEqual(false, enqueued.Partial);
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(2, enqueued.Ids.Count());
+            Assert.Equal(false, enqueued.Partial);
 
             enqueued = provider.PostMessages(queueName, new[] { genericMessage, genericMessage });
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(2, enqueued.Ids.Count());
-            Assert.AreEqual(false, enqueued.Partial);
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(2, enqueued.Ids.Count());
+            Assert.Equal(false, enqueued.Partial);
 
             //
             // Validation
             //
 
             ReadOnlyCollection<QueuedMessage> messages = ListAllMessages(provider, queueName, null, true, true);
-            Assert.IsNotNull(messages);
-            Assert.AreEqual(4, messages.Count);
+            Assert.NotNull(messages);
+            Assert.Equal(4, messages.Count);
 
             //
             // Cleanup
@@ -475,7 +474,7 @@
         /// and <see cref="QueueingServiceExtensions.PostMessages{T}(QueueName, IEnumerable{Message{T}}, CancellationToken)"/>
         /// methods when posting 0 messages.
         /// </summary>
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestPostQueueMessages_Typed_0()
@@ -494,19 +493,19 @@
             //
 
             enqueued = provider.PostMessages<SampleMetadata>(queueName);
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(0, enqueued.Ids.Count());
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(0, enqueued.Ids.Count());
             Assert.AreSame(MessagesEnqueued.Empty, enqueued);
 
             enqueued = provider.PostMessages<SampleMetadata>(queueName, Enumerable.Empty<Message<SampleMetadata>>());
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(0, enqueued.Ids.Count());
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(0, enqueued.Ids.Count());
             Assert.AreSame(MessagesEnqueued.Empty, enqueued);
 
             //
@@ -514,8 +513,8 @@
             //
 
             ReadOnlyCollection<QueuedMessage> messages = ListAllMessages(provider, queueName, null, true, true);
-            Assert.IsNotNull(messages);
-            Assert.AreEqual(0, messages.Count);
+            Assert.NotNull(messages);
+            Assert.Equal(0, messages.Count);
 
             //
             // Cleanup
@@ -529,7 +528,7 @@
         /// and <see cref="QueueingServiceExtensions.PostMessages{T}(QueueName, IEnumerable{Message{T}}, CancellationToken)"/>
         /// methods when posting 1 message.
         /// </summary>
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestPostQueueMessages_Typed_1()
@@ -548,26 +547,26 @@
             //
 
             enqueued = provider.PostMessages<SampleMetadata>(queueName, typedMessage);
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(1, enqueued.Ids.Count());
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(1, enqueued.Ids.Count());
 
             enqueued = provider.PostMessages<SampleMetadata>(queueName, new[] { typedMessage });
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(1, enqueued.Ids.Count());
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(1, enqueued.Ids.Count());
 
             //
             // Validation
             //
 
             ReadOnlyCollection<QueuedMessage> messages = ListAllMessages(provider, queueName, null, true, true);
-            Assert.IsNotNull(messages);
-            Assert.AreEqual(2, messages.Count);
+            Assert.NotNull(messages);
+            Assert.Equal(2, messages.Count);
 
             //
             // Cleanup
@@ -581,7 +580,7 @@
         /// and <see cref="QueueingServiceExtensions.PostMessages{T}(QueueName, IEnumerable{Message{T}}, CancellationToken)"/>
         /// methods when posting 2 messages.
         /// </summary>
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestPostQueueMessages_Typed_2()
@@ -600,26 +599,26 @@
             //
 
             enqueued = provider.PostMessages<SampleMetadata>(queueName, typedMessage, typedMessage);
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(2, enqueued.Ids.Count());
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(2, enqueued.Ids.Count());
 
             enqueued = provider.PostMessages<SampleMetadata>(queueName, new[] { typedMessage, typedMessage });
-            Assert.IsNotNull(enqueued);
-            Assert.AreEqual(false, enqueued.Partial);
-            Assert.IsNotNull(enqueued.Ids);
-            Assert.IsFalse(enqueued.Ids.Contains(null));
-            Assert.AreEqual(2, enqueued.Ids.Count());
+            Assert.NotNull(enqueued);
+            Assert.Equal(false, enqueued.Partial);
+            Assert.NotNull(enqueued.Ids);
+            Assert.False(enqueued.Ids.Contains(null));
+            Assert.Equal(2, enqueued.Ids.Count());
 
             //
             // Validation
             //
 
             ReadOnlyCollection<QueuedMessage> messages = ListAllMessages(provider, queueName, null, true, true);
-            Assert.IsNotNull(messages);
-            Assert.AreEqual(4, messages.Count);
+            Assert.NotNull(messages);
+            Assert.Equal(4, messages.Count);
 
             //
             // Cleanup
@@ -632,7 +631,7 @@
         /// Tests the queueing service message functionality by creating two queues
         /// and two sub-processes and using them for two-way communication.
         /// </summary>
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueMessages()
@@ -740,7 +739,7 @@
                 provider.DeleteQueue(queueName);
 
             if (clientTotal == 0)
-                Assert.Inconclusive("No messages were fully processed by the test.");
+                Assert.False(true, "No messages were fully processed by the test.");
         }
 
         private void PublishMessages(QueueName requestQueueName, QueueName replyQueueName, ref int processedMessages, CancellationToken token)
@@ -769,8 +768,8 @@
                             if (result._id == message.Body._id)
                             {
                                 // this is the reply to this thread's operation
-                                Assert.AreEqual(message.Body._operand1 + message.Body._operand2, result._result);
-                                Assert.AreEqual(x + y, result._result);
+                                Assert.Equal(message.Body._operand1 + message.Body._operand2, result._result);
+                                Assert.Equal(x + y, result._result);
                                 queueingService.DeleteMessage(replyQueueName, queuedMessage.Id, claim);
                                 processedMessages++;
                                 handled = true;
@@ -913,7 +912,7 @@
             }
         }
 
-        [TestMethod]
+        [Fact]
         [TestCategory(TestCategories.User)]
         [TestCategory(TestCategories.QueuesSynchronous)]
         public void SynchronousTestQueueClaims()
@@ -928,28 +927,28 @@
             QueueStatistics statistics;
             using (Claim claim = provider.ClaimMessage(queueName, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(1)))
             {
-                Assert.AreEqual(TimeSpan.FromMinutes(5), claim.TimeToLive);
+                Assert.Equal(TimeSpan.FromMinutes(5), claim.TimeToLive);
 
-                Assert.IsNotNull(claim.Messages);
-                Assert.AreEqual(1, claim.Messages.Count);
+                Assert.NotNull(claim.Messages);
+                Assert.Equal(1, claim.Messages.Count);
 
                 statistics = provider.GetQueueStatistics(queueName);
-                Assert.AreEqual(1, statistics.MessageStatistics.Claimed);
+                Assert.Equal(1, statistics.MessageStatistics.Claimed);
 
                 QueuedMessage message = provider.GetMessage(queueName, claim.Messages[0].Id);
-                Assert.IsNotNull(message);
+                Assert.NotNull(message);
 
                 TimeSpan age = claim.Age;
                 Thread.Sleep(TimeSpan.FromSeconds(2));
                 claim.Refresh();
-                Assert.IsTrue(claim.Age >= age + TimeSpan.FromSeconds(2));
+                Assert.True(claim.Age >= age + TimeSpan.FromSeconds(2));
 
                 claim.Renew(TimeSpan.FromMinutes(10));
-                Assert.AreEqual(TimeSpan.FromMinutes(10), claim.TimeToLive);
+                Assert.Equal(TimeSpan.FromMinutes(10), claim.TimeToLive);
             }
 
             statistics = provider.GetQueueStatistics(queueName);
-            Assert.AreEqual(0, statistics.MessageStatistics.Claimed);
+            Assert.Equal(0, statistics.MessageStatistics.Claimed);
 
             provider.DeleteQueue(queueName);
         }

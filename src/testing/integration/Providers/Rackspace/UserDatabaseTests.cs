@@ -5,11 +5,11 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Collections;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.Databases;
+    using Xunit;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
@@ -24,7 +24,6 @@
     using WebException = System.Net.WebException;
     using WebResponse = System.Net.WebResponse;
 
-    [TestClass]
     public class UserDatabaseTests
     {
         /// <summary>
@@ -39,8 +38,8 @@
         /// </summary>
         private static readonly string TestDatabaseBackupPrefix = "UnitTestDbBackup-";
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupTestDatabases()
         {
             IDatabaseService provider = CreateProvider();
@@ -62,8 +61,8 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupTestDatabaseBackups()
         {
             IDatabaseService provider = CreateProvider();
@@ -85,9 +84,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestCreateInstance()
         {
             IDatabaseService provider = CreateProvider();
@@ -95,7 +94,7 @@
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = await provider.ListFlavorsAsync(cancellationTokenSource.Token);
                 if (flavors.Count == 0)
-                    Assert.Inconclusive("The service did not report any flavors.");
+                    Assert.False(true, "The service did not report any flavors.");
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
@@ -108,9 +107,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestEnableRootUser()
         {
             IDatabaseService provider = CreateProvider();
@@ -118,7 +117,7 @@
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = await provider.ListFlavorsAsync(cancellationTokenSource.Token);
                 if (flavors.Count == 0)
-                    Assert.Inconclusive("The service did not report any flavors.");
+                    Assert.False(true, "The service did not report any flavors.");
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
@@ -126,20 +125,20 @@
                 DatabaseInstance instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 bool? enabled = await provider.CheckRootEnabledStatusAsync(instance.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(enabled);
-                Assert.IsFalse(enabled.Value);
+                Assert.NotNull(enabled);
+                Assert.False(enabled.Value);
 
                 RootUser rootUser = await provider.EnableRootUserAsync(instance.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(rootUser);
-                Assert.IsFalse(string.IsNullOrEmpty(rootUser.Name));
-                Assert.IsFalse(string.IsNullOrEmpty(rootUser.Password));
+                Assert.NotNull(rootUser);
+                Assert.False(string.IsNullOrEmpty(rootUser.Name));
+                Assert.False(string.IsNullOrEmpty(rootUser.Password));
 
                 enabled = await provider.CheckRootEnabledStatusAsync(instance.Id, cancellationTokenSource.Token);
 
                 RootUser anotherRootUser = await provider.EnableRootUserAsync(instance.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(anotherRootUser);
-                Assert.IsFalse(string.IsNullOrEmpty(rootUser.Name));
-                Assert.IsFalse(string.IsNullOrEmpty(rootUser.Password));
+                Assert.NotNull(anotherRootUser);
+                Assert.False(string.IsNullOrEmpty(rootUser.Name));
+                Assert.False(string.IsNullOrEmpty(rootUser.Password));
 
                 /* Cleanup
                  */
@@ -147,9 +146,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestRebootInstance()
         {
             IDatabaseService provider = CreateProvider();
@@ -157,7 +156,7 @@
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = await provider.ListFlavorsAsync(cancellationTokenSource.Token);
                 if (flavors.Count == 0)
-                    Assert.Inconclusive("The service did not report any flavors.");
+                    Assert.False(true, "The service did not report any flavors.");
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
@@ -172,9 +171,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestResizeInstance()
         {
             IDatabaseService provider = CreateProvider();
@@ -182,7 +181,7 @@
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = await provider.ListFlavorsAsync(cancellationTokenSource.Token);
                 if (flavors.Count == 0)
-                    Assert.Inconclusive("The service did not report any flavors.");
+                    Assert.False(true, "The service did not report any flavors.");
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
@@ -198,9 +197,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestResizeInstanceVolume()
         {
             IDatabaseService provider = CreateProvider();
@@ -208,7 +207,7 @@
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = await provider.ListFlavorsAsync(cancellationTokenSource.Token);
                 if (flavors.Count == 0)
-                    Assert.Inconclusive("The service did not report any flavors.");
+                    Assert.False(true, "The service did not report any flavors.");
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
@@ -223,9 +222,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestCreateDatabase()
         {
             IDatabaseService provider = CreateProvider();
@@ -233,7 +232,7 @@
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = await provider.ListFlavorsAsync(cancellationTokenSource.Token);
                 if (flavors.Count == 0)
-                    Assert.Inconclusive("The service did not report any flavors.");
+                    Assert.False(true, "The service did not report any flavors.");
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
@@ -256,9 +255,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestListFlavors()
         {
             IDatabaseService provider = CreateProvider();
@@ -266,7 +265,7 @@
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = await provider.ListFlavorsAsync(cancellationTokenSource.Token);
                 if (flavors.Count == 0)
-                    Assert.Inconclusive("The service did not report any flavors.");
+                    Assert.False(true, "The service did not report any flavors.");
 
                 foreach (var flavor in flavors)
                 {
@@ -277,9 +276,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestGetFlavor()
         {
             IDatabaseService provider = CreateProvider();
@@ -287,7 +286,7 @@
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = await provider.ListFlavorsAsync(cancellationTokenSource.Token);
                 if (flavors.Count == 0)
-                    Assert.Inconclusive("The service did not report any flavors.");
+                    Assert.False(true, "The service did not report any flavors.");
 
                 Task<DatabaseFlavor>[] flavorTasks = Array.ConvertAll(flavors.ToArray(), flavor => provider.GetFlavorAsync(flavor.Id, cancellationTokenSource.Token));
                 await Task.WhenAll(flavorTasks);
@@ -295,28 +294,28 @@
                 for (int i = 0; i < flavors.Count; i++)
                 {
                     DatabaseFlavor referenceFlavor = flavors[i];
-                    Assert.IsNotNull(referenceFlavor);
+                    Assert.NotNull(referenceFlavor);
 
                     DatabaseFlavor individualFlavor = flavorTasks[i].Result;
-                    Assert.IsNotNull(individualFlavor);
+                    Assert.NotNull(individualFlavor);
 
-                    Assert.AreEqual(referenceFlavor.Id, individualFlavor.Id);
-                    Assert.AreEqual(referenceFlavor.Name, individualFlavor.Name);
-                    Assert.AreEqual(referenceFlavor.Href, individualFlavor.Href);
-                    Assert.AreEqual(referenceFlavor.Memory, individualFlavor.Memory);
-                    Assert.AreEqual(referenceFlavor.Links.Count, individualFlavor.Links.Count);
+                    Assert.Equal(referenceFlavor.Id, individualFlavor.Id);
+                    Assert.Equal(referenceFlavor.Name, individualFlavor.Name);
+                    Assert.Equal(referenceFlavor.Href, individualFlavor.Href);
+                    Assert.Equal(referenceFlavor.Memory, individualFlavor.Memory);
+                    Assert.Equal(referenceFlavor.Links.Count, individualFlavor.Links.Count);
                     for (int j = 0; j < referenceFlavor.Links.Count; j++)
                     {
-                        Assert.AreEqual(referenceFlavor.Links[j].Href, individualFlavor.Links[j].Href);
-                        Assert.AreEqual(referenceFlavor.Links[j].Rel, individualFlavor.Links[j].Rel);
+                        Assert.Equal(referenceFlavor.Links[j].Href, individualFlavor.Links[j].Href);
+                        Assert.Equal(referenceFlavor.Links[j].Rel, individualFlavor.Links[j].Rel);
                     }
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Database)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Database, "")]
         public async Task TestCreateBackup()
         {
             IDatabaseService provider = CreateProvider();
@@ -324,7 +323,7 @@
             {
                 ReadOnlyCollection<DatabaseFlavor> flavors = await provider.ListFlavorsAsync(cancellationTokenSource.Token);
                 if (flavors.Count == 0)
-                    Assert.Inconclusive("The service did not report any flavors.");
+                    Assert.False(true, "The service did not report any flavors.");
 
                 DatabaseFlavor smallestFlavor = flavors.Where(i => i.Memory.HasValue).OrderBy(i => i.Memory).First();
                 string instanceName = CreateRandomDatabaseInstanceName();
@@ -332,36 +331,36 @@
                 DatabaseInstance instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 ReadOnlyCollection<Backup> initialBackups = await provider.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(initialBackups);
-                Assert.AreEqual(0, initialBackups.Count);
+                Assert.NotNull(initialBackups);
+                Assert.Equal(0, initialBackups.Count);
 
                 string backupName = CreateRandomBackupName();
                 string backupDescription = "My backup";
                 BackupConfiguration backupConfiguration = new BackupConfiguration(instance.Id, backupName, backupDescription);
                 Backup backup = await provider.CreateBackupAsync(backupConfiguration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.AreEqual(BackupStatus.Completed, backup.Status);
+                Assert.Equal(BackupStatus.Completed, backup.Status);
 
                 Backup backupCopy = await provider.GetBackupAsync(backup.Id, cancellationTokenSource.Token);
-                Assert.AreEqual(backup.Id, backupCopy.Id);
+                Assert.Equal(backup.Id, backupCopy.Id);
 
                 ReadOnlyCollection<Backup> allBackups = await provider.ListBackupsAsync(cancellationTokenSource.Token);
                 ReadOnlyCollection<Backup> instanceBackups = await provider.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
-                Assert.IsTrue(allBackups.Count >= instanceBackups.Count);
-                Assert.AreEqual(1, instanceBackups.Count);
-                Assert.AreEqual(backupName, instanceBackups[0].Name);
-                Assert.AreEqual(backupDescription, instanceBackups[0].Description);
+                Assert.True(allBackups.Count >= instanceBackups.Count);
+                Assert.Equal(1, instanceBackups.Count);
+                Assert.Equal(backupName, instanceBackups[0].Name);
+                Assert.Equal(backupDescription, instanceBackups[0].Description);
 
                 await provider.EnableRootUserAsync(instance.Id, cancellationTokenSource.Token);
-                Assert.AreEqual(true, await provider.CheckRootEnabledStatusAsync(instance.Id, cancellationTokenSource.Token));
+                Assert.Equal(true, await provider.CheckRootEnabledStatusAsync(instance.Id, cancellationTokenSource.Token));
 
                 await provider.RemoveDatabaseInstanceAsync(instance.Id, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
 
                 ReadOnlyCollection<Backup> instanceBackupsAfterRemove = await provider.ListBackupsForInstanceAsync(instance.Id, cancellationTokenSource.Token);
-                Assert.AreEqual(instanceBackups.Count, instanceBackupsAfterRemove.Count);
+                Assert.Equal(instanceBackups.Count, instanceBackupsAfterRemove.Count);
 
                 configuration = new DatabaseInstanceConfiguration(smallestFlavor.Href, new DatabaseVolumeConfiguration(1), instanceName, new RestorePoint(backup.Id));
                 instance = await provider.CreateDatabaseInstanceAsync(configuration, AsyncCompletionOption.RequestCompleted, cancellationTokenSource.Token, null);
-                Assert.AreEqual(false, await provider.CheckRootEnabledStatusAsync(instance.Id, cancellationTokenSource.Token));
+                Assert.Equal(false, await provider.CheckRootEnabledStatusAsync(instance.Id, cancellationTokenSource.Token));
 
                 await provider.RemoveBackupAsync(backup.Id, cancellationTokenSource.Token);
 

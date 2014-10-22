@@ -5,7 +5,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using net.openstack.Core.Domain;
 using net.openstack.Core.Exceptions.Response;
 using net.openstack.Providers.Rackspace;
@@ -80,148 +79,148 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
         #region Container Tests
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Container_List()
         {
             var provider = new CloudFilesProvider();
             var containerList = provider.ListContainers(identity: _testIdentity);
 
-            Assert.IsNotNull(containerList);
-            Assert.IsTrue(containerList.Any());
+            Assert.NotNull(containerList);
+            Assert.True(containerList.Any());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Container_List_With_Internal_Url()
         {
             var provider = new CloudFilesProvider();
             var containerList = provider.ListContainers(useInternalUrl:true, identity: _testIdentity);
 
-            Assert.IsNotNull(containerList);
-            Assert.IsTrue(containerList.Any());
+            Assert.NotNull(containerList);
+            Assert.True(containerList.Any());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Container_List_With_Limit()
         {
             var provider = new CloudFilesProvider();
             var containerList = provider.ListContainers(1, identity: _testIdentity);
 
-            Assert.IsNotNull(containerList);
-            Assert.AreEqual(1, containerList.Count());
+            Assert.NotNull(containerList);
+            Assert.Equal(1, containerList.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Container_List_With_Start_Marker_Lower_Case()
         {
             var provider = new CloudFilesProvider();
             var containerList = provider.ListContainers(null, "a", identity: _testIdentity);
 
-            Assert.IsNotNull(containerList);
-            Assert.IsTrue(containerList.Any());
+            Assert.NotNull(containerList);
+            Assert.True(containerList.Any());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Container_List_With_Start_Marker_Upper_Case()
         {
             var provider = new CloudFilesProvider();
             var containerList = provider.ListContainers(null, "A", identity: _testIdentity);
 
-            Assert.IsNotNull(containerList);
-            Assert.IsTrue(containerList.Any());
+            Assert.NotNull(containerList);
+            Assert.True(containerList.Any());
         }
 
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Container_List_With_End_Marker_Upper_Case()
         {
             var provider = new CloudFilesProvider();
             var containerList = provider.ListContainers(null, null, "L", identity: _testIdentity);
 
-            Assert.IsNotNull(containerList);
-            Assert.IsTrue(containerList.Any());
+            Assert.NotNull(containerList);
+            Assert.True(containerList.Any());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Return_Container_List_With_End_Marker_Lower_Case()
         {
             var provider = new CloudFilesProvider();
             var containerList = provider.ListContainers(null, null, "l", identity: _testIdentity);
 
-            Assert.IsNotNull(containerList);
-            Assert.IsTrue(containerList.Any());
+            Assert.NotNull(containerList);
+            Assert.True(containerList.Any());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Create_Container()
         {
 
             var provider = new CloudFilesProvider();
             var containerCreatedResponse = provider.CreateContainer(containerName, identity: _testIdentity);
 
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerCreatedResponse);
+            Assert.Equal(ObjectStore.ContainerCreated, containerCreatedResponse);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Create_Destination_Container()
         {
             var provider = new CloudFilesProvider();
             var containerCreatedResponse = provider.CreateContainer(destinationContainerName, identity: _testIdentity);
 
-            Assert.AreEqual(ObjectStore.ContainerCreated, containerCreatedResponse);
+            Assert.Equal(ObjectStore.ContainerCreated, containerCreatedResponse);
         }
 
 
-        [TestMethod]
+        [Fact]
         public void Should_Not_Create_Container_Already_Exists()
         {
             var provider = new CloudFilesProvider();
             var containerCreatedResponse = provider.CreateContainer(containerName, identity: _testIdentity);
 
-            Assert.AreEqual(ObjectStore.ContainerExists, containerCreatedResponse);
+            Assert.Equal(ObjectStore.ContainerExists, containerCreatedResponse);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Delete_Container()
         {
             var provider = new CloudFilesProvider();
             provider.DeleteContainer(containerName, deleteObjects: true, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Delete_Destination_Container()
         {
             var provider = new CloudFilesProvider();
             provider.DeleteContainer(destinationContainerName, deleteObjects: true, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_Objects_From_Container()
         {
             var provider = new CloudFilesProvider();
             var containerGetObjectsResponse = provider.ListObjects(containerName, identity: _testIdentity);
 
-            Assert.IsNotNull(containerGetObjectsResponse);
+            Assert.NotNull(containerGetObjectsResponse);
         }
 
-        [TestMethod]
+        [Fact]
         [ExpectedException(typeof(ItemNotFoundException))]
         public void Should_Throw_An_Exception_When_Calling_Get_Objects_From_Container_And_Container_Does_Not_Exist()
         {
             var provider = new CloudFilesProvider();
             var containerGetObjectsResponse = provider.ListObjects(containerName, identity: _testIdentity);
-            Assert.Fail("Expected exception was not thrown.");
+            Assert.True(false, "Expected exception was not thrown.");
         }
 
-        [TestMethod]
+        [Fact]
         [ExpectedException(typeof(ItemNotFoundException))]
         public void Should_Throw_An_Exception_When_Calling_Get_Objects_From_Container_And_Objects_Does_Not_Exist()
         {
             var provider = new CloudFilesProvider();
             provider.ListObjects(containerName, identity: _testIdentity);
-            Assert.Fail("Expected exception was not thrown.");
+            Assert.True(false, "Expected exception was not thrown.");
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Add_MetaData_For_Container()
         {
             var metaData = new Dictionary<string, string>();
@@ -233,20 +232,20 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.UpdateContainerMetadata(containerName, metaData, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_MetaData_For_Container_And_Include_Key1_And_Key2_And_Key3_And_Key4()
         {
             var provider = new CloudFilesProvider( _testIdentity);
             var metaData = provider.GetContainerMetaData(containerName);
-            Assert.IsNotNull(metaData);
-            Assert.IsTrue(metaData.Any());
-            Assert.AreEqual("value1", metaData.Where(x => x.Key.Equals("key1", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual("value2", metaData.Where(x => x.Key.Equals("key2", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual("value3", metaData.Where(x => x.Key.Equals("key3", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.NotNull(metaData);
+            Assert.True(metaData.Any());
+            Assert.Equal("value1", metaData.Where(x => x.Key.Equals("key1", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal("value2", metaData.Where(x => x.Key.Equals("key2", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal("value3", metaData.Where(x => x.Key.Equals("key3", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Remove_Multiple_Metadata_For_Container_Items_Key2_and_Key3()
         {
             var provider = new CloudFilesProvider(_testIdentity);
@@ -255,17 +254,17 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.DeleteContainerMetadata(containerName, metaData.Keys);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_MetaData_For_Container_After_Multiple_Delete_And_Include_Key1_And_Key4()
         {
             var provider = new CloudFilesProvider();
             var metaData = provider.GetContainerMetaData(containerName, identity: _testIdentity);
-            Assert.IsNotNull(metaData);
-            Assert.AreEqual("value1", metaData.Where(x => x.Key.Equals("key1", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.NotNull(metaData);
+            Assert.Equal("value1", metaData.Where(x => x.Key.Equals("key1", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Remove_Single_Metadata_For_Container_Item_Key1()
         {
             var provider = new CloudFilesProvider(_testIdentity);
@@ -273,16 +272,16 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.DeleteContainerMetadata(containerName, "key1");
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_MetaData_For_Container_After_Single_Delete_And_Include__Key4()
         {
             var provider = new CloudFilesProvider();
             var metaData = provider.GetContainerMetaData(containerName, identity: _testIdentity);
-            Assert.IsNotNull(metaData);
-            Assert.AreEqual("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.NotNull(metaData);
+            Assert.Equal("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Add_Headers_For_Container()
         {
             var metaData = new Dictionary<string, string>();
@@ -292,37 +291,37 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.UpdateContainerMetadata(containerName, metaData, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_Headers_For_Container()
         {
             var provider = new CloudFilesProvider();
             var objectHeadersResponse = provider.GetContainerHeader(containerName, identity: _testIdentity);
 
-            Assert.IsNotNull(objectHeadersResponse);
-            Assert.IsTrue(objectHeadersResponse.Any());
+            Assert.NotNull(objectHeadersResponse);
+            Assert.True(objectHeadersResponse.Any());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_CDN_Headers_For_Container()
         {
             var provider = new CloudFilesProvider();
             var objectHeadersResponse = provider.GetContainerCDNHeader(containerName, identity: _testIdentity);
 
-            Assert.IsNotNull(objectHeadersResponse);
+            Assert.NotNull(objectHeadersResponse);
         }
 
-        [TestMethod]
+        [Fact]
         [ExpectedException(typeof(ItemNotFoundException))]
         public void Should_Not_Get_CDN_Headers_For_Container()
         {
             var provider = new CloudFilesProvider();
             var objectHeadersResponse = provider.GetContainerCDNHeader(containerName, identity: _testIdentity);
 
-            Assert.Fail("Expected exception was not thrown.");
+            Assert.True(false, "Expected exception was not thrown.");
         }
 
         //X-Log-Retention, X-CDN-enabled, and X-TTL.
-        [TestMethod]
+        [Fact]
         public void Should_Add_CDN_Headers_For_Container()
         {
             var provider = new CloudFilesProvider();
@@ -331,7 +330,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.UpdateContainerCdnHeaders(containerName, headers, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         [ExpectedException(typeof(ItemNotFoundException))]
         public void Should_Not_Add_CDN_Headers_For_Container()
         {
@@ -339,31 +338,31 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("X-Log-Retention", "false");
             provider.UpdateContainerCdnHeaders(containerName, headers, identity: _testIdentity);
-            Assert.Fail("Expected exception was not thrown.");
+            Assert.True(false, "Expected exception was not thrown.");
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_CDN_Enabled_Containers()
         {
             var provider = new CloudFilesProvider();
             var cdnContainerList = provider.ListCDNContainers(null, null, null, true, identity: _testIdentity);
 
-            Assert.IsNotNull(cdnContainerList);
-            Assert.IsTrue(cdnContainerList.All(x => x.CDNEnabled == true));
+            Assert.NotNull(cdnContainerList);
+            Assert.True(cdnContainerList.All(x => x.CDNEnabled == true));
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_CDN_All_Containers()
         {
             var provider = new CloudFilesProvider();
             var cdnContainerList = provider.ListCDNContainers(identity: _testIdentity);
 
-            Assert.IsNotNull(cdnContainerList);
-            Assert.IsTrue(cdnContainerList.Any(x => x.CDNEnabled == true));
-            Assert.IsTrue(cdnContainerList.Any(x => x.CDNEnabled == false));
+            Assert.NotNull(cdnContainerList);
+            Assert.True(cdnContainerList.Any(x => x.CDNEnabled == true));
+            Assert.True(cdnContainerList.Any(x => x.CDNEnabled == false));
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Make_Container_CDN_Enabled_With_TTL()
         {
             var provider = new CloudFilesProvider();
@@ -371,12 +370,12 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
             var cdnContainerHeaderResponse = provider.GetContainerCDNHeader(containerName, identity: _testIdentity);
 
-            Assert.AreEqual(1000, cdnContainerHeaderResponse.Ttl);
-            Assert.IsTrue(cdnContainerHeaderResponse.CDNEnabled);
+            Assert.Equal(1000, cdnContainerHeaderResponse.Ttl);
+            Assert.True(cdnContainerHeaderResponse.CDNEnabled);
 
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Make_Container_CDN_Enabled_With_Log_Retention()
         {
             var provider = new CloudFilesProvider();
@@ -384,15 +383,15 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
             var cdnContainerHeaderResponse = provider.GetContainerCDNHeader(containerName, identity: _testIdentity);
 
-            Assert.AreEqual(259200, cdnContainerHeaderResponse.Ttl);
-            Assert.IsTrue(cdnContainerHeaderResponse.LogRetention);
-            Assert.IsTrue(cdnContainerHeaderResponse.CDNEnabled);
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(cdnContainerHeaderResponse.CDNIosUri));
-            Assert.IsTrue(containerName.Equals(cdnContainerHeaderResponse.Name, StringComparison.OrdinalIgnoreCase));
+            Assert.Equal(259200, cdnContainerHeaderResponse.Ttl);
+            Assert.True(cdnContainerHeaderResponse.LogRetention);
+            Assert.True(cdnContainerHeaderResponse.CDNEnabled);
+            Assert.True(!string.IsNullOrWhiteSpace(cdnContainerHeaderResponse.CDNIosUri));
+            Assert.True(containerName.Equals(cdnContainerHeaderResponse.Name, StringComparison.OrdinalIgnoreCase));
 
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Make_Container_CDN_Disabled()
         {
             var provider = new CloudFilesProvider();
@@ -400,10 +399,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
             var cdnContainerHeaderResponse = provider.GetContainerCDNHeader(containerName, identity: _testIdentity);
 
-            Assert.IsFalse(cdnContainerHeaderResponse.CDNEnabled);
+            Assert.False(cdnContainerHeaderResponse.CDNEnabled);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Enable_Static_Web_On_Container_With_Index_Error_CSS_And_Listing_As_True()
         {
             var provider = new CloudFilesProvider();
@@ -412,14 +411,14 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.EnableStaticWebOnContainer(containerName, webIndex, webError, webListingsCSS, webListing, null, false, _testIdentity);
             var cdnContainerMetaDataResponse = provider.GetContainerMetaData(containerName, identity: _testIdentity);
 
-            Assert.AreEqual(webIndex, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("Web-index", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual(webError, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-error", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual(webListingsCSS, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-listings-css", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.IsTrue(bool.Parse(cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-listings", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value));
+            Assert.Equal(webIndex, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("Web-index", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal(webError, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-error", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal(webListingsCSS, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-listings-css", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.True(bool.Parse(cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-listings", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value));
 
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Enable_Static_Web_On_Container_With_CSS_And_Listing_As_True()
         {
             var provider = new CloudFilesProvider();
@@ -428,12 +427,12 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.EnableStaticWebOnContainer(containerName, webListingsCSS, webListing, null, false, _testIdentity);
             var cdnContainerMetaDataResponse = provider.GetContainerMetaData(containerName, identity: _testIdentity);
 
-            Assert.AreEqual(webListingsCSS, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-listings-css", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.IsTrue(bool.Parse(cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-listings", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value));
+            Assert.Equal(webListingsCSS, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-listings-css", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.True(bool.Parse(cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-listings", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value));
 
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Enable_Static_Web_On_Container_With_Index_Error_And_Listing_As_True()
         {
             var provider = new CloudFilesProvider();
@@ -442,13 +441,13 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.EnableStaticWebOnContainer(containerName, webIndex, webError, webListing, null, false, _testIdentity);
             var cdnContainerMetaDataResponse = provider.GetContainerMetaData(containerName, identity: _testIdentity);
 
-            Assert.AreEqual(webIndex, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("Web-index", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual(webError, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-error", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.IsTrue(bool.Parse(cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-listings", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value));
+            Assert.Equal(webIndex, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("Web-index", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal(webError, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-error", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.True(bool.Parse(cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-listings", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value));
 
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Enable_Static_Web_On_Container_With_Index_And_Error()
         {
             var provider = new CloudFilesProvider();
@@ -457,11 +456,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.EnableStaticWebOnContainer(containerName, webIndex, webError, null, false, _testIdentity);
             var cdnContainerMetaDataResponse = provider.GetContainerMetaData(containerName, identity: _testIdentity);
 
-            Assert.AreEqual(webIndex, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("Web-index", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual(webError, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-error", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal(webIndex, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("Web-index", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal(webError, cdnContainerMetaDataResponse.Where(x => x.Key.Equals("web-error", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Disable_Static_Web_On_Container()
         {
 
@@ -472,10 +471,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var cdnContainerMetaDataResponse = provider.GetContainerMetaData(containerName, identity: _testIdentity);
 
 
-            Assert.IsFalse(cdnContainerMetaDataResponse.ContainsKey("Web-Index"));
-            Assert.IsFalse(cdnContainerMetaDataResponse.ContainsKey("Web-Error"));
-            Assert.IsFalse(cdnContainerMetaDataResponse.ContainsKey("Web-Listings-Css"));
-            Assert.IsFalse(cdnContainerMetaDataResponse.ContainsKey("Web-Listings"));
+            Assert.False(cdnContainerMetaDataResponse.ContainsKey("Web-Index"));
+            Assert.False(cdnContainerMetaDataResponse.ContainsKey("Web-Error"));
+            Assert.False(cdnContainerMetaDataResponse.ContainsKey("Web-Listings-Css"));
+            Assert.False(cdnContainerMetaDataResponse.ContainsKey("Web-Listings"));
 
         }
 
@@ -484,17 +483,17 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
         #region Object Tests
 
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_Headers_For_Object()
         {
 
             var provider = new CloudFilesProvider();
             var objectHeadersResponse = provider.GetObjectHeaders(containerName, objectName, identity: _testIdentity);
 
-            Assert.IsNotNull(objectHeadersResponse);
+            Assert.NotNull(objectHeadersResponse);
         }
 
-        [TestMethod]
+        [Fact]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Should_Throw_Exception_When_Calling_Get_Headers_For_Object_And_Container_Name_Is_Empty()
         {
@@ -502,10 +501,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var provider = new CloudFilesProvider();
             var objectHeadersResponse = provider.GetObjectHeaders(containerNameLocal, objectName, identity: _testIdentity);
 
-            Assert.Fail("Expected exception was not thrown.");
+            Assert.True(false, "Expected exception was not thrown.");
         }
 
-        [TestMethod]
+        [Fact]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Should_Throw_Exception_When_Calling_Get_Headers_For_Object_And_Object_Name_Is_Empty()
         {
@@ -513,10 +512,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var provider = new CloudFilesProvider();
             var objectHeadersResponse = provider.GetObjectHeaders(containerName, objectNameLocal, identity: _testIdentity);
 
-            Assert.Fail("Expected exception was not thrown.");
+            Assert.True(false, "Expected exception was not thrown.");
         }
 
-        [TestMethod]
+        [Fact]
         [DeploymentItem("DarkKnightRises.jpg")]
         public void Should_Create_Object_From_Stream_With_Headers()
         {
@@ -529,12 +528,12 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             }
 
             var containerGetObjectsResponse = provider.ListObjects(containerName, identity: _testIdentity);
-            Assert.AreEqual(objectName, containerGetObjectsResponse.Where(x => x.Name.Equals(objectName, StringComparison.Ordinal)).FirstOrDefault().Name);
+            Assert.Equal(objectName, containerGetObjectsResponse.Where(x => x.Name.Equals(objectName, StringComparison.Ordinal)).FirstOrDefault().Name);
 
             var objectHeadersResponse = provider.GetObjectHeaders(containerName, objectName, identity: _testIdentity);
 
-            Assert.IsNotNull(objectHeadersResponse);
-            Assert.AreEqual(etag, objectHeadersResponse.Where(x => x.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.NotNull(objectHeadersResponse);
+            Assert.Equal(etag, objectHeadersResponse.Where(x => x.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
         }
 
 
@@ -549,7 +548,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             return sBuilder.ToString();
         }
 
-        [TestMethod]
+        [Fact]
         [DeploymentItem("DarkKnightRises.jpg")]
         public void Should_Create_Object_From_Stream_Without_Headers()
         {
@@ -562,11 +561,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.CreateObject(containerName, stream, fileName, null, 65536, headers);
 
             var containerGetObjectsResponse = provider.ListObjects(containerName, identity: _testIdentity);
-            Assert.AreEqual(fileName, containerGetObjectsResponse.Where(x => x.Name.Equals(fileName, StringComparison.Ordinal)).FirstOrDefault().Name);
+            Assert.Equal(fileName, containerGetObjectsResponse.Where(x => x.Name.Equals(fileName, StringComparison.Ordinal)).FirstOrDefault().Name);
 
         }
 
-        [TestMethod]
+        [Fact]
         [DeploymentItem("DarkKnightRises.jpg")]
         public void Should_Create_Object_From_File_With_Headers()
         {
@@ -577,15 +576,15 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.CreateObjectFromFile(containerName, filePath, objectName, headers: headers);
 
             var containerGetObjectsResponse = provider.ListObjects(containerName, identity: _testIdentity);
-            Assert.AreEqual(objectName, containerGetObjectsResponse.Where(x => x.Name.Equals(objectName, StringComparison.Ordinal)).FirstOrDefault().Name);
+            Assert.Equal(objectName, containerGetObjectsResponse.Where(x => x.Name.Equals(objectName, StringComparison.Ordinal)).FirstOrDefault().Name);
 
             var objectHeadersResponse = provider.GetObjectHeaders(containerName, objectName, identity: _testIdentity);
 
-            Assert.IsNotNull(objectHeadersResponse);
-            Assert.AreEqual(etag, objectHeadersResponse.Where(x => x.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.NotNull(objectHeadersResponse);
+            Assert.Equal(etag, objectHeadersResponse.Where(x => x.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
         }
 
-        [TestMethod]
+        [Fact]
         [DeploymentItem("DarkKnightRises.jpg")]
         public void Should_Create_Object_From_File_Without_Headers()
         {
@@ -596,10 +595,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.CreateObjectFromFile(containerName, filePath, fileName, null, 65536, headers, identity: _testIdentity);
 
             var containerGetObjectsResponse = provider.ListObjects(containerName, identity: _testIdentity);
-            Assert.AreEqual(fileName, containerGetObjectsResponse.Where(x => x.Name.Equals(fileName, StringComparison.Ordinal)).FirstOrDefault().Name);
+            Assert.Equal(fileName, containerGetObjectsResponse.Where(x => x.Name.Equals(fileName, StringComparison.Ordinal)).FirstOrDefault().Name);
         }
 
-        [TestMethod]
+        [Fact]
         [DeploymentItem("DarkKnightRises.jpg")]
         public void Should_Get_Object_And_Save_To_File_Without_Headers()
         {
@@ -607,7 +606,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.GetObjectSaveToFile(containerName, Directory.GetCurrentDirectory(), objectName, saveFileNane1);
         }
 
-        [TestMethod]
+        [Fact]
         [DeploymentItem("DarkKnightRises.jpg")]
         public void Should_Get_Object_And_Save_To_File_Without_Headers_And_Verify_Etag()
         {
@@ -615,7 +614,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.GetObjectSaveToFile(containerName, Directory.GetCurrentDirectory(), objectName, saveFileNane2, verifyEtag: true);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Delete_Object()
         {
             string fileName = objectName;
@@ -624,7 +623,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.DeleteObject(containerName, fileName, headers, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Delete_Object_On_Destination_Container()
         {
             var headers = new Dictionary<string, string>();
@@ -632,7 +631,7 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.DeleteObject(destinationContainerName, destinationObjectName, headers, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         [ExpectedException(typeof(ItemNotFoundException))]
         public void Should_Throw_An_Exception_When_Deleting_Object()
         {
@@ -641,17 +640,17 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var provider = new CloudFilesProvider();
             provider.DeleteObject(containerName, objectName, headers, identity: _testIdentity);
 
-            Assert.Fail("Expected exception was not thrown.");
+            Assert.True(false, "Expected exception was not thrown.");
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Copy_Object_When_Not_Passing_Content_Length()
         {
             var provider = new CloudFilesProvider();
             provider.CopyObject(sourceContainerName, sourceObjectName, destinationContainerName, destinationObjectName, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Copy_Object_When_Passing_Content_Length()
         {
             var provider = new CloudFilesProvider(_testIdentity);
@@ -660,11 +659,11 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var sourceheader = provider.GetObjectHeaders(sourceContainerName, sourceObjectName);
             var destinationHeader = provider.GetObjectHeaders(destinationContainerName, destinationObjectName);
 
-            Assert.AreEqual(sourceheader.First(h => h.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).Value, destinationHeader.First(h => h.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).Value);
-            Assert.AreEqual(sourceheader.First(h => h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)).Value, destinationHeader.First(h => h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)).Value);
+            Assert.Equal(sourceheader.First(h => h.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).Value, destinationHeader.First(h => h.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).Value);
+            Assert.Equal(sourceheader.First(h => h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)).Value, destinationHeader.First(h => h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)).Value);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Copy_Object_When_Not_Passing_Content_Length_And_Passing_Expiring_Header()
         {
             // Object will expire 2 days from now.
@@ -678,12 +677,12 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             var sourceheader = provider.GetObjectHeaders(sourceContainerName, sourceObjectName);
             var destinationHeader = provider.GetObjectHeaders(destinationContainerName, destinationObjectName);
 
-            Assert.AreEqual(sourceheader.First(h => h.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).Value, destinationHeader.First(h => h.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).Value);
-            Assert.AreEqual(sourceheader.First(h => h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)).Value, destinationHeader.First(h => h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)).Value);
+            Assert.Equal(sourceheader.First(h => h.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).Value, destinationHeader.First(h => h.Key.Equals("ETag", StringComparison.OrdinalIgnoreCase)).Value);
+            Assert.Equal(sourceheader.First(h => h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)).Value, destinationHeader.First(h => h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)).Value);
 
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Add_MetaData_For_Object()
         {
             var metaData = new Dictionary<string, string>();
@@ -695,20 +694,20 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.UpdateObjectMetadata(containerName, objectName, metaData, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_MetaData_For_Object_And_Include_Key1_And_Key2_And_Key3_And_Key4()
         {
             var provider = new CloudFilesProvider(_testIdentity);
             var metaData = provider.GetObjectMetaData(containerName, objectName);
-            Assert.IsNotNull(metaData);
-            Assert.IsTrue(metaData.Any());
-            Assert.AreEqual("value1", metaData.Where(x => x.Key.Equals("key1", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual("value2", metaData.Where(x => x.Key.Equals("key2", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual("value3", metaData.Where(x => x.Key.Equals("key3", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.NotNull(metaData);
+            Assert.True(metaData.Any());
+            Assert.Equal("value1", metaData.Where(x => x.Key.Equals("key1", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal("value2", metaData.Where(x => x.Key.Equals("key2", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal("value3", metaData.Where(x => x.Key.Equals("key3", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Remove_Multiple_Metadata_For_Object_Items_Key2_and_Key3()
         {
             var provider = new CloudFilesProvider(_testIdentity);
@@ -717,17 +716,17 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.DeleteObjectMetadata(containerName, objectName, metaData.Keys);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_MetaData_For_Object_After_Multiple_Delete_And_Include_Key1_And_Key4()
         {
             var provider = new CloudFilesProvider(_testIdentity);
             var metaData = provider.GetObjectMetaData(containerName, objectName);
-            Assert.IsNotNull(metaData);
-            Assert.AreEqual("value1", metaData.Where(x => x.Key.Equals("key1", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
-            Assert.AreEqual("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.NotNull(metaData);
+            Assert.Equal("value1", metaData.Where(x => x.Key.Equals("key1", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.Equal("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Remove_Single_Metadata_For_Object_Item_Key1()
         {
             var provider = new CloudFilesProvider(_testIdentity);
@@ -735,23 +734,23 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.DeleteObjectMetadata(containerName, objectName, "key1");
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_MetaData_For_Object_After_Single_Delete_And_Include__Key4()
         {
             var provider = new CloudFilesProvider(_testIdentity);
             var metaData = provider.GetObjectMetaData(containerName, objectName);
-            Assert.IsNotNull(metaData);
-            Assert.AreEqual("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.NotNull(metaData);
+            Assert.Equal("value4", metaData.Where(x => x.Key.Equals("key4", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Purge_CDN_Enabled_Object_No_Email_Notification()
         {
             var provider = new CloudFilesProvider();
             provider.PurgeObjectFromCDN(containerName, objectName, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Purge_CDN_Enabled_Object_Single_Email_Notification()
         {
             var provider = new CloudFilesProvider();
@@ -759,14 +758,14 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Purge_CDN_Enabled_Object_Multiple_Email_Notification()
         {
             var provider = new CloudFilesProvider();
             provider.PurgeObjectFromCDN(containerName, objectName, emailToList, identity: _testIdentity);
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Create_New_Test_Container_2()
         {
             var provider = new CloudFilesProvider(_testIdentity);
@@ -775,10 +774,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.CreateContainer(containerName2);
 
             var containers = provider.ListContainers();
-            Assert.IsTrue(containers.Any(c => c.Name.Equals(containerName2)));
+            Assert.True(containers.Any(c => c.Name.Equals(containerName2)));
         }
 
-        [TestMethod]
+        [Fact]
         [DeploymentItem("DarkKnightRises.jpg")]
         public void Should_Upload_File_In_Segments()
         {
@@ -791,15 +790,15 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
             var objects = provider.ListObjects(containerName2).ToArray();
 
-            Assert.AreEqual(12, objects.Count());
-            Assert.IsTrue(objects.Any(o => o.Name.Equals(objectName)));
+            Assert.Equal(12, objects.Count());
+            Assert.True(objects.Any(o => o.Name.Equals(objectName)));
             for (int i = 0; i < 11; i++)
             {
-                Assert.IsTrue(objects.Any(o => o.Name.Equals(string.Format("{0}.seg{1}", objectName, i.ToString("0000")))));
+                Assert.True(objects.Any(o => o.Name.Equals(string.Format("{0}.seg{1}", objectName, i.ToString("0000")))));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Delete_Object_And_All_Segments()
         {
             var provider = new CloudFilesProvider(_testIdentity);
@@ -809,15 +808,15 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
             var objects = provider.ListObjects(containerName2).ToArray();
 
-            Assert.AreEqual(0, objects.Count());
-            Assert.IsFalse(objects.Any(o => o.Name.Equals(objectName)));
+            Assert.Equal(0, objects.Count());
+            Assert.False(objects.Any(o => o.Name.Equals(objectName)));
             for (int i = 0; i < 11; i++)
             {
-                Assert.IsFalse(objects.Any(o => o.Name.Equals(string.Format("{0}.seg{1}", objectName, i.ToString("0000")))));
+                Assert.False(objects.Any(o => o.Name.Equals(string.Format("{0}.seg{1}", objectName, i.ToString("0000")))));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Delete_Object_But_Not_The_Segments()
         {
             var provider = new CloudFilesProvider(_testIdentity);
@@ -827,15 +826,15 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
             var objects = provider.ListObjects(containerName2).ToArray();
 
-            Assert.AreEqual(11, objects.Count());
-            Assert.IsFalse(objects.Any(o => o.Name.Equals(objectName)));
+            Assert.Equal(11, objects.Count());
+            Assert.False(objects.Any(o => o.Name.Equals(objectName)));
             for (int i = 0; i < 11; i++)
             {
-                Assert.IsTrue(objects.Any(o => o.Name.Equals(string.Format("{0}.seg{1}", objectName, i.ToString("0000")))));
+                Assert.True(objects.Any(o => o.Name.Equals(string.Format("{0}.seg{1}", objectName, i.ToString("0000")))));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Bulk_Delete_All_Objects()
         {
             var provider = new CloudFilesProvider(_testIdentity);
@@ -845,10 +844,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
 
             var objects = provider.ListObjects(containerName2).ToArray();
 
-            Assert.AreEqual(0, objects.Count());
+            Assert.Equal(0, objects.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Purge_Objects_Before_Deleting_The_Conatiner()
         {
             var provider = new CloudFilesProvider(_testIdentity);
@@ -857,35 +856,35 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.DeleteContainer(containerName2, deleteObjects: true);
 
             var containers = provider.ListContainers();
-            Assert.IsFalse(containers.Any(c => c.Name.Equals(containerName2)));
+            Assert.False(containers.Any(c => c.Name.Equals(containerName2)));
         }
 
         #endregion Object Tests
 
         #region Account Tests
-        [TestMethod]
+        [Fact]
         public void Should_Get_Headers_For_Account()
         {
             var provider = new CloudFilesProvider();
             var accountHeadersResponse = provider.GetAccountHeaders(identity: _testIdentity);
 
-            Assert.IsNotNull(accountHeadersResponse);
-            Assert.IsTrue(accountHeadersResponse.ContainsKey("x-account-object-count"));
+            Assert.NotNull(accountHeadersResponse);
+            Assert.True(accountHeadersResponse.ContainsKey("x-account-object-count"));
 
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Get_MetaData_For_Account()
         {
 
             var provider = new CloudFilesProvider();
             var accountHeadersResponse = provider.GetAccountMetaData(identity: _testIdentity);
 
-            Assert.IsNotNull(accountHeadersResponse);
-            Assert.IsTrue(accountHeadersResponse.ContainsKey("Temp-Url-Key"));
+            Assert.NotNull(accountHeadersResponse);
+            Assert.True(accountHeadersResponse.ContainsKey("Temp-Url-Key"));
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Add_MetaData_For_Account()
         {
             var metaData = new Dictionary<string, string>();
@@ -894,13 +893,13 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.UpdateAccountMetadata(metaData, identity: _testIdentity);
             var accountHeadersResponse = provider.GetAccountMetaData(identity: _testIdentity);
 
-            Assert.IsNotNull(accountHeadersResponse);
-            Assert.IsTrue(accountHeadersResponse.ContainsKey("Test-Accountmetadata"));
-            Assert.AreEqual("Test", accountHeadersResponse.Where(x => x.Key.Equals("Test-Accountmetadata", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
+            Assert.NotNull(accountHeadersResponse);
+            Assert.True(accountHeadersResponse.ContainsKey("Test-Accountmetadata"));
+            Assert.Equal("Test", accountHeadersResponse.Where(x => x.Key.Equals("Test-Accountmetadata", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Value);
 
         }
 
-        [TestMethod]
+        [Fact]
         public void Should_Update_Headers_For_Account()
         {
             var headers = new Dictionary<string, string>();
@@ -910,10 +909,10 @@ namespace Net.OpenStack.Testing.Integration.Providers.Rackspace
             provider.UpdateAccountMetadata(headers, identity: _testIdentity);
             var accountHeadersResponse = provider.GetAccountMetaData(identity: _testIdentity);
 
-            Assert.IsNotNull(accountHeadersResponse);
+            Assert.NotNull(accountHeadersResponse);
             string value;
-            Assert.IsTrue(accountHeadersResponse.TryGetValue("Test-Accountmetadata", out value));
-            Assert.AreEqual("Test1", value);
+            Assert.True(accountHeadersResponse.TryGetValue("Test-Accountmetadata", out value));
+            Assert.Equal("Test1", value);
         }
 
         #endregion

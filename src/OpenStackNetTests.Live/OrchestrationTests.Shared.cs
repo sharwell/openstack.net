@@ -9,21 +9,19 @@
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using OpenStack.Collections;
     using OpenStack.Net;
+    using OpenStack.ObjectModel;
     using OpenStack.Security.Authentication;
     using OpenStack.Services.ObjectStorage.V1;
     using OpenStack.Services.Orchestration.V1;
     using OpenStack.Threading;
+    using Xunit;
     using ContainerName = OpenStack.Services.ObjectStorage.V1.ContainerName;
     using IObjectStorageService = OpenStack.Services.ObjectStorage.V1.IObjectStorageService;
-    using MemoryStream = System.IO.MemoryStream;
-    using Encoding = System.Text.Encoding;
     using Path = System.IO.Path;
-    using OpenStack.ObjectModel;
 
     partial class OrchestrationTests
     {
@@ -35,8 +33,8 @@
         /// <summary>
         /// This unit removes all stacks which were created by these unit tests.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupTestStacks()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -57,9 +55,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public void TestJsonSerialization()
         {
             TestResourceIdentifierBehavior<TemplateParameterName>();
@@ -74,17 +72,17 @@
         {
             // the basics
             T resource1a = JsonConvert.DeserializeObject<T>("\"Resource1\"");
-            Assert.IsNotNull(resource1a);
-            Assert.AreEqual("Resource1", resource1a.Value);
+            Assert.NotNull(resource1a);
+            Assert.Equal("Resource1", resource1a.Value);
 
             T resource1b = JsonConvert.DeserializeObject<T>("\"Resource1\"");
-            Assert.AreEqual(resource1a, resource1b);
+            Assert.Equal(resource1a, resource1b);
 
             string string1a = JsonConvert.SerializeObject(resource1a);
-            Assert.AreEqual("\"Resource1\"", string1a);
+            Assert.Equal("\"Resource1\"", string1a);
 
             string string1b = JsonConvert.SerializeObject(resource1b);
-            Assert.AreEqual(string1a, string1b);
+            Assert.Equal(string1a, string1b);
 
             // lists
 
@@ -93,9 +91,9 @@
             //var dictionary = new Dictionary<T, T> { { new T("foo"), new T("bar") } };
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestListStacks()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -106,7 +104,7 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<Stack> stacks = await ListAllStacksAsync(service, cancellationToken);
                 if (!stacks.Any())
-                    Assert.Inconclusive("The account does not have any stacks in the region.");
+                    Assert.False(true, "The account does not have any stacks in the region.");
 
                 Console.WriteLine("Stacks");
                 foreach (Stack stack in stacks)
@@ -116,9 +114,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestGetStackByNameAndId()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -129,7 +127,7 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<Stack> stacks = await ListAllStacksAsync(service, cancellationToken);
                 if (!stacks.Any())
-                    Assert.Inconclusive("The account does not have any stacks in the region.");
+                    Assert.False(true, "The account does not have any stacks in the region.");
 
                 Console.WriteLine("Stacks");
                 foreach (Stack stack in stacks)
@@ -137,14 +135,14 @@
                     GetStackApiCall singleStackCall = await service.PrepareGetStackAsync(stack.Name, stack.Id, cancellationToken);
                     var result = await singleStackCall.SendAsync(cancellationToken);
                     Stack singleStack = result.Item2.Stack;
-                    Assert.IsNotNull(singleStack);
+                    Assert.NotNull(singleStack);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestGetStackByNameOnly()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -155,7 +153,7 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<Stack> stacks = await ListAllStacksAsync(service, cancellationToken);
                 if (!stacks.Any())
-                    Assert.Inconclusive("The account does not have any stacks in the region.");
+                    Assert.False(true, "The account does not have any stacks in the region.");
 
                 Console.WriteLine("Stacks");
                 foreach (Stack stack in stacks)
@@ -163,14 +161,14 @@
                     GetStackApiCall singleStackCall = await service.PrepareGetStackAsync(stack.Name, null, cancellationToken);
                     var result = await singleStackCall.SendAsync(cancellationToken);
                     Stack singleStack = result.Item2.Stack;
-                    Assert.IsNotNull(singleStack);
+                    Assert.NotNull(singleStack);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestGetStackTemplateByNameAndId()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -181,7 +179,7 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<Stack> stacks = await ListAllStacksAsync(service, cancellationToken);
                 if (!stacks.Any())
-                    Assert.Inconclusive("The account does not have any stacks in the region.");
+                    Assert.False(true, "The account does not have any stacks in the region.");
 
                 Console.WriteLine("Stacks");
                 foreach (Stack stack in stacks)
@@ -189,14 +187,14 @@
                     GetStackTemplateApiCall stackTemplateCall = await service.PrepareGetStackTemplateAsync(stack.Name, stack.Id, cancellationToken);
                     var result = await stackTemplateCall.SendAsync(cancellationToken);
                     StackTemplate stackTemplate = result.Item2;
-                    Assert.IsNotNull(stackTemplate);
+                    Assert.NotNull(stackTemplate);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestGetStackTemplateByNameOnly()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -207,7 +205,7 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<Stack> stacks = await ListAllStacksAsync(service, cancellationToken);
                 if (!stacks.Any())
-                    Assert.Inconclusive("The account does not have any stacks in the region.");
+                    Assert.False(true, "The account does not have any stacks in the region.");
 
                 Console.WriteLine("Stacks");
                 foreach (Stack stack in stacks)
@@ -215,18 +213,18 @@
                     GetStackTemplateApiCall stackTemplateCall = await service.PrepareGetStackTemplateAsync(stack.Name, null, cancellationToken);
                     var result = await stackTemplateCall.SendAsync(cancellationToken);
                     StackTemplate stackTemplate = result.Item2;
-                    Assert.IsNotNull(stackTemplate);
+                    Assert.NotNull(stackTemplate);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestSuspendResumeStack()
         {
             if (string.Equals("rackspace", Credentials.Vendor, StringComparison.OrdinalIgnoreCase))
-                Assert.Inconclusive("Rackspace Cloud Orchestration does not support stack actions.");
+                Assert.False(true, "Rackspace Cloud Orchestration does not support stack actions.");
 
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
             {
@@ -236,7 +234,7 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<Stack> stacks = await ListAllStacksAsync(service, cancellationToken);
                 if (!stacks.Any())
-                    Assert.Inconclusive("The account does not have any stacks in the region.");
+                    Assert.False(true, "The account does not have any stacks in the region.");
 
                 Stack stack = stacks.First();
                 SuspendStackApiCall suspendCall = await service.PrepareSuspendStackAsync(stack.Name, stack.Id, new SuspendStackRequest(), cancellationToken);
@@ -247,9 +245,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestListResources()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -260,15 +258,15 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<Stack> stacks = await ListAllStacksAsync(service, cancellationToken);
                 if (!stacks.Any())
-                    Assert.Inconclusive("The account does not have any stacks in the region.");
+                    Assert.False(true, "The account does not have any stacks in the region.");
 
                 bool foundResources = false;
                 foreach (var stack in stacks)
                 {
                     var listResourcesCall = await service.PrepareListResourcesAsync(stack.Name, stack.Id, cancellationToken);
                     var resourcesResponse = await listResourcesCall.SendAsync(cancellationToken);
-                    Assert.IsNotNull(resourcesResponse);
-                    Assert.IsNotNull(resourcesResponse.Item2);
+                    Assert.NotNull(resourcesResponse);
+                    Assert.NotNull(resourcesResponse.Item2);
 
                     var resources = await resourcesResponse.Item2.GetAllPagesAsync(cancellationToken, null);
                     if (resources.Count == 0)
@@ -281,13 +279,13 @@
                 }
 
                 if (!foundResources)
-                    Assert.Inconclusive("No resources were found for any stacks in the region.");
+                    Assert.False(true, "No resources were found for any stacks in the region.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestListEvents()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -298,7 +296,7 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<Stack> stacks = await ListAllStacksAsync(service, cancellationToken);
                 if (!stacks.Any())
-                    Assert.Inconclusive("The account does not have any stacks in the region.");
+                    Assert.False(true, "The account does not have any stacks in the region.");
 
                 bool foundEvents = false;
                 foreach (var stack in stacks)
@@ -306,7 +304,7 @@
                     var listEventsCall = await service.PrepareListEventsAsync(stack.Name, stack.Id, cancellationToken);
                     var response = await listEventsCall.SendAsync(cancellationToken);
                     var events = await response.Item2.GetAllPagesAsync(cancellationToken, null);
-                    Assert.IsNotNull(events);
+                    Assert.NotNull(events);
                     if (events.Count == 0)
                         continue;
 
@@ -314,13 +312,13 @@
                 }
 
                 if (!foundEvents)
-                    Assert.Inconclusive("No events were found for any stacks in the region.");
+                    Assert.False(true, "No events were found for any stacks in the region.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestListResourceEvents()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -331,15 +329,15 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<Stack> stacks = await ListAllStacksAsync(service, cancellationToken);
                 if (!stacks.Any())
-                    Assert.Inconclusive("The account does not have any stacks in the region.");
+                    Assert.False(true, "The account does not have any stacks in the region.");
 
                 bool foundEvents = false;
                 foreach (var stack in stacks)
                 {
                     var listResourcesCall = await service.PrepareListResourcesAsync(stack.Name, stack.Id, cancellationToken);
                     var resourcesResponse = await listResourcesCall.SendAsync(cancellationToken);
-                    Assert.IsNotNull(resourcesResponse);
-                    Assert.IsNotNull(resourcesResponse.Item2);
+                    Assert.NotNull(resourcesResponse);
+                    Assert.NotNull(resourcesResponse.Item2);
 
                     var resources = await resourcesResponse.Item2.GetAllPagesAsync(cancellationToken, null);
                     if (resources.Count == 0)
@@ -350,7 +348,7 @@
                         var listResourceEventsCall = await service.PrepareListResourceEventsAsync(stack.Name, stack.Id, resource.Name, cancellationToken);
                         var response = await listResourceEventsCall.SendAsync(cancellationToken);
                         var events = await response.Item2.GetAllPagesAsync(cancellationToken, null);
-                        Assert.IsNotNull(events);
+                        Assert.NotNull(events);
                         if (events.Count == 0)
                             continue;
 
@@ -359,13 +357,13 @@
                 }
 
                 if (!foundEvents)
-                    Assert.Inconclusive("No events were found for any stack resources in the region.");
+                    Assert.False(true, "No events were found for any stack resources in the region.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestValidateTemplateJson()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -378,15 +376,15 @@
                 ValidateTemplateRequest validateRequest = new ValidateTemplateRequest(JsonConvert.DeserializeObject<StackTemplate>(TestResources.ValidateStackTemplateJson));
                 ValidateTemplateApiCall validateCall = await service.PrepareValidateTemplateAsync(validateRequest, cancellationToken);
                 var validateResult = await validateCall.SendAsync(cancellationToken);
-                Assert.IsNotNull(validateResult);
+                Assert.NotNull(validateResult);
                 TemplateValidationInformation validated = validateResult.Item2;
-                Assert.IsNotNull(validated);
+                Assert.NotNull(validated);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestValidateTemplateYaml()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -399,15 +397,15 @@
                 ValidateTemplateRequest validateRequest = new ValidateTemplateRequest(null, null, new JProperty("template", JValue.CreateString(TestResources.ValidateStackTemplateYaml)));
                 ValidateTemplateApiCall validateCall = await service.PrepareValidateTemplateAsync(validateRequest, cancellationToken);
                 var validateResult = await validateCall.SendAsync(cancellationToken);
-                Assert.IsNotNull(validateResult);
+                Assert.NotNull(validateResult);
                 TemplateValidationInformation validated = validateResult.Item2;
-                Assert.IsNotNull(validated);
+                Assert.NotNull(validated);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestListResourceTypes()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -418,7 +416,7 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<ResourceTypeName> resourceTypes = await ListAllResourceTypesAsync(service, cancellationToken);
                 if (!resourceTypes.Any())
-                    Assert.Inconclusive("The account does not have any resource types in the region.");
+                    Assert.False(true, "The account does not have any resource types in the region.");
 
                 Console.WriteLine("Resource Types");
                 foreach (ResourceTypeName resourceType in resourceTypes)
@@ -426,9 +424,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestGetResourceTypeSchema()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -439,21 +437,21 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<ResourceTypeName> resourceTypes = await ListAllResourceTypesAsync(service, cancellationToken);
                 if (!resourceTypes.Any())
-                    Assert.Inconclusive("The account does not have any resource types in the region.");
+                    Assert.False(true, "The account does not have any resource types in the region.");
 
                 foreach (ResourceTypeName resourceType in resourceTypes)
                 {
                     GetResourceTypeSchemaApiCall apiCall = await service.PrepareGetResourceTypeSchemaAsync(resourceType, cancellationToken);
                     var response = await apiCall.SendAsync(cancellationToken);
                     ResourceTypeSchema schema = response.Item2;
-                    Assert.IsNotNull(schema);
+                    Assert.NotNull(schema);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestGetResourceTypeTemplate()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -464,21 +462,21 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<ResourceTypeName> resourceTypes = await ListAllResourceTypesAsync(service, cancellationToken);
                 if (!resourceTypes.Any())
-                    Assert.Inconclusive("The account does not have any resource types in the region.");
+                    Assert.False(true, "The account does not have any resource types in the region.");
 
                 foreach (ResourceTypeName resourceType in resourceTypes)
                 {
                     GetResourceTypeTemplateApiCall apiCall = await service.PrepareGetResourceTypeTemplateAsync(resourceType, cancellationToken);
                     var response = await apiCall.SendAsync(cancellationToken);
                     ResourceTypeTemplate template = response.Item2;
-                    Assert.IsNotNull(template);
+                    Assert.NotNull(template);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestShowBuildInformation()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -491,20 +489,20 @@
                 GetBuildInformationApiCall apiCall = await service.PrepareGetBuildInformationAsync(cancellationToken);
                 var response = await apiCall.SendAsync(cancellationToken);
                 BuildInformation buildInformation = response.Item2;
-                Assert.IsNotNull(buildInformation);
-                Assert.IsNotNull(buildInformation.Api);
-                Assert.IsNotNull(buildInformation.Api.Revision);
-                Assert.IsNotNull(buildInformation.Engine);
-                Assert.IsNotNull(buildInformation.Engine.Revision);
+                Assert.NotNull(buildInformation);
+                Assert.NotNull(buildInformation.Api);
+                Assert.NotNull(buildInformation.Api.Revision);
+                Assert.NotNull(buildInformation.Engine);
+                Assert.NotNull(buildInformation.Engine.Revision);
 
                 Console.WriteLine("API Revision: {0}", buildInformation.Api.Revision);
                 Console.WriteLine("Engine Revision: {0}", buildInformation.Engine.Revision);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestCreateEmptyStack()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -526,8 +524,8 @@
 
                 CreateStackApiCall apiCall = await service.PrepareCreateStackAsync(requestData, cancellationToken);
                 var response = await apiCall.SendAsync(cancellationToken);
-                Assert.IsNotNull(response);
-                Assert.IsNotNull(response.Item2);
+                Assert.NotNull(response);
+                Assert.NotNull(response.Item2);
                 Stack stack = response.Item2.Stack;
 
                 RemoveStackApiCall removeApiCall = await service.PrepareRemoveStackAsync(stackName, stack.Id, cancellationToken);
@@ -535,9 +533,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestCreateContainerStack()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -551,7 +549,7 @@
 
                 ContainerName containerName = new ContainerName(ObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName());
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
                 StackName stackName = new StackName(TestStackPrefix + Path.GetRandomFileName());
                 Uri templateUri = null;
@@ -569,21 +567,21 @@
                 StackData requestData = new StackData(stackName, templateUri, template, environment, files, parameters, timeout, disableRollback);
 
                 Stack stack = await service.CreateStackAsync(requestData, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
-                Assert.IsNotNull(stack);
+                Assert.NotNull(stack);
 
                 await service.GetStackTemplateAsync(stack.Name, stack.Id, cancellationToken);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
                 await service.RemoveStackAsync(stackName, stack.Id, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestCreateContainerStackListResources()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -597,7 +595,7 @@
 
                 ContainerName containerName = new ContainerName(ObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName());
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
                 StackName stackName = new StackName(TestStackPrefix + Path.GetRandomFileName());
                 Uri templateUri = null;
@@ -615,27 +613,27 @@
                 StackData requestData = new StackData(stackName, templateUri, template, environment, files, parameters, timeout, disableRollback);
 
                 Stack stack = await service.CreateStackAsync(requestData, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
-                Assert.IsNotNull(stack);
+                Assert.NotNull(stack);
 
                 ReadOnlyCollection<Resource> resources = await (await service.ListResourcesAsync(stack.Name, stack.Id, cancellationToken)).GetAllPagesAsync(cancellationToken, null);
-                Assert.AreEqual(1, resources.Count);
+                Assert.Equal(1, resources.Count);
                 Resource containerResource = resources[0];
-                Assert.AreEqual(new ResourceTypeName("OS::Swift::Container"), containerResource.Type);
+                Assert.Equal(new ResourceTypeName("OS::Swift::Container"), containerResource.Type);
                 await service.GetResourceMetadataAsync(stack.Name, stack.Id, containerResource.Name, cancellationToken);
 
                 await service.GetStackTemplateAsync(stack.Name, stack.Id, cancellationToken);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
                 await service.RemoveStackAsync(stackName, stack.Id, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestCreateCustomResourceTemplate()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -652,7 +650,7 @@
 
                 ContainerName containerName = new ContainerName(ObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName());
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
                 StackName stackName = new StackName(TestStackPrefix + Path.GetRandomFileName());
                 Uri templateUri = null;
@@ -671,21 +669,21 @@
                 StackData requestData = new StackData(stackName, templateUri, template, environment, files, parameters, timeout, disableRollback);
 
                 Stack stack = await service.CreateStackAsync(requestData, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
-                Assert.IsNotNull(stack);
+                Assert.NotNull(stack);
 
                 await service.GetStackTemplateAsync(stack.Name, stack.Id, cancellationToken);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
                 await service.RemoveStackAsync(stackName, stack.Id, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestCreateCustomResourceTemplateNewVersion()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -701,7 +699,7 @@
 
                 ContainerName containerName = new ContainerName(ObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName());
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
                 StackName stackName = new StackName(TestStackPrefix + Path.GetRandomFileName());
                 Uri templateUri = null;
@@ -720,21 +718,21 @@
                 StackData requestData = new StackData(stackName, templateUri, template, environment, files, parameters, timeout, disableRollback);
 
                 Stack stack = await service.CreateStackAsync(requestData, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
-                Assert.IsNotNull(stack);
+                Assert.NotNull(stack);
 
                 await service.GetStackTemplateAsync(stack.Name, stack.Id, cancellationToken);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
                 await service.RemoveStackAsync(stackName, stack.Id, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestAbandonAdoptStack()
         {
             /* 1. Create a stack with a single Object Storage container as a resource
@@ -754,8 +752,8 @@
                 ContainerName containerName = new ContainerName(ObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName());
                 ContainerName anotherContainerName = new ContainerName(ObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName());
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
 
                 StackName stackName = new StackName(TestStackPrefix + Path.GetRandomFileName());
                 Uri templateUri = null;
@@ -771,15 +769,15 @@
                 StackData requestData = new StackData(stackName, templateUri, template, environment, files, parameters, timeout, disableRollback);
 
                 Stack stack = await service.CreateStackAsync(requestData, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
-                Assert.IsNotNull(stack);
+                Assert.NotNull(stack);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
 
                 Stack abandonedStack = await service.AbandonStackAsync(stackName, stack.Id, cancellationToken);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
 
                 StackName adoptedStackName = new StackName(TestStackPrefix + Path.GetRandomFileName());
                 IDictionary<string, string> adoptedParameters = new Dictionary<string, string>
@@ -789,19 +787,19 @@
                 AdoptStackData adoptRequestData = new AdoptStackData(adoptedStackName, JsonConvert.SerializeObject(abandonedStack), templateUri, template, environment, files, adoptedParameters, timeout, disableRollback);
                 Stack adoptedStack = await service.AdoptStackAsync(adoptRequestData, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
 
                 await service.RemoveStackAsync(adoptedStackName, adoptedStack.Id, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestAbandonAdoptStackAutomatic()
         {
             /* 1. Create a stack with a single Object Storage container as a resource
@@ -821,8 +819,8 @@
                 ContainerName containerName = new ContainerName(ObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName());
                 ContainerName anotherContainerName = new ContainerName(ObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName());
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
 
                 StackName stackName = new StackName(TestStackPrefix + Path.GetRandomFileName());
                 Uri templateUri = null;
@@ -838,15 +836,15 @@
                 StackData requestData = new StackData(stackName, templateUri, template, environment, files, parameters, timeout, disableRollback);
 
                 Stack stack = await service.CreateStackAsync(requestData, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
-                Assert.IsNotNull(stack);
+                Assert.NotNull(stack);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
 
                 Stack abandonedStack = await service.AbandonStackAsync(stackName, stack.Id, cancellationToken);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
 
                 StackName adoptedStackName = new StackName(TestStackPrefix + Path.GetRandomFileName());
                 IDictionary<string, string> adoptedParameters = new Dictionary<string, string>
@@ -856,19 +854,19 @@
                 AdoptStackData adoptRequestData = new AdoptStackData(adoptedStackName, abandonedStack);
                 Stack adoptedStack = await service.AdoptStackAsync(adoptRequestData, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
 
                 await service.RemoveStackAsync(adoptedStackName, adoptedStack.Id, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, anotherContainerName, cancellationToken));
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestUpdateContainerStack()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -881,7 +879,7 @@
                 IObjectStorageService objectStorageService = ObjectStorageTests.CreateService(authenticationService, Credentials);
 
                 ContainerName containerName = new ContainerName(ObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName());
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
                 StackName stackName = new StackName(TestStackPrefix + Path.GetRandomFileName());
                 Uri templateUri = null;
@@ -897,20 +895,20 @@
                 StackData requestData = new StackData(stackName, templateUri, template, environment, files, parameters, timeout, disableRollback);
 
                 Stack stack = await service.CreateStackAsync(requestData, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
-                Assert.IsNotNull(stack);
+                Assert.NotNull(stack);
 
-                Assert.IsTrue(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
                 await service.RemoveStackAsync(stackName, stack.Id, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
 
-                Assert.IsFalse(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
             }
         }
 
 #if false
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestListSoftwareConfigurations()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -921,7 +919,7 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<SoftwareConfiguration> softwareConfigurations = await ListAllSoftwareConfigurationsAsync(service, cancellationToken);
                 if (!softwareConfigurations.Any())
-                    Assert.Inconclusive("The account does not have any software configurations in the region.");
+                    Assert.False(true, "The account does not have any software configurations in the region.");
 
                 Console.WriteLine("Software Configurations");
                 foreach (SoftwareConfiguration softwareConfiguration in softwareConfigurations)
@@ -932,9 +930,9 @@
         }
 #endif
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Orchestration)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Orchestration, "")]
         public async Task TestListDeployments()
         {
             using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
@@ -945,7 +943,7 @@
                 IOrchestrationService service = CreateService();
                 ReadOnlyCollection<Deployment> deployments = await ListAllDeploymentsAsync(service, cancellationToken);
                 if (!deployments.Any())
-                    Assert.Inconclusive("The account does not have any deployments in the region.");
+                    Assert.False(true, "The account does not have any deployments in the region.");
 
                 Console.WriteLine("Deployments");
                 foreach (Deployment deployment in deployments)

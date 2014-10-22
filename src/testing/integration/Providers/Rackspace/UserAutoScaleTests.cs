@@ -7,13 +7,13 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using net.openstack.Core;
     using net.openstack.Core.Domain;
     using net.openstack.Core.Providers;
     using net.openstack.Providers.Rackspace;
     using net.openstack.Providers.Rackspace.Objects.AutoScale;
     using Newtonsoft.Json.Linq;
+    using Xunit;
     using CancellationToken = System.Threading.CancellationToken;
     using CancellationTokenSource = System.Threading.CancellationTokenSource;
     using CloudIdentity = net.openstack.Core.Domain.CloudIdentity;
@@ -25,7 +25,6 @@
     using WebRequest = System.Net.WebRequest;
     using WebResponse = System.Net.WebResponse;
 
-    [TestClass]
     public class UserAutoScaleTests
     {
         /// <summary>
@@ -33,8 +32,8 @@
         /// </summary>
         public static readonly string TestScalingGroupPrefix = "UnitTestGroup-";
 
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public async Task CleanupScalingGroups()
         {
             IAutoScaleService provider = CreateProvider();
@@ -66,9 +65,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestListScalingGroups()
         {
             IAutoScaleService provider = CreateProvider();
@@ -76,16 +75,16 @@
             {
                 ReadOnlyCollection<ScalingGroup> scalingGroups = await ListAllScalingGroupsAsync(provider, null, cancellationTokenSource.Token);
                 if (scalingGroups.Count == 0)
-                    Assert.Inconclusive("The service did not report any scaling groups.");
+                    Assert.False(true, "The service did not report any scaling groups.");
 
                 foreach (ScalingGroup scalingGroup in scalingGroups)
                     Console.WriteLine("Scaling group '{0}' ({1})", scalingGroup.State.Name, scalingGroup.Id);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestCreateGroup()
         {
             IAutoScaleService provider = CreateProvider();
@@ -101,16 +100,16 @@
                 PolicyConfiguration[] policyConfigurations = { };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
 
                 await provider.DeleteGroupAsync(scalingGroup.Id, false, cancellationTokenSource.Token);
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestCreateGroupWithEntities()
         {
             IAutoScaleService provider = CreateProvider();
@@ -126,8 +125,8 @@
                 PolicyConfiguration[] policyConfigurations = { };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
 
                 GroupConfiguration updatedConfiguration = new GroupConfiguration(name: groupName, cooldown: TimeSpan.FromSeconds(240), minEntities: 0, maxEntities: 0, metadata: new JObject());
                 await provider.SetGroupConfigurationAsync(scalingGroup.Id, updatedConfiguration, cancellationTokenSource.Token);
@@ -136,9 +135,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestGetGroup()
         {
             IAutoScaleService provider = CreateProvider();
@@ -146,20 +145,20 @@
             {
                 ReadOnlyCollection<ScalingGroup> scalingGroups = await ListAllScalingGroupsAsync(provider, null, cancellationTokenSource.Token);
                 if (scalingGroups.Count == 0)
-                    Assert.Inconclusive("The service did not report any scaling groups.");
+                    Assert.False(true, "The service did not report any scaling groups.");
 
                 foreach (ScalingGroup scalingGroup in scalingGroups)
                 {
                     ScalingGroup singleGroup = await provider.GetGroupAsync(scalingGroup.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(singleGroup);
-                    Assert.AreEqual(scalingGroup.Id, singleGroup.Id);
+                    Assert.NotNull(singleGroup);
+                    Assert.Equal(scalingGroup.Id, singleGroup.Id);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestGetGroupState()
         {
             IAutoScaleService provider = CreateProvider();
@@ -167,24 +166,24 @@
             {
                 ReadOnlyCollection<ScalingGroup> scalingGroups = await ListAllScalingGroupsAsync(provider, null, cancellationTokenSource.Token);
                 if (scalingGroups.Count == 0)
-                    Assert.Inconclusive("The service did not report any scaling groups.");
+                    Assert.False(true, "The service did not report any scaling groups.");
 
                 foreach (ScalingGroup scalingGroup in scalingGroups)
                 {
                     GroupState groupState = await provider.GetGroupStateAsync(scalingGroup.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(groupState);
-                    Assert.AreEqual(scalingGroup.State.ActiveCapacity, groupState.ActiveCapacity);
-                    Assert.AreEqual(scalingGroup.State.DesiredCapacity, groupState.DesiredCapacity);
-                    Assert.AreEqual(scalingGroup.State.Name, groupState.Name);
-                    Assert.AreEqual(scalingGroup.State.Paused, groupState.Paused);
-                    Assert.AreEqual(scalingGroup.State.PendingCapacity, groupState.PendingCapacity);
+                    Assert.NotNull(groupState);
+                    Assert.Equal(scalingGroup.State.ActiveCapacity, groupState.ActiveCapacity);
+                    Assert.Equal(scalingGroup.State.DesiredCapacity, groupState.DesiredCapacity);
+                    Assert.Equal(scalingGroup.State.Name, groupState.Name);
+                    Assert.Equal(scalingGroup.State.Paused, groupState.Paused);
+                    Assert.Equal(scalingGroup.State.PendingCapacity, groupState.PendingCapacity);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestPauseGroup()
         {
             IAutoScaleService provider = CreateProvider();
@@ -200,7 +199,7 @@
                 PolicyConfiguration[] policyConfigurations = { };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
+                Assert.NotNull(scalingGroup);
 
                 await provider.PauseGroupAsync(scalingGroup.Id, cancellationTokenSource.Token);
                 await provider.PauseGroupAsync(scalingGroup.Id, cancellationTokenSource.Token);
@@ -211,9 +210,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestGetGroupConfiguration()
         {
             IAutoScaleService provider = CreateProvider();
@@ -221,20 +220,20 @@
             {
                 ReadOnlyCollection<ScalingGroup> scalingGroups = await ListAllScalingGroupsAsync(provider, null, cancellationTokenSource.Token);
                 if (scalingGroups.Count == 0)
-                    Assert.Inconclusive("The service did not report any scaling groups.");
+                    Assert.False(true, "The service did not report any scaling groups.");
 
                 foreach (ScalingGroup scalingGroup in scalingGroups)
                 {
                     GroupConfiguration groupConfiguration = await provider.GetGroupConfigurationAsync(scalingGroup.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(groupConfiguration);
-                    Assert.AreEqual(scalingGroup.State.Name, groupConfiguration.Name);
+                    Assert.NotNull(groupConfiguration);
+                    Assert.Equal(scalingGroup.State.Name, groupConfiguration.Name);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestSetGroupConfiguration()
         {
             IAutoScaleService provider = CreateProvider();
@@ -250,7 +249,7 @@
                 PolicyConfiguration[] policyConfigurations = { };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
+                Assert.NotNull(scalingGroup);
 
                 GroupConfiguration updatedConfiguration = new GroupConfiguration(name: groupName, cooldown: TimeSpan.FromSeconds(240), minEntities: 0, maxEntities: 0, metadata: new JObject());
                 await provider.SetGroupConfigurationAsync(scalingGroup.Id, updatedConfiguration, cancellationTokenSource.Token);
@@ -259,9 +258,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestGetLaunchConfiguration()
         {
             IAutoScaleService provider = CreateProvider();
@@ -269,20 +268,20 @@
             {
                 ReadOnlyCollection<ScalingGroup> scalingGroups = await ListAllScalingGroupsAsync(provider, null, cancellationTokenSource.Token);
                 if (scalingGroups.Count == 0)
-                    Assert.Inconclusive("The service did not report any scaling groups.");
+                    Assert.False(true, "The service did not report any scaling groups.");
 
                 foreach (ScalingGroup scalingGroup in scalingGroups)
                 {
                     LaunchConfiguration launchConfiguration = await provider.GetLaunchConfigurationAsync(scalingGroup.Id, cancellationTokenSource.Token);
-                    Assert.IsNotNull(launchConfiguration);
-                    Assert.IsNotNull(launchConfiguration.LaunchType);
+                    Assert.NotNull(launchConfiguration);
+                    Assert.NotNull(launchConfiguration.LaunchType);
                 }
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestSetLaunchConfiguration()
         {
             IAutoScaleService provider = CreateProvider();
@@ -298,7 +297,7 @@
                 PolicyConfiguration[] policyConfigurations = { };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
+                Assert.NotNull(scalingGroup);
 
                 Personality[] personality = { new Personality("/usr/lib/myfile.txt", "Stuff", Encoding.UTF8) };
                 LaunchConfiguration updatedConfiguration = new ServerLaunchConfiguration(new ServerLaunchArguments(new ServerArgument(flavorId, imageId, serverName, null, null, null, personality)));
@@ -308,9 +307,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestListPolicies()
         {
             IAutoScaleService provider = CreateProvider();
@@ -318,7 +317,7 @@
             {
                 ReadOnlyCollection<ScalingGroup> scalingGroups = await ListAllScalingGroupsAsync(provider, null, cancellationTokenSource.Token);
                 if (scalingGroups.Count == 0)
-                    Assert.Inconclusive("The service did not report any scaling groups.");
+                    Assert.False(true, "The service did not report any scaling groups.");
 
                 bool foundPolicy = false;
                 foreach (ScalingGroup scalingGroup in scalingGroups)
@@ -333,13 +332,13 @@
                 }
 
                 if (!foundPolicy)
-                    Assert.Inconclusive("The service did not report any policies.");
+                    Assert.False(true, "The service did not report any policies.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestCreatePolicy()
         {
             IAutoScaleService provider = CreateProvider();
@@ -355,8 +354,8 @@
                 PolicyConfiguration[] policyConfigurations = { };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
 
                 PolicyConfiguration policyConfiguration;
                 Policy policy;
@@ -364,60 +363,60 @@
                 /* Desired Capacity
                  */
                 policyConfiguration = PolicyConfiguration.Capacity("Capacity 0 Policy", 0, TimeSpan.FromSeconds(60));
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(policy);
-                Assert.AreEqual(policyConfiguration.Change, policy.Change);
-                Assert.AreEqual(policyConfiguration.ChangePercent, policy.ChangePercent);
-                Assert.AreEqual(policyConfiguration.Cooldown, policy.Cooldown);
-                Assert.AreEqual(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
-                Assert.AreEqual(policyConfiguration.Name, policy.Name);
-                Assert.AreEqual(policyConfiguration.PolicyType, policy.PolicyType);
+                Assert.NotNull(policy);
+                Assert.Equal(policyConfiguration.Change, policy.Change);
+                Assert.Equal(policyConfiguration.ChangePercent, policy.ChangePercent);
+                Assert.Equal(policyConfiguration.Cooldown, policy.Cooldown);
+                Assert.Equal(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
+                Assert.Equal(policyConfiguration.Name, policy.Name);
+                Assert.Equal(policyConfiguration.PolicyType, policy.PolicyType);
 
                 await provider.DeletePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
 
                 /* Incremental Change
                  */
                 policyConfiguration = PolicyConfiguration.IncrementalChange("Incremental Change -1 Policy", -1, TimeSpan.FromSeconds(60));
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(policy);
-                Assert.AreEqual(policyConfiguration.Change, policy.Change);
-                Assert.AreEqual(policyConfiguration.ChangePercent, policy.ChangePercent);
-                Assert.AreEqual(policyConfiguration.Cooldown, policy.Cooldown);
-                Assert.AreEqual(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
-                Assert.AreEqual(policyConfiguration.Name, policy.Name);
-                Assert.AreEqual(policyConfiguration.PolicyType, policy.PolicyType);
+                Assert.NotNull(policy);
+                Assert.Equal(policyConfiguration.Change, policy.Change);
+                Assert.Equal(policyConfiguration.ChangePercent, policy.ChangePercent);
+                Assert.Equal(policyConfiguration.Cooldown, policy.Cooldown);
+                Assert.Equal(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
+                Assert.Equal(policyConfiguration.Name, policy.Name);
+                Assert.Equal(policyConfiguration.PolicyType, policy.PolicyType);
 
                 await provider.DeletePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
 
                 /* Percentage Change
                  */
                 policyConfiguration = PolicyConfiguration.PercentageChange("Percentage Change -50% Policy", -50.0, TimeSpan.FromSeconds(60));
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(policy);
-                Assert.AreEqual(policyConfiguration.Change, policy.Change);
-                Assert.AreEqual(policyConfiguration.ChangePercent, policy.ChangePercent);
-                Assert.AreEqual(policyConfiguration.Cooldown, policy.Cooldown);
-                Assert.AreEqual(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
-                Assert.AreEqual(policyConfiguration.Name, policy.Name);
-                Assert.AreEqual(policyConfiguration.PolicyType, policy.PolicyType);
+                Assert.NotNull(policy);
+                Assert.Equal(policyConfiguration.Change, policy.Change);
+                Assert.Equal(policyConfiguration.ChangePercent, policy.ChangePercent);
+                Assert.Equal(policyConfiguration.Cooldown, policy.Cooldown);
+                Assert.Equal(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
+                Assert.Equal(policyConfiguration.Name, policy.Name);
+                Assert.Equal(policyConfiguration.PolicyType, policy.PolicyType);
 
                 await provider.DeletePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
 
                 /* Percentage Change At Time
                  */
                 policyConfiguration = PolicyConfiguration.PercentageChangeAtTime("Percentage Change -50% At Time Policy", -50.0, TimeSpan.FromSeconds(60), DateTimeOffset.UtcNow.AddMinutes(30));
-                Assert.AreEqual(PolicyType.Schedule, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Schedule, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(policy);
-                Assert.AreEqual(policyConfiguration.Change, policy.Change);
-                Assert.AreEqual(policyConfiguration.ChangePercent, policy.ChangePercent);
-                Assert.AreEqual(policyConfiguration.Cooldown, policy.Cooldown);
-                Assert.AreEqual(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
-                Assert.AreEqual(policyConfiguration.Name, policy.Name);
-                Assert.AreEqual(policyConfiguration.PolicyType, policy.PolicyType);
+                Assert.NotNull(policy);
+                Assert.Equal(policyConfiguration.Change, policy.Change);
+                Assert.Equal(policyConfiguration.ChangePercent, policy.ChangePercent);
+                Assert.Equal(policyConfiguration.Cooldown, policy.Cooldown);
+                Assert.Equal(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
+                Assert.Equal(policyConfiguration.Name, policy.Name);
+                Assert.Equal(policyConfiguration.PolicyType, policy.PolicyType);
 
                 await provider.DeletePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
 
@@ -427,9 +426,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestGetPolicy()
         {
             IAutoScaleService provider = CreateProvider();
@@ -445,8 +444,8 @@
                 PolicyConfiguration[] policyConfigurations = { };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
 
                 PolicyConfiguration policyConfiguration;
                 Policy policy;
@@ -455,116 +454,116 @@
                 /* Desired Capacity
                  */
                 policyConfiguration = PolicyConfiguration.Capacity("Capacity 0 Policy", 0, TimeSpan.FromSeconds(60));
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(policy);
-                Assert.IsNotNull(policy.Id);
-                Assert.AreEqual(policyConfiguration.Change, policy.Change);
-                Assert.AreEqual(policyConfiguration.ChangePercent, policy.ChangePercent);
-                Assert.AreEqual(policyConfiguration.Cooldown, policy.Cooldown);
-                Assert.AreEqual(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
-                Assert.AreEqual(policyConfiguration.Name, policy.Name);
-                Assert.AreEqual(policyConfiguration.PolicyType, policy.PolicyType);
+                Assert.NotNull(policy);
+                Assert.NotNull(policy.Id);
+                Assert.Equal(policyConfiguration.Change, policy.Change);
+                Assert.Equal(policyConfiguration.ChangePercent, policy.ChangePercent);
+                Assert.Equal(policyConfiguration.Cooldown, policy.Cooldown);
+                Assert.Equal(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
+                Assert.Equal(policyConfiguration.Name, policy.Name);
+                Assert.Equal(policyConfiguration.PolicyType, policy.PolicyType);
 
                 singlePolicy = await provider.GetPolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(singlePolicy);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Change, singlePolicy.Change);
-                Assert.AreEqual(policy.ChangePercent, singlePolicy.ChangePercent);
-                Assert.AreEqual(policy.Cooldown, singlePolicy.Cooldown);
-                Assert.AreEqual(policy.DesiredCapacity, singlePolicy.DesiredCapacity);
-                Assert.AreEqual(policy.Name, singlePolicy.Name);
-                Assert.AreEqual(policy.PolicyType, singlePolicy.PolicyType);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
+                Assert.NotNull(singlePolicy);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Change, singlePolicy.Change);
+                Assert.Equal(policy.ChangePercent, singlePolicy.ChangePercent);
+                Assert.Equal(policy.Cooldown, singlePolicy.Cooldown);
+                Assert.Equal(policy.DesiredCapacity, singlePolicy.DesiredCapacity);
+                Assert.Equal(policy.Name, singlePolicy.Name);
+                Assert.Equal(policy.PolicyType, singlePolicy.PolicyType);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Id, singlePolicy.Id);
 
                 await provider.DeletePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
 
                 /* Incremental Change
                  */
                 policyConfiguration = PolicyConfiguration.IncrementalChange("Incremental Change -1 Policy", -1, TimeSpan.FromSeconds(60));
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(policy);
-                Assert.IsNotNull(policy.Id);
-                Assert.AreEqual(policyConfiguration.Change, policy.Change);
-                Assert.AreEqual(policyConfiguration.ChangePercent, policy.ChangePercent);
-                Assert.AreEqual(policyConfiguration.Cooldown, policy.Cooldown);
-                Assert.AreEqual(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
-                Assert.AreEqual(policyConfiguration.Name, policy.Name);
-                Assert.AreEqual(policyConfiguration.PolicyType, policy.PolicyType);
+                Assert.NotNull(policy);
+                Assert.NotNull(policy.Id);
+                Assert.Equal(policyConfiguration.Change, policy.Change);
+                Assert.Equal(policyConfiguration.ChangePercent, policy.ChangePercent);
+                Assert.Equal(policyConfiguration.Cooldown, policy.Cooldown);
+                Assert.Equal(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
+                Assert.Equal(policyConfiguration.Name, policy.Name);
+                Assert.Equal(policyConfiguration.PolicyType, policy.PolicyType);
 
                 singlePolicy = await provider.GetPolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(singlePolicy);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Change, singlePolicy.Change);
-                Assert.AreEqual(policy.ChangePercent, singlePolicy.ChangePercent);
-                Assert.AreEqual(policy.Cooldown, singlePolicy.Cooldown);
-                Assert.AreEqual(policy.DesiredCapacity, singlePolicy.DesiredCapacity);
-                Assert.AreEqual(policy.Name, singlePolicy.Name);
-                Assert.AreEqual(policy.PolicyType, singlePolicy.PolicyType);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
+                Assert.NotNull(singlePolicy);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Change, singlePolicy.Change);
+                Assert.Equal(policy.ChangePercent, singlePolicy.ChangePercent);
+                Assert.Equal(policy.Cooldown, singlePolicy.Cooldown);
+                Assert.Equal(policy.DesiredCapacity, singlePolicy.DesiredCapacity);
+                Assert.Equal(policy.Name, singlePolicy.Name);
+                Assert.Equal(policy.PolicyType, singlePolicy.PolicyType);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Id, singlePolicy.Id);
 
                 await provider.DeletePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
 
                 /* Percentage Change
                  */
                 policyConfiguration = PolicyConfiguration.PercentageChange("Percentage Change -50% Policy", -50.0, TimeSpan.FromSeconds(60));
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(policy);
-                Assert.IsNotNull(policy.Id);
-                Assert.AreEqual(policyConfiguration.Change, policy.Change);
-                Assert.AreEqual(policyConfiguration.ChangePercent, policy.ChangePercent);
-                Assert.AreEqual(policyConfiguration.Cooldown, policy.Cooldown);
-                Assert.AreEqual(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
-                Assert.AreEqual(policyConfiguration.Name, policy.Name);
-                Assert.AreEqual(policyConfiguration.PolicyType, policy.PolicyType);
+                Assert.NotNull(policy);
+                Assert.NotNull(policy.Id);
+                Assert.Equal(policyConfiguration.Change, policy.Change);
+                Assert.Equal(policyConfiguration.ChangePercent, policy.ChangePercent);
+                Assert.Equal(policyConfiguration.Cooldown, policy.Cooldown);
+                Assert.Equal(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
+                Assert.Equal(policyConfiguration.Name, policy.Name);
+                Assert.Equal(policyConfiguration.PolicyType, policy.PolicyType);
 
                 singlePolicy = await provider.GetPolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(singlePolicy);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Change, singlePolicy.Change);
-                Assert.AreEqual(policy.ChangePercent, singlePolicy.ChangePercent);
-                Assert.AreEqual(policy.Cooldown, singlePolicy.Cooldown);
-                Assert.AreEqual(policy.DesiredCapacity, singlePolicy.DesiredCapacity);
-                Assert.AreEqual(policy.Name, singlePolicy.Name);
-                Assert.AreEqual(policy.PolicyType, singlePolicy.PolicyType);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
+                Assert.NotNull(singlePolicy);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Change, singlePolicy.Change);
+                Assert.Equal(policy.ChangePercent, singlePolicy.ChangePercent);
+                Assert.Equal(policy.Cooldown, singlePolicy.Cooldown);
+                Assert.Equal(policy.DesiredCapacity, singlePolicy.DesiredCapacity);
+                Assert.Equal(policy.Name, singlePolicy.Name);
+                Assert.Equal(policy.PolicyType, singlePolicy.PolicyType);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Id, singlePolicy.Id);
 
                 await provider.DeletePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
 
                 /* Percentage Change At Time
                  */
                 policyConfiguration = PolicyConfiguration.PercentageChangeAtTime("Percentage Change -50% At Time Policy", -50.0, TimeSpan.FromSeconds(60), DateTimeOffset.UtcNow.AddMinutes(30));
-                Assert.AreEqual(PolicyType.Schedule, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Schedule, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(policy);
-                Assert.IsNotNull(policy.Id);
-                Assert.AreEqual(policyConfiguration.Change, policy.Change);
-                Assert.AreEqual(policyConfiguration.ChangePercent, policy.ChangePercent);
-                Assert.AreEqual(policyConfiguration.Cooldown, policy.Cooldown);
-                Assert.AreEqual(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
-                Assert.AreEqual(policyConfiguration.Name, policy.Name);
-                Assert.AreEqual(policyConfiguration.PolicyType, policy.PolicyType);
+                Assert.NotNull(policy);
+                Assert.NotNull(policy.Id);
+                Assert.Equal(policyConfiguration.Change, policy.Change);
+                Assert.Equal(policyConfiguration.ChangePercent, policy.ChangePercent);
+                Assert.Equal(policyConfiguration.Cooldown, policy.Cooldown);
+                Assert.Equal(policyConfiguration.DesiredCapacity, policy.DesiredCapacity);
+                Assert.Equal(policyConfiguration.Name, policy.Name);
+                Assert.Equal(policyConfiguration.PolicyType, policy.PolicyType);
 
                 singlePolicy = await provider.GetPolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(singlePolicy);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Change, singlePolicy.Change);
-                Assert.AreEqual(policy.ChangePercent, singlePolicy.ChangePercent);
-                Assert.AreEqual(policy.Cooldown, singlePolicy.Cooldown);
-                Assert.AreEqual(policy.DesiredCapacity, singlePolicy.DesiredCapacity);
-                Assert.AreEqual(policy.Name, singlePolicy.Name);
-                Assert.AreEqual(policy.PolicyType, singlePolicy.PolicyType);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
-                Assert.AreEqual(policy.Id, singlePolicy.Id);
+                Assert.NotNull(singlePolicy);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Change, singlePolicy.Change);
+                Assert.Equal(policy.ChangePercent, singlePolicy.ChangePercent);
+                Assert.Equal(policy.Cooldown, singlePolicy.Cooldown);
+                Assert.Equal(policy.DesiredCapacity, singlePolicy.DesiredCapacity);
+                Assert.Equal(policy.Name, singlePolicy.Name);
+                Assert.Equal(policy.PolicyType, singlePolicy.PolicyType);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Id, singlePolicy.Id);
+                Assert.Equal(policy.Id, singlePolicy.Id);
 
                 await provider.DeletePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
 
@@ -574,9 +573,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestSetPolicy()
         {
             IAutoScaleService provider = CreateProvider();
@@ -592,8 +591,8 @@
                 PolicyConfiguration[] policyConfigurations = { };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
 
                 PolicyConfiguration policyConfiguration;
                 Policy policy;
@@ -601,7 +600,7 @@
                 /* Desired Capacity
                  */
                 policyConfiguration = PolicyConfiguration.Capacity("Capacity 1 Policy", 1, TimeSpan.FromSeconds(60));
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
 
                 await provider.SetPolicyAsync(scalingGroup.Id, policy.Id, policyConfiguration, cancellationTokenSource.Token);
@@ -611,7 +610,7 @@
                 /* Incremental Change
                  */
                 policyConfiguration = PolicyConfiguration.IncrementalChange("Incremental Change -1 Policy", -1, TimeSpan.FromSeconds(60));
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
 
                 await provider.SetPolicyAsync(scalingGroup.Id, policy.Id, policyConfiguration, cancellationTokenSource.Token);
@@ -621,7 +620,7 @@
                 /* Percentage Change
                  */
                 policyConfiguration = PolicyConfiguration.PercentageChange("Percentage Change -50% Policy", -50.0, TimeSpan.FromSeconds(60));
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
 
                 await provider.SetPolicyAsync(scalingGroup.Id, policy.Id, policyConfiguration, cancellationTokenSource.Token);
@@ -631,7 +630,7 @@
                 /* Percentage Change At Time
                  */
                 policyConfiguration = PolicyConfiguration.PercentageChangeAtTime("Percentage Change -50% At Time Policy", -50.0, TimeSpan.FromSeconds(60), DateTimeOffset.UtcNow.AddMinutes(30));
-                Assert.AreEqual(PolicyType.Schedule, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Schedule, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
 
                 await provider.SetPolicyAsync(scalingGroup.Id, policy.Id, policyConfiguration, cancellationTokenSource.Token);
@@ -644,9 +643,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestExecutePolicy()
         {
             IAutoScaleService provider = CreateProvider();
@@ -662,8 +661,8 @@
                 PolicyConfiguration[] policyConfigurations = { };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
 
                 PolicyConfiguration policyConfiguration;
                 Policy policy;
@@ -671,7 +670,7 @@
                 /* Desired Capacity
                  */
                 policyConfiguration = PolicyConfiguration.Capacity("Capacity 1 Policy", 1, TimeSpan.Zero);
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
 
                 await provider.ExecutePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
@@ -681,7 +680,7 @@
                 /* Incremental Change
                  */
                 policyConfiguration = PolicyConfiguration.IncrementalChange("Incremental Change -1 Policy", -1, TimeSpan.Zero);
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
 
                 await provider.ExecutePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
@@ -691,7 +690,7 @@
                 /* Percentage Change
                  */
                 policyConfiguration = PolicyConfiguration.PercentageChange("Percentage Change +50% Policy", 50.0, TimeSpan.Zero);
-                Assert.AreEqual(PolicyType.Webhook, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Webhook, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
 
                 await provider.ExecutePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
@@ -701,7 +700,7 @@
                 /* Percentage Change At Time
                  */
                 policyConfiguration = PolicyConfiguration.PercentageChangeAtTime("Percentage Change -50% At Time Policy", -50.0, TimeSpan.Zero, DateTimeOffset.UtcNow.AddMinutes(30));
-                Assert.AreEqual(PolicyType.Schedule, policyConfiguration.PolicyType);
+                Assert.Equal(PolicyType.Schedule, policyConfiguration.PolicyType);
                 policy = await provider.CreatePolicyAsync(scalingGroup.Id, policyConfiguration, cancellationTokenSource.Token);
 
                 await provider.ExecutePolicyAsync(scalingGroup.Id, policy.Id, cancellationTokenSource.Token);
@@ -714,9 +713,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestExecuteAnonymousWebhook()
         {
             IAutoScaleService provider = CreateProvider();
@@ -732,9 +731,9 @@
                 PolicyConfiguration[] policyConfigurations = { PolicyConfiguration.Capacity("Capacity 1 Policy", 1, TimeSpan.Zero) };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
-                Assert.AreEqual(0, scalingGroup.State.DesiredCapacity);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
+                Assert.Equal(0, scalingGroup.State.DesiredCapacity);
 
                 // create a webhook
                 NewWebhookConfiguration webhookConfiguration = new NewWebhookConfiguration("Test Webhook");
@@ -742,7 +741,7 @@
 
                 // execute the webhook anonymously
                 Link capabilityLink = webhook.Links.FirstOrDefault(i => string.Equals(i.Rel, "capability", StringComparison.OrdinalIgnoreCase));
-                Assert.IsNotNull(capabilityLink);
+                Assert.NotNull(capabilityLink);
                 Uri capability = new Uri(capabilityLink.Href, UriKind.Absolute);
                 HttpWebRequest request = WebRequest.CreateHttp(capability);
                 request.Method = "POST";
@@ -757,7 +756,7 @@
 
                 // verify successful execution
                 GroupState groupState = await provider.GetGroupStateAsync(scalingGroup.Id, cancellationTokenSource.Token);
-                Assert.AreEqual(1, groupState.DesiredCapacity);
+                Assert.Equal(1, groupState.DesiredCapacity);
 
                 /* Cleanup
                  */
@@ -766,9 +765,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestListWebhooks()
         {
             IAutoScaleService provider = CreateProvider();
@@ -776,7 +775,7 @@
             {
                 ReadOnlyCollection<ScalingGroup> scalingGroups = await ListAllScalingGroupsAsync(provider, null, cancellationTokenSource.Token);
                 if (scalingGroups.Count == 0)
-                    Assert.Inconclusive("The service did not report any scaling groups.");
+                    Assert.False(true, "The service did not report any scaling groups.");
 
                 bool foundPolicy = false;
                 bool foundWebhook = false;
@@ -798,15 +797,15 @@
                 }
 
                 if (!foundPolicy)
-                    Assert.Inconclusive("The service did not report any policies.");
+                    Assert.False(true, "The service did not report any policies.");
                 if (!foundWebhook)
-                    Assert.Inconclusive("The service did not report any webhooks.");
+                    Assert.False(true, "The service did not report any webhooks.");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestCreateWebhook()
         {
             IAutoScaleService provider = CreateProvider();
@@ -822,15 +821,15 @@
                 PolicyConfiguration[] policyConfigurations = { PolicyConfiguration.Capacity("Capacity 1 Policy", 1, TimeSpan.Zero) };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
-                Assert.AreEqual(0, scalingGroup.State.DesiredCapacity);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
+                Assert.Equal(0, scalingGroup.State.DesiredCapacity);
 
                 // create a webhook
                 NewWebhookConfiguration webhookConfiguration = new NewWebhookConfiguration("Test Webhook");
                 Webhook webhook = await provider.CreateWebhookAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhookConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(webhook);
-                Assert.IsNotNull(webhook.Id);
+                Assert.NotNull(webhook);
+                Assert.NotNull(webhook.Id);
 
                 // delete the webhook
                 await provider.DeleteWebhookAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhook.Id, cancellationTokenSource.Token);
@@ -841,9 +840,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestCreateWebhookRange()
         {
             IAutoScaleService provider = CreateProvider();
@@ -859,9 +858,9 @@
                 PolicyConfiguration[] policyConfigurations = { PolicyConfiguration.Capacity("Capacity 1 Policy", 1, TimeSpan.Zero) };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
-                Assert.AreEqual(0, scalingGroup.State.DesiredCapacity);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
+                Assert.Equal(0, scalingGroup.State.DesiredCapacity);
 
                 // create a webhook
                 NewWebhookConfiguration[] webhookConfigurations =
@@ -871,8 +870,8 @@
                         new NewWebhookConfiguration("Test Webhook 3")
                     };
                 ReadOnlyCollection<Webhook> webhooks = await provider.CreateWebhookRangeAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhookConfigurations, cancellationTokenSource.Token);
-                Assert.IsNotNull(webhooks);
-                Assert.AreEqual(webhookConfigurations.Length, webhooks.Count);
+                Assert.NotNull(webhooks);
+                Assert.Equal(webhookConfigurations.Length, webhooks.Count);
 
                 /* Cleanup
                  */
@@ -880,9 +879,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestGetWebhook()
         {
             IAutoScaleService provider = CreateProvider();
@@ -898,21 +897,21 @@
                 PolicyConfiguration[] policyConfigurations = { PolicyConfiguration.Capacity("Capacity 1 Policy", 1, TimeSpan.Zero) };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
-                Assert.AreEqual(0, scalingGroup.State.DesiredCapacity);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
+                Assert.Equal(0, scalingGroup.State.DesiredCapacity);
 
                 // create a webhook
                 NewWebhookConfiguration webhookConfiguration = new NewWebhookConfiguration("Test Webhook");
                 Webhook webhook = await provider.CreateWebhookAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhookConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(webhook);
-                Assert.IsNotNull(webhook.Id);
+                Assert.NotNull(webhook);
+                Assert.NotNull(webhook.Id);
 
                 // get the webhook
                 Webhook singleWebhook = await provider.GetWebhookAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhook.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(singleWebhook);
-                Assert.AreEqual(webhook.Id, singleWebhook.Id);
-                Assert.AreEqual(webhook.Name, singleWebhook.Name);
+                Assert.NotNull(singleWebhook);
+                Assert.Equal(webhook.Id, singleWebhook.Id);
+                Assert.Equal(webhook.Name, singleWebhook.Name);
 
                 // delete the webhook
                 await provider.DeleteWebhookAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhook.Id, cancellationTokenSource.Token);
@@ -923,9 +922,9 @@
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.AutoScale)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.AutoScale, "")]
         public async Task TestUpdateWebhook()
         {
             IAutoScaleService provider = CreateProvider();
@@ -941,15 +940,15 @@
                 PolicyConfiguration[] policyConfigurations = { PolicyConfiguration.Capacity("Capacity 1 Policy", 1, TimeSpan.Zero) };
                 ScalingGroupConfiguration configuration = new ScalingGroupConfiguration(groupConfiguration, launchConfiguration, policyConfigurations);
                 ScalingGroup scalingGroup = await provider.CreateGroupAsync(configuration, cancellationTokenSource.Token);
-                Assert.IsNotNull(scalingGroup);
-                Assert.IsNotNull(scalingGroup.Id);
-                Assert.AreEqual(0, scalingGroup.State.DesiredCapacity);
+                Assert.NotNull(scalingGroup);
+                Assert.NotNull(scalingGroup.Id);
+                Assert.Equal(0, scalingGroup.State.DesiredCapacity);
 
                 // create a webhook
                 NewWebhookConfiguration webhookConfiguration = new NewWebhookConfiguration("Test Webhook");
                 Webhook webhook = await provider.CreateWebhookAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhookConfiguration, cancellationTokenSource.Token);
-                Assert.IsNotNull(webhook);
-                Assert.IsNotNull(webhook.Id);
+                Assert.NotNull(webhook);
+                Assert.NotNull(webhook.Id);
 
                 // update the webhook name
                 string updatedName = "Updated Webhook";
@@ -957,10 +956,10 @@
 
                 // verify the update
                 Webhook singleWebhook = await provider.GetWebhookAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhook.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(singleWebhook);
-                Assert.AreEqual(webhook.Id, singleWebhook.Id);
-                Assert.AreEqual(updatedName, singleWebhook.Name);
-                Assert.AreEqual(0, singleWebhook.Metadata.Count);
+                Assert.NotNull(singleWebhook);
+                Assert.Equal(webhook.Id, singleWebhook.Id);
+                Assert.Equal(updatedName, singleWebhook.Name);
+                Assert.Equal(0, singleWebhook.Metadata.Count);
 
                 // update the webhook metadata
                 Dictionary<string, string> updatedMetadata = new Dictionary<string, string> { { "My metadata", "Value ­²" } };
@@ -968,10 +967,10 @@
 
                 // verify the update
                 singleWebhook = await provider.GetWebhookAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhook.Id, cancellationTokenSource.Token);
-                Assert.IsNotNull(singleWebhook);
-                Assert.AreEqual(webhook.Id, singleWebhook.Id);
-                Assert.AreEqual(updatedName, singleWebhook.Name);
-                CollectionAssert.AreEqual(updatedMetadata, singleWebhook.Metadata);
+                Assert.NotNull(singleWebhook);
+                Assert.Equal(webhook.Id, singleWebhook.Id);
+                Assert.Equal(updatedName, singleWebhook.Name);
+                CollectionAssert.Equal(updatedMetadata, singleWebhook.Metadata);
 
                 // delete the webhook
                 await provider.DeleteWebhookAsync(scalingGroup.Id, scalingGroup.ScalingPolicies[0].Id, webhook.Id, cancellationTokenSource.Token);

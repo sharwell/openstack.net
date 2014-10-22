@@ -1,9 +1,8 @@
 ﻿namespace OpenStackNetTests.Live
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
 
-    [TestClass]
-    public partial class ObjectStorageTests
+    public sealed partial class ObjectStorageTests : IDisposable
     {
         private LiveTestConfiguration _configuration;
 
@@ -18,14 +17,12 @@
             }
         }
 
-        [TestInitialize]
-        public void TestInitialize()
+        public ObjectStorageTests()
         {
             _configuration = LiveTestConfiguration.LoadDefaultConfiguration();
         }
 
-        [TestCleanup]
-        public void TestCleanup()
+        public void Dispose()
         {
         }
     }

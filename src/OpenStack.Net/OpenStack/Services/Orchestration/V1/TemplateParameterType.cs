@@ -15,7 +15,7 @@ namespace OpenStack.Services.Orchestration.V1
     /// <threadsafety static="true" instance="false"/>
     /// <preliminary/>
     [JsonConverter(typeof(TemplateParameterType.Converter))]
-    public sealed class TemplateParameterType : ExtensibleEnum<TemplateParameterType>
+    public sealed class TemplateParameterType : ExtensibleEnum<TemplateParameterType>, ITemplateParameterType
     {
         private static readonly ConcurrentDictionary<string, TemplateParameterType> _values =
             new ConcurrentDictionary<string, TemplateParameterType>(StringComparer.OrdinalIgnoreCase);

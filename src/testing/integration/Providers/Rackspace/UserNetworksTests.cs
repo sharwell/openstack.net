@@ -26,26 +26,26 @@
         /// </summary>
         private const string UnitTestNetworkPrefix = "UnitTestNetwork-";
 
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Networks)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Networks, "")]
         public void TestListNetworks()
         {
             INetworksProvider provider = Bootstrapper.CreateNetworksProvider();
             IEnumerable<CloudNetwork> networks = provider.ListNetworks();
-            Assert.IsNotNull(networks);
+            Assert.NotNull(networks);
             if (!networks.Any())
-                Assert.Inconclusive("The test could not proceed because the specified account and/or region does not appear to contain any configured networks.");
+                Assert.False(true, "The test could not proceed because the specified account and/or region does not appear to contain any configured networks.");
 
             Console.WriteLine("Networks");
             foreach (CloudNetwork network in networks)
             {
-                Assert.IsNotNull(network);
+                Assert.NotNull(network);
 
                 Console.WriteLine("    {0}: {1} ({2})", network.Id, network.Label, network.Cidr);
 
-                Assert.IsFalse(string.IsNullOrEmpty(network.Id));
-                Assert.IsFalse(string.IsNullOrEmpty(network.Label));
+                Assert.False(string.IsNullOrEmpty(network.Id));
+                Assert.False(string.IsNullOrEmpty(network.Label));
 
                 if (!string.IsNullOrEmpty(network.Cidr))
                     CloudNetworksValidator.Default.ValidateCidr(network.Cidr);
@@ -57,9 +57,9 @@
         /// <see cref="INetworksProvider.ShowNetwork"/>, and <see cref="INetworksProvider.DeleteNetwork"/>
         /// methods.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.User)]
-        [TestCategory(TestCategories.Networks)]
+        [Fact]
+        [Trait(TestCategories.User, "")]
+        [Trait(TestCategories.Networks, "")]
         public void TestBasicFunctionality()
         {
             INetworksProvider provider = Bootstrapper.CreateNetworksProvider();
@@ -74,35 +74,35 @@
             catch (BadServiceRequestException ex)
             {
                 if (ex.Message == "Quota exceeded, too many networks.")
-                    Assert.Inconclusive("The required test network could not be created due to a quota.");
+                    Assert.False(true, "The required test network could not be created due to a quota.");
 
                 throw;
             }
 
-            Assert.IsNotNull(network);
+            Assert.NotNull(network);
 
             CloudNetwork showNetwork = provider.ShowNetwork(network.Id);
-            Assert.IsNotNull(showNetwork);
-            Assert.AreEqual(network.Id, showNetwork.Id);
-            Assert.AreEqual(network.Label, showNetwork.Label);
-            Assert.AreEqual(network.Cidr, showNetwork.Cidr);
+            Assert.NotNull(showNetwork);
+            Assert.Equal(network.Id, showNetwork.Id);
+            Assert.Equal(network.Label, showNetwork.Label);
+            Assert.Equal(network.Cidr, showNetwork.Cidr);
         }
 
         /// <summary>
         /// This unit test deletes all the networks created by the unit tests in this class.
         /// These are identified by the prefix <see cref="UnitTestNetworkPrefix"/>.
         /// </summary>
-        [TestMethod]
-        [TestCategory(TestCategories.Cleanup)]
+        [Fact]
+        [Trait(TestCategories.Cleanup, "")]
         public void CleanupTestNetworks()
         {
             INetworksProvider provider = Bootstrapper.CreateNetworksProvider();
             IEnumerable<CloudNetwork> networks = provider.ListNetworks();
-            Assert.IsNotNull(networks);
+            Assert.NotNull(networks);
 
             foreach (CloudNetwork network in networks)
             {
-                Assert.IsNotNull(network);
+                Assert.NotNull(network);
                 if (!network.Label.StartsWith(UnitTestNetworkPrefix))
                     continue;
 

@@ -1,18 +1,15 @@
 ﻿namespace OpenStackNetTests.Live
 {
+    using System;
     using System.Threading;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using OpenStackNetTests.Unit;
     using OpenStackNetTests.Unit.Simulator.IdentityService.V2;
     using OpenStackNetTests.Unit.Simulator.ObjectStorageService.V1;
+    using Xunit;
 
-    [TestClass]
-    public partial class ObjectStorageTests
+    public sealed partial class ObjectStorageTests : IUseFixture<ObjectStorageTests.ObjectStorageFixture>
     {
-        private SimulatedIdentityService _identityService;
-        private SimulatedObjectStorageService _objectStorageService;
-
         internal TestCredentials Credentials
         {
             get
@@ -21,24 +18,32 @@
             }
         }
 
-        [TestInitialize]
-        public void TestInitialize()
+        public void SetFixture(ObjectStorageFixture data)
         {
-            _identityService = new SimulatedIdentityService();
-            _identityService.StartAsync(CancellationToken.None);
-
-            _objectStorageService = new SimulatedObjectStorageService(_identityService);
-            _objectStorageService.StartAsync(CancellationToken.None);
         }
 
-        [TestCleanup]
-        public void TestCleanup()
+        public class ObjectStorageFixture : IDisposable
         {
-            _identityService.Dispose();
-            _identityService = null;
+            private SimulatedIdentityService _identityService;
+            private SimulatedObjectStorageService _objectStorageService;
 
-            _objectStorageService.Dispose();
-            _objectStorageService = null;
+            public ObjectStorageFixture()
+            {
+                _identityService = new SimulatedIdentityService();
+                _identityService.StartAsync(CancellationToken.None);
+
+                _objectStorageService = new SimulatedObjectStorageService(_identityService);
+                _objectStorageService.StartAsync(CancellationToken.None);
+            }
+
+            public void Dispose()
+            {
+                _identityService.Dispose();
+                _identityService = null;
+
+                _objectStorageService.Dispose();
+                _objectStorageService = null;
+            }
         }
     }
 }

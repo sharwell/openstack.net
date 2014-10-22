@@ -231,6 +231,12 @@
     <Compile Include="OpenStack\Services\Orchestration\V1\GetStackApiCall.cs" />
     <Compile Include="OpenStack\Services\Orchestration\V1\GetStackTemplateApiCall.cs" />
     <Compile Include="OpenStack\Services\Orchestration\V1\IOrchestrationService.cs" />
+    <Compile Include="OpenStack\Services\Orchestration\V1\ITemplate.cs" />
+    <Compile Include="OpenStack\Services\Orchestration\V1\ITemplateOutput.cs" />
+    <Compile Include="OpenStack\Services\Orchestration\V1\ITemplateParameter.cs" />
+    <Compile Include="OpenStack\Services\Orchestration\V1\ITemplateParameterGroup.cs" />
+    <Compile Include="OpenStack\Services\Orchestration\V1\ITemplateParameterType.cs" />
+    <Compile Include="OpenStack\Services\Orchestration\V1\ITemplateResource.cs" />
     <Compile Include="OpenStack\Services\Orchestration\V1\LengthConstraint.cs" />
     <Compile Include="OpenStack\Services\Orchestration\V1\ListDeploymentsApiCall.cs" />
     <Compile Include="OpenStack\Services\Orchestration\V1\ListEventsApiCall.cs" />

@@ -1,15 +1,19 @@
 ﻿namespace OpenStackNetTests.Live
 {
+    using System;
     using System.Threading;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using OpenStackNetTests.Unit;
     using OpenStackNetTests.Unit.Simulator.IdentityService;
 
-    [TestClass]
-    public partial class BaseIdentityTests
+    public partial class BaseIdentityTests : IDisposable
     {
         private SimulatedBaseIdentityService _simulator;
+
+        public BaseIdentityTests()
+        {
+            TestInitialize();
+        }
 
         internal TestCredentials Credentials
         {
@@ -19,14 +23,26 @@
             }
         }
 
-        [TestInitialize]
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                TestCleanup();
+            }
+        }
+
         public void TestInitialize()
         {
             _simulator = new SimulatedBaseIdentityService(5000);
             _simulator.StartAsync(CancellationToken.None);
         }
 
-        [TestCleanup]
         public void TestCleanup()
         {
             _simulator.Dispose();
