@@ -272,9 +272,13 @@
                     if (resources.Count == 0)
                         continue;
 
-                    foundResources = true;
-                    foreach (var resource in resources)
+                    if (!foundResources)
                     {
+                        foundResources = true;
+                        foreach (var resource in resources)
+                        {
+                            await service.GetResourceAsync(stack.Name, stack.Id, resource.Name, cancellationToken);
+                        }
                     }
                 }
 
@@ -899,9 +903,23 @@
 
                 Assert.True(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
 
+                ContainerName updatedContainerName = new ContainerName(ObjectStorageTests.TestContainerPrefix + Path.GetRandomFileName());
+                Assert.False(await ContainerExistsAsync(objectStorageService, updatedContainerName, cancellationToken));
+
+                IDictionary<string, string> updatedParameters = new Dictionary<string, string>
+                    {
+                        { "name", updatedContainerName.Value }
+                    };
+                StackData updatedStackData = new StackData(stackName, templateUri, template, environment, files, updatedParameters, timeout, disableRollback);
+                await service.UpdateStackAsync(stackName, stack.Id, updatedStackData, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
+
+                Assert.True(await ContainerExistsAsync(objectStorageService, updatedContainerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+
                 await service.RemoveStackAsync(stackName, stack.Id, AsyncCompletionOption.RequestCompleted, cancellationToken, null);
 
                 Assert.False(await ContainerExistsAsync(objectStorageService, containerName, cancellationToken));
+                Assert.False(await ContainerExistsAsync(objectStorageService, updatedContainerName, cancellationToken));
             }
         }
 
