@@ -57,4 +57,5 @@ if (-not (Test-Path 'nuget')) {
 	mkdir "nuget"
 }
 
-&$nuget 'pack' '..\src\OpenStack.Net\OpenStack.Net.nuspec' '-OutputDirectory' 'nuget' '-Prop' "Configuration=$BuildConfig" '-Version' "$Version" '-Symbols'
+&$nuget 'pack' '..\src\OpenStack.Net\OpenStack.Net.V2.nuspec' '-OutputDirectory' 'nuget' '-Prop' "Configuration=$BuildConfig" '-Version' "$Version" '-Symbols'
+&$nuget 'pack' '..\src\corelib\corelib.nuspec' '-OutputDirectory' 'nuget' '-Prop' "Configuration=$BuildConfig" '-Version' "$Version1" '-Symbols'

@@ -5,4 +5,4 @@ If ($Version.EndsWith('-dev')) {
 	Exit 1
 }
 
-..\src\.nuget\NuGet.exe 'push' ".\nuget\openstack.net.$Version.nupkg"
+..\src\.nuget\NuGet.exe 'push' ".\nuget\OpenStack.Net.V2.$Version.nupkg"
