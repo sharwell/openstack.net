@@ -97,6 +97,7 @@
     <Compile Include="OpenStack\ObjectModel\Converters\AddressFamilySimpleConverter.cs" />
     <Compile Include="OpenStack\ObjectModel\Converters\HttpMethodConverter.cs" />
     <Compile Include="OpenStack\ObjectModel\Converters\NamespaceDoc.cs" />
+    <Compile Include="OpenStack\ObjectModel\Converters\OptionalConverter.cs" />
     <Compile Include="OpenStack\ObjectModel\Converters\SimpleStringJsonConverter`1.cs" />
     <Compile Include="OpenStack\ObjectModel\ExtensibleEnum`1.cs" />
     <Compile Include="OpenStack\ObjectModel\ExtensibleJsonObject.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="OpenStack\ObjectModel\JsonHome\ResourceHints.cs" />
     <Compile Include="OpenStack\ObjectModel\JsonHome\ResourceObject.cs" />
     <Compile Include="OpenStack\ObjectModel\NamespaceDoc.cs" />
+    <Compile Include="OpenStack\ObjectModel\Optional`1.cs" />
     <Compile Include="OpenStack\ObjectModel\ResourceIdentifier`1.cs" />
     <Compile Include="OpenStack\Security\Authentication\DelegatingPartialAuthenticationService.cs" />
     <Compile Include="OpenStack\Security\Authentication\IAuthenticationService.cs" />
