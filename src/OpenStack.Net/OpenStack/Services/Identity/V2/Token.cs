@@ -59,7 +59,7 @@ namespace OpenStack.Services.Identity.V2
         /// as the credentials.</para>
         /// </remarks>
         /// <param name="id">The unique ID of the token.</param>
-        public Token(TokenId id)
+        public Token(Optional<TokenId> id)
         {
             _id = id;
         }
@@ -75,7 +75,7 @@ namespace OpenStack.Services.Identity.V2
         /// <param name="extensionData">The extension data.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="extensionData"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="extensionData"/> contains any <see langword="null"/> values.</exception>
-        public Token(TokenId id, params JProperty[] extensionData)
+        public Token(Optional<TokenId> id, params JProperty[] extensionData)
             : base(extensionData)
         {
             _id = id;
@@ -91,7 +91,7 @@ namespace OpenStack.Services.Identity.V2
         /// <param name="id">The unique ID of the token.</param>
         /// <param name="extensionData">The extension data.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="extensionData"/> is <see langword="null"/>.</exception>
-        public Token(TokenId id, IDictionary<string, JToken> extensionData)
+        public Token(Optional<TokenId> id, IDictionary<string, JToken> extensionData)
             : base(extensionData)
         {
             _id = id;

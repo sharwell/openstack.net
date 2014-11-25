@@ -60,7 +60,7 @@
         /// <exception cref="ArgumentNullException">If <paramref name="extensionData"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="extensionData"/> contains any <see langword="null"/> values.</exception>
         public AuthenticationData(params JProperty[] extensionData)
-            : this(default(string), default(ProjectId), default(PasswordCredentials), default(Token), extensionData)
+            : this(Optional<string>.Unset, Optional<ProjectId>.Unset, Optional<PasswordCredentials>.Unset, Optional<Token>.Unset, extensionData)
         {
         }
 
@@ -75,7 +75,7 @@
         /// <param name="extensionData">The extension data.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="extensionData"/> is <see langword="null"/>.</exception>
         public AuthenticationData(IDictionary<string, JToken> extensionData)
-            : this(default(string), default(ProjectId), default(PasswordCredentials), default(Token), extensionData)
+            : this(Optional<string>.Unset, Optional<ProjectId>.Unset, Optional<PasswordCredentials>.Unset, Optional<Token>.Unset, extensionData)
         {
         }
 
@@ -83,8 +83,8 @@
         /// Initializes a new instance of the <see cref="AuthenticationData"/> class with the specified credentials.
         /// </summary>
         /// <param name="passwordCredentials">The credentials to use for authentication.</param>
-        public AuthenticationData(PasswordCredentials passwordCredentials)
-            : this(default(string), default(ProjectId), passwordCredentials, default(Token))
+        public AuthenticationData(Optional<PasswordCredentials> passwordCredentials)
+            : this(Optional<string>.Unset, Optional<ProjectId>.Unset, passwordCredentials, Optional<Token>.Unset)
         {
         }
 
@@ -92,8 +92,8 @@
         /// Initializes a new instance of the <see cref="AuthenticationData"/> class with the specified token.
         /// </summary>
         /// <param name="token">The <see cref="V2.Token"/> to use for authentication.</param>
-        public AuthenticationData(Token token)
-            : this(default(string), default(ProjectId), default(PasswordCredentials), token)
+        public AuthenticationData(Optional<Token> token)
+            : this(Optional<string>.Unset, Optional<ProjectId>.Unset, Optional<PasswordCredentials>.Unset, token)
         {
         }
 
@@ -103,8 +103,8 @@
         /// </summary>
         /// <param name="tenantName">The tenant name.</param>
         /// <param name="passwordCredentials">The credentials to use for authentication.</param>
-        public AuthenticationData(string tenantName, PasswordCredentials passwordCredentials)
-            : this(tenantName, default(ProjectId), passwordCredentials, default(Token))
+        public AuthenticationData(Optional<string> tenantName, Optional<PasswordCredentials> passwordCredentials)
+            : this(tenantName, Optional<ProjectId>.Unset, passwordCredentials, Optional<Token>.Unset)
         {
         }
 
@@ -114,8 +114,8 @@
         /// </summary>
         /// <param name="tenantName">The tenant name.</param>
         /// <param name="token">The <see cref="V2.Token"/> to use for authentication.</param>
-        public AuthenticationData(string tenantName, Token token)
-            : this(tenantName, default(ProjectId), default(PasswordCredentials), token)
+        public AuthenticationData(Optional<string> tenantName, Optional<Token> token)
+            : this(tenantName, Optional<ProjectId>.Unset, Optional<PasswordCredentials>.Unset, token)
         {
         }
 
@@ -125,8 +125,8 @@
         /// </summary>
         /// <param name="tenantId">The tenant ID.</param>
         /// <param name="passwordCredentials">The credentials to use for authentication.</param>
-        public AuthenticationData(ProjectId tenantId, PasswordCredentials passwordCredentials)
-            : this(default(string), tenantId, passwordCredentials, default(Token))
+        public AuthenticationData(Optional<ProjectId> tenantId, Optional<PasswordCredentials> passwordCredentials)
+            : this(Optional<string>.Unset, tenantId, passwordCredentials, Optional<Token>.Unset)
         {
         }
 
@@ -136,8 +136,8 @@
         /// </summary>
         /// <param name="tenantId">The tenant ID.</param>
         /// <param name="token">The <see cref="V2.Token"/> to use for authentication.</param>
-        public AuthenticationData(ProjectId tenantId, Token token)
-            : this(default(string), tenantId, default(PasswordCredentials), token)
+        public AuthenticationData(Optional<ProjectId> tenantId, Optional<Token> token)
+            : this(Optional<string>.Unset, tenantId, Optional<PasswordCredentials>.Unset, token)
         {
         }
 
@@ -156,7 +156,7 @@
         /// <param name="extensionData">The extension data.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="extensionData"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="extensionData"/> contains any <see langword="null"/> values.</exception>
-        public AuthenticationData(string tenantName, ProjectId tenantId, PasswordCredentials passwordCredentials, Token token, params JProperty[] extensionData)
+        public AuthenticationData(Optional<string> tenantName, Optional<ProjectId> tenantId, Optional<PasswordCredentials> passwordCredentials, Optional<Token> token, params JProperty[] extensionData)
             : base(extensionData)
         {
             _tenantName = tenantName;
@@ -179,7 +179,7 @@
         /// <param name="token">The <see cref="V2.Token"/> to use for authentication.</param>
         /// <param name="extensionData">The extension data.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="extensionData"/> is <see langword="null"/>.</exception>
-        public AuthenticationData(string tenantName, ProjectId tenantId, PasswordCredentials passwordCredentials, Token token, IDictionary<string, JToken> extensionData)
+        public AuthenticationData(Optional<string> tenantName, Optional<ProjectId> tenantId, Optional<PasswordCredentials> passwordCredentials, Optional<Token> token, IDictionary<string, JToken> extensionData)
             : base(extensionData)
         {
             _tenantName = tenantName;

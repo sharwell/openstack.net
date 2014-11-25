@@ -41,7 +41,7 @@ namespace OpenStack.Services.Identity.V2
         /// </summary>
         /// <param name="username">The username.</param>
         /// <param name="password">The password.</param>
-        public PasswordCredentials(string username, string password)
+        public PasswordCredentials(Optional<string> username, Optional<string> password)
         {
             _username = username;
             _password = password;
@@ -56,7 +56,7 @@ namespace OpenStack.Services.Identity.V2
         /// <param name="extensionData">The extension data.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="extensionData"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">If <paramref name="extensionData"/> contains any <see langword="null"/> values.</exception>
-        public PasswordCredentials(string username, string password, params JProperty[] extensionData)
+        public PasswordCredentials(Optional<string> username, Optional<string> password, params JProperty[] extensionData)
             : base(extensionData)
         {
             _username = username;
@@ -71,7 +71,7 @@ namespace OpenStack.Services.Identity.V2
         /// <param name="password">The password.</param>
         /// <param name="extensionData">The extension data.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="extensionData"/> is <see langword="null"/>.</exception>
-        public PasswordCredentials(string username, string password, IDictionary<string, JToken> extensionData)
+        public PasswordCredentials(Optional<string> username, Optional<string> password, IDictionary<string, JToken> extensionData)
             : base(extensionData)
         {
             _username = username;
