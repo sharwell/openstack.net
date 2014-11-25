@@ -20,31 +20,31 @@ namespace OpenStack.Services.Identity
         /// This is the backing field for the <see cref="Id"/> property.
         /// </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private ApiVersionId _id;
+        private Optional<ApiVersionId> _id;
 
         /// <summary>
         /// This is the backing field for the <see cref="Status"/> property.
         /// </summary>
         [JsonProperty("status", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private ApiStatus _status;
+        private Optional<ApiStatus> _status;
 
         /// <summary>
         /// This is the backing field for the <see cref="LastModified"/> property.
         /// </summary>
         [JsonProperty("updated", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private DateTimeOffset? _updated;
+        private Optional<DateTimeOffset?> _updated;
 
         /// <summary>
         /// This is the backing field for the <see cref="MediaTypes"/> property.
         /// </summary>
         [JsonProperty("media-types", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private MediaType[] _mediaTypes;
+        private Optional<MediaType[]> _mediaTypes;
 
         /// <summary>
         /// This is the backing field for the <see cref="Links"/> property.
         /// </summary>
         [JsonProperty("links", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private Link[] _links;
+        private Optional<Link[]> _links;
 #pragma warning restore 649
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                return _id;
+                return _id.GetValueOrDefault();
             }
         }
 
@@ -82,7 +82,7 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                return _status;
+                return _status.GetValueOrDefault();
             }
         }
 
@@ -97,7 +97,7 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                return _updated;
+                return _updated.GetValueOrDefault();
             }
         }
 
@@ -114,10 +114,10 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                if (_mediaTypes == null)
+                if (_mediaTypes.GetValueOrDefault() == null)
                     return null;
 
-                return new ReadOnlyCollection<MediaType>(_mediaTypes);
+                return new ReadOnlyCollection<MediaType>(_mediaTypes.GetValueOrDefault());
             }
         }
 
@@ -134,10 +134,10 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                if (_links == null)
+                if (_links.GetValueOrDefault() == null)
                     return null;
 
-                return new ReadOnlyCollection<Link>(_links);
+                return new ReadOnlyCollection<Link>(_links.GetValueOrDefault());
             }
         }
     }

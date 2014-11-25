@@ -19,25 +19,25 @@
         /// This is the backing field for the <see cref="TenantName"/> property.
         /// </summary>
         [JsonProperty("tenantName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _tenantName;
+        private Optional<string> _tenantName;
 
         /// <summary>
         /// This is the backing field for the <see cref="TenantId"/> property.
         /// </summary>
         [JsonProperty("tenantId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private ProjectId _tenantId;
+        private Optional<ProjectId> _tenantId;
 
         /// <summary>
         /// This is the backing field for the <see cref="PasswordCredentials"/> property.
         /// </summary>
         [JsonProperty("passwordCredentials", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private PasswordCredentials _passwordCredentials;
+        private Optional<PasswordCredentials> _passwordCredentials;
 
         /// <summary>
         /// This is the backing field for the <see cref="Token"/> property.
         /// </summary>
         [JsonProperty("token", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private Token _token;
+        private Optional<Token> _token;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationData"/> class
@@ -199,7 +199,7 @@
         {
             get
             {
-                return _tenantName;
+                return _tenantName.GetValueOrDefault();
             }
         }
 
@@ -214,7 +214,7 @@
         {
             get
             {
-                return _tenantId;
+                return _tenantId.GetValueOrDefault();
             }
         }
 
@@ -229,7 +229,7 @@
         {
             get
             {
-                return _passwordCredentials;
+                return _passwordCredentials.GetValueOrDefault();
             }
         }
 
@@ -244,7 +244,7 @@
         {
             get
             {
-                return _token;
+                return _token.GetValueOrDefault();
             }
         }
     }

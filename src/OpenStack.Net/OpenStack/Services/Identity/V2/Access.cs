@@ -21,25 +21,25 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="Token"/> property.
         /// </summary>
         [JsonProperty("token", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private Token _token;
+        private Optional<Token> _token;
 
         /// <summary>
         /// This is the backing field for the <see cref="ServiceCatalog"/> property.
         /// </summary>
         [JsonProperty("serviceCatalog", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private ServiceCatalogEntry[] _serviceCatalog;
+        private Optional<ServiceCatalogEntry[]> _serviceCatalog;
 
         /// <summary>
         /// This is the backing field for the <see cref="User"/> property.
         /// </summary>
         [JsonProperty("user", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private User _user;
+        private Optional<User> _user;
 
         /// <summary>
         /// This is the backing field for the <see cref="Metadata"/> property.
         /// </summary>
         [JsonProperty("metadata", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private Dictionary<string, JToken> _metadata;
+        private Optional<Dictionary<string, JToken>> _metadata;
 #pragma warning restore 649
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _token;
+                return _token.GetValueOrDefault();
             }
         }
 
@@ -81,10 +81,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_serviceCatalog == null)
+                if (_serviceCatalog.GetValueOrDefault() == null)
                     return null;
 
-                return new ReadOnlyCollection<ServiceCatalogEntry>(_serviceCatalog);
+                return new ReadOnlyCollection<ServiceCatalogEntry>(_serviceCatalog.GetValueOrDefault());
             }
         }
 
@@ -99,7 +99,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _user;
+                return _user.GetValueOrDefault();
             }
         }
 
@@ -114,10 +114,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_metadata == null)
+                if (_metadata.GetValueOrDefault() == null)
                     return null;
 
-                return new ReadOnlyDictionary<string, JToken>(_metadata);
+                return new ReadOnlyDictionary<string, JToken>(_metadata.GetValueOrDefault());
             }
         }
     }

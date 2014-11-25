@@ -22,7 +22,7 @@ namespace OpenStack.Services.Identity
         /// This is the backing field for the <see cref="Version"/> property.
         /// </summary>
         [JsonProperty("version", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private ApiVersion _version;
+        private Optional<ApiVersion> _version;
 #pragma warning restore 649
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                return _version;
+                return _version.GetValueOrDefault();
             }
         }
     }

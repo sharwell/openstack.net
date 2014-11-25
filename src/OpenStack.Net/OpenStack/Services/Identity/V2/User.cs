@@ -17,31 +17,31 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="Id"/> property.
         /// </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private UserId _id;
+        private Optional<UserId> _id;
 
         /// <summary>
         /// This is the backing field for the <see cref="Username"/> property.
         /// </summary>
         [JsonProperty("username", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _username;
+        private Optional<string> _username;
 
         /// <summary>
         /// This is the backing field for the <see cref="Name"/> property.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _name;
+        private Optional<string> _name;
 
         /// <summary>
         /// This is the backing field for the <see cref="Roles"/> property.
         /// </summary>
         [JsonProperty("roles", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private Role[] _roles;
+        private Optional<Role[]> _roles;
 
         /// <summary>
         /// This is the backing field for the <see cref="RolesLinks"/> property.
         /// </summary>
         [JsonProperty("roles_links", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private Link[] _rolesLinks;
+        private Optional<Link[]> _rolesLinks;
 #pragma warning restore 649
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _id;
+                return _id.GetValueOrDefault();
             }
         }
 
@@ -79,7 +79,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _username;
+                return _username.GetValueOrDefault();
             }
         }
 
@@ -94,7 +94,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _name;
+                return _name.GetValueOrDefault();
             }
         }
 
@@ -109,10 +109,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_roles == null)
+                if (_roles.GetValueOrDefault() == null)
                     return null;
 
-                return new ReadOnlyCollection<Role>(_roles);
+                return new ReadOnlyCollection<Role>(_roles.GetValueOrDefault());
             }
         }
 
@@ -129,10 +129,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_rolesLinks == null)
+                if (_rolesLinks.GetValueOrDefault() == null)
                     return null;
 
-                return new ReadOnlyCollection<Link>(_rolesLinks);
+                return new ReadOnlyCollection<Link>(_rolesLinks.GetValueOrDefault());
             }
         }
     }

@@ -18,25 +18,25 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="Alias"/> property.
         /// </summary>
         [JsonProperty("alias", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private ExtensionAlias _alias;
+        private Optional<ExtensionAlias> _alias;
 
         /// <summary>
         /// This is the backing field for the <see cref="Name"/> property.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _name;
+        private Optional<string> _name;
 
         /// <summary>
         /// This is the backing field for the <see cref="Namespace"/> property.
         /// </summary>
         [JsonProperty("namespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _namespace;
+        private Optional<string> _namespace;
 
         /// <summary>
         /// This is the backing field for the <see cref="Description"/> property.
         /// </summary>
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _description;
+        private Optional<string> _description;
 
         /// <summary>
         /// This is the backing field for the <see cref="LastModified"/> property.
@@ -47,7 +47,7 @@ namespace OpenStack.Services.Identity.V2
         /// cases where the <see cref="LastModified"/> property is accessed.</para>
         /// </remarks>
         [JsonProperty("updated", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _updated;
+        private Optional<string> _updated;
 #pragma warning restore 649
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _alias;
+                return _alias.GetValueOrDefault();
             }
         }
 
@@ -85,7 +85,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _name;
+                return _name.GetValueOrDefault();
             }
         }
 
@@ -101,10 +101,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_namespace == null)
+                if (_namespace.GetValueOrDefault() == null)
                     return null;
 
-                return new Uri(_namespace);
+                return new Uri(_namespace.GetValueOrDefault());
             }
         }
 
@@ -119,7 +119,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _description;
+                return _description.GetValueOrDefault();
             }
         }
 
@@ -134,10 +134,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_updated == null)
+                if (_updated.GetValueOrDefault() == null)
                     return null;
 
-                return JsonConvert.DeserializeObject<DateTimeOffset>(_updated);
+                return JsonConvert.DeserializeObject<DateTimeOffset>(_updated.GetValueOrDefault());
             }
         }
     }

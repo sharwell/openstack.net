@@ -10,25 +10,25 @@
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _name;
+        private Optional<string> _name;
 
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _description;
+        private Optional<string> _description;
 
         [JsonProperty("vendor", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _vendor;
+        private Optional<string> _vendor;
 
         [JsonProperty("baseAddress", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _baseAddress;
+        private Optional<string> _baseAddress;
 
         [JsonProperty("defaultRegion", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _defaultRegion;
+        private Optional<string> _defaultRegion;
 
         [JsonProperty("authRequest", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private AuthenticationRequest _authRequest;
+        private Optional<AuthenticationRequest> _authRequest;
 
         [JsonProperty("proxy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private TestProxy _proxy;
+        private Optional<TestProxy> _proxy;
 #pragma warning restore 649
 
         /// <summary>
@@ -44,7 +44,7 @@
         {
             get
             {
-                return _name;
+                return _name.GetValueOrDefault();
             }
         }
 
@@ -52,7 +52,7 @@
         {
             get
             {
-                return _description;
+                return _description.GetValueOrDefault();
             }
         }
 
@@ -60,7 +60,7 @@
         {
             get
             {
-                return _vendor;
+                return _vendor.GetValueOrDefault();
             }
         }
 
@@ -68,10 +68,10 @@
         {
             get
             {
-                if (_baseAddress == null)
+                if (_baseAddress.GetValueOrDefault() == null)
                     return null;
 
-                return new Uri(_baseAddress);
+                return new Uri(_baseAddress.GetValueOrDefault());
             }
         }
 
@@ -79,7 +79,7 @@
         {
             get
             {
-                return _defaultRegion;
+                return _defaultRegion.GetValueOrDefault();
             }
         }
 
@@ -87,7 +87,7 @@
         {
             get
             {
-                return _authRequest;
+                return _authRequest.GetValueOrDefault();
             }
         }
 
@@ -95,7 +95,7 @@
         {
             get
             {
-                return _proxy;
+                return _proxy.GetValueOrDefault();
             }
         }
     }

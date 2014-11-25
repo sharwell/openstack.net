@@ -20,26 +20,26 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="Id"/> property.
         /// </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private TokenId _id;
+        private Optional<TokenId> _id;
 
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         /// <summary>
         /// This is the backing field for the <see cref="IssuedAt"/> property.
         /// </summary>
         [JsonProperty("issued_at", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private DateTimeOffset? _issuedAt;
+        private Optional<DateTimeOffset?> _issuedAt;
 
         /// <summary>
         /// This is the backing field for the <see cref="ExpiresAt"/> property.
         /// </summary>
         [JsonProperty("expires", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private DateTimeOffset? _expires;
+        private Optional<DateTimeOffset?> _expires;
 
         /// <summary>
         /// This is the backing field for the <see cref="Tenant"/> property.
         /// </summary>
         [JsonProperty("tenant", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private Tenant _tenant;
+        private Optional<Tenant> _tenant;
 #pragma warning restore 649
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _id;
+                return _id.GetValueOrDefault();
             }
         }
 
@@ -127,7 +127,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _issuedAt;
+                return _issuedAt.GetValueOrDefault();
             }
         }
 
@@ -151,7 +151,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _expires;
+                return _expires.GetValueOrDefault();
             }
         }
 
@@ -166,7 +166,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _tenant;
+                return _tenant.GetValueOrDefault();
             }
         }
     }

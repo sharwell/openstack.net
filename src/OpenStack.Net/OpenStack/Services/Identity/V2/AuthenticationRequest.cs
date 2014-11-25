@@ -26,7 +26,7 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="AuthenticationData"/> property.
         /// </summary>
         [JsonProperty("auth", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private AuthenticationData _auth;
+        private Optional<AuthenticationData> _auth;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationRequest"/> class
@@ -94,7 +94,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _auth;
+                return _auth.GetValueOrDefault();
             }
         }
     }

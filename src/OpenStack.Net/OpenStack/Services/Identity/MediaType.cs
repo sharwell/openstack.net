@@ -17,13 +17,13 @@ namespace OpenStack.Services.Identity
         /// This is the backing field for the <see cref="Base"/> property.
         /// </summary>
         [JsonProperty("base", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _base;
+        private Optional<string> _base;
 
         /// <summary>
         /// This is the backing field for the <see cref="Type"/> property.
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _type;
+        private Optional<string> _type;
 #pragma warning restore 649
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                return _base;
+                return _base.GetValueOrDefault();
             }
         }
 
@@ -63,7 +63,7 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                return _type;
+                return _type.GetValueOrDefault();
             }
         }
     }

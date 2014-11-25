@@ -16,7 +16,7 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="Access"/> property.
         /// </summary>
         [JsonProperty("access", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private Access _access;
+        private Optional<Access> _access;
 #pragma warning restore 649
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _access;
+                return _access.GetValueOrDefault();
             }
         }
     }

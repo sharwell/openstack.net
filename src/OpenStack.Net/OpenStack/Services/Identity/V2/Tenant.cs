@@ -22,25 +22,25 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="Id"/> property.
         /// </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private ProjectId _id;
+        private Optional<ProjectId> _id;
 
         /// <summary>
         /// This is the backing field for the <see cref="Name"/> property.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _name;
+        private Optional<string> _name;
 
         /// <summary>
         /// This is the backing field for the <see cref="Description"/> property.
         /// </summary>
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _description;
+        private Optional<string> _description;
 
         /// <summary>
         /// This is the backing field for the <see cref="Enabled"/> property.
         /// </summary>
         [JsonProperty("enabled", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private bool? _enabled;
+        private Optional<bool?> _enabled;
 #pragma warning restore 649
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _id;
+                return _id.GetValueOrDefault();
             }
         }
 
@@ -78,7 +78,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _name;
+                return _name.GetValueOrDefault();
             }
         }
 
@@ -93,7 +93,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _description;
+                return _description.GetValueOrDefault();
             }
         }
 
@@ -110,7 +110,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _enabled;
+                return _enabled.GetValueOrDefault();
             }
         }
     }

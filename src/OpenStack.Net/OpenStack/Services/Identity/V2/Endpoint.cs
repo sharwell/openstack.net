@@ -18,31 +18,31 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="Id"/> property.
         /// </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private EndpointId _id;
+        private Optional<EndpointId> _id;
 
         /// <summary>
         /// This is the backing field for the <see cref="Region"/> property.
         /// </summary>
         [JsonProperty("region", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _region;
+        private Optional<string> _region;
 
         /// <summary>
         /// This is the backing field for the <see cref="PublicUrl"/> property.
         /// </summary>
         [JsonProperty("publicURL", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _publicUrl;
+        private Optional<string> _publicUrl;
 
         /// <summary>
         /// This is the backing field for the <see cref="InternalUrl"/> property.
         /// </summary>
         [JsonProperty("internalURL", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _internalUrl;
+        private Optional<string> _internalUrl;
 
         /// <summary>
         /// This is the backing field for the <see cref="AdminUrl"/> property.
         /// </summary>
         [JsonProperty("adminURL", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _adminUrl;
+        private Optional<string> _adminUrl;
 #pragma warning restore 649
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _id;
+                return _id.GetValueOrDefault();
             }
         }
 
@@ -80,7 +80,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _region;
+                return _region.GetValueOrDefault();
             }
         }
 
@@ -95,10 +95,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_publicUrl == null)
+                if (_publicUrl.GetValueOrDefault() == null)
                     return null;
 
-                return new Uri(_publicUrl);
+                return new Uri(_publicUrl.GetValueOrDefault());
             }
         }
 
@@ -113,10 +113,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_internalUrl == null)
+                if (_internalUrl.GetValueOrDefault() == null)
                     return null;
 
-                return new Uri(_internalUrl);
+                return new Uri(_internalUrl.GetValueOrDefault());
             }
         }
 
@@ -131,10 +131,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_adminUrl == null)
+                if (_adminUrl.GetValueOrDefault() == null)
                     return null;
 
-                return new Uri(_adminUrl);
+                return new Uri(_adminUrl.GetValueOrDefault());
             }
         }
     }

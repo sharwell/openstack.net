@@ -12,13 +12,13 @@ namespace OpenStackNetTests.Live
     {
 #pragma warning disable 649 // Field 'fieldName' is never assigned to, and will always have its default value {value}
         [JsonProperty("address", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _address;
+        private Optional<string> _address;
 
         [JsonProperty("host", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _host;
+        private Optional<string> _host;
 
         [JsonProperty("port", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private int? _port;
+        private Optional<int?> _port;
 #pragma warning restore 649
 
         /// <summary>
@@ -34,10 +34,10 @@ namespace OpenStackNetTests.Live
         {
             get
             {
-                if (_address == null)
+                if (_address.GetValueOrDefault() == null)
                     return null;
 
-                return new Uri(_address);
+                return new Uri(_address.GetValueOrDefault());
             }
         }
 
@@ -45,7 +45,7 @@ namespace OpenStackNetTests.Live
         {
             get
             {
-                return _host;
+                return _host.GetValueOrDefault();
             }
         }
 
@@ -53,7 +53,7 @@ namespace OpenStackNetTests.Live
         {
             get
             {
-                return _port;
+                return _port.GetValueOrDefault();
             }
         }
 

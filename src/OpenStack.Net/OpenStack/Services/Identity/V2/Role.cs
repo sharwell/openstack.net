@@ -17,7 +17,7 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="Name"/> property.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _name;
+        private Optional<string> _name;
 #pragma warning restore 649
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _name;
+                return _name.GetValueOrDefault();
             }
         }
     }

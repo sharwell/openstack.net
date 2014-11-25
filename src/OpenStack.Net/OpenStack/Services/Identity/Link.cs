@@ -18,19 +18,19 @@ namespace OpenStack.Services.Identity
         /// This is the backing field for the <see cref="Target"/> property.
         /// </summary>
         [JsonProperty("href", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _href;
+        private Optional<string> _href;
 
         /// <summary>
         /// This is the backing field for the <see cref="Relation"/> property.
         /// </summary>
         [JsonProperty("rel", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _rel;
+        private Optional<string> _rel;
 
         /// <summary>
         /// This is the backing field for the <see cref="Type"/> property.
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _type;
+        private Optional<string> _type;
 #pragma warning restore 649
 
         /// <summary>
@@ -53,10 +53,10 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                if (_href == null)
+                if (_href.GetValueOrDefault() == null)
                     return null;
 
-                return new Uri(_href);
+                return new Uri(_href.GetValueOrDefault());
             }
         }
 
@@ -71,7 +71,7 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                return _rel;
+                return _rel.GetValueOrDefault();
             }
         }
 
@@ -86,7 +86,7 @@ namespace OpenStack.Services.Identity
         {
             get
             {
-                return _type;
+                return _type.GetValueOrDefault();
             }
         }
     }

@@ -19,25 +19,25 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="Type"/> property.
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _type;
+        private Optional<string> _type;
 
         /// <summary>
         /// This is the backing field for the <see cref="Name"/> property.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _name;
+        private Optional<string> _name;
 
         /// <summary>
         /// This is the backing field for the <see cref="Endpoints"/> property.
         /// </summary>
         [JsonProperty("endpoints", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private Endpoint[] _endpoints;
+        private Optional<Endpoint[]> _endpoints;
 
         /// <summary>
         /// This is the backing field for the <see cref="EndpointsLinks"/> property.
         /// </summary>
         [JsonProperty("endpoints_links", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private Link[] _endpointsLinks;
+        private Optional<Link[]> _endpointsLinks;
 #pragma warning restore 649
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _type;
+                return _type.GetValueOrDefault();
             }
         }
 
@@ -75,7 +75,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _name;
+                return _name.GetValueOrDefault();
             }
         }
 
@@ -91,10 +91,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_endpoints == null)
+                if (_endpoints.GetValueOrDefault() == null)
                     return null;
 
-                return new ReadOnlyCollection<Endpoint>(_endpoints);
+                return new ReadOnlyCollection<Endpoint>(_endpoints.GetValueOrDefault());
             }
         }
 
@@ -110,10 +110,10 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                if (_endpointsLinks == null)
+                if (_endpointsLinks.GetValueOrDefault() == null)
                     return null;
 
-                return new ReadOnlyCollection<Link>(_endpointsLinks);
+                return new ReadOnlyCollection<Link>(_endpointsLinks.GetValueOrDefault());
             }
         }
     }

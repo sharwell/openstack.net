@@ -19,13 +19,13 @@ namespace OpenStack.Services.Identity.V2
         /// This is the backing field for the <see cref="Username"/> property.
         /// </summary>
         [JsonProperty("username", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _username;
+        private Optional<string> _username;
 
         /// <summary>
         /// This is the backing field for the <see cref="Password"/> property.
         /// </summary>
         [JsonProperty("password", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        private string _password;
+        private Optional<string> _password;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PasswordCredentials"/> class
@@ -89,7 +89,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _username;
+                return _username.GetValueOrDefault();
             }
         }
 
@@ -104,7 +104,7 @@ namespace OpenStack.Services.Identity.V2
         {
             get
             {
-                return _password;
+                return _password.GetValueOrDefault();
             }
         }
     }
