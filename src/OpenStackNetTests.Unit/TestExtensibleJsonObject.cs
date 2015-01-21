@@ -80,12 +80,17 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(JsonSerializationException))]
         [TestCategory(TestCategories.Unit)]
         public void TestDeserializeMultipleValuesSameKey()
         {
             string @object = "{\"key\":\"value\",\"key\":\"value2\"}";
-            JsonConvert.DeserializeObject<BasicExtensibleJsonObject>(@object);
+            ExtensibleJsonObject result = JsonConvert.DeserializeObject<BasicExtensibleJsonObject>(@object);
+            Assert.AreEqual(1, result.ExtensionData.Count);
+            Assert.AreEqual("{\"key\":\"value2\"}", JsonConvert.SerializeObject(result, Formatting.None));
+            Assert.IsTrue(result.ExtensionData.ContainsKey("key"));
+            Assert.AreEqual("value2", result.ExtensionData["key"]);
+
+            Assert.IsFalse(result.ExtensionData.ContainsValue("value"));
         }
 
         [TestMethod]

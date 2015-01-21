@@ -240,7 +240,7 @@
 
             public void Add(string key, object value)
             {
-                _underlying._extensionData = _underlying._extensionData.Add(key, ToJToken(value));
+                _underlying._extensionData = _underlying._extensionData.SetItem(key, ToJToken(value));
             }
 
             public void Clear()
